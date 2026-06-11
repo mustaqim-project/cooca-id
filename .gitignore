@@ -12,53 +12,37 @@ __pycache__/
 *.out
 
 # Dependencies
-vendor/
 node_modules/
-.npm/
-.yarn/
-bower_components/
-composer.lock
+venv/
+.venv/
+.env
+.env.local
+*.env.*
 
-# Build directories
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Editors
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Build directories (common for various frameworks)
 dist/
 build/
 target/
-coverage/
-htmlcov/
-*.egg-info/
-
-# Environment specific
-.env
-.env.local
-.env.*
-.env~*
-.env.local~
-*.local
-
-# Editors and IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-*.log
-*~
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Laravel specific
-/storage/logs/*
-/bootstrap/cache/*
-public/storage
-
-# PHP specific
-.php_cs.cache
-.phpunit.result.cache
+.gradle/
+.mypy_cache/
+.pytest_cache/
 ```
