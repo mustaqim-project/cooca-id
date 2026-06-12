@@ -18,7 +18,7 @@ final class DashboardController extends Controller
     {
         $affiliator = Auth::guard('affiliator')->user();
 
-        return Inertia::render('Affiliator/Dashboard', [
+        return Inertia::render('Affiliator/Dashboard/Index', [
             'stats' => [
                 'total_referrals' => 0,
                 'total_commissions' => 0,

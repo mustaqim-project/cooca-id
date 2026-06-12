@@ -1,116 +1,30 @@
 ```
-# Dependencies
-node_modules/
+# Laravel-specific ignores
+vendor/
+composer.lock
+.env
+.env.*
+!.env.example
 
 # Build artifacts
-dist/
-build/
-target/
+public/css/
+public/js/
+public/build/
 
-# Editor/IDE files
+# Logs
+storage/logs/*
+bootstrap/cache/*
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*.tmp
 
-# Logs
-*.log
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.git/modules/
+# OS
 .DS_Store
-*.swp
-*~
-.pytest_cache/
-.hypothesis/
-.coverage*
-htmlcov/
-.pytest_cache/
-.mypy_cache/
-.eggs/
-eggs/
-parts/
-sdist/
-develop-eggs/
-.installed.cfg
-lib/
-lib64/
-.venv/
-venv/
-ENV/
-env/
-.ENV/
-.env/
-env.bak/
-venv.bak/
+Thumbs.db
 
-# Node.js specific
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-node_modules/
-dist/
-build/
-.nyc_output
-coverage/
-.nyc_output/
-coverage/
-.tap/
-.tap/
-.jscs/
-.jscs/
-.eslintcache
-.eslintcache
-.nodemon/
-.nodemon/
-.next/
-.next/
-.nuxt/
-.nuxt/
-.vuepress/dist
-.vuepress/dist
-.output
-.output
-.temp
-.temp
-.cache/
-.cache/
-.storybook-static/
-.storybook-static/
-.vercel/
-.vercel/
-.now/
-.now/
-.netlify/
-.netlify/
-public/uploads/
-public/uploads/
-storage/
-storage/
-bootstrap/cache/
-bootstrap/cache/
+# Testing
+phpunit.xml
 ```

@@ -10,11 +10,11 @@ use App\Http\Requests\Customer\LoginCustomerRequest;
 use App\Http\Requests\Affiliator\RegisterAffiliatorRequest;
 use App\Http\Requests\Affiliator\LoginAffiliatorRequest;
 use App\Http\Requests\Admin\LoginAdminRequest;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
 
 final class AuthController extends Controller
 {
@@ -24,31 +24,37 @@ final class AuthController extends Controller
 
     /* ==================== CUSTOMER AUTH ==================== */
 
-    public function customerRegister(RegisterCustomerRequest $request): JsonResponse
+    public function customerRegister(RegisterCustomerRequest $request): RedirectResponse
     {
         $customer = $this->authService->registerCustomer($request->validated());
 
-        return response()->json([
-            'message' => 'Registration successful',
-            'customer' => $customer,
-        ], 201);
+        Auth::guard('customer')->login($customer);
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('customer.dashboard'))
+            ->with('success', 'Registrasi berhasil! Selamat datang di Cooca.id');
     }
 
-    public function customerLogin(LoginCustomerRequest $request): JsonResponse
+    public function customerLogin(LoginCustomerRequest $request): RedirectResponse
     {
-        $token = $this->authService->loginCustomer($request->validated());
+        if (!Auth::guard('customer')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            return back()
+                ->withErrors(['email' => 'Kredensial tidak valid.'])
+                ->withInput($request->only('email'));
+        }
 
-        return response()->json([
-            'message' => 'Login successful',
-            'access_token' => $token,
-        ]);
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('customer.dashboard'));
     }
 
-    public function customerLogout(): JsonResponse
+    public function customerLogout(Request $request): RedirectResponse
     {
-        $this->authService->logoutCustomer();
+        Auth::guard('customer')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'Logout successful']);
+        return redirect()->route('home')->with('success', 'Anda telah logout.');
     }
 
     public function redirectToGoogleCustomer(): RedirectResponse
@@ -56,62 +62,77 @@ final class AuthController extends Controller
         return Socialite::guard('customer')->redirect();
     }
 
-    public function handleGoogleCallbackCustomer(): JsonResponse
+    public function handleGoogleCallbackCustomer(): RedirectResponse
     {
-        $customer = $this->authService->handleGoogleCallback('customer');
-
-        return response()->json([
-            'message' => 'Google login successful',
-            'customer' => $customer,
-        ]);
+        try {
+            $customer = $this->authService->handleGoogleCallback('customer');
+            Auth::guard('customer')->login($customer);
+            
+            return redirect()->intended(route('customer.dashboard'))
+                ->with('success', 'Login dengan Google berhasil!');
+        } catch (\Exception $e) {
+            return redirect()->route('customer.login')
+                ->withErrors(['email' => 'Gagal login dengan Google: ' . $e->getMessage()]);
+        }
     }
 
     /* ==================== AFFILIATOR AUTH ==================== */
 
-    public function affiliatorRegister(RegisterAffiliatorRequest $request): JsonResponse
+    public function affiliatorRegister(RegisterAffiliatorRequest $request): RedirectResponse
     {
         $affiliator = $this->authService->registerAffiliator($request->validated());
 
-        return response()->json([
-            'message' => 'Registration successful',
-            'affiliator' => $affiliator,
-        ], 201);
+        Auth::guard('affiliator')->login($affiliator);
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('affiliator.dashboard'))
+            ->with('success', 'Registrasi affiliator berhasil!');
     }
 
-    public function affiliatorLogin(LoginAffiliatorRequest $request): JsonResponse
+    public function affiliatorLogin(LoginAffiliatorRequest $request): RedirectResponse
     {
-        $token = $this->authService->loginAffiliator($request->validated());
+        if (!Auth::guard('affiliator')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            return back()
+                ->withErrors(['email' => 'Kredensial tidak valid.'])
+                ->withInput($request->only('email'));
+        }
 
-        return response()->json([
-            'message' => 'Login successful',
-            'access_token' => $token,
-        ]);
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('affiliator.dashboard'));
     }
 
-    public function affiliatorLogout(): JsonResponse
+    public function affiliatorLogout(Request $request): RedirectResponse
     {
-        $this->authService->logoutAffiliator();
+        Auth::guard('affiliator')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'Logout successful']);
+        return redirect()->route('home')->with('success', 'Anda telah logout.');
     }
 
     /* ==================== ADMIN AUTH ==================== */
 
-    public function adminLogin(LoginAdminRequest $request): JsonResponse
+    public function adminLogin(LoginAdminRequest $request): RedirectResponse
     {
-        $token = $this->authService->loginAdmin($request->validated());
+        if (!Auth::guard('admin')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            return back()
+                ->withErrors(['email' => 'Kredensial tidak valid.'])
+                ->withInput($request->only('email'));
+        }
 
-        return response()->json([
-            'message' => 'Login successful',
-            'access_token' => $token,
-        ]);
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('admin.dashboard'));
     }
 
-    public function adminLogout(): JsonResponse
+    public function adminLogout(Request $request): RedirectResponse
     {
-        $this->authService->logoutAdmin();
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'Logout successful']);
+        return redirect()->route('admin.login')->with('success', 'Admin telah logout.');
     }
 
 

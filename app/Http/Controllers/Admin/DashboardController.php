@@ -15,7 +15,7 @@ final class DashboardController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('Admin/Dashboard', [
+        return Inertia::render('Admin/Dashboard/Index', [
             'stats' => [
                 'total_customers' => 0,
                 'total_affiliators' => 0,

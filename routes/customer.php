@@ -9,6 +9,7 @@ use App\Http\Controllers\Customer\SubscriptionController;
 use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\Customer\InvoiceController;
 use App\Http\Controllers\Customer\ReviewController;
+use App\Http\Controllers\Customer\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -60,7 +61,7 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer'])->gro
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Profile Settings
-    Route::get('/profile', 'ProfileController@edit')->name('profile.edit');
-    Route::put('/profile', 'ProfileController@update')->name('profile.update');
-    Route::put('/profile/password', 'ProfileController@updatePassword')->name('profile.password.update');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 });

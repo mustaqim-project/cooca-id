@@ -8,6 +8,8 @@ use App\Http\Controllers\Affiliator\CommissionController;
 use App\Http\Controllers\Affiliator\DownlineController;
 use App\Http\Controllers\Affiliator\WithdrawalController;
 use App\Http\Controllers\Affiliator\ReviewController;
+use App\Http\Controllers\Affiliator\ProfileController;
+use App\Http\Controllers\Affiliator\MarketingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -54,13 +56,13 @@ Route::prefix('affiliator')->name('affiliator.')->middleware(['auth:affiliator']
     Route::get('/reviews/my-reviews', [ReviewController::class, 'myReviews'])->name('reviews.my_reviews');
 
     // Profile Settings
-    Route::get('/profile', 'ProfileController@edit')->name('profile.edit');
-    Route::put('/profile', 'ProfileController@update')->name('profile.update');
-    Route::put('/profile/bank-account', 'ProfileController@updateBankAccount')->name('profile.bank_account.update');
-    Route::put('/profile/password', 'ProfileController@updatePassword')->name('profile.password.update');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/bank-account', [ProfileController::class, 'updateBankAccount'])->name('profile.bank_account.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
     // Marketing Materials
-    Route::get('/marketing-materials', 'MarketingController@index')->name('marketing_materials.index');
-    Route::get('/marketing-materials/banners', 'MarketingController@banners')->name('marketing_materials.banners');
-    Route::get('/marketing-materials/links', 'MarketingController@links')->name('marketing_materials.links');
+    Route::get('/marketing-materials', [MarketingController::class, 'index'])->name('marketing_materials.index');
+    Route::get('/marketing-materials/banners', [MarketingController::class, 'banners'])->name('marketing_materials.banners');
+    Route::get('/marketing-materials/links', [MarketingController::class, 'links'])->name('marketing_materials.links');
 });
