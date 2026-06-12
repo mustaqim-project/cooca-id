@@ -1,40 +1,41 @@
 ```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-dist/
-build/
-target/
-
 # Dependencies
 node_modules/
 vendor/
-composer.lock
 
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-*.swo
+# Build artifacts
+dist/
+build/
+public/build/
+
+# Cache directories
+.cache/
+node/.cache/
 
 # Environment
 .env
 .env.local
 .env.*
 
-# Editors
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
+# Logs
+*.log
 
 # OS generated files
 .DS_Store
 Thumbs.db
 
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
 # Laravel specific
-storage/
 bootstrap/cache/
+storage/logs/
+storage/framework/
+public/storage
+
+# Vue.js
+.nuxt/
 ```
