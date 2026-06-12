@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Web\BlogController;
 use App\Http\Controllers\Web\LandingController;
 use Illuminate\Support\Facades\Route;
