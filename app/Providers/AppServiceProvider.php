@@ -57,6 +57,29 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->bootPolicies();
+        $this->bootObservers();
+    }
+
+    private function bootPolicies(): void
+    {
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\License::class, \App\Policies\LicensePolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Transaction::class, \App\Policies\TransactionPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Subscription::class, \App\Policies\SubscriptionPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\AffiliateCommission::class, \App\Policies\AffiliateCommissionPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\AffiliateWithdrawal::class, \App\Policies\AffiliateWithdrawalPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Voucher::class, \App\Policies\VoucherPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Ticket::class, \App\Policies\TicketPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Review::class, \App\Policies\ReviewPolicy::class);
+        \Illuminate\Support\Facades\Gate::policy(\App\Models\Invoice::class, \App\Policies\InvoicePolicy::class);
+    }
+
+    private function bootObservers(): void
+    {
+        \App\Models\Transaction::observe(\App\Observers\TransactionObserver::class);
+        \App\Models\Subscription::observe(\App\Observers\SubscriptionObserver::class);
+        \App\Models\License::observe(\App\Observers\LicenseObserver::class);
+        \App\Models\Customer::observe(\App\Observers\CustomerObserver::class);
+        \App\Models\Affiliator::observe(\App\Observers\AffiliatorObserver::class);
     }
 }
