@@ -26,74 +26,77 @@ final class AffiliateService
     /**
      * Calculate and create commissions for a transaction
      * CRITICAL: Commission is calculated from gross_amount, NOT net_amount
+     * Wrapped in DB transaction for data integrity
      */
     public function processCommissions(Transaction $transaction): array
     {
-        $customer = $transaction->customer;
-        
-        if (!$customer->affiliator_id) {
-            return ['commissions' => [], 'total' => 0];
-        }
+        return DB::transaction(function () use ($transaction) {
+            $customer = $transaction->customer;
+            
+            if (!$customer->affiliator_id) {
+                return ['commissions' => [], 'total' => 0];
+            }
 
-        $commissions = [];
-        $totalCommission = 0;
+            $commissions = [];
+            $totalCommission = 0;
 
-        // Level 1: Direct referrer (25% of gross_amount)
-        $l1Affiliator = $customer->affiliator;
-        if ($l1Affiliator) {
-            $l1CommissionAmount = CommissionData::calculateCommission(
-                $transaction->gross_amount,
-                1
-            );
+            // Level 1: Direct referrer (25% of gross_amount)
+            $l1Affiliator = $customer->affiliator;
+            if ($l1Affiliator) {
+                $l1CommissionAmount = CommissionData::calculateCommission(
+                    $transaction->gross_amount,
+                    1
+                );
 
-            $l1Commission = $this->createCommission(
-                affiliatorId: $l1Affiliator->id,
-                transactionId: $transaction->id,
-                customerId: $customer->id,
-                level: 1,
-                grossAmount: $transaction->gross_amount,
-                commissionPercent: self::L1_COMMISSION_PERCENT,
-                commissionAmount: $l1CommissionAmount,
-            );
+                $l1Commission = $this->createCommission(
+                    affiliatorId: $l1Affiliator->id,
+                    transactionId: $transaction->id,
+                    customerId: $customer->id,
+                    level: 1,
+                    grossAmount: $transaction->gross_amount,
+                    commissionPercent: self::L1_COMMISSION_PERCENT,
+                    commissionAmount: $l1CommissionAmount,
+                );
 
-            $commissions[] = $l1Commission;
-            $totalCommission += $l1CommissionAmount;
+                $commissions[] = $l1Commission;
+                $totalCommission += $l1CommissionAmount;
 
-            // Update L1 affiliator balance
-            $this->updateAffiliatorBalance($l1Affiliator->id, $l1CommissionAmount);
+                // Update L1 affiliator balance
+                $this->updateAffiliatorBalance($l1Affiliator->id, $l1CommissionAmount);
 
-            // Level 2: Parent affiliator (5% of gross_amount)
-            if ($l1Affiliator->parent_affiliator_id) {
-                $l2Affiliator = $l1Affiliator->parent;
-                if ($l2Affiliator) {
-                    $l2CommissionAmount = CommissionData::calculateCommission(
-                        $transaction->gross_amount,
-                        2
-                    );
+                // Level 2: Parent affiliator (5% of gross_amount)
+                if ($l1Affiliator->parent_affiliator_id) {
+                    $l2Affiliator = $l1Affiliator->parent;
+                    if ($l2Affiliator) {
+                        $l2CommissionAmount = CommissionData::calculateCommission(
+                            $transaction->gross_amount,
+                            2
+                        );
 
-                    $l2Commission = $this->createCommission(
-                        affiliatorId: $l2Affiliator->id,
-                        transactionId: $transaction->id,
-                        customerId: $customer->id,
-                        level: 2,
-                        grossAmount: $transaction->gross_amount,
-                        commissionPercent: self::L2_COMMISSION_PERCENT,
-                        commissionAmount: $l2CommissionAmount,
-                    );
+                        $l2Commission = $this->createCommission(
+                            affiliatorId: $l2Affiliator->id,
+                            transactionId: $transaction->id,
+                            customerId: $customer->id,
+                            level: 2,
+                            grossAmount: $transaction->gross_amount,
+                            commissionPercent: self::L2_COMMISSION_PERCENT,
+                            commissionAmount: $l2CommissionAmount,
+                        );
 
-                    $commissions[] = $l2Commission;
-                    $totalCommission += $l2CommissionAmount;
+                        $commissions[] = $l2Commission;
+                        $totalCommission += $l2CommissionAmount;
 
-                    // Update L2 affiliator balance
-                    $this->updateAffiliatorBalance($l2Affiliator->id, $l2CommissionAmount);
+                        // Update L2 affiliator balance
+                        $this->updateAffiliatorBalance($l2Affiliator->id, $l2CommissionAmount);
+                    }
                 }
             }
-        }
 
-        return [
-            'commissions' => $commissions,
-            'total' => $totalCommission,
-        ];
+            return [
+                'commissions' => $commissions,
+                'total' => $totalCommission,
+            ];
+        });
     }
 
     /**

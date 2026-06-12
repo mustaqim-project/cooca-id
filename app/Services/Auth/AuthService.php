@@ -10,6 +10,7 @@ use App\Models\Affiliator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
 
 final class AuthService
 {
@@ -27,11 +28,11 @@ final class AuthService
     }
 
     /**
-     * Login admin
+     * Login admin and return Sanctum token
      */
-    public function loginAdmin(string $email, string $password): Admin
+    public function loginAdmin(array $data): string
     {
-        if (!Auth::guard('admin')->attempt(['email' => $email, 'password' => $password])) {
+        if (!Auth::guard('admin')->attempt(['email' => $data['email'], 'password' => $data['password']])) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials'],
             ]);
@@ -40,7 +41,18 @@ final class AuthService
         /** @var Admin $admin */
         $admin = Auth::guard('admin')->user();
 
-        return $admin;
+        return $admin->createToken('admin-token')->plainTextToken;
+    }
+
+    /**
+     * Logout admin
+     */
+    public function logoutAdmin(): void
+    {
+        /** @var Admin $admin */
+        $admin = Auth::guard('admin')->user();
+        $admin->currentAccessToken()->delete();
+        Auth::guard('admin')->logout();
     }
 
     /**
@@ -67,11 +79,11 @@ final class AuthService
     }
 
     /**
-     * Login customer
+     * Login customer and return Sanctum token
      */
-    public function loginCustomer(string $email, string $password): Customer
+    public function loginCustomer(array $data): string
     {
-        if (!Auth::guard('customer')->attempt(['email' => $email, 'password' => $password])) {
+        if (!Auth::guard('customer')->attempt(['email' => $data['email'], 'password' => $data['password']])) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials'],
             ]);
@@ -80,21 +92,46 @@ final class AuthService
         /** @var Customer $customer */
         $customer = Auth::guard('customer')->user();
 
-        return $customer;
+        return $customer->createToken('customer-token')->plainTextToken;
+    }
+
+    /**
+     * Logout customer
+     */
+    public function logoutCustomer(): void
+    {
+        /** @var Customer $customer */
+        $customer = Auth::guard('customer')->user();
+        $customer->currentAccessToken()->delete();
+        Auth::guard('customer')->logout();
+    }
+
+    /**
+     * Handle Google callback for customer or affiliator
+     */
+    public function handleGoogleCallback(string $guard): Customer|Affiliator
+    {
+        $googleUser = Socialite::guard($guard)->user();
+
+        if ($guard === 'customer') {
+            return $this->loginCustomerWithGoogle($googleUser);
+        }
+
+        return $this->loginAffiliatorWithGoogle($googleUser);
     }
 
     /**
      * Login customer with Google
      */
-    public function loginCustomerWithGoogle(array $googleUser): Customer
+    private function loginCustomerWithGoogle(object $googleUser): Customer
     {
-        $customer = Customer::where('google_id', $googleUser['id'])->first();
+        $customer = Customer::where('google_id', $googleUser->getId())->first();
 
         if (!$customer) {
             $customer = Customer::create([
-                'name' => $googleUser['name'],
-                'email' => $googleUser['email'],
-                'google_id' => $googleUser['id'],
+                'name' => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
+                'google_id' => $googleUser->getId(),
                 'password' => Hash::make(bin2hex(random_bytes(16))),
             ]);
         }
@@ -115,7 +152,7 @@ final class AuthService
             'password' => Hash::make($data['password']),
             'bank_account' => $data['bank_account'] ?? null,
             'bank_name' => $data['bank_name'] ?? null,
-            'referral_code' => strtoupper(substr(uniqid(), -8)),
+            'referral_code' => strtoupper(\Illuminate\Support\Str::random(10)),
         ];
 
         // Link to parent affiliator if provided
@@ -130,11 +167,11 @@ final class AuthService
     }
 
     /**
-     * Login affiliator
+     * Login affiliator and return Sanctum token
      */
-    public function loginAffiliator(string $email, string $password): Affiliator
+    public function loginAffiliator(array $data): string
     {
-        if (!Auth::guard('affiliator')->attempt(['email' => $email, 'password' => $password])) {
+        if (!Auth::guard('affiliator')->attempt(['email' => $data['email'], 'password' => $data['password']])) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials'],
             ]);
@@ -143,23 +180,34 @@ final class AuthService
         /** @var Affiliator $affiliator */
         $affiliator = Auth::guard('affiliator')->user();
 
-        return $affiliator;
+        return $affiliator->createToken('affiliator-token')->plainTextToken;
+    }
+
+    /**
+     * Logout affiliator
+     */
+    public function logoutAffiliator(): void
+    {
+        /** @var Affiliator $affiliator */
+        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator->currentAccessToken()->delete();
+        Auth::guard('affiliator')->logout();
     }
 
     /**
      * Login affiliator with Google
      */
-    public function loginAffiliatorWithGoogle(array $googleUser): Affiliator
+    private function loginAffiliatorWithGoogle(object $googleUser): Affiliator
     {
-        $affiliator = Affiliator::where('google_id', $googleUser['id'])->first();
+        $affiliator = Affiliator::where('google_id', $googleUser->getId())->first();
 
         if (!$affiliator) {
             $affiliator = Affiliator::create([
-                'name' => $googleUser['name'],
-                'email' => $googleUser['email'],
-                'google_id' => $googleUser['id'],
+                'name' => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
+                'google_id' => $googleUser->getId(),
                 'password' => Hash::make(bin2hex(random_bytes(16))),
-                'referral_code' => strtoupper(substr(uniqid(), -8)),
+                'referral_code' => strtoupper(\Illuminate\Support\Str::random(10)),
             ]);
         }
 

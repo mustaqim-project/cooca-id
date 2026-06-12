@@ -168,9 +168,8 @@ final class LicenseService
      */
     private function clearLicenseCache(License $license): void
     {
-        $cacheKey = "license:validate:{$license->domain}:{$license->license_code}:*";
+        $cacheKey = "license:validate:{$license->domain}:{$license->license_code}:{$license->token_code}";
         
-        // Clear all cache keys matching this license
-        Cache::tags(['license'])->flush();
+        Cache::forget($cacheKey);
     }
 }
