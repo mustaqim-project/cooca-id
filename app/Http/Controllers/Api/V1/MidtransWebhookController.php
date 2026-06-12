@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\PaymentService;
+use App\Services\Payment\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -22,16 +22,19 @@ final class MidtransWebhookController extends Controller
      */
     public function midtrans(Request $request): JsonResponse
     {
-        $payload = $request->all();
+        $rawPayload = $request->getContent();
+        $signature = $request->header('X-Signature-Key', '');
         
         // Verify Midtrans signature
-        if (!$this->paymentService->verifyWebhookSignature($payload)) {
-            Log::warning('Invalid Midtrans webhook signature', ['payload' => $payload]);
+        if (!$this->paymentService->verifyWebhookSignature($rawPayload, $signature)) {
+            Log::warning('Invalid Midtrans webhook signature', ['payload' => $rawPayload]);
             
             return response()->json([
                 'message' => 'Invalid signature',
             ], 401);
         }
+
+        $payload = $request->all();
 
         try {
             $orderId = $payload['order_id'] ?? null;

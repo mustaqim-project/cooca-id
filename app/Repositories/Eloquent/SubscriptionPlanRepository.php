@@ -9,59 +9,59 @@ use App\Repositories\Contracts\SubscriptionPlanRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
-final class SubscriptionPlanRepository extends BaseRepository implements SubscriptionPlanRepositoryInterface
+final class SubscriptionPlanRepository extends Repository implements SubscriptionPlanRepositoryInterface
 {
-    public function __construct(SubscriptionPlan $model)
+    public function getModel(): string
     {
-        parent::__construct($model);
+        return SubscriptionPlan::class;
     }
 
-    public function getActivePlansByProduct(string $productId): Collection
+    /**
+     * @inheritDoc
+     */
+    public function findByProductId(string $productId): Collection
     {
-        return $this->model
+        return $this->model->newQuery()
             ->where('product_id', $productId)
-            ->where('is_active', true)
             ->orderBy('sort_order')
             ->orderBy('price')
             ->get();
     }
 
-    public function getActivePlanById(string $id): ?SubscriptionPlan
+    /**
+     * @inheritDoc
+     */
+    public function getActivePlans(): Collection
     {
-        return $this->model
-            ->where('id', $id)
+        return $this->model->newQuery()
             ->where('is_active', true)
-            ->first();
-    }
-
-    public function getPlansWithDuration(int $durationMonths): Collection
-    {
-        return $this->model
-            ->where('duration_months', $durationMonths)
-            ->where('is_active', true)
-            ->orderBy('price')
+            ->orderBy('sort_order')
             ->get();
     }
 
-    public function calculateDiscountedPrice(SubscriptionPlan $plan): float
+    /**
+     * @inheritDoc
+     */
+    public function getFeaturedPlans(): Collection
     {
-        if ($plan->discount_percent <= 0) {
-            return (float) $plan->price;
-        }
-
-        $discount = $plan->price * ($plan->discount_percent / 100);
-        return (float) ($plan->price - $discount);
-    }
-
-    public function getFeaturedPlans(int $limit = 6): Collection
-    {
-        return $this->model
+        return $this->model->newQuery()
             ->whereHas('product', function ($query) {
                 $query->where('is_featured', true);
             })
             ->where('is_active', true)
             ->orderBy('sort_order')
-            ->limit($limit)
+            ->limit(6)
             ->get();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findByIdAndProductId(string $planId, string $productId): ?SubscriptionPlan
+    {
+        return $this->model->newQuery()
+            ->where('id', $planId)
+            ->where('product_id', $productId)
+            ->first();
     }
 }

@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ValidateLicenseRequest;
-use App\Services\LicenseService;
+use App\Services\License\LicenseService;
 use Illuminate\Http\JsonResponse;
 
 final class LicenseValidationController extends Controller
