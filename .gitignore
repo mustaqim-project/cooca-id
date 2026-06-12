@@ -1,20 +1,24 @@
 ```
-# Vue.js build artifacts
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
 dist/
 build/
-*.vue.d.ts
+target/
 
 # Dependencies
 node_modules/
+vendor/
+.env
+.env.local
+.env.*
 
 # Logs and temp files
 *.log
 *.tmp
-
-# Environment variables
-.env
-.env.local
-.env.*
+*.swp
 
 # Editors
 .vscode/
@@ -23,4 +27,17 @@ node_modules/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Laravel specific
+public/storage
+bootstrap/cache/
+storage/logs/
+storage/framework/
+.npm
+.yarn
 ```
