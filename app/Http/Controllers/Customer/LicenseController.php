@@ -10,6 +10,7 @@ use App\Services\LicenseService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\RedirectResponse;
 
 final class LicenseController extends Controller
 {
@@ -43,6 +44,40 @@ final class LicenseController extends Controller
         }
 
         return Inertia::render('Customer/Licenses/Show', [
+            'license' => new LicenseResource($license),
+        ]);
+    }
+
+    /**
+     * Activate license for customer.
+     */
+    public function activate(string $id): RedirectResponse
+    {
+        $customer = Auth::guard('customer')->user();
+        
+        try {
+            $license = $this->licenseService->activateLicense($id, $customer->getKey());
+            
+            return redirect()->route('customer.licenses.credentials', $license->id)
+                ->with('success', 'License activated successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to activate license: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Display license credentials (license code + token).
+     */
+    public function credentials(string $id): Response
+    {
+        $customer = Auth::guard('customer')->user();
+        $license = $this->licenseService->findByIdAndCustomer($id, $customer->getKey());
+
+        if (!$license) {
+            abort(404, 'License not found');
+        }
+
+        return Inertia::render('Customer/Licenses/Credentials', [
             'license' => new LicenseResource($license),
         ]);
     }

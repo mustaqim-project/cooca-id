@@ -59,4 +59,28 @@ final class PaymentController extends Controller
 
         return redirect()->route('customer.invoices.index');
     }
+
+    /**
+     * Display payment success page.
+     */
+    public function success(): Response
+    {
+        return Inertia::render('Customer/Payments/Success');
+    }
+
+    /**
+     * Display payment pending page.
+     */
+    public function pending(): Response
+    {
+        return Inertia::render('Customer/Payments/Pending');
+    }
+
+    /**
+     * Display payment failed page.
+     */
+    public function failed(): Response
+    {
+        return Inertia::render('Customer/Payments/Failed');
+    }
 }
