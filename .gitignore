@@ -17,6 +17,8 @@ yarn-error.log*
 
 # Compiled and build artifacts
 *.php~
+```
+# Compiled and build artifacts
 *.pyc
 __pycache__/
 *.o
@@ -27,6 +29,19 @@ target/
 *.class
 *.jar
 *.war
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Dependencies
+vendor/
+node_modules/
+.env
+.env.local
+.env.*
 
 # Logs and temp files
 *.log
@@ -67,3 +82,24 @@ public/storage
 composer.lock
 package-lock.json
 yarn.lock
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Laravel/Lumen specific
+bootstrap/cache/
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+public/storage
+
+# PHP specific
+.php_cs.cache
+```
