@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Services\AuthService;
+use App\Services\Auth\AuthService;
 use App\Http\Requests\Customer\RegisterCustomerRequest;
 use App\Http\Requests\Customer\LoginCustomerRequest;
 use App\Http\Requests\Affiliator\RegisterAffiliatorRequest;
@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\View\View;
 
 final class AuthController extends Controller
 {
@@ -111,5 +112,31 @@ final class AuthController extends Controller
         $this->authService->logoutAdmin();
 
         return response()->json(['message' => 'Logout successful']);
+    }
+
+
+    public function showAdminLogin(): View
+    {
+        return view('auth.admin.login');
+    }
+
+    public function showCustomerLogin(): View
+    {
+        return view('auth.customer.login');
+    }
+
+    public function showCustomerRegister(): View
+    {
+        return view('auth.customer.register');
+    }
+
+    public function showAffiliatorLogin(): View
+    {
+        return view('auth.affiliator.login');
+    }
+
+    public function showAffiliatorRegister(): View
+    {
+        return view('auth.affiliator.register');
     }
 }

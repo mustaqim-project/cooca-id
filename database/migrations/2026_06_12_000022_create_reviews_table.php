@@ -15,24 +15,30 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->uuid('id')->primary();
+
             $table->morphs('reviewable');
+
             $table->enum('reviewer_type', ['customer', 'affiliator']);
             $table->uuid('reviewer_id');
+
             $table->tinyInteger('rating')->unsigned();
+
             $table->string('title')->nullable();
             $table->text('comment')->nullable();
+
             $table->boolean('is_approved')->default(false);
+
             $table->uuid('approved_by')->nullable();
             $table->timestamp('approved_at')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('approved_by')
                 ->references('id')
                 ->on('admins')
-                ->onDelete('set null');
+                ->nullOnDelete();
 
-            $table->index(['reviewable_type', 'reviewable_id']);
             $table->index('reviewer_type');
             $table->index('rating');
             $table->index('is_approved');

@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Cooca.id - SaaS ERP Platform')</title>
     <meta name="description" content="@yield('meta_description', 'Platform SaaS ERP multi-tenant untuk berbagai industri dengan sistem lisensi dan affiliate')">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @inertiaHead
+    {{-- @inertiaHead --}}
 </head>
+
 <body class="bg-white">
     <!-- Navigation -->
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -36,7 +38,8 @@
                     <a href="/customer/login" class="text-gray-700 hover:text-indigo-600 transition-colors">
                         Login
                     </a>
-                    <a href="/customer/register" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                    <a href="/customer/register"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
                         Start Free Trial
                     </a>
                 </div>
@@ -94,4 +97,5 @@
 
     @stack('scripts')
 </body>
+
 </html>

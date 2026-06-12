@@ -15,18 +15,21 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->uuid('id')->primary();
+
             $table->morphs('notifiable');
+
             $table->string('type');
             $table->enum('channel', ['email', 'whatsapp', 'database']);
             $table->string('subject')->nullable();
             $table->text('message');
             $table->json('data')->nullable();
+
             $table->timestamp('read_at')->nullable();
             $table->timestamp('sent_at')->nullable();
             $table->timestamp('failed_at')->nullable();
+
             $table->timestamps();
 
-            $table->index(['notifiable_type', 'notifiable_id']);
             $table->index('type');
             $table->index('channel');
             $table->index('read_at');
