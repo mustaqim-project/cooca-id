@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
-final class Customer extends Model
+
+final class Customer extends Authenticatable
 {
-    use HasFactory, Notifiable;
-
+    use HasApiTokens, HasFactory, Notifiable;
     protected $table = 'customers';
 
     protected $fillable = [
