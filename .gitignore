@@ -1,30 +1,26 @@
 ```
-# Laravel-specific ignores
-vendor/
-composer.lock
+# Vue.js build artifacts
+dist/
+build/
+*.vue.d.ts
+
+# Dependencies
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment variables
 .env
+.env.local
 .env.*
-!.env.example
 
-# Build artifacts
-public/css/
-public/js/
-public/build/
-
-# Logs
-storage/logs/*
-bootstrap/cache/*
-
-# IDE
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
-
-# Testing
-phpunit.xml
 ```
