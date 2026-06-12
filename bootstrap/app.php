@@ -28,9 +28,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Alias untuk multi-guard
         $middleware->alias([
-            'admin' => \App\Http\Middleware\Admin\AdminAuthenticate::class,
-            'customer' => \App\Http\Middleware\Customer\CustomerAuthenticate::class,
-            'affiliator' => \App\Http\Middleware\Affiliator\AffiliatorAuthenticate::class,
+            'admin' => \App\Http\Middleware\Admin\AdminAuth::class,
+            'customer' => \App\Http\Middleware\Customer\CustomerAuth::class,
+            'affiliator' => \App\Http\Middleware\Affiliator\AffiliatorAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
