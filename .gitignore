@@ -1,9 +1,34 @@
+# Laravel-specific ignores
+vendor/
+bootstrap/cache/
+storage/logs/
+storage/framework/
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Compiled and build artifacts
+*.php~
 ```
 # Compiled and build artifacts
 *.pyc
 __pycache__/
 *.o
 *.obj
+dist/
+build/
+target/
+*.class
+*.jar
+*.war
 *.class
 *.exe
 *.dll
@@ -27,6 +52,36 @@ node_modules/
 # Editors
 .vscode/
 .idea/
+*.swp
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Testing
+coverage/
+htmlcov/
+.coverage
+.pytest_cache/
+.mypy_cache/
+
+# Distribution / packaging
+*.tar.gz
+*.whl
+*.egg
+*.egg-info/
+
+# Laravel specific
+public/storage
+composer.lock
+package-lock.json
+yarn.lock
 
 # Coverage reports
 coverage/
