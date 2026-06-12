@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Affiliator;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\CommissionResource;
-use App\Services\AffiliateService;
+use App\Services\Affiliate\AffiliateService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;

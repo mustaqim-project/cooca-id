@@ -3,11 +3,18 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AffiliatorController;
+use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EmailCampaignController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SettlementController;
+use App\Http\Controllers\Admin\SubscriptionController;
+use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\VoucherController;
 use Illuminate\Support\Facades\Route;
@@ -55,9 +62,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
     Route::post('/licenses/{license}/activate', [LicenseController::class, 'activate'])->name('licenses.activate');
 
     // Subscriptions Management
-    Route::get('/subscriptions', 'SubscriptionController@index')->name('subscriptions.index');
-    Route::get('/subscriptions/{subscription}', 'SubscriptionController@show')->name('subscriptions.show');
-    Route::post('/subscriptions/{subscription}/cancel', 'SubscriptionController@cancel')->name('subscriptions.cancel');
+    Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
+    Route::post('/subscriptions/{subscription}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
 
     // Transactions Management
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
@@ -80,42 +87,42 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(functi
     Route::post('/settlements/{settlement}/reject', [SettlementController::class, 'reject'])->name('settlements.reject');
 
     // CMS - Pages
-    Route::get('/cms/pages', 'CmsController@index')->name('cms.pages.index');
-    Route::get('/cms/pages/create', 'CmsController@create')->name('cms.pages.create');
-    Route::post('/cms/pages', 'CmsController@store')->name('cms.pages.store');
-    Route::get('/cms/pages/{page}/edit', 'CmsController@edit')->name('cms.pages.edit');
-    Route::put('/cms/pages/{page}', 'CmsController@update')->name('cms.pages.update');
-    Route::delete('/cms/pages/{page}', 'CmsController@destroy')->name('cms.pages.destroy');
+    Route::get('/cms/pages', [CmsController::class, 'index'])->name('cms.pages.index');
+    Route::get('/cms/pages/create', [CmsController::class, 'create'])->name('cms.pages.create');
+    Route::post('/cms/pages', [CmsController::class, 'store'])->name('cms.pages.store');
+    Route::get('/cms/pages/{page}/edit', [CmsController::class, 'edit'])->name('cms.pages.edit');
+    Route::put('/cms/pages/{page}', [CmsController::class, 'update'])->name('cms.pages.update');
+    Route::delete('/cms/pages/{page}', [CmsController::class, 'destroy'])->name('cms.pages.destroy');
 
     // CMS - Blog
-    Route::get('/blog', 'BlogController@index')->name('blog.index');
-    Route::get('/blog/create', 'BlogController@create')->name('blog.create');
-    Route::post('/blog', 'BlogController@store')->name('blog.store');
-    Route::get('/blog/{post}/edit', 'BlogController@edit')->name('blog.edit');
-    Route::put('/blog/{post}', 'BlogController@update')->name('blog.update');
-    Route::delete('/blog/{post}', 'BlogController@destroy')->name('blog.destroy');
+    Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+    Route::get('/blog/create', [BlogController::class, 'create'])->name('blog.create');
+    Route::post('/blog', [BlogController::class, 'store'])->name('blog.store');
+    Route::get('/blog/{post}/edit', [BlogController::class, 'edit'])->name('blog.edit');
+    Route::put('/blog/{post}', [BlogController::class, 'update'])->name('blog.update');
+    Route::delete('/blog/{post}', [BlogController::class, 'destroy'])->name('blog.destroy');
 
     // Email Campaigns
-    Route::get('/email-campaigns', 'EmailCampaignController@index')->name('email-campaigns.index');
-    Route::get('/email-campaigns/create', 'EmailCampaignController@create')->name('email-campaigns.create');
-    Route::post('/email-campaigns', 'EmailCampaignController@store')->name('email-campaigns.store');
-    Route::get('/email-campaigns/{campaign}', 'EmailCampaignController@show')->name('email-campaigns.show');
-    Route::post('/email-campaigns/{campaign}/send', 'EmailCampaignController@send')->name('email-campaigns.send');
+    Route::get('/email-campaigns', [EmailCampaignController::class, 'index'])->name('email-campaigns.index');
+    Route::get('/email-campaigns/create', [EmailCampaignController::class, 'create'])->name('email-campaigns.create');
+    Route::post('/email-campaigns', [EmailCampaignController::class, 'store'])->name('email-campaigns.store');
+    Route::get('/email-campaigns/{campaign}', [EmailCampaignController::class, 'show'])->name('email-campaigns.show');
+    Route::post('/email-campaigns/{campaign}/send', [EmailCampaignController::class, 'send'])->name('email-campaigns.send');
 
     // Support Tickets
-    Route::get('/tickets', 'TicketController@index')->name('tickets.index');
-    Route::get('/tickets/{ticket}', 'TicketController@show')->name('tickets.show');
-    Route::post('/tickets/{ticket}/reply', 'TicketController@reply')->name('tickets.reply');
-    Route::post('/tickets/{ticket}/resolve', 'TicketController@resolve')->name('tickets.resolve');
-    Route::post('/tickets/{ticket}/close', 'TicketController@close')->name('tickets.close');
+    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
+    Route::post('/tickets/{ticket}/reply', [TicketController::class, 'reply'])->name('tickets.reply');
+    Route::post('/tickets/{ticket}/resolve', [TicketController::class, 'resolve'])->name('tickets.resolve');
+    Route::post('/tickets/{ticket}/close', [TicketController::class, 'close'])->name('tickets.close');
 
     // Reviews Moderation
-    Route::get('/reviews', 'ReviewController@index')->name('reviews.index');
-    Route::post('/reviews/{review}/approve', 'ReviewController@approve')->name('reviews.approve');
-    Route::post('/reviews/{review}/reject', 'ReviewController@reject')->name('reviews.reject');
-    Route::delete('/reviews/{review}', 'ReviewController@destroy')->name('reviews.destroy');
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('/reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Settings
-    Route::get('/settings', 'SettingsController@index')->name('settings.index');
-    Route::put('/settings', 'SettingsController@update')->name('settings.update');
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
 });
