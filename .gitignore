@@ -1,6 +1,10 @@
 ```
 # Dependencies
 node_modules/
+vendor/
+.env
+.env.local
+.env.*
 
 # Logs and temp files
 *.log
@@ -10,28 +14,26 @@ node_modules/
 .env
 .env.local
 *.env.*
+*.swp
 
 # Editors
 .vscode/
 .idea/
 
-# Laravel-specific
-vendor/
-composer.lock
-public/hot
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Laravel specific
 public/storage
-storage/*.key
-bootstrap/cache/*
-bootstrap/cache/.gitkeep
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# PHP
-*.php~
-**/vendor/**/*
-
-# Build
-dist/
-build/
+bootstrap/cache/
+storage/logs/
+storage/framework/
+.npm
+.yarn
 ```
