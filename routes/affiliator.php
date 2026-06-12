@@ -34,14 +34,14 @@ Route::prefix('affiliator')->name('affiliator.')->middleware(['auth:affiliator']
     // Commissions Tracking
     Route::get('/commissions', [CommissionController::class, 'index'])->name('commissions.index');
     Route::get('/commissions/stats', [CommissionController::class, 'stats'])->name('commissions.stats');
-    Route::get('/commissions/{commission}', [CommissionController::class, 'show'])->name('commissions.show');
     Route::get('/commissions/export', [CommissionController::class, 'export'])->name('commissions.export');
+    Route::get('/commissions/{commission}', [CommissionController::class, 'show'])->name('commissions.show');
 
     // Downline Network (2-tier)
     Route::get('/downlines', [DownlineController::class, 'index'])->name('downlines.index');
     Route::get('/downlines/tree', [DownlineController::class, 'tree'])->name('downlines.tree');
-    Route::get('/downlines/{affiliator}', [DownlineController::class, 'show'])->name('downlines.show');
     Route::get('/downlines/stats', [DownlineController::class, 'stats'])->name('downlines.stats');
+    Route::get('/downlines/{affiliator}', [DownlineController::class, 'show'])->name('downlines.show');
 
     // Withdrawals Requests
     Route::get('/withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');

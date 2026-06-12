@@ -38,8 +38,14 @@ Route::prefix('customer')->name('customer.')->group(function () {
         Route::post('register', [AuthController::class, 'customerRegister']);
         
         // Google OAuth
-        Route::get('auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-        Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+        Route::get('auth/google', [AuthController::class, 'redirectToGoogleCustomer'])->name('auth.google');
+        Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallbackCustomer']);
+        
+        // Password Reset
+        Route::get('forgot-password', [PasswordResetController::class, 'showCustomerForgotPassword'])->name('password.request');
+        Route::post('forgot-password', [PasswordResetController::class, 'sendCustomerResetLink'])->name('password.email');
+        Route::get('reset-password/{token}', [PasswordResetController::class, 'showCustomerReset'])->name('password.reset');
+        Route::post('reset-password', [PasswordResetController::class, 'resetCustomerPassword'])->name('password.update');
     });
     
     Route::middleware('auth:customer')->group(function () {
@@ -54,6 +60,12 @@ Route::prefix('affiliator')->name('affiliator.')->group(function () {
         Route::post('login', [AuthController::class, 'affiliatorLogin']);
         Route::get('register', [AuthController::class, 'showAffiliatorRegister'])->name('register');
         Route::post('register', [AuthController::class, 'affiliatorRegister']);
+        
+        // Password Reset for Affiliator
+        Route::get('forgot-password', [PasswordResetController::class, 'showAffiliatorForgotPassword'])->name('password.request');
+        Route::post('forgot-password', [PasswordResetController::class, 'sendAffiliatorResetLink'])->name('password.email');
+        Route::get('reset-password/{token}', [PasswordResetController::class, 'showAffiliatorReset'])->name('password.reset');
+        Route::post('reset-password', [PasswordResetController::class, 'resetAffiliatorPassword'])->name('password.update');
     });
     
     Route::middleware('auth:affiliator')->group(function () {
@@ -66,6 +78,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest:admin')->group(function () {
         Route::get('login', [AuthController::class, 'showAdminLogin'])->name('login');
         Route::post('login', [AuthController::class, 'adminLogin']);
+        
+        // Password Reset for Admin
+        Route::get('forgot-password', [PasswordResetController::class, 'showAdminForgotPassword'])->name('password.request');
+        Route::post('forgot-password', [PasswordResetController::class, 'sendAdminResetLink'])->name('password.email');
+        Route::get('reset-password/{token}', [PasswordResetController::class, 'showAdminReset'])->name('password.reset');
+        Route::post('reset-password', [PasswordResetController::class, 'resetAdminPassword'])->name('password.update');
     });
     
     Route::middleware('auth:admin')->group(function () {
