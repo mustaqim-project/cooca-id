@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 final class Invoice extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids;
 
     protected $table = 'invoices';
 
@@ -92,7 +92,7 @@ final class Invoice extends Model
 
     public function isOverdue(): bool
     {
-        return $this->status === self::STATUS_OVERDUE 
+        return $this->status === self::STATUS_OVERDUE
             || ($this->status === self::STATUS_SENT && $this->due_at->isPast());
     }
 }

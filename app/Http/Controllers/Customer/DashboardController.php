@@ -15,7 +15,7 @@ use Inertia\Response;
 
 /**
  * Customer Dashboard Controller
- * 
+ *
  * Handles customer dashboard with subscription, license, and invoice statistics.
  */
 final class DashboardController extends Controller
@@ -26,57 +26,57 @@ final class DashboardController extends Controller
     public function index(): Response
     {
         $customer = Auth::guard('customer')->user();
-        
+
         // License Statistics
         $activeLicenses = License::where('customer_id', $customer->id)
             ->where('status', 'active')
             ->count();
-        
+
         $expiringLicenses = License::where('customer_id', $customer->id)
             ->where('status', 'active')
             ->where('expires_at', '<=', now()->addDays(30))
             ->count();
-        
+
         // Subscription Statistics
         $totalSubscriptions = Subscription::where('customer_id', $customer->id)->count();
         $activeSubscriptions = Subscription::where('customer_id', $customer->id)
             ->where('status', 'active')
             ->count();
-        
+
         // Invoice Statistics
         $pendingInvoices = Invoice::where('customer_id', $customer->id)
             ->where('status', 'pending')
             ->count();
-        
+
         $unpaidInvoicesAmount = Invoice::where('customer_id', $customer->id)
             ->where('status', 'pending')
-            ->sum('total_amount');
-        
+            ->sum('amount');
+
         // Transaction Statistics
         $totalSpent = Transaction::where('customer_id', $customer->id)
             ->where('status', 'paid')
-            ->sum('amount');
-        
+            ->sum('gross_amount');
+
         $recentTransactions = Transaction::where('customer_id', $customer->id)
             ->with(['subscription'])
             ->latest()
             ->limit(5)
             ->get();
-        
+
         // Recent Licenses
         $recentLicenses = License::where('customer_id', $customer->id)
             ->with(['subscription.product'])
             ->latest()
             ->limit(5)
             ->get();
-        
+
         // Upcoming Renewals
         $upcomingRenewals = Subscription::where('customer_id', $customer->id)
-            ->where('status', 'active')
-            ->where('next_billing_date', '<=', now()->addDays(14))
-            ->with(['product', 'subscriptionPlan'])
+            ->where('status', Subscription::STATUS_ACTIVE)
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<=', now()->addDays(14))
             ->get();
-        
+
         // Notifications
         $notifications = $customer->notifications()
             ->unread()

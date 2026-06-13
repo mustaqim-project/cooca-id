@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 final class Subscription extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids;
 
     protected $table = 'subscriptions';
 
@@ -80,7 +80,7 @@ final class Subscription extends Model
 
     public function isActive(): bool
     {
-        return $this->status === self::STATUS_ACTIVE 
+        return $this->status === self::STATUS_ACTIVE
             && ($this->expires_at === null || $this->expires_at->isFuture());
     }
 

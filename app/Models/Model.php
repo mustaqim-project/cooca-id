@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 abstract class Model extends BaseModel
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids;
 
     protected $guarded = [
         'id',

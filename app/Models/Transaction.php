@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 final class Transaction extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids;
 
     protected $table = 'transactions';
 

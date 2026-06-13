@@ -7,13 +7,11 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\BlogPost;
-use App\Models\Page;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 /**
  * Landing Controller
- * 
+ *
  * Handles public-facing landing pages including home, about, pricing, contact, and affiliate info.
  */
 class LandingController extends Controller
@@ -85,11 +83,7 @@ class LandingController extends Controller
             ],
         ];
 
-        return Inertia::render('Landing/Home', [
-            'products' => $products,
-            'features' => $features,
-            'testimonials' => $testimonials,
-        ]);
+        return view('landing.home', compact('products', 'features', 'testimonials'));
     }
 
     /**
@@ -122,10 +116,7 @@ class LandingController extends Controller
             ],
         ];
 
-        return Inertia::render('Landing/About', [
-            'stats' => $stats,
-            'team' => $team,
-        ]);
+        return view('landing.about', compact('stats', 'team'));
     }
 
     /**
@@ -162,10 +153,7 @@ class LandingController extends Controller
             ],
         ];
 
-        return Inertia::render('Landing/Pricing', [
-            'products' => $products,
-            'faq' => $faq,
-        ]);
+        return view('landing.pricing', compact('products', 'faq'));
     }
 
     /**
@@ -200,9 +188,7 @@ class LandingController extends Controller
             ],
         ];
 
-        return Inertia::render('Landing/Contact', [
-            'contactInfo' => $contactInfo,
-        ]);
+        return view('landing.contact', compact('contactInfo'));
     }
 
     /**
@@ -244,19 +230,15 @@ class LandingController extends Controller
             'monthly' => [
                 'customers' => 10,
                 'avgPrice' => 500000,
-                'commission' => 1250000, // 25% dari 5jt
+                'commission' => 1250000,
             ],
             'yearly' => [
                 'customers' => 10,
                 'avgPrice' => 5000000,
-                'commission' => 12500000, // 25% dari 50jt
+                'commission' => 12500000,
             ],
         ];
 
-        return Inertia::render('Landing/Affiliate', [
-            'benefits' => $benefits,
-            'howItWorks' => $howItWorks,
-            'commissionExample' => $commissionExample,
-        ]);
+        return view('landing.affiliate', compact('benefits', 'howItWorks', 'commissionExample'));
     }
 }
