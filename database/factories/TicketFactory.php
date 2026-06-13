@@ -21,9 +21,9 @@ class TicketFactory extends Factory
         return [
             'id' => (string) Str::uuid(),
             'ticket_number' => 'TKT-' . strtoupper(Str::random(8)),
-            'customer_id' => null,
-            'affiliator_id' => null,
-            'admin_id' => null,
+            'customer_id' => \App\Models\Customer::inRandomOrder()->first()?->id ?? null,
+            'affiliator_id' => \App\Models\Affiliator::inRandomOrder()->first()?->id ?? null,
+            'admin_id' => \App\Models\Admin::inRandomOrder()->first()?->id ?? null,
             'subject' => fake()->sentence(),
             'priority' => fake()->randomElement(['low', 'medium', 'high', 'urgent']),
             'status' => fake()->randomElement(['open', 'in_progress', 'resolved', 'closed']),
