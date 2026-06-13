@@ -1,89 +1,65 @@
-#Vue/Laravel specific
-resources/js/node_modules/
-resources/css/node_modules/
-node_modules/
-
-#Build artifacts
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
 dist/
 build/
-public/build/
-storage/framework/cache/
-storage/framework/sessions/
-storage/framework/views/
-bootstrap/cache/
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
 
-#Environment
+# Dependencies
+.venv/
+venv/
+node_modules/
+vendor/
+composer.lock
+*.lock
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Environment
 .env
 .env.local
 .env.*
-!.env.example
 
-#Editor
+# Editors
 .vscode/
 .idea/
 *.swp
 *.swo
 
-#OS
+# OS generated files
 .DS_Store
 Thumbs.db
 
-#Logs
-*.log
-storage/logs/
-
-#Dependency directories
-vendor/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-#PHP/Laravel
-.php_cs.cache
-.phpunit.result.cache
-composer.lock
-
-#JavaScript
-.npm
-.yarn
-package-lock.json
-yarn.lock
-
-#Python (if present)
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-requirements.txt.bak
-
-#Java/Gradle (if present)
-.gradle/
-build/
-target/
-
-#Temporary files
-*.tmp
-*.temp
-.DS_Store
-*~
-
-#Coverage reports
+# Coverage reports
 coverage/
 htmlcov/
 .coverage
 
-#Database
-*.sqlite
-*.db
+# Laravel specific
+storage/
+bootstrap/cache/
+public/storage
 
-#ZIP archives
+# PHP specific
+*.php~
+.htaccess
+
+# Compressed files
 *.zip
-*.tar
 *.gz
+*.tar
 *.tgz
 *.bz2
 *.xz
@@ -103,3 +79,4 @@ htmlcov/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+```

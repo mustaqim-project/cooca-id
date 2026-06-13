@@ -48,6 +48,11 @@ final class AffiliateCommission extends Model
         'cleared_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'transaction_invoice',
+        'customer_name',
+    ];
+
     public const STATUS_PENDING = 'pending';
     public const STATUS_CLEARED = 'cleared';
     public const STATUS_CANCELLED = 'cancelled';
@@ -104,5 +109,15 @@ final class AffiliateCommission extends Model
     public function isCleared(): bool
     {
         return $this->status === self::STATUS_CLEARED;
+    }
+
+    public function getTransactionInvoiceAttribute(): string
+    {
+        return $this->transaction?->invoice_number ?? 'Unknown';
+    }
+
+    public function getCustomerNameAttribute(): string
+    {
+        return $this->customer?->name ?? 'Unknown';
     }
 }

@@ -109,4 +109,19 @@ final class Affiliator extends Model
               });
         });
     }
+
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(Customer::class, 'affiliator_id');
+    }
+
+    public function downlines(): HasMany
+    {
+        return $this->hasMany(Affiliator::class, 'parent_affiliator_id');
+    }
+
+    public function referralClicks(): int
+    {
+        return 0;
+    }
 }
