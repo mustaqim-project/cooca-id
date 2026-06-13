@@ -1,0 +1,173 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services\License;
+
+use App\Models\ErpRequest;
+use App\Models\License;
+use App\Models\LicenseLog;
+use App\Models\Subscription;
+use App\Models\Domain;
+use App\Services\Notification\NotificationService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+final class TrialActivationService
+{
+    public function __construct(
+        private readonly NotificationService $notificationService,
+    ) {}
+
+    public function activateTrial(ErpRequest $erpRequest, int $trialDays = 14): License
+    {
+        return DB::transaction(function () use ($erpRequest, $trialDays) {
+            $trialStartsAt = now();
+            $trialEndsAt = now()->addDays($trialDays);
+
+            $domain = $this->getOrCreateDomain($erpRequest);
+            $licenseCode = $this->generateUniqueCode();
+            $tokenCode = $this->generateUniqueCode();
+
+            $license = License::create([
+                'customer_id' => $erpRequest->customer_id,
+                'product_id' => $erpRequest->product_id,
+                'subscription_plan_id' => $this->getTrialPlanId(),
+                'erp_request_id' => $erpRequest->id,
+                'license_code' => $licenseCode,
+                'token_code' => $tokenCode,
+                'domain' => $domain->domain,
+                'status' => License::STATUS_ACTIVE,
+                'activated_at' => $trialStartsAt,
+                'expires_at' => $trialEndsAt,
+            ]);
+
+            LicenseLog::log(
+                $license->id->toString(),
+                LicenseLog::ACTION_GENERATED,
+                'License generated for trial activation',
+                ['erp_request_id' => $erpRequest->id->toString(), 'trial_days' => $trialDays],
+                request()->ip(),
+                request()->userAgent()
+            );
+
+            Subscription::create([
+                'customer_id' => $erpRequest->customer_id,
+                'license_id' => $license->id,
+                'subscription_plan_id' => $license->subscription_plan_id,
+                'status' => 'trial',
+                'started_at' => $trialStartsAt,
+                'expires_at' => $trialEndsAt,
+            ]);
+
+            $erpRequest->activateTrial($trialStartsAt, $trialEndsAt);
+            $domain->markAsActive();
+            $this->logActivity($erpRequest, $license);
+            $this->sendNotifications($erpRequest, $license, $trialEndsAt);
+
+            return $license;
+        });
+    }
+
+    private function getOrCreateDomain(ErpRequest $erpRequest): Domain
+    {
+        $existingDomain = Domain::where('erp_request_id', $erpRequest->id)->first();
+        if ($existingDomain) {
+            return $existingDomain;
+        }
+
+        $domainValue = $erpRequest->requested_domain ?? 
+                       ($erpRequest->requested_subdomain ? $erpRequest->requested_subdomain . '.cooca.id' : 'trial-' . Str::random(8) . '.cooca.id');
+
+        return Domain::create([
+            'customer_id' => $erpRequest->customer_id,
+            'erp_request_id' => $erpRequest->id,
+            'domain' => $domainValue,
+            'type' => str_contains($domainValue, 'cooca.id') ? Domain::TYPE_SUBDOMAIN : Domain::TYPE_CUSTOM_DOMAIN,
+            'status' => Domain::STATUS_ACTIVE,
+            'activated_at' => now(),
+        ]);
+    }
+
+    private function getTrialPlanId(): string
+    {
+        $plan = \App\Models\SubscriptionPlan::where('code', 'trial')->first();
+        
+        if (!$plan) {
+            $plan = \App\Models\SubscriptionPlan::create([
+                'name' => 'Trial Plan',
+                'code' => 'trial',
+                'price' => 0,
+                'duration_months' => 0,
+                'is_trial' => true,
+            ]);
+        }
+
+        return $plan->id->toString();
+    }
+
+    private function generateUniqueCode(): string
+    {
+        do {
+            $code = strtoupper(Str::random(16));
+        } while (License::where('license_code', $code)->exists());
+        return $code;
+    }
+
+    private function logActivity(ErpRequest $erpRequest, License $license): void
+    {
+        \App\Models\ActivityLog::create([
+            'causer_id' => auth()->id(),
+            'causer_type' => \App\Models\Admin::class,
+            'action' => 'trial_activated',
+            'module' => 'erp_request',
+            'description' => "Trial activated for customer {$erpRequest->customer->email}",
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'metadata' => [
+                'erp_request_id' => $erpRequest->id->toString(),
+                'customer_id' => $erpRequest->customer_id->toString(),
+                'license_id' => $license->id->toString(),
+                'license_code' => $license->license_code,
+            ],
+        ]);
+    }
+
+    private function sendNotifications(ErpRequest $erpRequest, License $license, \DateTimeInterface $trialEndsAt): void
+    {
+        $customer = $erpRequest->customer;
+
+        $this->notificationService->queueEmail(
+            $customer->email,
+            'Trial Activated - Your COOCA.ID ERP is Ready!',
+            'notifications.trial.activated',
+            [
+                'customerName' => $customer->name,
+                'businessName' => $customer->business_name,
+                'domain' => $license->domain,
+                'licenseCode' => $license->license_code,
+                'tokenCode' => $license->token_code,
+                'trialEndsAt' => $trialEndsAt->format('d F Y'),
+                'loginUrl' => route('customer.login'),
+            ]
+        );
+
+        if (!empty($customer->phone)) {
+            $this->notificationService->queueWhatsApp(
+                $customer->phone,
+                "🎉 Trial Activated!\n\nYour COOCA.ID ERP is ready.\nDomain: {$license->domain}\nLicense: {$license->license_code}\nTrial ends: {$trialEndsAt->format('d M Y')}\n\nLogin: " . route('customer.login')
+            );
+        }
+
+        $this->notificationService->createDatabaseNotification(
+            $customer,
+            'trial_activated',
+            'Your trial has been activated! Your ERP system is ready to use.',
+            [
+                'license_code' => $license->license_code,
+                'domain' => $license->domain,
+                'trial_ends_at' => $trialEndsAt->toIso8601String(),
+            ]
+        );
+    }
+}

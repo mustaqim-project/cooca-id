@@ -6,21 +6,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/**
- * @property string $id
- * @property string $transaction_id
- * @property string $invoice_number
- * @property string $customer_id
- * @property float $amount
- * @property string $status
- * @property \Carbon\Carbon $issued_at
- * @property \Carbon\Carbon $due_at
- * @property string|null $pdf_path
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- */
 final class Invoice extends Model
 {
     use HasFactory, HasUuids;
@@ -45,44 +33,24 @@ final class Invoice extends Model
     ];
 
     public const STATUS_DRAFT = 'draft';
-    public const STATUS_SENT = 'sent';
+    public const STATUS_ISSUED = 'issued';
     public const STATUS_PAID = 'paid';
     public const STATUS_OVERDUE = 'overdue';
     public const STATUS_CANCELLED = 'cancelled';
 
-    public static function getStatuses(): array
-    {
-        return [
-            self::STATUS_DRAFT,
-            self::STATUS_SENT,
-            self::STATUS_PAID,
-            self::STATUS_OVERDUE,
-            self::STATUS_CANCELLED,
-        ];
-    }
-
-    public function transaction(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function transaction(): BelongsTo
     {
         return $this->belongsTo(Transaction::class, 'transaction_id');
     }
 
-    public function customer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'customer_id');
     }
 
-    public function scopePaid($query): \Illuminate\Database\Eloquent\Builder
+    public function payments(): HasMany
     {
-        return $query->where('status', self::STATUS_PAID);
-    }
-
-    public function scopeOverdue($query): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('status', self::STATUS_OVERDUE)
-            ->orWhere(function ($q) {
-                $q->where('status', self::STATUS_SENT)
-                    ->where('due_at', '<', now());
-            });
+        return $this->hasMany(Payment::class, 'invoice_id');
     }
 
     public function isPaid(): bool
@@ -90,9 +58,31 @@ final class Invoice extends Model
         return $this->status === self::STATUS_PAID;
     }
 
-    public function isOverdue(): bool
+    public function isDraft(): bool
     {
-        return $this->status === self::STATUS_OVERDUE
-            || ($this->status === self::STATUS_SENT && $this->due_at->isPast());
+        return $this->status === self::STATUS_DRAFT;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === self::STATUS_CANCELLED;
+    }
+
+    public function markAsIssued(): void
+    {
+        $this->update([
+            'status' => self::STATUS_ISSUED,
+            'issued_at' => now(),
+        ]);
+    }
+
+    public function markAsPaid(): void
+    {
+        $this->update(['status' => self::STATUS_PAID]);
+    }
+
+    public function markAsCancelled(): void
+    {
+        $this->update(['status' => self::STATUS_CANCELLED]);
     }
 }
