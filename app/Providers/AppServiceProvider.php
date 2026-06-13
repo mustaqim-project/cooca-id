@@ -1,36 +1,59 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 use App\Repositories\Contracts\{
     AdminRepositoryInterface,
     AffiliateCommissionRepositoryInterface,
     AffiliatorRepositoryInterface,
     CustomerRepositoryInterface,
+    InvoiceRepositoryInterface,
     LicenseRepositoryInterface,
+    NotificationTemplateRepositoryInterface,
     ProductRepositoryInterface,
+    SubscriptionPlanRepositoryInterface,
     SubscriptionRepositoryInterface,
     TransactionRepositoryInterface,
     VoucherRepositoryInterface,
+    VoucherUsageRepositoryInterface,
 };
 use App\Repositories\Eloquent\{
     AdminRepository,
     AffiliateCommissionRepository,
     AffiliatorRepository,
     CustomerRepository,
+    InvoiceRepository,
     LicenseRepository,
+    NotificationTemplateRepository,
     ProductRepository,
     SubscriptionPlanRepository,
     SubscriptionRepository,
     TransactionRepository,
     VoucherRepository,
+    VoucherUsageRepository,
 };
-use App\Repositories\Contracts\SubscriptionPlanRepositoryInterface;
-use App\Repositories\Contracts\VoucherUsageRepositoryInterface;
-use App\Repositories\Eloquent\VoucherUsageRepository;
+use App\Models\{
+    License,
+    Transaction,
+    AffiliateCommission,
+    AffiliateWithdrawal,
+    Customer,
+    Affiliator,
+    Voucher,
+    Subscription,
+};
+use App\Policies\{
+    LicensePolicy,
+    TransactionPolicy,
+    AffiliateCommissionPolicy,
+    AffiliateWithdrawalPolicy,
+    CustomerPolicy,
+    AffiliatorPolicy,
+    VoucherPolicy,
+    SubscriptionPolicy,
+};
 
 final class AppServiceProvider extends ServiceProvider
 {
@@ -39,17 +62,25 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(AdminRepositoryInterface::class, AdminRepository::class);
-        $this->app->bind(AffiliateCommissionRepositoryInterface::class, AffiliateCommissionRepository::class);
-        $this->app->bind(AffiliatorRepositoryInterface::class, AffiliatorRepository::class);
-        $this->app->bind(CustomerRepositoryInterface::class, CustomerRepository::class);
-        $this->app->bind(LicenseRepositoryInterface::class, LicenseRepository::class);
-        $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
-        $this->app->bind(SubscriptionRepositoryInterface::class, SubscriptionRepository::class);
-        $this->app->bind(SubscriptionPlanRepositoryInterface::class, SubscriptionPlanRepository::class);
-        $this->app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
-        $this->app->bind(VoucherRepositoryInterface::class, VoucherRepository::class);
-        $this->app->bind(VoucherUsageRepositoryInterface::class, VoucherUsageRepository::class);
+        $bindings = [
+            AdminRepositoryInterface::class => AdminRepository::class,
+            AffiliateCommissionRepositoryInterface::class => AffiliateCommissionRepository::class,
+            AffiliatorRepositoryInterface::class => AffiliatorRepository::class,
+            CustomerRepositoryInterface::class => CustomerRepository::class,
+            InvoiceRepositoryInterface::class => InvoiceRepository::class,
+            LicenseRepositoryInterface::class => LicenseRepository::class,
+            NotificationTemplateRepositoryInterface::class => NotificationTemplateRepository::class,
+            ProductRepositoryInterface::class => ProductRepository::class,
+            SubscriptionPlanRepositoryInterface::class => SubscriptionPlanRepository::class,
+            SubscriptionRepositoryInterface::class => SubscriptionRepository::class,
+            TransactionRepositoryInterface::class => TransactionRepository::class,
+            VoucherRepositoryInterface::class => VoucherRepository::class,
+            VoucherUsageRepositoryInterface::class => VoucherUsageRepository::class,
+        ];
+
+        foreach ($bindings as $interface => $implementation) {
+            $this->app->bind($interface, $implementation);
+        }
     }
 
     /**
@@ -63,15 +94,14 @@ final class AppServiceProvider extends ServiceProvider
 
     private function bootPolicies(): void
     {
-        \Illuminate\Support\Facades\Gate::policy(\App\Models\License::class, \App\Policies\LicensePolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\App\Models\Transaction::class, \App\Policies\TransactionPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\App\Models\Subscription::class, \App\Policies\SubscriptionPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\App\Models\AffiliateCommission::class, \App\Policies\AffiliateCommissionPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\App\Models\AffiliateWithdrawal::class, \App\Policies\AffiliateWithdrawalPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\App\Models\Voucher::class, \App\Policies\VoucherPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\App\Models\Ticket::class, \App\Policies\TicketPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\App\Models\Review::class, \App\Policies\ReviewPolicy::class);
-        \Illuminate\Support\Facades\Gate::policy(\App\Models\Invoice::class, \App\Policies\InvoicePolicy::class);
+        Gate::policy(License::class, LicensePolicy::class);
+        Gate::policy(Transaction::class, TransactionPolicy::class);
+        Gate::policy(AffiliateCommission::class, AffiliateCommissionPolicy::class);
+        Gate::policy(AffiliateWithdrawal::class, AffiliateWithdrawalPolicy::class);
+        Gate::policy(Customer::class, CustomerPolicy::class);
+        Gate::policy(Affiliator::class, AffiliatorPolicy::class);
+        Gate::policy(Voucher::class, VoucherPolicy::class);
+        Gate::policy(Subscription::class, SubscriptionPolicy::class);
     }
 
     private function bootObservers(): void

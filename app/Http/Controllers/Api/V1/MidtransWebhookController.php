@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
@@ -25,16 +23,16 @@ final class MidtransWebhookController extends Controller
         $rawPayload = $request->getContent();
         $signature = $request->header('X-Signature-Key', '');
         
-        // Verify Midtrans signature
+        // Verify Midtrans signature with TWO arguments
         if (!$this->paymentService->verifyWebhookSignature($rawPayload, $signature)) {
-            Log::warning('Invalid Midtrans webhook signature', ['payload' => $rawPayload]);
+            Log::warning('Invalid Midtrans webhook signature', ['ip' => $request->ip()]);
             
             return response()->json([
                 'message' => 'Invalid signature',
             ], 401);
         }
 
-        $payload = $request->all();
+        $payload = json_decode($rawPayload, true);
 
         try {
             $orderId = $payload['order_id'] ?? null;

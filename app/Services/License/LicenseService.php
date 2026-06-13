@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Services\License;
 
@@ -9,10 +7,13 @@ use App\Models\Customer;
 use App\DTOs\License\LicenseData;
 use App\Repositories\Contracts\LicenseRepositoryInterface;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 
 final class LicenseService
 {
+    private const int CACHE_TTL = 900;
+
     public function __construct(
         private readonly LicenseRepositoryInterface $licenseRepository,
     ) {}
@@ -34,13 +35,13 @@ final class LicenseService
 
     /**
      * Validate license with triple-check: domain + code + token
-     * Uses Redis caching for performance (1 hour TTL)
+     * Uses Redis caching for performance (15 minutes TTL)
      */
-    public function validateLicense(string $domain, string $licenseCode, string $tokenCode): array
+    public function validateLicense(string $domain, string $licenseCode, ?string $tokenCode): array
     {
-        $cacheKey = "license:validate:{$domain}:{$licenseCode}:{$tokenCode}";
+        $cacheKey = $this->buildCacheKey($domain, $licenseCode, $tokenCode ?? '');
 
-        return Cache::remember($cacheKey, 3600, function () use ($domain, $licenseCode, $tokenCode) {
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($domain, $licenseCode, $tokenCode) {
             $license = $this->licenseRepository->findByDomainAndCode($domain, $licenseCode);
 
             if (!$license) {
@@ -51,8 +52,7 @@ final class LicenseService
                 ];
             }
 
-            // Triple validation: domain + license_code + token_code
-            if ($license->token_code !== $tokenCode) {
+            if ($tokenCode !== null && $license->token_code !== $tokenCode) {
                 return [
                     'valid' => false,
                     'status' => 'invalid',
@@ -114,7 +114,7 @@ final class LicenseService
     /**
      * Revoke a license
      */
-    public function revokeLicense(License $license, string $reason, ?\UuidInterface $adminId): License
+    public function revokeLicense(License $license, string $reason, ?\Ramsey\Uuid\UuidInterface $adminId): License
     {
         $license = $this->licenseRepository->update($license->id, [
             'status' => 'revoked',
@@ -123,7 +123,6 @@ final class LicenseService
             'revocation_reason' => $reason,
         ]);
 
-        // Clear cache
         $this->clearLicenseCache($license);
 
         return $license;
@@ -152,6 +151,14 @@ final class LicenseService
     }
 
     /**
+     * Find license by code
+     */
+    public function findByCode(string $code): ?License
+    {
+        return $this->licenseRepository->findByCode($code);
+    }
+
+    /**
      * Generate unique 16-character code
      */
     private function generateUniqueCode(): string
@@ -168,8 +175,32 @@ final class LicenseService
      */
     private function clearLicenseCache(License $license): void
     {
-        $cacheKey = "license:validate:{$license->domain}:{$license->license_code}:{$license->token_code}";
-        
+        $cacheKey = $this->buildCacheKey(
+            $license->domain,
+            $license->license_code,
+            $license->token_code
+        );
         Cache::forget($cacheKey);
+        
+        // Also clear wildcard pattern if Redis available
+        if (config('cache.default') === 'redis') {
+            try {
+                $pattern = "license:validate:{$license->domain}:{$license->license_code}:*";
+                $keys = Redis::keys($pattern);
+                if (!empty($keys)) {
+                    Redis::del($keys);
+                }
+            } catch (\Exception $e) {
+                // Redis not available or error occurred
+            }
+        }
+    }
+
+    /**
+     * Build cache key from parts
+     */
+    private function buildCacheKey(string ...$parts): string
+    {
+        return 'license:validate:' . implode(':', $parts);
     }
 }

@@ -1,68 +1,54 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Jobs\Notification\SendSubscriptionExpiryReminderJob;
 use App\Models\Subscription;
+use App\Jobs\Notification\SendSubscriptionExpiryReminderJob;
 use Illuminate\Console\Command;
 
 final class SendSubscriptionExpiryRemindersCommand extends Command
 {
-    protected $signature = 'subscriptions:send-reminders';
-    protected $description = 'Send subscription expiry reminders (H-7 and H-1)';
+    protected $signature = 'subscriptions:remind {--days=7}';
+    protected $description = 'Send subscription expiry reminders for specified days before expiry';
 
     public function handle(): int
     {
-        $this->info('Sending subscription expiry reminders...');
+        $days = (int) $this->option('days');
+        
+        $this->info("Sending subscription expiry reminders (H-{$days})...");
 
-        // H-7 reminder
-        $sevenDaysBefore = now()->addDays(7)->startOfDay();
-        $subscriptions7Days = Subscription::where('status', 'active')
-            ->whereDate('expires_at', $sevenDaysBefore)
+        $targetDate = now()->addDays($days)->startOfDay();
+        
+        $subscriptions = Subscription::where('status', 'active')
+            ->whereDate('ends_at', $targetDate)
             ->with(['customer', 'license.product'])
             ->get();
 
-        foreach ($subscriptions7Days as $subscription) {
+        if ($subscriptions->isEmpty()) {
+            $this->info("No subscriptions expiring in {$days} days.");
+            return self::SUCCESS;
+        }
+
+        $count = 0;
+
+        foreach ($subscriptions as $subscription) {
             try {
                 SendSubscriptionExpiryReminderJob::dispatch(
                     $subscription->customer,
                     $subscription,
-                    7
+                    $days
                 );
 
-                $this->line("✓ Sent H-7 reminder to {$subscription->customer->email}");
+                $this->line("✓ Sent H-{$days} reminder to {$subscription->customer->email}");
+                $count++;
             } catch (\Throwable $e) {
                 report($e);
-                $this->error("Failed to send H-7 reminder to {$subscription->customer->email}");
+                $this->error("Failed to send H-{$days} reminder to {$subscription->customer->email}");
             }
         }
 
-        // H-1 reminder
-        $oneDayBefore = now()->addDays(1)->startOfDay();
-        $subscriptions1Day = Subscription::where('status', 'active')
-            ->whereDate('expires_at', $oneDayBefore)
-            ->with(['customer', 'license.product'])
-            ->get();
+        $this->info("Total reminders sent: {$count}");
 
-        foreach ($subscriptions1Day as $subscription) {
-            try {
-                SendSubscriptionExpiryReminderJob::dispatch(
-                    $subscription->customer,
-                    $subscription,
-                    1
-                );
-
-                $this->line("✓ Sent H-1 reminder to {$subscription->customer->email}");
-            } catch (\Throwable $e) {
-                report($e);
-                $this->error("Failed to send H-1 reminder to {$subscription->customer->email}");
-            }
-        }
-
-        $totalSent = $subscriptions7Days->count() + $subscriptions1Day->count();
-        $this->info("Total reminders sent: {$totalSent}");
-
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 }
