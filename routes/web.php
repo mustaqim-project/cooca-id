@@ -24,6 +24,20 @@ Route::get('/about', [LandingController::class, 'about'])->name('about');
 Route::get('/pricing', [LandingController::class, 'pricing'])->name('pricing');
 Route::get('/contact', [LandingController::class, 'contact'])->name('contact');
 Route::get('/affiliate', [LandingController::class, 'affiliate'])->name('affiliate');
+Route::get('/features', [LandingController::class, 'features'])->name('features');
+Route::get('/faq', [LandingController::class, 'faq'])->name('faq');
+Route::get('/docs', [LandingController::class, 'docs'])->name('docs');
+Route::get('/terms', [LandingController::class, 'terms'])->name('terms');
+Route::get('/privacy', [LandingController::class, 'privacy'])->name('privacy');
+
+// Product Catalog
+Route::prefix('products')->name('products.')->group(function () {
+    Route::get('/', [LandingController::class, 'products'])->name('index');
+    Route::get('/erp-restoran', [LandingController::class, 'productRestoran'])->name('restoran');
+    Route::get('/erp-klinik', [LandingController::class, 'productKlinik'])->name('klinik');
+    Route::get('/erp-bengkel', [LandingController::class, 'productBengkel'])->name('bengkel');
+    Route::get('/erp-legal', [LandingController::class, 'productLegal'])->name('legal');
+});
 
 // Blog
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');

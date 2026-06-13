@@ -241,4 +241,140 @@ class LandingController extends Controller
 
         return view('landing.affiliate', compact('benefits', 'howItWorks', 'commissionExample'));
     }
+
+    /**
+     * Display the features page.
+     */
+    public function features()
+    {
+        return view('pages.features');
+    }
+
+    /**
+     * Display the FAQ page.
+     */
+    public function faq()
+    {
+        return view('pages.faq');
+    }
+
+    /**
+     * Display the documentation page.
+     */
+    public function docs()
+    {
+        return view('pages.docs.index');
+    }
+
+    /**
+     * Display the Terms of Service page.
+     */
+    public function terms()
+    {
+        return view('pages.legal.terms');
+    }
+
+    /**
+     * Display the Privacy Policy page.
+     */
+    public function privacy()
+    {
+        return view('pages.legal.privacy');
+    }
+
+    /**
+     * Display the products catalog page.
+     */
+    public function products()
+    {
+        $products = Product::where('is_active', true)
+            ->with(['category', 'subscriptionPlans'])
+            ->get();
+
+        return view('pages.products.index', compact('products'));
+    }
+
+    /**
+     * Display ERP Restoran product detail.
+     */
+    public function productRestoran()
+    {
+        $product = Product::where('slug', 'erp-restoran')
+            ->with(['category', 'subscriptionPlans', 'features'])
+            ->first();
+
+        $features = [
+            'Manajemen Meja & Reservasi',
+            'POS & Kitchen Display System',
+            'Manajemen Resep & Bahan Baku',
+            'Laporan Penjualan & Stok',
+            'QR Code Menu',
+            'Delivery Order Integration',
+        ];
+
+        return view('pages.products.restoran', compact('product', 'features'));
+    }
+
+    /**
+     * Display ERP Klinik product detail.
+     */
+    public function productKlinik()
+    {
+        $product = Product::where('slug', 'erp-klinik')
+            ->with(['category', 'subscriptionPlans', 'features'])
+            ->first();
+
+        $features = [
+            'Rekam Medis Elektronik (EMR)',
+            'Sistem Antrian Pasien',
+            'Manajemen Farmasi & Obat',
+            'Billing & Asuransi',
+            'Janji Temu Online',
+            'Telemedicine Ready',
+        ];
+
+        return view('pages.products.klinik', compact('product', 'features'));
+    }
+
+    /**
+     * Display ERP Bengkel product detail.
+     */
+    public function productBengkel()
+    {
+        $product = Product::where('slug', 'erp-bengkel')
+            ->with(['category', 'subscriptionPlans', 'features'])
+            ->first();
+
+        $features = [
+            'Job Order & Service Tracking',
+            'Manajemen Sparepart',
+            'Estimasi Biaya & Invoice',
+            'Riwayat Kendaraan Pelanggan',
+            'Reminder Servis Berkala',
+            'Integration dengan Marketplace Parts',
+        ];
+
+        return view('pages.products.bengkel', compact('product', 'features'));
+    }
+
+    /**
+     * Display ERP Legal product detail.
+     */
+    public function productLegal()
+    {
+        $product = Product::where('slug', 'erp-legal')
+            ->with(['category', 'subscriptionPlans', 'features'])
+            ->first();
+
+        $features = [
+            'Case Management',
+            'Billing Hours & Time Tracking',
+            'Dokumentasi & Kontrak',
+            'Client Portal & Communication',
+            'Court Calendar & Reminders',
+            'Document Template Generator',
+        ];
+
+        return view('pages.products.legal', compact('product', 'features'));
+    }
 }
