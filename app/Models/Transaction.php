@@ -63,6 +63,10 @@ final class Transaction extends Model
         'refunded_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'customer_name',
+    ];
+
     public const STATUS_PENDING = 'pending';
     public const STATUS_PAID = 'paid';
     public const STATUS_FAILED = 'failed';
@@ -121,5 +125,10 @@ final class Transaction extends Model
     public function isPending(): bool
     {
         return $this->status === self::STATUS_PENDING;
+    }
+
+    public function getCustomerNameAttribute(): string
+    {
+        return $this->customer?->name ?? 'Unknown';
     }
 }

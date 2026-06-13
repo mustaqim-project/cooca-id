@@ -35,11 +35,17 @@ interface Props {
   subscriptions: Subscription[];
   licenses: License[];
   recentTransactions: Transaction[];
+  recentLicenses: any[];
+  upcomingRenewals: any[];
+  notifications: any[];
   stats: {
+    activeLicenses: number;
+    expiringLicenses: number;
+    totalSubscriptions: number;
     activeSubscriptions: number;
-    totalLicenses: number;
-    totalSpent: number;
     pendingInvoices: number;
+    unpaidInvoicesAmount: number;
+    totalSpent: number;
   };
 }
 
@@ -95,7 +101,7 @@ const getStatusColor = (status: string) => {
       <StatCards
         :stats="[
           { label: 'Subscripsi Aktif', value: stats.activeSubscriptions.toString(), icon: '📦', trend: 'stable' },
-          { label: 'Total Lisensi', value: stats.totalLicenses.toString(), icon: '🔑', trend: 'stable' },
+          { label: 'Lisensi Aktif', value: stats.activeLicenses.toString(), icon: '🔑', trend: 'stable' },
           { label: 'Total Pengeluaran', value: formatCurrency(stats.totalSpent), icon: '💰', trend: 'up' },
           { label: 'Invoice Pending', value: stats.pendingInvoices.toString(), icon: '📄', trend: 'down' },
         ]"
@@ -118,9 +124,9 @@ const getStatusColor = (status: string) => {
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="sub in subscriptions" :key="sub.id">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ sub.product_name }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ sub.plan_name }}</td>
+              <tr v-for="sub in recentLicenses" :key="sub.id">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ sub.subscription?.product?.name || '-' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ sub.subscription?.plan?.name || '-' }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span :class="['px-2 py-1 text-xs font-medium rounded-full', getStatusColor(sub.status)]">
                     {{ sub.status }}
@@ -133,7 +139,7 @@ const getStatusColor = (status: string) => {
                   </Link>
                 </td>
               </tr>
-              <tr v-if="subscriptions.length === 0">
+              <tr v-if="recentLicenses.length === 0">
                 <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">
                   Belum ada subscripsi aktif. Mulai dengan membeli produk pertama Anda.
                 </td>

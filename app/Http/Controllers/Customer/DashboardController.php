@@ -86,13 +86,13 @@ final class DashboardController extends Controller
 
         return Inertia::render('Customer/Dashboard/Index', [
             'stats' => [
-                'active_licenses' => $activeLicenses,
-                'expiring_licenses' => $expiringLicenses,
-                'total_subscriptions' => $totalSubscriptions,
-                'active_subscriptions' => $activeSubscriptions,
-                'pending_invoices' => $pendingInvoices,
-                'unpaid_invoices_amount' => $unpaidInvoicesAmount,
-                'total_spent' => $totalSpent,
+                'activeLicenses' => $activeLicenses,
+                'expiringLicenses' => $expiringLicenses,
+                'totalSubscriptions' => $totalSubscriptions,
+                'activeSubscriptions' => $activeSubscriptions,
+                'pendingInvoices' => $pendingInvoices,
+                'unpaidInvoicesAmount' => $unpaidInvoicesAmount,
+                'totalSpent' => $totalSpent,
             ],
             'recentTransactions' => $recentTransactions,
             'recentLicenses' => $recentLicenses,

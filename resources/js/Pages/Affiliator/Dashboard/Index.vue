@@ -31,6 +31,9 @@ interface Props {
   commissions: Commission[];
   referrals: Referral[];
   downlines: Referral[];
+  recentCommissions?: Commission[];
+  recentWithdrawals?: any[];
+  commissionTrend?: any[];
   stats: {
     totalBalance: number;
     totalEarned: number;
@@ -179,7 +182,7 @@ const activeTab = ref<'commissions' | 'referrals' | 'downlines'>('commissions');
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-for="comm in commissions" :key="comm.id">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ comm.transaction_invoice }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ comm.customer_name }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ comm.customer_name || '-' }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span :class="comm.level === 1 ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'" class="px-2 py-1 text-xs font-medium rounded-full">
                     Level {{ comm.level }}
