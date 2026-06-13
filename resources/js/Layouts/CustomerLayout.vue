@@ -20,14 +20,25 @@ const sidebarOpen = ref(false);
 
 const navigation = computed(() => [
     { name: 'Dashboard', href: route('customer.dashboard'), icon: 'home' },
-    { name: 'Products', href: route('customer.products.index'), icon: 'box' },
-    { name: 'My Subscriptions', href: route('customer.subscriptions.index'), icon: 'refresh' },
-    { name: 'Licenses', href: route('customer.licenses.index'), icon: 'key' },
-    { name: 'Invoices', href: route('customer.invoices.index'), icon: 'document-text' },
+    { name: 'Produk', href: route('customer.products.index'), icon: 'box' },
+    { name: 'Subscripsi Saya', href: route('customer.subscriptions.index'), icon: 'refresh' },
+    { name: 'Lisensi', href: route('customer.licenses.index'), icon: 'key' },
+    { name: 'Invoice', href: route('customer.invoices.index'), icon: 'document-text' },
 ]);
 
 const toggleSidebar = () => {
     sidebarOpen.value = !sidebarOpen.value;
+};
+
+const getIconPath = (icon: string): string => {
+    const icons: Record<string, string> = {
+        home: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+        box: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
+        refresh: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15',
+        key: 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z',
+        'document-text': 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+    };
+    return icons[icon] || icons.home;
 };
 </script>
 
@@ -93,7 +104,7 @@ const toggleSidebar = () => {
                     <div class="flex items-center space-x-4">
                         <div class="text-right">
                             <p class="text-sm font-medium text-gray-900">{{ user?.name }}</p>
-                            <p class="text-xs text-gray-500">{{ user?.business_name }}</p>
+                            <p class="text-xs text-gray-500">{{ user?.business_name || '-' }}</p>
                         </div>
                         <Link
                             :href="route('customer.logout')"
@@ -116,20 +127,3 @@ const toggleSidebar = () => {
         </div>
     </div>
 </template>
-
-<script lang="ts">
-export default {
-    methods: {
-        getIconPath(icon: string): string {
-            const icons: Record<string, string> = {
-                home: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
-                box: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
-                refresh: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15',
-                key: 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z',
-                'document-text': 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-            };
-            return icons[icon] || icons.home;
-        }
-    }
-};
-</script>
