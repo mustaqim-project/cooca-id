@@ -1,123 +1,62 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * @property string $id
- * @property string $affiliator_id
- * @property string $transaction_id
- * @property string $customer_id
- * @property int $level
- * @property float $gross_amount
- * @property float $commission_percent
- * @property float $commission_amount
- * @property string $status
- * @property \Carbon\Carbon|null $cleared_at
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- */
-final class AffiliateCommission extends Model
+class AffiliateCommission extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
-
     protected $table = 'affiliate_commissions';
 
     protected $fillable = [
-        'affiliator_id',
-        'transaction_id',
+        'affiliate_id',
+        'order_id',
         'customer_id',
         'level',
         'gross_amount',
-        'commission_percent',
+        'commission_rate',
         'commission_amount',
         'status',
-        'cleared_at',
+        'settled_at',
+        'calculated_at',
     ];
 
     protected $casts = [
-        'level' => 'integer',
         'gross_amount' => 'decimal:2',
-        'commission_percent' => 'decimal:2',
+        'commission_rate' => 'decimal:4',
         'commission_amount' => 'decimal:2',
-        'cleared_at' => 'datetime',
+        'settled_at' => 'datetime',
+        'calculated_at' => 'datetime',
     ];
 
-    protected $appends = [
-        'transaction_invoice',
-        'customer_name',
-    ];
-
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_CLEARED = 'cleared';
-    public const STATUS_CANCELLED = 'cancelled';
-
-    public static function getStatuses(): array
+    public function affiliate(): BelongsTo
     {
-        return [
-            self::STATUS_PENDING,
-            self::STATUS_CLEARED,
-            self::STATUS_CANCELLED,
-        ];
+        return $this->belongsTo(User::class, 'affiliate_id');
     }
 
-    public function affiliator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function order(): BelongsTo
     {
-        return $this->belongsTo(Affiliator::class, 'affiliator_id');
+        return $this->belongsTo(Order::class);
     }
 
-    public function transaction(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function customer(): BelongsTo
     {
-        return $this->belongsTo(Transaction::class, 'transaction_id');
+        return $this->belongsTo(User::class, 'customer_id');
     }
 
-    public function customer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function getFormattedAmountAttribute(): string
     {
-        return $this->belongsTo(Customer::class, 'customer_id');
+        return number_format($this->commission_amount, 0, ',', '.');
     }
 
-    public function scopeLevel1($query): \Illuminate\Database\Eloquent\Builder
+    public function getFormattedGrossAttribute(): string
     {
-        return $query->where('level', 1);
+        return number_format($this->gross_amount, 0, ',', '.');
     }
 
-    public function scopeLevel2($query): \Illuminate\Database\Eloquent\Builder
+    public function getPercentageAttribute(): string
     {
-        return $query->where('level', 2);
-    }
-
-    public function scopePending($query): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('status', self::STATUS_PENDING);
-    }
-
-    public function scopeCleared($query): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('status', self::STATUS_CLEARED);
-    }
-
-    public function isPending(): bool
-    {
-        return $this->status === self::STATUS_PENDING;
-    }
-
-    public function isCleared(): bool
-    {
-        return $this->status === self::STATUS_CLEARED;
-    }
-
-    public function getTransactionInvoiceAttribute(): string
-    {
-        return $this->transaction?->invoice_number ?? 'Unknown';
-    }
-
-    public function getCustomerNameAttribute(): string
-    {
-        return $this->customer?->name ?? 'Unknown';
+        return number_format($this->commission_rate * 100, 1) . '%';
     }
 }
