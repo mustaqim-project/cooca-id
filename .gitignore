@@ -1,42 +1,37 @@
 ```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-dist/
-build/
-target/
-
 # Dependencies
 node_modules/
+
+# Build artifacts
+dist/
+build/
+public/build/
+
+# Cache directories
+bootstrap/cache/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
 vendor/
+
+# Environment
 .env
 .env.local
 .env.*
 
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-
-# Editors
+# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# System files
+# OS
 .DS_Store
 Thumbs.db
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
+# Logs
+*.log
 
-# Cache directories
-.mypy_cache/
-.pytest_cache/
-.gradle/
+# Temporary files
+*.tmp
+*.swp
+*~
 ```
