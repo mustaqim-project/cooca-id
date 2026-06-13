@@ -34,11 +34,14 @@ final class TrialActivationService
                 'product_id' => $erpRequest->product_id,
                 'subscription_plan_id' => $this->getTrialPlanId(),
                 'erp_request_id' => $erpRequest->id,
+                'domain_id' => $domain->id,
                 'license_code' => $licenseCode,
                 'token_code' => $tokenCode,
                 'domain' => $domain->domain,
                 'status' => License::STATUS_ACTIVE,
+                'is_trial' => true,
                 'activated_at' => $trialStartsAt,
+                'starts_at' => $trialStartsAt,
                 'expires_at' => $trialEndsAt,
             ]);
 
@@ -55,10 +58,16 @@ final class TrialActivationService
                 'customer_id' => $erpRequest->customer_id,
                 'license_id' => $license->id,
                 'subscription_plan_id' => $license->subscription_plan_id,
-                'status' => 'trial',
+                'status' => Subscription::STATUS_ACTIVE,
                 'started_at' => $trialStartsAt,
                 'expires_at' => $trialEndsAt,
             ]);
+
+            // Link subscription to license
+            $license->subscription_id = Subscription::where('license_id', $license->id)
+                ->latest('created_at')
+                ->first()?->id;
+            $license->save();
 
             $erpRequest->activateTrial($trialStartsAt, $trialEndsAt);
             $domain->markAsActive();

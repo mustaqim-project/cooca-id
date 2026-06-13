@@ -36,11 +36,16 @@ final class License extends Model
         'customer_id',
         'product_id',
         'subscription_plan_id',
+        'erp_request_id',
+        'subscription_id',
+        'domain_id',
         'license_code',
         'token_code',
         'domain',
         'status',
+        'is_trial',
         'activated_at',
+        'starts_at',
         'expires_at',
         'revoked_at',
         'revoked_by',
@@ -51,6 +56,8 @@ final class License extends Model
         'activated_at' => 'datetime',
         'expires_at' => 'datetime',
         'revoked_at' => 'datetime',
+        'starts_at' => 'datetime',
+        'is_trial' => 'boolean',
     ];
 
     protected $hidden = [
@@ -87,9 +94,19 @@ final class License extends Model
         return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
     }
 
-    public function subscription(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function erpRequest(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->hasOne(Subscription::class, 'license_id');
+        return $this->belongsTo(ErpRequest::class, 'erp_request_id');
+    }
+
+    public function subscription(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Subscription::class, 'subscription_id');
+    }
+
+    public function domain(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Domain::class, 'domain_id');
     }
 
     public function revokedBy(): \Illuminate\Database\Eloquent\Relations\BelongsTo
