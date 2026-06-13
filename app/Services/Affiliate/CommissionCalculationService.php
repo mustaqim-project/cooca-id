@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Affiliate;
 
-use App\Models\Order;
-use App\Models\User;
+use App\Models\Transaction;
+use App\Models\Affiliator;
 use App\Models\AffiliateWallet;
 use App\Models\AffiliateCommission;
 use Illuminate\Support\Facades\DB;
 
-class CommissionCalculationService
+final class CommissionCalculationService
 {
     /**
      * Level 1 commission rate: 25%
@@ -18,32 +20,33 @@ class CommissionCalculationService
     const LEVEL_2_RATE = 0.05;
 
     /**
-     * Calculate and record commissions for an order
+     * Calculate and record commissions for a transaction
      */
-    public function calculateForOrder(Order $order): void
+    public function calculateForTransaction(Transaction $transaction): void
     {
-        if (!$order->affiliate_id) {
+        if (!$transaction->customer?->affiliator_id) {
             return;
         }
 
         DB::beginTransaction();
         try {
-            $affiliate = User::findOrFail($order->affiliate_id);
+            $customer = $transaction->customer;
+            $affiliate = Affiliator::findOrFail($customer->affiliator_id);
             
             // Calculate based on gross revenue (before voucher discount)
-            $grossAmount = $order->gross_amount ?? $order->total_amount;
+            $grossAmount = $transaction->gross_amount;
             
             // Level 1 commission (direct referral)
             $level1Commission = $grossAmount * self::LEVEL_1_RATE;
             
-            $this->recordCommission($affiliate, $order, $level1Commission, 1);
+            $this->recordCommission($affiliate, $transaction, $level1Commission, 1);
 
             // Level 2 commission (upline)
-            if ($affiliate->referrer_id) {
-                $upline = User::findOrFail($affiliate->referrer_id);
+            if ($affiliate->parent_affiliator_id) {
+                $upline = Affiliator::findOrFail($affiliate->parent_affiliator_id);
                 $level2Commission = $grossAmount * self::LEVEL_2_RATE;
                 
-                $this->recordCommission($upline, $order, $level2Commission, 2);
+                $this->recordCommission($upline, $transaction, $level2Commission, 2);
             }
 
             DB::commit();
@@ -56,38 +59,38 @@ class CommissionCalculationService
     /**
      * Record a commission entry
      */
-    private function recordCommission(User $affiliate, Order $order, float $amount, int $level): void
+    private function recordCommission(Affiliator $affiliate, Transaction $transaction, float $amount, int $level): void
     {
         $commission = AffiliateCommission::create([
-            'affiliate_id' => $affiliate->id,
-            'order_id' => $order->id,
-            'customer_id' => $order->customer_id,
+            'affiliator_id' => $affiliate->id,
+            'transaction_id' => $transaction->id,
+            'customer_id' => $transaction->customer_id,
             'level' => $level,
-            'gross_amount' => $order->gross_amount ?? $order->total_amount,
-            'commission_rate' => $level === 1 ? self::LEVEL_1_RATE : self::LEVEL_2_RATE,
+            'gross_amount' => $transaction->gross_amount,
+            'commission_percent' => $level === 1 ? self::LEVEL_1_RATE * 100 : self::LEVEL_2_RATE * 100,
             'commission_amount' => $amount,
             'status' => 'pending',
-            'calculated_at' => now(),
+            'cleared_at' => null,
         ]);
 
         // Add to wallet as pending
         $wallet = AffiliateWallet::firstOrCreate(
-            ['user_id' => $affiliate->id],
+            ['affiliator_id' => $affiliate->id],
             ['balance' => 0, 'pending_balance' => 0]
         );
 
         $wallet->increment('pending_balance', $amount);
 
         // Send notification
-        $affiliate->notify(new \App\Notifications\CommissionEarnedNotification($commission));
+        $affiliate->notify(new \App\Notifications\Affiliator\CommissionEarnedNotification($commission));
     }
 
     /**
-     * Get commission breakdown for an order
+     * Get commission breakdown for a transaction
      */
-    public function getBreakdown(Order $order): array
+    public function getBreakdown(Transaction $transaction): array
     {
-        $grossAmount = $order->gross_amount ?? $order->total_amount;
+        $grossAmount = $transaction->gross_amount;
         
         return [
             'gross_amount' => $grossAmount,
