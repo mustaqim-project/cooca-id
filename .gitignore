@@ -1,18 +1,12 @@
 ```
 # Dependencies
-node_modules/
-
-# Build artifacts
-dist/
-build/
-public/build/
-
-# Cache directories
-bootstrap/cache/
-storage/framework/cache/
-storage/framework/sessions/
-storage/framework/views/
 vendor/
+
+# Laravel specific
+bootstrap/cache/
+storage/logs/
+storage/framework/
+public/storage/
 
 # Environment
 .env
@@ -33,5 +27,4 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.swp
-*~
 ```
