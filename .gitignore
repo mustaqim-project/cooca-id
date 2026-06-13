@@ -1,68 +1,117 @@
 ```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
 # Dependencies
-vendor/
 node_modules/
-.env
-.env.local
-.env.*
 
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-*.swo
-
-# Editors
-.vscode/
-.idea/
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Build directories
+public/
+# Build artifacts
 dist/
 build/
 target/
-*.tar*
-*.zip
-*.gz
-*.rar
-*.7z
 
-# PHP specific
-*.phar
-.php_cs.cache
-
-# Laravel specific
-bootstrap/cache/
-storage/logs/
-storage/framework/
-public/storage
-
-# Database
-*.sqlite
-*.db
-
-# IDE
+# Editor/IDE files
+.vscode/
+.idea/
 *.swp
 *.swo
+*.tmp
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/modules/
+.DS_Store
+*.swp
 *~
+.pytest_cache/
+.hypothesis/
+.coverage*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.eggs/
+eggs/
+parts/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+.venv/
+venv/
+ENV/
+env/
+.ENV/
+.env/
+env.bak/
+venv.bak/
+vendor/
+# Node.js specific
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+node_modules/
+dist/
+build/
+.nyc_output
+coverage/
+.nyc_output/
+coverage/
+.tap/
+.tap/
+.jscs/
+.jscs/
+.eslintcache
+.eslintcache
+.nodemon/
+.nodemon/
+.next/
+.next/
+.nuxt/
+.nuxt/
+.vuepress/dist
+.vuepress/dist
+.output
+.output
+.temp
+.temp
+.cache/
+.cache/
+.storybook-static/
+.storybook-static/
+.vercel/
+.vercel/
+.now/
+.now/
+.netlify/
+.netlify/
+public/uploads/
+public/uploads/
+storage/
+storage/
+bootstrap/cache/
+bootstrap/cache/
 ```
