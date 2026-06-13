@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-class AffiliateWallet extends Model
+final class AffiliateWallet extends Model
 {
+    use HasUuids;
+
     protected $table = 'affiliate_wallets';
 
     protected $fillable = [
-        'user_id',
+        'affiliator_id',
         'balance',
         'pending_balance',
     ];
@@ -21,23 +26,23 @@ class AffiliateWallet extends Model
         'pending_balance' => 'decimal:2',
     ];
 
-    public function user(): BelongsTo
+    public function affiliator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Affiliator::class, 'affiliator_id');
     }
 
     public function withdrawals(): HasMany
     {
-        return $this->hasMany(AffiliateWithdrawal::class, 'affiliate_id', 'user_id');
+        return $this->hasMany(AffiliateWithdrawal::class, 'affiliator_id', 'affiliator_id');
     }
 
     public function getAvailableBalanceAttribute(): string
     {
-        return number_format($this->balance, 2);
+        return number_format((float) $this->balance, 2);
     }
 
     public function getTotalBalanceAttribute(): string
     {
-        return number_format($this->balance + $this->pending_balance, 2);
+        return number_format((float) $this->balance + (float) $this->pending_balance, 2);
     }
 }

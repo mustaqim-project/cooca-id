@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-class AffiliateWithdrawal extends Model
+final class AffiliateWithdrawal extends Model
 {
+    use HasUuids;
+
     protected $table = 'affiliate_withdrawals';
 
     protected $fillable = [
-        'affiliate_id',
+        'affiliator_id',
         'amount',
         'bank_name',
         'account_number',
@@ -32,33 +37,69 @@ class AffiliateWithdrawal extends Model
         'requested_at' => 'datetime',
     ];
 
-    public function affiliate(): BelongsTo
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_PAID = 'paid';
+
+    public static function getStatuses(): array
     {
-        return $this->belongsTo(User::class, 'affiliate_id');
+        return [
+            self::STATUS_PENDING,
+            self::STATUS_APPROVED,
+            self::STATUS_REJECTED,
+            self::STATUS_PAID,
+        ];
+    }
+
+    public function affiliator(): BelongsTo
+    {
+        return $this->belongsTo(Affiliator::class, 'affiliator_id');
     }
 
     public function approver(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->belongsTo(Admin::class, 'approved_by');
     }
 
     public function rejector(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'rejected_by');
+        return $this->belongsTo(Admin::class, 'rejected_by');
     }
 
     public function getFormattedAmountAttribute(): string
     {
-        return number_format($this->amount, 0, ',', '.');
+        return 'Rp ' . number_format((float) $this->amount, 0, ',', '.');
     }
 
     public function getStatusBadgeClassAttribute(): string
     {
         return match ($this->status) {
-            'pending' => 'bg-yellow-100 text-yellow-800',
-            'approved' => 'bg-green-100 text-green-800',
-            'rejected' => 'bg-red-100 text-red-800',
+            self::STATUS_PENDING => 'bg-yellow-100 text-yellow-800',
+            self::STATUS_APPROVED => 'bg-green-100 text-green-800',
+            self::STATUS_REJECTED => 'bg-red-100 text-red-800',
+            self::STATUS_PAID => 'bg-blue-100 text-blue-800',
             default => 'bg-gray-100 text-gray-800',
         };
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === self::STATUS_PENDING;
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->status === self::STATUS_APPROVED;
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->status === self::STATUS_REJECTED;
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->status === self::STATUS_PAID;
     }
 }

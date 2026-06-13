@@ -1,19 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Affiliate;
 
 use App\Models\Subscription;
-use App\Models\Order;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 
-class RecurringCommissionService
+final class RecurringCommissionService
 {
-    protected CommissionCalculationService $calculationService;
-
-    public function __construct(CommissionCalculationService $calculationService)
-    {
-        $this->calculationService = $calculationService;
-    }
+    public function __construct(
+        private readonly CommissionCalculationService $calculationService,
+    ) {}
 
     /**
      * Process recurring commissions for subscription renewals
@@ -23,10 +22,12 @@ class RecurringCommissionService
         $processedCount = 0;
 
         // Get recent successful renewal payments
-        $renewalPayments = Order::where('type', 'subscription_renewal')
+        $renewalTransactions = Transaction::where('type', 'subscription_renewal')
             ->where('status', 'paid')
-            ->whereNotNull('affiliate_id')
-            ->whereDoesntHave('commission', function ($query) {
+            ->whereHas('customer', function ($query) {
+                $query->whereNotNull('affiliator_id');
+            })
+            ->whereDoesntHave('commissions', function ($query) {
                 $query->where('status', '!=', 'pending');
             })
             ->latest()
@@ -34,8 +35,8 @@ class RecurringCommissionService
 
         DB::beginTransaction();
         try {
-            foreach ($renewalPayments as $order) {
-                $this->calculationService->calculateForOrder($order);
+            foreach ($renewalTransactions as $transaction) {
+                $this->calculationService->calculateForTransaction($transaction);
                 $processedCount++;
             }
 
@@ -43,10 +44,10 @@ class RecurringCommissionService
 
             // Create activity log
             \App\Models\ActivityLog::create([
-                'user_id' => null,
-                'user_type' => 'system',
+                'causer_id' => null,
+                'causer_type' => 'system',
                 'action' => 'recurring_commission_processed',
-                'module' => 'Affiliate',
+                'module' => 'affiliate',
                 'description' => "Processed {$processedCount} recurring commissions",
                 'ip_address' => 'system',
                 'user_agent' => 'Scheduler',
@@ -68,15 +69,19 @@ class RecurringCommissionService
      */
     public function getStatistics(): array
     {
-        $totalRenewals = Order::where('type', 'subscription_renewal')
+        $totalRenewals = Transaction::where('type', 'subscription_renewal')
             ->where('status', 'paid')
-            ->whereNotNull('affiliate_id')
+            ->whereHas('customer', function ($query) {
+                $query->whereNotNull('affiliator_id');
+            })
             ->count();
 
-        $totalRenewalCommission = Order::where('type', 'subscription_renewal')
+        $totalRenewalCommission = Transaction::where('type', 'subscription_renewal')
             ->where('status', 'paid')
-            ->whereNotNull('affiliate_id')
-            ->join('affiliate_commissions', 'orders.id', '=', 'affiliate_commissions.order_id')
+            ->whereHas('customer', function ($query) {
+                $query->whereNotNull('affiliator_id');
+            })
+            ->join('affiliate_commissions', 'transactions.id', '=', 'affiliate_commissions.transaction_id')
             ->sum('affiliate_commissions.commission_amount');
 
         return [

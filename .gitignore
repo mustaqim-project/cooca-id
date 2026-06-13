@@ -4,16 +4,18 @@
 __pycache__/
 *.o
 *.obj
-dist/
-build/
-target/
+*.so
+*.dll
+*.exe
+*.class
+*.out
 
 # Dependencies
-.venv/
-venv/
-node_modules/
 vendor/
-composer.lock
+node_modules/
+.env
+.env.local
+.env.*
 
 # Logs and temp files
 *.log
@@ -21,32 +23,52 @@ composer.lock
 *.swp
 *.swo
 
-# Environment
-.env
-.env.local
-.env.*
-
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# Laravel specific
-/storage/
-/bootstrap/cache/
-public/storage
-
-# Database
-*.sqlite
-*.db
-
-# Coverage
+# Coverage reports
+.coverage
 coverage/
 htmlcov/
-.coverage
 
-# OS generated
+# OS generated files
 .DS_Store
 Thumbs.db
+
+# Build directories (if present in Laravel/Lumen projects)
+bootstrap/cache/
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Compression files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
