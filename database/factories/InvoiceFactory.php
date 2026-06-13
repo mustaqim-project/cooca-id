@@ -20,9 +20,9 @@ class InvoiceFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'transaction_id' => \App\Models\Transaction::factory(),
+            'transaction_id' => \App\Models\Transaction::inRandomOrder()->first()?->id ?? \App\Models\Transaction::factory(),
             'invoice_number' => 'INV-' . strtoupper(Str::random(10)),
-            'customer_id' => \App\Models\Customer::factory(),
+            'customer_id' => \App\Models\Customer::inRandomOrder()->first()?->id ?? \App\Models\Customer::factory(),
             'amount' => fake()->randomFloat(2, 50, 2000),
             'status' => fake()->randomElement(['draft', 'sent', 'paid', 'overdue', 'cancelled']),
             'issued_at' => fake()->dateTimeBetween('-1 year', 'now'),

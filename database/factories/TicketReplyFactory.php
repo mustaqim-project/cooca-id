@@ -20,7 +20,7 @@ class TicketReplyFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'ticket_id' => \App\Models\Ticket::factory(),
+            'ticket_id' => \App\Models\Ticket::inRandomOrder()->first()?->id ?? \App\Models\Ticket::factory(),
             'user_type' => fake()->randomElement(['customer', 'affiliator', 'admin']),
             'user_id' => null,
             'message' => fake()->paragraphs(2, true),

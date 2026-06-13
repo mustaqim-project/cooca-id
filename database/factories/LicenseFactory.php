@@ -20,9 +20,9 @@ class LicenseFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'customer_id' => \App\Models\Customer::factory(),
-            'product_id' => \App\Models\Product::factory(),
-            'subscription_plan_id' => \App\Models\SubscriptionPlan::factory(),
+            'customer_id' => \App\Models\Customer::inRandomOrder()->first()?->id ?? \App\Models\Customer::factory(),
+            'product_id' => \App\Models\Product::inRandomOrder()->first()?->id ?? \App\Models\Product::factory(),
+            'subscription_plan_id' => \App\Models\SubscriptionPlan::inRandomOrder()->first()?->id ?? \App\Models\SubscriptionPlan::factory(),
             'license_code' => strtoupper(Str::random(16)) . '-' . strtoupper(Str::random(8)),
             'token_code' => hash('sha256', Str::random(40)),
             'domain' => fake()->optional(0.7)->domainName(),

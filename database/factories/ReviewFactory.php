@@ -21,7 +21,7 @@ class ReviewFactory extends Factory
         return [
             'id' => (string) Str::uuid(),
             'reviewable_type' => \App\Models\Product::class,
-            'reviewable_id' => \App\Models\Product::factory(),
+            'reviewable_id' => \App\Models\Product::inRandomOrder()->first()?->id ?? \App\Models\Product::factory(),
             'reviewer_type' => fake()->randomElement(['customer', 'affiliator']),
             'reviewer_id' => null,
             'rating' => fake()->numberBetween(1, 5),

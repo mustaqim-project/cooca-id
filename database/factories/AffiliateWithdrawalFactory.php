@@ -23,7 +23,7 @@ class AffiliateWithdrawalFactory extends Factory
         
         return [
             'id' => (string) Str::uuid(),
-            'affiliator_id' => \App\Models\Affiliator::factory(),
+            'affiliator_id' => \App\Models\Affiliator::inRandomOrder()->first()?->id ?? \App\Models\Affiliator::factory(),
             'amount' => $amount,
             'fee' => $fee,
             'net_amount' => $amount - $fee,

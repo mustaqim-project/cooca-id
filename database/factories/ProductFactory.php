@@ -22,7 +22,7 @@ class ProductFactory extends Factory
         
         return [
             'id' => (string) Str::uuid(),
-            'category_id' => \App\Models\ProductCategory::factory(),
+            'category_id' => \App\Models\ProductCategory::inRandomOrder()->first()?->id ?? \App\Models\ProductCategory::factory(),
             'name' => ucwords($name),
             'slug' => Str::slug($name),
             'description' => fake()->paragraphs(3, true),
