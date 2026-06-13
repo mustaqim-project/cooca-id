@@ -35,7 +35,7 @@ interface Props {
   subscriptions: Subscription[];
   licenses: License[];
   recentTransactions: Transaction[];
-  recentLicenses: any[];
+  recentLicenses: License[];
   upcomingRenewals: any[];
   notifications: any[];
   stats: {
