@@ -1,52 +1,12 @@
-```php
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
+```
+node_modules/
 dist/
 build/
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
-# Dependencies
-node_modules/
-vendor/
-composer.lock
 .env
 .env.local
-.env.*
-
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-*.swo
-
-# Editors
+*.env.*
 .vscode/
 .idea/
-*.sublime-project
-*.sublime-workspace
-
-# System files
-.DS_Store
-Thumbs.db
-
-# Coverage and testing
-.coverage
-coverage/
-htmlcov/
-.phpunit.result.cache
-
-# Laravel specific
-bootstrap/cache/
-storage/
-public/storage
-.npm
-.yarn
+*.log
+*.tmp
 ```
