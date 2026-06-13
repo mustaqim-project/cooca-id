@@ -19,6 +19,7 @@ class InvoiceFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => (string) Str::uuid(),
             'transaction_id' => \App\Models\Transaction::factory(),
             'invoice_number' => 'INV-' . strtoupper(Str::random(10)),
             'customer_id' => \App\Models\Customer::factory(),

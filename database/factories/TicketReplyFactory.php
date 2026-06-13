@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\TicketReply;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<TicketReply>
@@ -18,6 +19,7 @@ class TicketReplyFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => (string) Str::uuid(),
             'ticket_id' => \App\Models\Ticket::factory(),
             'user_type' => fake()->randomElement(['customer', 'affiliator', 'admin']),
             'user_id' => null,

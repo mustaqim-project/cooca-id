@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\AffiliateCommission;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<AffiliateCommission>
@@ -22,6 +23,7 @@ class AffiliateCommissionFactory extends Factory
         $commissionAmount = ($grossAmount * $commissionPercent) / 100;
         
         return [
+            'id' => (string) Str::uuid(),
             'affiliator_id' => \App\Models\Affiliator::factory(),
             'transaction_id' => \App\Models\Transaction::factory(),
             'customer_id' => \App\Models\Customer::factory(),

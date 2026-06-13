@@ -21,6 +21,7 @@ class BlogPostFactory extends Factory
         $title = fake()->unique()->sentence(4);
         
         return [
+            'id' => (string) Str::uuid(),
             'title' => rtrim($title, '.'),
             'slug' => Str::slug($title),
             'excerpt' => fake()->sentence(15),

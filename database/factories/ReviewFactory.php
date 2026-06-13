@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Review;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Review>
@@ -18,6 +19,7 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => (string) Str::uuid(),
             'reviewable_type' => \App\Models\Product::class,
             'reviewable_id' => \App\Models\Product::factory(),
             'reviewer_type' => fake()->randomElement(['customer', 'affiliator']),

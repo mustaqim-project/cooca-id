@@ -19,6 +19,7 @@ class TicketFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => (string) Str::uuid(),
             'ticket_number' => 'TKT-' . strtoupper(Str::random(8)),
             'customer_id' => null,
             'affiliator_id' => null,

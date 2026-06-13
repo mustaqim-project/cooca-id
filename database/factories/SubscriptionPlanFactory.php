@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\SubscriptionPlan;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<SubscriptionPlan>
@@ -18,6 +19,7 @@ class SubscriptionPlanFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => (string) Str::uuid(),
             'product_id' => \App\Models\Product::factory(),
             'name' => fake()->randomElement(['Basic', 'Standard', 'Premium', 'Enterprise']) . ' Plan',
             'duration_months' => fake()->randomElement([1, 3, 6, 12]),

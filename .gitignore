@@ -1,1 +1,68 @@
-Nothing should be ignored based on the provided file changes, as they only include source code files (.vue files) without any build artifacts, dependencies, or temporary files.
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Dependencies
+vendor/
+node_modules/
+.env
+.env.local
+.env.*
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Editors
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Build directories
+dist/
+build/
+target/
+*.tar*
+*.zip
+*.gz
+*.rar
+*.7z
+
+# PHP specific
+*.phar
+.php_cs.cache
+
+# Laravel specific
+bootstrap/cache/
+storage/logs/
+storage/framework/
+public/storage
+
+# Database
+*.sqlite
+*.db
+
+# IDE
+*.swp
+*.swo
+*~
+```

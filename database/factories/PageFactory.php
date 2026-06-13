@@ -21,6 +21,7 @@ class PageFactory extends Factory
         $title = fake()->unique()->sentence(3);
         
         return [
+            'id' => (string) Str::uuid(),
             'title' => rtrim($title, '.'),
             'slug' => Str::slug($title),
             'content' => fake()->paragraphs(5, true),
