@@ -1,117 +1,47 @@
 ```
 # Dependencies
+vendor/
 node_modules/
 
-public/
 # Build artifacts
-dist/
-build/
-target/
-
-# Editor/IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# Logs
-*.log
+public/build/
+public/css/
+public/js/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+bootstrap/cache/
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
+!.env.example
 
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
+# Logs
+storage/logs/
 *.log
-.git/modules/
-.DS_Store
+
+# Editor/IDE
+.vscode/
+.idea/
 *.swp
-*~
-.pytest_cache/
-.hypothesis/
-.coverage*
-htmlcov/
-.pytest_cache/
-.mypy_cache/
-.eggs/
-eggs/
-parts/
-sdist/
-develop-eggs/
-.installed.cfg
-lib/
-lib64/
-.venv/
-venv/
-ENV/
-env/
-.ENV/
-.env/
-env.bak/
-venv.bak/
-vendor/
-# Node.js specific
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PHP
+*.php~
+*.php.bak
+
+# Laravel specific
+public/hot
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-node_modules/
-dist/
-build/
-.nyc_output
-coverage/
-.nyc_output/
-coverage/
-.tap/
-.tap/
-.jscs/
-.jscs/
-.eslintcache
-.eslintcache
-.nodemon/
-.nodemon/
-.next/
-.next/
-.nuxt/
-.nuxt/
-.vuepress/dist
-.vuepress/dist
-.output
-.output
-.temp
-.temp
-.cache/
-.cache/
-.storybook-static/
-.storybook-static/
-.vercel/
-.vercel/
-.now/
-.now/
-.netlify/
-.netlify/
-public/uploads/
-public/uploads/
-storage/
-storage/
-bootstrap/cache/
-bootstrap/cache/
+
+# Tests
+.phpunit.result.cache
 ```

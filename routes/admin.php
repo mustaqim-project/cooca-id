@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailCampaignController;
+use App\Http\Controllers\Admin\ErpRequestController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReviewController;
@@ -19,19 +20,20 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\VoucherController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Admin Panel Routes
-|--------------------------------------------------------------------------
-|
-| These routes are for the admin dashboard, protected by auth:admin middleware.
-| All admin routes use Inertia.js for Vue 3 integration.
-|
-*/
-
 Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // ERP Requests Management
+    Route::get('/erp-requests', [ErpRequestController::class, 'index'])->name('erp-requests.index');
+    Route::get('/erp-requests/{request}', [ErpRequestController::class, 'show'])->name('erp-requests.show');
+    Route::post('/erp-requests/{request}/approve', [ErpRequestController::class, 'approve'])->name('erp-requests.approve');
+    Route::post('/erp-requests/{request}/reject', [ErpRequestController::class, 'reject'])->name('erp-requests.reject');
+    Route::post('/erp-requests/{request}/mark-waiting-setup', [ErpRequestController::class, 'markWaitingSetup'])->name('erp-requests.mark-waiting-setup');
+    Route::post('/erp-requests/{request}/mark-in-setup', [ErpRequestController::class, 'markInSetup'])->name('erp-requests.mark-in-setup');
+    Route::post('/erp-requests/{request}/mark-domain-setup', [ErpRequestController::class, 'markDomainSetup'])->name('erp-requests.mark-domain-setup');
+    Route::post('/erp-requests/{request}/mark-testing', [ErpRequestController::class, 'markTesting'])->name('erp-requests.mark-testing');
+    Route::post('/erp-requests/{request}/confirm-ready', [ErpRequestController::class, 'confirmReady'])->name('erp-requests.confirm-ready');
 
     // Products Management
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
