@@ -21,6 +21,7 @@ class ProductCategoryFactory extends Factory
         $name = fake()->unique()->words(2, true);
         
         return [
+            'id' => (string) Str::uuid(),
             'name' => ucwords($name),
             'slug' => Str::slug($name),
             'description' => fake()->sentence(),

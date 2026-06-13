@@ -25,11 +25,12 @@ class CustomerFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => (string) Str::uuid(),
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'password' => static::$password ??= Hash::make('password'),
             'business_name' => fake()->company(),
-            'domain' => fake()->domainName(),
+            'domain' => fake()->unique()->domainName(),
             'affiliator_id' => null,
             'google_id' => null,
         ];

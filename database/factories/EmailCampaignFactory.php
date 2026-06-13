@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\EmailCampaign;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<EmailCampaign>
@@ -18,6 +19,7 @@ class EmailCampaignFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => (string) Str::uuid(),
             'name' => fake()->unique()->sentence(3),
             'subject' => fake()->sentence(5),
             'content' => fake()->paragraphs(3, true),

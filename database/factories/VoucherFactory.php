@@ -19,6 +19,7 @@ class VoucherFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => (string) Str::uuid(),
             'code' => strtoupper(fake()->unique()->lexify('VOUCHER-???-###')),
             'name' => fake()->sentence(3),
             'description' => fake()->optional(0.7)->paragraph(),

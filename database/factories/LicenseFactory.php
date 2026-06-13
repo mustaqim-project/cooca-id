@@ -19,6 +19,7 @@ class LicenseFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => (string) Str::uuid(),
             'customer_id' => \App\Models\Customer::factory(),
             'product_id' => \App\Models\Product::factory(),
             'subscription_plan_id' => \App\Models\SubscriptionPlan::factory(),

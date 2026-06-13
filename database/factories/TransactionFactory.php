@@ -22,6 +22,7 @@ class TransactionFactory extends Factory
         $voucherDiscount = fake()->optional(0.3)->randomFloat(2, 5, 100) ?? 0;
         
         return [
+            'id' => (string) Str::uuid(),
             'customer_id' => \App\Models\Customer::factory(),
             'subscription_id' => \App\Models\Subscription::factory(),
             'invoice_number' => 'INV-' . strtoupper(Str::random(10)),

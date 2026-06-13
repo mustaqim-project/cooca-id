@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\AffiliateWithdrawal;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<AffiliateWithdrawal>
@@ -21,6 +22,7 @@ class AffiliateWithdrawalFactory extends Factory
         $fee = $amount * 0.02; // 2% fee
         
         return [
+            'id' => (string) Str::uuid(),
             'affiliator_id' => \App\Models\Affiliator::factory(),
             'amount' => $amount,
             'fee' => $fee,

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Subscription;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Subscription>
@@ -18,6 +19,7 @@ class SubscriptionFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => (string) Str::uuid(),
             'customer_id' => \App\Models\Customer::factory(),
             'license_id' => \App\Models\License::factory(),
             'subscription_plan_id' => \App\Models\SubscriptionPlan::factory(),
