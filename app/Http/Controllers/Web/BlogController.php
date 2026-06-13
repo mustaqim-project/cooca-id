@@ -7,12 +7,12 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 /**
  * Blog Controller
  * 
  * Handles public blog pages for content marketing and SEO.
+ * Uses Blade templates for optimal SEO performance.
  */
 class BlogController extends Controller
 {
@@ -39,15 +39,7 @@ class BlogController extends Controller
             ->limit(3)
             ->get();
 
-        return Inertia::render('Blog/Index', [
-            'posts' => $posts,
-            'categories' => $categories,
-            'featuredPosts' => $featuredPosts,
-            'filters' => [
-                'category' => $request->get('category'),
-                'search' => $request->get('search'),
-            ],
-        ]);
+        return view('blog.index', compact('posts', 'categories', 'featuredPosts'));
     }
 
     /**
@@ -74,9 +66,6 @@ class BlogController extends Controller
             ->limit(4)
             ->get();
 
-        return Inertia::render('Blog/Show', [
-            'post' => $post,
-            'relatedPosts' => $relatedPosts,
-        ]);
+        return view('blog.show', compact('post', 'relatedPosts'));
     }
 }

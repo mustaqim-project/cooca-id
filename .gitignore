@@ -4,18 +4,22 @@
 __pycache__/
 *.o
 *.obj
-*.so
-*.dll
-*.exe
 *.class
+*.dll
+*.so
+*.a
 *.out
 
 # Dependencies
-vendor/
+.venv/
+venv/
 node_modules/
-.env
-.env.local
-.env.*
+dist/
+build/
+target/
+.gradle/
+.mypy_cache/
+.pytest_cache/
 
 # Logs and temp files
 *.log
@@ -23,32 +27,25 @@ node_modules/
 *.swp
 *.swo
 
+# Environment
+.env
+.env.local
+.env.*
+
 # Editors
 .vscode/
 .idea/
 
-# Coverage reports
-.coverage
-coverage/
-htmlcov/
-
-# OS generated files
+# System files
 .DS_Store
 Thumbs.db
 
-# Build directories (if present in Laravel/Lumen projects)
-bootstrap/cache/
-storage/logs/
-storage/framework/cache/
-storage/framework/sessions/
-storage/framework/views/
+# Coverage
+coverage/
+htmlcov/
+.coverage
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Compression files
+# Compressed files
 *.zip
 *.gz
 *.tar
