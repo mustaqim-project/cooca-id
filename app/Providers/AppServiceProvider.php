@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use App\Repositories\Contracts\{
     AdminRepositoryInterface,
     AffiliateCommissionRepositoryInterface,
@@ -100,6 +103,7 @@ final class AppServiceProvider extends ServiceProvider
     {
         $this->bootPolicies();
         $this->bootObservers();
+        $this->bootRateLimiters();
     }
 
     private function bootPolicies(): void
@@ -126,5 +130,71 @@ final class AppServiceProvider extends ServiceProvider
         \App\Models\License::observe(\App\Observers\LicenseObserver::class);
         \App\Models\Customer::observe(\App\Observers\CustomerObserver::class);
         \App\Models\Affiliator::observe(\App\Observers\AffiliatorObserver::class);
+    }
+
+    /**
+     * Configure rate limiters for API and authentication endpoints.
+     */
+    private function bootRateLimiters(): void
+    {
+        // General API rate limiter: 60 requests per minute
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->ip())
+                ->response(function ($request, $headers) {
+                    return response()->json([
+                        'message' => 'Too Many Requests',
+                    ], 429, $headers);
+                });
+        });
+
+        // Login rate limiter: 5 requests per minute (brute force protection)
+        RateLimiter::for('login', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip())
+                ->response(function ($request, $headers) {
+                    return response()->json([
+                        'message' => 'Too Many Requests. Please try again later.',
+                    ], 429, $headers);
+                });
+        });
+
+        // Registration rate limiter: 10 requests per minute
+        RateLimiter::for('register', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip())
+                ->response(function ($request, $headers) {
+                    return response()->json([
+                        'message' => 'Too Many Requests. Please try again later.',
+                    ], 429, $headers);
+                });
+        });
+
+        // Customer routes rate limiter: 60 requests per minute
+        RateLimiter::for('customer', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?? $request->ip())
+                ->response(function ($request, $headers) {
+                    return response()->json([
+                        'message' => 'Too Many Requests',
+                    ], 429, $headers);
+                });
+        });
+
+        // Affiliator routes rate limiter: 60 requests per minute
+        RateLimiter::for('affiliator', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?? $request->ip())
+                ->response(function ($request, $headers) {
+                    return response()->json([
+                        'message' => 'Too Many Requests',
+                    ], 429, $headers);
+                });
+        });
+
+        // Midtrans webhook rate limiter: 120 requests per minute (higher for webhook processing)
+        RateLimiter::for('midtrans-webhook', function (Request $request) {
+            return Limit::perMinute(120)->by($request->ip())
+                ->response(function ($request, $headers) {
+                    return response()->json([
+                        'message' => 'Too Many Requests',
+                    ], 429, $headers);
+                });
+        });
     }
 }
