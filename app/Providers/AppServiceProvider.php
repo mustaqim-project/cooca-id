@@ -43,6 +43,11 @@ use App\Models\{
     Affiliator,
     Voucher,
     Subscription,
+    Invoice,
+    ErpRequest,
+    Domain,
+    Ticket,
+    Review,
 };
 use App\Policies\{
     LicensePolicy,
@@ -53,6 +58,11 @@ use App\Policies\{
     AffiliatorPolicy,
     VoucherPolicy,
     SubscriptionPolicy,
+    InvoicePolicy,
+    ErpRequestPolicy,
+    DomainPolicy,
+    TicketPolicy,
+    ReviewPolicy,
 };
 
 final class AppServiceProvider extends ServiceProvider
@@ -102,6 +112,11 @@ final class AppServiceProvider extends ServiceProvider
         Gate::policy(Affiliator::class, AffiliatorPolicy::class);
         Gate::policy(Voucher::class, VoucherPolicy::class);
         Gate::policy(Subscription::class, SubscriptionPolicy::class);
+        Gate::policy(Invoice::class, InvoicePolicy::class);
+        Gate::policy(ErpRequest::class, ErpRequestPolicy::class);
+        Gate::policy(Domain::class, DomainPolicy::class);
+        Gate::policy(Ticket::class, TicketPolicy::class);
+        Gate::policy(Review::class, ReviewPolicy::class);
     }
 
     private function bootObservers(): void
