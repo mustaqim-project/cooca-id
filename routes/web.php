@@ -42,32 +42,40 @@ Route::prefix('products')->name('products.')->group(function () {
 // Blog
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
-
 // Customer Auth Routes
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Cache\RateLimiting\Limit;
+
+RateLimiter::for('customer-login', function ($request) {
+    return Limit::perMinute(5)->by($request->ip());
+});
+
+RateLimiter::for('customer-register', function ($request) {
+    return Limit::perMinute(10)->by($request->ip());
+});
+
 Route::prefix('customer')->name('customer.')->group(function () {
     Route::middleware('guest:customer')->group(function () {
         Route::get('login', [AuthController::class, 'showCustomerLogin'])->name('login');
-        Route::post('login', [AuthController::class, 'customerLogin']);
+        Route::post('login', [AuthController::class, 'customerLogin'])->middleware('throttle:customer-login');
         Route::get('register', [AuthController::class, 'showCustomerRegister'])->name('register');
-        Route::post('register', [AuthController::class, 'customerRegister']);
-        
+        Route::post('register', [AuthController::class, 'customerRegister'])->middleware('throttle:customer-register');
+
         // Google OAuth
         Route::get('auth/google', [AuthController::class, 'redirectToGoogleCustomer'])->name('auth.google');
         Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallbackCustomer']);
-        
+
         // Password Reset
         Route::get('forgot-password', [PasswordResetController::class, 'showCustomerForgotPassword'])->name('password.request');
-        Route::post('forgot-password', [PasswordResetController::class, 'sendCustomerResetLink'])->name('password.email');
+        Route::post('forgot-password', [PasswordResetController::class, 'sendCustomerResetLink'])->middleware('throttle:customer-login');
         Route::get('reset-password/{token}', [PasswordResetController::class, 'showCustomerReset'])->name('password.reset');
-        Route::post('reset-password', [PasswordResetController::class, 'resetCustomerPassword'])->name('password.update');
+        Route::post('reset-password', [PasswordResetController::class, 'resetCustomerPassword'])->middleware('throttle:customer-login');
     });
-    
+
     Route::middleware('auth:customer')->group(function () {
         Route::post('logout', [AuthController::class, 'customerLogout'])->name('logout');
     });
 });
-
-// Affiliator Auth Routes
 Route::prefix('affiliator')->name('affiliator.')->group(function () {
     Route::middleware('guest:affiliator')->group(function () {
         Route::get('login', [AuthController::class, 'showAffiliatorLogin'])->name('login');
