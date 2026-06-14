@@ -4,23 +4,25 @@
 __pycache__/
 *.o
 *.obj
-dist/
-build/
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
 
 # Dependencies
-node_modules/
 vendor/
-composer.lock
+node_modules/
+.env
+.env.local
+.env.*
 
 # Logs and temp files
 *.log
 *.tmp
 *.swp
-
-# Environment
-.env
-.env.local
-*.env.*
+*.swo
 
 # Editors
 .vscode/
@@ -30,8 +32,25 @@ composer.lock
 .DS_Store
 Thumbs.db
 
+# Testing and coverage
+.coverage
+coverage/
+htmlcov/
+.mypy_cache/
+.pytest_cache/
+
 # Laravel specific
-storage/
 bootstrap/cache/
+storage/logs/
 public/storage
+
+# Distribution / packaging
+dist/
+build/
+*.tar.gz
+*.zip
+
+# Environment specific
+.env*
+!.env.example
 ```
