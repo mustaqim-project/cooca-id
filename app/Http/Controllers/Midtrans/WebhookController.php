@@ -117,7 +117,8 @@ class WebhookController extends Controller
     }
 
     /**
-     * Verify Midtrans signature key
+    /**
+     * Verify Midtrans signature key with enhanced security
      */
     private function verifySignature(Request $request): bool
     {
@@ -125,18 +126,52 @@ class WebhookController extends Controller
         $providedSignature = $payload['signature_key'] ?? null;
 
         if (!$providedSignature) {
+            Log::warning('Midtrans webhook: Missing signature_key', [
+                'order_id' => $payload['order_id'] ?? 'unknown',
+                'ip' => $request->ip()
+            ]);
             return false;
         }
 
+        // Required fields for signature calculation
+        $requiredFields = ['order_id', 'status_code', 'gross_amount'];
+        foreach ($requiredFields as $field) {
+            if (!isset($payload[$field])) {
+                Log::warning('Midtrans webhook: Missing required field for signature', [
+                    'order_id' => $payload['order_id'] ?? 'unknown',
+                    'missing_field' => $field
+                ]);
+                return false;
+            }
+        }
+
         $serverKey = config('services.midtrans.server_key');
-        $inputString = $payload['order_id'] . 
-                      $payload['status_code'] . 
-                      $payload['gross_amount'] . 
+        
+        if (empty($serverKey)) {
+            Log::error('Midtrans webhook: Server key not configured');
+            return false;
+        }
+
+        $inputString = $payload['order_id'] .
+                      $payload['status_code'] .
+                      $payload['gross_amount'] .
                       $serverKey;
 
         $calculatedSignature = hash('sha512', $inputString);
 
-        return $providedSignature === $calculatedSignature;
+        $isValid = hash_equals($calculatedSignature, $providedSignature);
+
+        if (!$isValid) {
+            Log::critical('Midtrans webhook: Invalid signature detected - POTENTIAL FRAUD', [
+                'order_id' => $payload['order_id'],
+                'provided_signature' => substr($providedSignature, 0, 16) . '...',
+                'expected_signature' => substr($calculatedSignature, 0, 16) . '...',
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+        }
+
+        return $isValid;
     }
 
     /**

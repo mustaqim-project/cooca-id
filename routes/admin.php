@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Cache\RateLimiting\Limit;
 use App\Http\Controllers\Admin\AffiliatorController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\CmsController;
@@ -18,9 +21,17 @@ use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\VoucherController;
-use Illuminate\Support\Facades\Route;
 
-Route::prefix('admin')->name('admin.')->middleware(['auth:admin'])->group(function () {
+// Rate limiter for admin routes
+RateLimiter::for('admin', function ($request) {
+    return Limit::perMinute(100)->by($request->user()?->id ?? $request->ip());
+});
+
+RateLimiter::for('admin-login', function ($request) {
+    return Limit::perMinute(5)->by($request->ip());
+});
+
+Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admin'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

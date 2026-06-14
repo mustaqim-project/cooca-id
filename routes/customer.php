@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Cache\RateLimiting\Limit;
 use App\Http\Controllers\Customer\DashboardController;
 use App\Http\Controllers\Customer\LicenseController;
 use App\Http\Controllers\Customer\ProductController;
@@ -10,7 +13,6 @@ use App\Http\Controllers\Customer\PaymentController;
 use App\Http\Controllers\Customer\InvoiceController;
 use App\Http\Controllers\Customer\ReviewController;
 use App\Http\Controllers\Customer\ProfileController;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +24,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('customer')->name('customer.')->middleware(['auth:customer'])->group(function () {
+// Rate limiter for customer routes
+RateLimiter::for('customer', function ($request) {
+    return Limit::perMinute(60)->by($request->user()?->id ?? $request->ip());
+});
+
+RateLimiter::for('customer-login', function ($request) {
+    return Limit::perMinute(5)->by($request->ip());
+});
+
+RateLimiter::for('customer-register', function ($request) {
+    return Limit::perMinute(10)->by($request->ip());
+});
+
+Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'throttle:customer'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
