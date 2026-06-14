@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 /**
@@ -67,10 +68,8 @@ class InvoiceController extends Controller
     {
         $customer = Auth::guard('customer')->user();
 
-        // Ensure customer owns this invoice
-        if ($invoice->customer_id !== $customer->id) {
-            abort(403);
-        }
+        // Use Policy for authorization (prevents IDOR)
+        Gate::authorize('view', $invoice);
 
         $invoice->load(['subscription.product', 'transaction']);
 
@@ -86,10 +85,8 @@ class InvoiceController extends Controller
     {
         $customer = Auth::guard('customer')->user();
 
-        // Ensure customer owns this invoice
-        if ($invoice->customer_id !== $customer->id) {
-            abort(403);
-        }
+        // Use Policy for authorization (prevents IDOR)
+        Gate::authorize('download', $invoice);
 
         // Generate PDF (implementation depends on PDF library used)
         // For now, we'll return a response that would trigger PDF generation

@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 /**
@@ -113,10 +114,8 @@ class ReviewController extends Controller
     {
         $customer = Auth::guard('customer')->user();
 
-        // Ensure customer owns this review
-        if ($review->customer_id !== $customer->id) {
-            abort(403);
-        }
+        // Use Policy for authorization (prevents IDOR)
+        Gate::authorize('update', $review);
 
         // Can only edit pending or rejected reviews
         if ($review->status === 'approved') {
@@ -147,10 +146,8 @@ class ReviewController extends Controller
     {
         $customer = Auth::guard('customer')->user();
 
-        // Ensure customer owns this review
-        if ($review->customer_id !== $customer->id) {
-            abort(403);
-        }
+        // Use Policy for authorization (prevents IDOR)
+        Gate::authorize('delete', $review);
 
         // Can only delete pending or rejected reviews
         if ($review->status === 'approved') {
