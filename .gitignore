@@ -12,11 +12,19 @@ __pycache__/
 *.out
 
 # Dependencies
-vendor/
 node_modules/
+venv/
+.venv/
 .env
 .env.local
 .env.*
+
+# Build directories
+dist/
+build/
+target/
+coverage/
+htmlcov/
 
 # Logs and temp files
 *.log
@@ -27,30 +35,15 @@ node_modules/
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# OS generated files
+# System files
 .DS_Store
 Thumbs.db
 
-# Testing and coverage
-.coverage
-coverage/
-htmlcov/
+# Cache directories
 .mypy_cache/
 .pytest_cache/
-
-# Laravel specific
-bootstrap/cache/
-storage/logs/
-public/storage
-
-# Distribution / packaging
-dist/
-build/
-*.tar.gz
-*.zip
-
-# Environment specific
-.env*
-!.env.example
+.gradle/
 ```
