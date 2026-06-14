@@ -22,28 +22,28 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('affiliator')->name('affiliator.')->middleware(['auth:affiliator'])->group(function () {
+Route::prefix('affiliator')->name('affiliator.')->middleware(['auth:affiliator', 'throttle:affiliator'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Referrals Management
+    // Referrals Management - Using scoped route model binding for IDOR prevention
     Route::get('/referrals', [ReferralController::class, 'index'])->name('referrals.index');
     Route::get('/referrals/stats', [ReferralController::class, 'stats'])->name('referrals.stats');
     Route::get('/referrals/{customer}', [ReferralController::class, 'show'])->name('referrals.show');
 
-    // Commissions Tracking
+    // Commissions Tracking - Using policy-based authorization
     Route::get('/commissions', [CommissionController::class, 'index'])->name('commissions.index');
     Route::get('/commissions/stats', [CommissionController::class, 'stats'])->name('commissions.stats');
     Route::get('/commissions/export', [CommissionController::class, 'export'])->name('commissions.export');
     Route::get('/commissions/{commission}', [CommissionController::class, 'show'])->name('commissions.show');
 
-    // Downline Network (2-tier)
+    // Downline Network (2-tier) - Using policy-based authorization
     Route::get('/downlines', [DownlineController::class, 'index'])->name('downlines.index');
     Route::get('/downlines/tree', [DownlineController::class, 'tree'])->name('downlines.tree');
     Route::get('/downlines/stats', [DownlineController::class, 'stats'])->name('downlines.stats');
     Route::get('/downlines/{affiliator}', [DownlineController::class, 'show'])->name('downlines.show');
 
-    // Withdrawals Requests
+    // Withdrawals Requests - Using policy-based authorization
     Route::get('/withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
     Route::post('/withdrawals', [WithdrawalController::class, 'store'])->name('withdrawals.store');
     Route::get('/withdrawals/create', [WithdrawalController::class, 'create'])->name('withdrawals.create');

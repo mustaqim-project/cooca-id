@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Cache\RateLimiting\Limit;
 use App\Http\Controllers\Customer\DashboardController;
 use App\Http\Controllers\Customer\LicenseController;
 use App\Http\Controllers\Customer\ProductController;
@@ -24,19 +22,6 @@ use App\Http\Controllers\Customer\ProfileController;
 |
 */
 
-// Rate limiter for customer routes
-RateLimiter::for('customer', function ($request) {
-    return Limit::perMinute(60)->by($request->user()?->id ?? $request->ip());
-});
-
-RateLimiter::for('customer-login', function ($request) {
-    return Limit::perMinute(5)->by($request->ip());
-});
-
-RateLimiter::for('customer-register', function ($request) {
-    return Limit::perMinute(10)->by($request->ip());
-});
-
 Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'throttle:customer'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -45,7 +30,7 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'thro
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
-    // Subscriptions
+    // Subscriptions - Using scoped route model binding for IDOR prevention
     Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::get('/subscriptions/create', [SubscriptionController::class, 'create'])->name('subscriptions.create');
     Route::post('/subscriptions', [SubscriptionController::class, 'store'])->name('subscriptions.store');
@@ -53,23 +38,23 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'thro
     Route::post('/subscriptions/{subscription}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
     Route::post('/subscriptions/{subscription}/renew', [SubscriptionController::class, 'renew'])->name('subscriptions.renew');
 
-    // Payments
+    // Payments - Using scoped route model binding for IDOR prevention
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
     Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
 
-    // Invoices
+    // Invoices - Using scoped route model binding for IDOR prevention
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
     Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
 
-    // Licenses
+    // Licenses - Using scoped route model binding for IDOR prevention
     Route::get('/licenses', [LicenseController::class, 'index'])->name('licenses.index');
     Route::get('/licenses/{license}', [LicenseController::class, 'show'])->name('licenses.show');
     Route::post('/licenses/{license}/activate', [LicenseController::class, 'activate'])->name('licenses.activate');
     Route::get('/licenses/{license}/credentials', [LicenseController::class, 'credentials'])->name('licenses.credentials');
 
-    // Reviews
+    // Reviews - Using policy-based authorization
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::get('/my-reviews', [ReviewController::class, 'index'])->name('reviews.index');
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
