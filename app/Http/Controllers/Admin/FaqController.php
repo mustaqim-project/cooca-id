@@ -32,6 +32,27 @@ class FaqController extends Controller
     }
 
     /**
+     * Show form for creating a new FAQ
+     */
+    public function create(): Response
+    {
+        return Inertia::render('Admin/Faqs/Create', [
+            'faq' => null,
+        ]);
+    }
+
+    /**
+     * Show form for editing a FAQ
+     */
+    public function edit(string $id): Response
+    {
+        $faq = Faq::findOrFail($id);
+        return Inertia::render('Admin/Faqs/Create', [
+            'faq' => $faq,
+        ]);
+    }
+
+    /**
      * Get all FAQs
      */
     public function list(): JsonResponse

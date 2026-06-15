@@ -138,4 +138,45 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
+
+    // Product Categories Management
+    Route::get('/product-categories', [App\Http\Controllers\Admin\ProductCategoryController::class, 'index'])->name('product-categories.index');
+    Route::get('/product-categories/create', [App\Http\Controllers\Admin\ProductCategoryController::class, 'create'])->name('product-categories.create');
+    Route::post('/product-categories', [App\Http\Controllers\Admin\ProductCategoryController::class, 'store'])->name('product-categories.store');
+    Route::get('/product-categories/{category}', [App\Http\Controllers\Admin\ProductCategoryController::class, 'show'])->name('product-categories.show');
+    Route::get('/product-categories/{category}/edit', [App\Http\Controllers\Admin\ProductCategoryController::class, 'edit'])->name('product-categories.edit');
+    Route::put('/product-categories/{category}', [App\Http\Controllers\Admin\ProductCategoryController::class, 'update'])->name('product-categories.update');
+    Route::delete('/product-categories/{category}', [App\Http\Controllers\Admin\ProductCategoryController::class, 'destroy'])->name('product-categories.destroy');
+    Route::post('/product-categories/reorder', [App\Http\Controllers\Admin\ProductCategoryController::class, 'reorder'])->name('product-categories.reorder');
+    Route::post('/product-categories/{category}/toggle-active', [App\Http\Controllers\Admin\ProductCategoryController::class, 'toggleActive'])->name('product-categories.toggle-active');
+
+    // Email Templates Management
+    Route::get('/email-templates', [App\Http\Controllers\Admin\EmailTemplateController::class, 'index'])->name('email-templates.index');
+    Route::get('/email-templates/create', [App\Http\Controllers\Admin\EmailTemplateController::class, 'create'])->name('email-templates.create');
+    Route::post('/email-templates', [App\Http\Controllers\Admin\EmailTemplateController::class, 'store'])->name('email-templates.store');
+    Route::get('/email-templates/{template}', [App\Http\Controllers\Admin\EmailTemplateController::class, 'show'])->name('email-templates.show');
+    Route::get('/email-templates/{template}/edit', [App\Http\Controllers\Admin\EmailTemplateController::class, 'edit'])->name('email-templates.edit');
+    Route::put('/email-templates/{template}', [App\Http\Controllers\Admin\EmailTemplateController::class, 'update'])->name('email-templates.update');
+    Route::delete('/email-templates/{template}', [App\Http\Controllers\Admin\EmailTemplateController::class, 'destroy'])->name('email-templates.destroy');
+    Route::post('/email-templates/{template}/toggle-active', [App\Http\Controllers\Admin\EmailTemplateController::class, 'toggleActive'])->name('email-templates.toggle-active');
+    Route::get('/email-templates/{template}/preview', [App\Http\Controllers\Admin\EmailTemplateController::class, 'preview'])->name('email-templates.preview');
+
+    // FAQs Management
+    Route::get('/faqs', [App\Http\Controllers\Admin\FaqController::class, 'index'])->name('faqs.index');
+    Route::get('/faqs/create', [App\Http\Controllers\Admin\FaqController::class, 'create'])->name('faqs.create');
+    Route::post('/faqs', [App\Http\Controllers\Admin\FaqController::class, 'store'])->name('faqs.store');
+    Route::get('/faqs/{faq}/edit', [App\Http\Controllers\Admin\FaqController::class, 'edit'])->name('faqs.edit');
+    Route::put('/faqs/{faq}', [App\Http\Controllers\Admin\FaqController::class, 'update'])->name('faqs.update');
+    Route::delete('/faqs/{faq}', [App\Http\Controllers\Admin\FaqController::class, 'destroy'])->name('faqs.destroy');
+    Route::post('/faqs/reorder', [App\Http\Controllers\Admin\FaqController::class, 'reorder'])->name('faqs.reorder');
+
+    // Testimonials Management
+    Route::get('/testimonials', [App\Http\Controllers\Admin\TestimonialController::class, 'index'])->name('testimonials.index');
+    Route::get('/testimonials/create', [App\Http\Controllers\Admin\TestimonialController::class, 'create'])->name('testimonials.create');
+    Route::post('/testimonials', [App\Http\Controllers\Admin\TestimonialController::class, 'store'])->name('testimonials.store');
+    Route::get('/testimonials/{testimonial}/edit', [App\Http\Controllers\Admin\TestimonialController::class, 'edit'])->name('testimonials.edit');
+    Route::put('/testimonials/{testimonial}', [App\Http\Controllers\Admin\TestimonialController::class, 'update'])->name('testimonials.update');
+    Route::delete('/testimonials/{testimonial}', [App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->name('testimonials.destroy');
+    Route::post('/testimonials/reorder', [App\Http\Controllers\Admin\TestimonialController::class, 'reorder'])->name('testimonials.reorder');
+    Route::post('/testimonials/{testimonial}/toggle-featured', [App\Http\Controllers\Admin\TestimonialController::class, 'toggleFeatured'])->name('testimonials.toggle-featured');
 });

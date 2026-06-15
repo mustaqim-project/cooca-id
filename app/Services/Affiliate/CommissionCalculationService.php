@@ -8,16 +8,30 @@ use App\Models\Transaction;
 use App\Models\Affiliator;
 use App\Models\AffiliateWallet;
 use App\Models\AffiliateCommission;
+use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 
 final class CommissionCalculationService
 {
     /**
-     * Level 1 commission rate: 25%
-     * Level 2 commission rate: 5%
+     * Get commission rate from database settings or config fallback
      */
-    const LEVEL_1_RATE = 0.25;
-    const LEVEL_2_RATE = 0.05;
+    private function getCommissionRate(int $level): float
+    {
+        $key = $level === 1 ? 'affiliate.commission_rate_level_1' : 'affiliate.commission_rate_level_2';
+        $defaultValue = $level === 1 ? 25 : 5;
+        
+        // Try to get from database settings first
+        $rate = Setting::get($key);
+        
+        if ($rate === null) {
+            // Fallback to config
+            $rate = config('affiliate.commission_rate_level_' . $level, $defaultValue);
+        }
+        
+        // Convert percentage to decimal (e.g., 25% -> 0.25)
+        return (float) $rate / 100;
+    }
 
     /**
      * Calculate and record commissions for a transaction
@@ -37,16 +51,18 @@ final class CommissionCalculationService
             $grossAmount = $transaction->gross_amount;
             
             // Level 1 commission (direct referral)
-            $level1Commission = $grossAmount * self::LEVEL_1_RATE;
+            $level1Rate = $this->getCommissionRate(1);
+            $level1Commission = $grossAmount * $level1Rate;
             
-            $this->recordCommission($affiliate, $transaction, $level1Commission, 1);
+            $this->recordCommission($affiliate, $transaction, $level1Commission, 1, $level1Rate * 100);
 
             // Level 2 commission (upline)
             if ($affiliate->parent_affiliator_id) {
                 $upline = Affiliator::findOrFail($affiliate->parent_affiliator_id);
-                $level2Commission = $grossAmount * self::LEVEL_2_RATE;
+                $level2Rate = $this->getCommissionRate(2);
+                $level2Commission = $grossAmount * $level2Rate;
                 
-                $this->recordCommission($upline, $transaction, $level2Commission, 2);
+                $this->recordCommission($upline, $transaction, $level2Commission, 2, $level2Rate * 100);
             }
 
             DB::commit();
@@ -59,7 +75,7 @@ final class CommissionCalculationService
     /**
      * Record a commission entry
      */
-    private function recordCommission(Affiliator $affiliate, Transaction $transaction, float $amount, int $level): void
+    private function recordCommission(Affiliator $affiliate, Transaction $transaction, float $amount, int $level, float $percent): void
     {
         $commission = AffiliateCommission::create([
             'affiliator_id' => $affiliate->id,
@@ -67,7 +83,7 @@ final class CommissionCalculationService
             'customer_id' => $transaction->customer_id,
             'level' => $level,
             'gross_amount' => $transaction->gross_amount,
-            'commission_percent' => $level === 1 ? self::LEVEL_1_RATE * 100 : self::LEVEL_2_RATE * 100,
+            'commission_percent' => $percent,
             'commission_amount' => $amount,
             'status' => 'pending',
             'cleared_at' => null,
@@ -91,18 +107,22 @@ final class CommissionCalculationService
     public function getBreakdown(Transaction $transaction): array
     {
         $grossAmount = $transaction->gross_amount;
+        $level1Rate = $this->getCommissionRate(1);
+        $level2Rate = $this->getCommissionRate(2);
         
         return [
             'gross_amount' => $grossAmount,
             'level_1' => [
-                'rate' => self::LEVEL_1_RATE,
-                'amount' => $grossAmount * self::LEVEL_1_RATE,
+                'rate' => $level1Rate,
+                'rate_percent' => $level1Rate * 100,
+                'amount' => $grossAmount * $level1Rate,
             ],
             'level_2' => [
-                'rate' => self::LEVEL_2_RATE,
-                'amount' => $grossAmount * self::LEVEL_2_RATE,
+                'rate' => $level2Rate,
+                'rate_percent' => $level2Rate * 100,
+                'amount' => $grossAmount * $level2Rate,
             ],
-            'total_commission' => ($grossAmount * self::LEVEL_1_RATE) + ($grossAmount * self::LEVEL_2_RATE),
+            'total_commission' => ($grossAmount * $level1Rate) + ($grossAmount * $level2Rate),
         ];
     }
 }
