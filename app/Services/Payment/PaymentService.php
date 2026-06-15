@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace App\Services\Payment;
 
 use App\Models\Transaction;
-use App\DTOs\Payment\TransactionData;
+use App\Models\MidtransTransaction;
+use App\Models\Invoice;
+use App\Models\Subscription;
+use App\Jobs\Notification\SendPaymentConfirmationJob;
+use App\Jobs\Payment\ProcessCommissionJob;
+use App\Jobs\Subscription\ActivateSubscriptionJob;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 final class PaymentService
 {
@@ -70,6 +76,232 @@ final class PaymentService
     }
 
     /**
+     * Mark transaction as paid - called from webhook controller
+     * Handles: subscription activation, invoice update, commission calculation, notifications
+     */
+    public function markAsPaid(
+        Transaction $transaction,
+        ?string $midtransTransactionId,
+        string $midtransStatus,
+        array $payload
+    ): void {
+        DB::beginTransaction();
+        try {
+            // Update transaction status
+            $transaction->update([
+                'status' => 'paid',
+                'midtrans_transaction_id' => $midtransTransactionId,
+                'midtrans_status' => $midtransStatus,
+                'paid_at' => Carbon::now(),
+            ]);
+
+            // Log to midtrans_transactions table for idempotency tracking
+            MidtransTransaction::create([
+                'transaction_id' => $transaction->id->toString(),
+                'order_id' => $transaction->midtrans_order_id,
+                'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
+                'currency' => $payload['currency'] ?? 'IDR',
+                'payment_type' => $payload['payment_type'] ?? null,
+                'transaction_status' => $midtransStatus,
+                'fraud_status' => $payload['fraud_status'] ?? null,
+                'status_code' => $payload['status_code'] ?? null,
+                'raw_response' => $payload,
+                'transaction_time' => isset($payload['transaction_time']) ? Carbon::parse($payload['transaction_time']) : null,
+                'settlement_time' => isset($payload['settlement_time']) ? Carbon::parse($payload['settlement_time']) : null,
+            ]);
+
+            // Update related invoice
+            $invoice = Invoice::where('transaction_id', $transaction->id->toString())->first();
+            if ($invoice) {
+                $invoice->update([
+                    'status' => 'paid',
+                    'paid_at' => Carbon::now(),
+                ]);
+            }
+
+            // Activate subscription via queued job for reliability
+            if ($transaction->subscription) {
+                ActivateSubscriptionJob::dispatch($transaction);
+            }
+
+            DB::commit();
+
+            // Queue notifications (async to avoid blocking webhook response)
+            SendPaymentConfirmationJob::dispatch($transaction);
+
+            // Queue commission calculation for affiliate payouts
+            ProcessCommissionJob::dispatch($transaction);
+
+            Log::info('PaymentService: Transaction marked as paid', [
+                'transaction_id' => $transaction->id->toString(),
+                'invoice_number' => $transaction->invoice_number,
+                'amount' => $transaction->net_amount,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('PaymentService: Failed to mark transaction as paid', [
+                'transaction_id' => $transaction->id->toString(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Mark transaction as pending
+     */
+    public function markAsPending(
+        Transaction $transaction,
+        ?string $midtransTransactionId,
+        string $midtransStatus,
+        array $payload
+    ): void {
+        DB::beginTransaction();
+        try {
+            $transaction->update([
+                'status' => 'pending',
+                'midtrans_transaction_id' => $midtransTransactionId,
+                'midtrans_status' => $midtransStatus,
+            ]);
+
+            // Log to midtrans_transactions table
+            MidtransTransaction::create([
+                'transaction_id' => $transaction->id->toString(),
+                'order_id' => $transaction->midtrans_order_id,
+                'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
+                'currency' => $payload['currency'] ?? 'IDR',
+                'payment_type' => $payload['payment_type'] ?? null,
+                'transaction_status' => $midtransStatus,
+                'fraud_status' => $payload['fraud_status'] ?? null,
+                'status_code' => $payload['status_code'] ?? null,
+                'raw_response' => $payload,
+            ]);
+
+            DB::commit();
+
+            Log::info('PaymentService: Transaction marked as pending', [
+                'transaction_id' => $transaction->id->toString(),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Mark transaction as failed
+     */
+    public function markAsFailed(
+        Transaction $transaction,
+        ?string $midtransTransactionId,
+        string $midtransStatus,
+        array $payload,
+        string $failureReason = 'Payment failed'
+    ): void {
+        DB::beginTransaction();
+        try {
+            $transaction->update([
+                'status' => 'failed',
+                'midtrans_transaction_id' => $midtransTransactionId,
+                'midtrans_status' => $midtransStatus,
+                'failed_at' => Carbon::now(),
+            ]);
+
+            // Log to midtrans_transactions table
+            MidtransTransaction::create([
+                'transaction_id' => $transaction->id->toString(),
+                'order_id' => $transaction->midtrans_order_id,
+                'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
+                'currency' => $payload['currency'] ?? 'IDR',
+                'payment_type' => $payload['payment_type'] ?? null,
+                'transaction_status' => $midtransStatus,
+                'fraud_status' => $payload['fraud_status'] ?? null,
+                'status_code' => $payload['status_code'] ?? null,
+                'raw_response' => $payload,
+            ]);
+
+            // Update related invoice
+            $invoice = Invoice::where('transaction_id', $transaction->id->toString())->first();
+            if ($invoice) {
+                $invoice->update(['status' => 'failed']);
+            }
+
+            DB::commit();
+
+            // Queue failure notification
+            SendPaymentConfirmationJob::dispatch($transaction);
+
+            Log::warning('PaymentService: Transaction marked as failed', [
+                'transaction_id' => $transaction->id->toString(),
+                'reason' => $failureReason,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Mark transaction as refunded
+     */
+    public function markAsRefunded(
+        Transaction $transaction,
+        ?string $midtransTransactionId,
+        string $midtransStatus,
+        array $payload
+    ): void {
+        DB::beginTransaction();
+        try {
+            $transaction->update([
+                'status' => 'refunded',
+                'midtrans_transaction_id' => $midtransTransactionId,
+                'midtrans_status' => $midtransStatus,
+                'refunded_at' => Carbon::now(),
+            ]);
+
+            // Log to midtrans_transactions table
+            MidtransTransaction::create([
+                'transaction_id' => $transaction->id->toString(),
+                'order_id' => $transaction->midtrans_order_id,
+                'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
+                'currency' => $payload['currency'] ?? 'IDR',
+                'payment_type' => $payload['payment_type'] ?? null,
+                'transaction_status' => $midtransStatus,
+                'fraud_status' => $payload['fraud_status'] ?? null,
+                'status_code' => $payload['status_code'] ?? null,
+                'raw_response' => $payload,
+            ]);
+
+            // Update related invoice
+            $invoice = Invoice::where('transaction_id', $transaction->id->toString())->first();
+            if ($invoice) {
+                $invoice->update(['status' => 'refunded']);
+            }
+
+            // Deactivate subscription if exists
+            if ($transaction->subscription) {
+                $transaction->subscription->update([
+                    'status' => 'cancelled',
+                    'ends_at' => Carbon::now(),
+                ]);
+            }
+
+            DB::commit();
+
+            // Queue refund notification
+            SendPaymentConfirmationJob::dispatch($transaction);
+
+            Log::info('PaymentService: Transaction marked as refunded', [
+                'transaction_id' => $transaction->id->toString(),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
      * Verify Midtrans webhook signature
      */
     public function verifyWebhookSignature(string $rawPayload, string $signature): bool
@@ -81,6 +313,7 @@ final class PaymentService
 
     /**
      * Process Midtrans webhook notification
+     * @deprecated Use markAsPaid/markAsFailed methods instead
      */
     public function processWebhook(array $notification): Transaction
     {

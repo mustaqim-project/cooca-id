@@ -1,116 +1,71 @@
 ```
-# Dependencies
-node_modules/
-
-# Build artifacts
-dist/
-build/
-target/
-
-# Editor/IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# Logs
-*.log
+# Laravel-specific ignores
+bootstrap/cache/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+vendor/
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
+# Logs
 *.log
-.git/modules/
-.DS_Store
-*.swp
-*~
-.pytest_cache/
-.hypothesis/
-.coverage*
-htmlcov/
-.pytest_cache/
-.mypy_cache/
-.eggs/
-eggs/
-parts/
-sdist/
-develop-eggs/
-.installed.cfg
-lib/
-lib64/
-.venv/
-venv/
-ENV/
-env/
-.ENV/
-.env/
-env.bak/
-venv.bak/
-vendor/
-# Node.js specific
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-node_modules/
+
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
 dist/
 build/
-.nyc_output
+target/
+
+# Dependencies
+node_modules/
+.npm/
+.yarn/
+.pnpm-store/
+composer.lock
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
 coverage/
-.nyc_output/
-coverage/
-.tap/
-.tap/
-.jscs/
-.jscs/
-.eslintcache
-.eslintcache
-.nodemon/
-.nodemon/
-.next/
-.next/
-.nuxt/
-.nuxt/
-.vuepress/dist
-.vuepress/dist
-.output
-.output
-.temp
-.temp
-.cache/
-.cache/
-.storybook-static/
-.storybook-static/
-.vercel/
-.vercel/
-.now/
-.now/
-.netlify/
-.netlify/
-public/uploads/
-public/uploads/
-storage/
-storage/
-bootstrap/cache/
-bootstrap/cache/
+htmlcov/
+
+# Archives
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```

@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Midtrans;
 
 use App\Http\Controllers\Controller;
 use App\Models\MidtransTransaction;
-use App\Models\Payment;
-use App\Models\Invoice;
-use App\Services\PaymentService;
+use App\Models\Transaction;
+use App\Services\Payment\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -44,7 +43,7 @@ class WebhookController extends Controller
             return response()->json(['message' => 'Missing order_id'], 400);
         }
 
-        // Check for duplicate callback protection
+        // Check for duplicate callback protection using idempotency
         $existingTransaction = MidtransTransaction::where('order_id', $orderId)
             ->where('transaction_status', $transactionStatus)
             ->latest()
@@ -60,48 +59,78 @@ class WebhookController extends Controller
 
         DB::beginTransaction();
         try {
-            // Log transaction
-            $transaction = MidtransTransaction::create([
+            // Find the transaction by midtrans_order_id
+            $transaction = Transaction::where('midtrans_order_id', $orderId)->first();
+
+            if (!$transaction) {
+                Log::channel('payment')->error('Midtrans webhook: Transaction not found', [
+                    'order_id' => $orderId
+                ]);
+                return response()->json(['message' => 'Transaction not found'], 404);
+            }
+
+            // Determine the appropriate status and call PaymentService
+            $status = match (true) {
+                $transactionStatus === 'capture' && $fraudStatus === 'accept' => 'paid',
+                $transactionStatus === 'settlement' => 'paid',
+                $transactionStatus === 'pending' => 'pending',
+                $transactionStatus === 'deny' => 'failed',
+                $transactionStatus === 'expire' => 'failed',
+                $transactionStatus === 'cancel' => 'failed',
+                $transactionStatus === 'refund' => 'refunded',
+                default => 'failed',
+            };
+
+            // Create MidtransTransaction log first for idempotency
+            $midtransTransaction = MidtransTransaction::create([
+                'transaction_id' => $transaction->id,
                 'order_id' => $orderId,
-                'transaction_id' => $payload['transaction_id'] ?? null,
-                'gross_amount' => $payload['gross_amount'] ?? 0,
+                'gross_amount' => $payload['gross_amount'] ?? $transaction->net_amount,
                 'currency' => $payload['currency'] ?? 'IDR',
                 'payment_type' => $payload['payment_type'] ?? null,
                 'transaction_status' => $transactionStatus,
                 'fraud_status' => $fraudStatus,
                 'status_code' => $payload['status_code'] ?? null,
-                'status_message' => $payload['status_message'] ?? null,
-                'signature_key' => $payload['signature_key'] ?? null,
-                'transaction_time' => $payload['transaction_time'] ?? null,
-                'settlement_time' => $payload['settlement_time'] ?? null,
-                'expiry_time' => $payload['expiry_time'] ?? null,
-                'channel_response_code' => $payload['channel_response_code'] ?? null,
-                'channel_response_message' => $payload['channel_response_message'] ?? null,
-                'bank' => $payload['bank'] ?? null,
-                'va_numbers' => json_encode($payload['va_numbers'] ?? []),
-                'bill_key' => $payload['bill_key'] ?? null,
-                'biller_code' => $payload['biller_code'] ?? null,
-                'pdf_url' => $payload['pdf_url'] ?? null,
-                'finish_redirect_url' => $payload['finish_redirect_url'] ?? null,
-                'metadata' => json_encode($payload),
+                'raw_response' => $payload,
+                'transaction_time' => isset($payload['transaction_time']) ? now()->parse($payload['transaction_time']) : null,
+                'settlement_time' => isset($payload['settlement_time']) ? now()->parse($payload['settlement_time']) : null,
             ]);
 
-            // Find related payment
-            $payment = Payment::where('reference_id', $orderId)->first();
-
-            if ($payment) {
-                $this->processPaymentStatus($payment, $transactionStatus, $fraudStatus, $transaction);
-            } else {
-                Log::channel('payment')->warning('Midtrans webhook: Payment not found', [
-                    'order_id' => $orderId
-                ]);
-            }
+            // Use PaymentService to handle status updates
+            match ($status) {
+                'paid' => $this->paymentService->markAsPaid(
+                    $transaction,
+                    $payload['transaction_id'] ?? null,
+                    $transactionStatus,
+                    $payload
+                ),
+                'pending' => $this->paymentService->markAsPending(
+                    $transaction,
+                    $payload['transaction_id'] ?? null,
+                    $transactionStatus,
+                    $payload
+                ),
+                'refunded' => $this->paymentService->markAsRefunded(
+                    $transaction,
+                    $payload['transaction_id'] ?? null,
+                    $transactionStatus,
+                    $payload
+                ),
+                default => $this->paymentService->markAsFailed(
+                    $transaction,
+                    $payload['transaction_id'] ?? null,
+                    $transactionStatus,
+                    $payload,
+                    $payload['status_message'] ?? 'Payment failed'
+                ),
+            };
 
             DB::commit();
 
             Log::channel('payment')->info('Midtrans webhook processed successfully', [
                 'order_id'           => $orderId,
                 'transaction_status' => $transactionStatus,
+                'new_status'         => $status,
             ]);
 
             return response()->json(['message' => 'Webhook processed successfully'], 200);
@@ -118,7 +147,6 @@ class WebhookController extends Controller
         }
     }
 
-    /**
     /**
      * Verify Midtrans signature key with enhanced security
      */
@@ -174,74 +202,5 @@ class WebhookController extends Controller
         }
 
         return $isValid;
-    }
-
-    /**
-     * Process payment status based on Midtrans response
-     */
-    private function processPaymentStatus(Payment $payment, string $transactionStatus, ?string $fraudStatus, MidtransTransaction $transaction)
-    {
-        $newStatus = match ($transactionStatus) {
-            'capture' => ($fraudStatus === 'accept') ? 'Success' : 'Failed',
-            'settlement' => 'Success',
-            'pending' => 'Pending',
-            'deny' => 'Failed',
-            'expire' => 'Failed',
-            'cancel' => 'Failed',
-            'refund' => 'Refunded',
-            default => 'Failed',
-        };
-
-        // Update payment status
-        $payment->update([
-            'status' => $newStatus,
-            'midtrans_transaction_id' => $transaction->id,
-            'paid_at' => in_array($newStatus, ['Success', 'Refunded']) ? now() : null,
-        ]);
-
-        // Update invoice status if payment is successful
-        if ($newStatus === 'Success' && $payment->invoice) {
-            $payment->invoice->update([
-                'status' => 'Paid',
-                'paid_at' => now(),
-            ]);
-
-            // Trigger subscription activation if this is a subscription payment
-            if ($payment->subscription) {
-                $payment->subscription->update([
-                    'status' => 'Active',
-                    'starts_at' => now(),
-                ]);
-            }
-
-            // Queue notification
-            $payment->invoice->user->notify(
-                new \App\Notifications\PaymentSuccessNotification($payment)
-            );
-        } elseif ($newStatus === 'Failed' && $payment->invoice) {
-            $payment->invoice->update(['status' => 'Failed']);
-            
-            // Queue notification
-            $payment->invoice->user->notify(
-                new \App\Notifications\PaymentFailedNotification($payment)
-            );
-        }
-
-        // Create activity log
-        \App\Models\ActivityLog::create([
-            'user_id' => $payment->invoice?->customer_id ?? $payment->subscription?->customer_id,
-            'user_type' => 'customer',
-            'action' => 'payment_webhook_received',
-            'module' => 'Payment',
-            'description' => "Payment webhook received: {$transactionStatus}",
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'metadata' => [
-                'payment_id' => $payment->id,
-                'transaction_status' => $transactionStatus,
-                'fraud_status' => $fraudStatus,
-                'new_status' => $newStatus,
-            ],
-        ]);
     }
 }

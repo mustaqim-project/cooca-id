@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Jobs\Notification;
 
-use App\Models\Customer;
+use App\Models\Transaction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -18,19 +18,23 @@ final class SendPaymentConfirmationJob implements ShouldQueue
     public int $backoff = 60;
 
     public function __construct(
-        private readonly Customer $customer,
-        private readonly string $invoiceNumber,
-        private readonly float $amount,
+        private readonly Transaction $transaction,
     ) {}
 
     public function handle(): void
     {
         try {
+            $customer = $this->transaction->customer;
+            
+            if (!$customer) {
+                return;
+            }
+
             // Dispatch email notification
-            $this->customer->notify(
+            $this->transaction->notify(
                 new \App\Notifications\Customer\PaymentConfirmedNotification(
-                    $this->invoiceNumber,
-                    $this->amount
+                    $this->transaction->invoice_number,
+                    $this->transaction->net_amount
                 )
             );
 
@@ -41,11 +45,11 @@ final class SendPaymentConfirmationJob implements ShouldQueue
                 "Terima kasih %s,\n" .
                 "Pembayaran Anda dengan invoice %s sebesar Rp %s telah berhasil.\n\n" .
                 "Terima kasih telah menggunakan COOCA.ID",
-                $this->customer->name,
-                $this->invoiceNumber,
-                number_format($this->amount, 0, ',', '.')
+                $customer->name,
+                $this->transaction->invoice_number,
+                number_format($this->transaction->net_amount, 0, ',', '.')
             );
-            $whatsappService->send($this->customer->email, $message);
+            $whatsappService->send($customer->phone ?? $customer->email, $message);
         } catch (\Throwable $e) {
             report($e);
             throw $e;

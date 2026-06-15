@@ -30,6 +30,7 @@ final class MidtransTransaction extends Model
     ];
 
     protected $casts = [
+        'gross_amount' => 'decimal:2',
         'transaction_time' => 'datetime',
         'settlement_time' => 'datetime',
         'expire_time' => 'datetime',
