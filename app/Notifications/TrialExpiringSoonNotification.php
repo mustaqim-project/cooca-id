@@ -13,7 +13,7 @@ use Illuminate\Notifications\Messages\WhatsAppMessage;
 
 class TrialExpiringSoonNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, HasQueueConfiguration;
 
     public function __construct(
         private readonly Subscription $subscription,

@@ -60,6 +60,25 @@ return [
             'report' => false,
         ],
 
+        /*
+         * Dedicated disk for backups.
+         * Configure with your S3-compatible bucket for backup storage.
+         * Can also be Google Cloud Storage (GCS) with a compatible driver.
+         */
+        'backup-s3' => [
+            'driver' => 's3',
+            'key' => env('BACKUP_AWS_ACCESS_KEY_ID', env('AWS_ACCESS_KEY_ID')),
+            'secret' => env('BACKUP_AWS_SECRET_ACCESS_KEY', env('AWS_SECRET_ACCESS_KEY')),
+            'region' => env('BACKUP_AWS_DEFAULT_REGION', env('AWS_DEFAULT_REGION', 'ap-southeast-1')),
+            'bucket' => env('BACKUP_S3_BUCKET', env('AWS_BUCKET')),
+            'url' => env('BACKUP_AWS_URL'),
+            'endpoint' => env('BACKUP_AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('BACKUP_AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'root' => env('BACKUP_S3_ROOT', 'cooca-backups'),
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

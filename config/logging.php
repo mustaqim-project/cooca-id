@@ -127,6 +127,42 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        /*
+        |--------------------------------------------------------------------------
+        | Custom Application Channels
+        |--------------------------------------------------------------------------
+        */
+
+        // Dedicated channel for all payment-related events and errors.
+        // Usage: Log::channel('payment')->error('Payment failed', [...]);
+        'payment' => [
+            'driver'              => 'daily',
+            'path'                => storage_path('logs/payment.log'),
+            'level'               => env('LOG_PAYMENT_LEVEL', 'debug'),
+            'days'                => env('LOG_PAYMENT_DAYS', 30),
+            'replace_placeholders'=> true,
+        ],
+
+        // Dedicated channel for user activity logs (audit trail).
+        // Usage: Log::channel('activity')->info('User action', [...]);
+        'activity' => [
+            'driver'              => 'daily',
+            'path'                => storage_path('logs/activity.log'),
+            'level'               => env('LOG_ACTIVITY_LEVEL', 'info'),
+            'days'                => env('LOG_ACTIVITY_DAYS', 90),
+            'replace_placeholders'=> true,
+        ],
+
+        // Dedicated channel for security events (failed logins, invalid signatures, etc.)
+        // Usage: Log::channel('security')->warning('Suspicious activity', [...]);
+        'security' => [
+            'driver'              => 'daily',
+            'path'                => storage_path('logs/security.log'),
+            'level'               => env('LOG_SECURITY_LEVEL', 'warning'),
+            'days'                => env('LOG_SECURITY_DAYS', 90),
+            'replace_placeholders'=> true,
+        ],
+
     ],
 
 ];

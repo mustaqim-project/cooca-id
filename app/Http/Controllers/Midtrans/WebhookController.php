@@ -27,8 +27,9 @@ class WebhookController extends Controller
     {
         // Verify signature key
         if (!$this->verifySignature($request)) {
-            Log::warning('Midtrans webhook: Invalid signature', [
-                'payload' => $request->all()
+            Log::channel('security')->warning('Midtrans webhook: Invalid signature', [
+                'ip'      => $request->ip(),
+                'payload' => $request->only(['order_id', 'transaction_status']),
             ]);
             return response()->json(['message' => 'Invalid signature'], 401);
         }
@@ -39,7 +40,7 @@ class WebhookController extends Controller
         $fraudStatus = $payload['fraud_status'] ?? null;
 
         if (!$orderId) {
-            Log::error('Midtrans webhook: Missing order_id', ['payload' => $payload]);
+            Log::channel('payment')->error('Midtrans webhook: Missing order_id', ['payload' => $payload]);
             return response()->json(['message' => 'Missing order_id'], 400);
         }
 
@@ -91,25 +92,26 @@ class WebhookController extends Controller
             if ($payment) {
                 $this->processPaymentStatus($payment, $transactionStatus, $fraudStatus, $transaction);
             } else {
-                Log::warning('Midtrans webhook: Payment not found', [
+                Log::channel('payment')->warning('Midtrans webhook: Payment not found', [
                     'order_id' => $orderId
                 ]);
             }
 
             DB::commit();
 
-            Log::info('Midtrans webhook processed successfully', [
-                'order_id' => $orderId,
-                'transaction_status' => $transactionStatus
+            Log::channel('payment')->info('Midtrans webhook processed successfully', [
+                'order_id'           => $orderId,
+                'transaction_status' => $transactionStatus,
             ]);
 
             return response()->json(['message' => 'Webhook processed successfully'], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Midtrans webhook processing failed', [
+            Log::channel('payment')->error('Midtrans webhook processing failed', [
                 'order_id' => $orderId,
-                'error' => $e->getMessage()
+                'error'    => $e->getMessage(),
+                'trace'    => $e->getTraceAsString(),
             ]);
 
             return response()->json(['message' => 'Processing failed'], 500);
@@ -162,12 +164,12 @@ class WebhookController extends Controller
         $isValid = hash_equals($calculatedSignature, $providedSignature);
 
         if (!$isValid) {
-            Log::critical('Midtrans webhook: Invalid signature detected - POTENTIAL FRAUD', [
-                'order_id' => $payload['order_id'],
-                'provided_signature' => substr($providedSignature, 0, 16) . '...',
-                'expected_signature' => substr($calculatedSignature, 0, 16) . '...',
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent()
+            Log::channel('security')->critical('Midtrans webhook: Invalid signature detected - POTENTIAL FRAUD', [
+                'order_id'            => $payload['order_id'],
+                'provided_signature'  => substr($providedSignature, 0, 16) . '...',
+                'expected_signature'  => substr($calculatedSignature, 0, 16) . '...',
+                'ip_address'          => $request->ip(),
+                'user_agent'          => $request->userAgent(),
             ]);
         }
 

@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notification;
 
 final class TrialExpiredNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, HasQueueConfiguration;
 
     public function __construct(
         private readonly License $license,

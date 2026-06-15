@@ -11,10 +11,8 @@ use Illuminate\Notifications\Notification;
 
 final class WithdrawalPaidNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, HasQueueConfiguration;
 
-    public int $tries = 3;
-    public int $backoff = 60;
 
     public function __construct(
         private readonly AffiliateWithdrawal $withdrawal,

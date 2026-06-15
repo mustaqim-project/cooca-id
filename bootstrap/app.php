@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             SecurityHeadersMiddleware::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
+            \App\Http\Middleware\ActivityLogger::class,
         ]);
 
         $middleware->api(append: [

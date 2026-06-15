@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 
 class WithdrawalApprovedNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, HasQueueConfiguration;
 
     public function __construct(
         private AffiliateWithdrawal $withdrawal

@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notification;
 
 class CommissionEarnedNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, HasQueueConfiguration;
 
     public function __construct(
         private AffiliateCommission $commission
