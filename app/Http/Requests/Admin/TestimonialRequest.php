@@ -22,11 +22,11 @@ class TestimonialRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'position' => ['nullable', 'string', 'max:255'],
+            'role' => ['nullable', 'string', 'max:255'],
             'company' => ['nullable', 'string', 'max:255'],
             'content' => ['required', 'string'],
-            'avatar' => ['nullable', 'string', 'url'],
-            'rating' => ['integer', 'min:1', 'max:5'],
+            'image_url' => ['nullable', 'string', 'url'],
+            'rating' => ['nullable', 'integer', 'min:1', 'max:5'],
             'product_type' => ['nullable', 'string', 'max:100'],
             'is_featured' => ['boolean'],
             'is_active' => ['boolean'],

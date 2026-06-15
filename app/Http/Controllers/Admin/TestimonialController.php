@@ -29,6 +29,27 @@ class TestimonialController extends Controller
     }
 
     /**
+     * Show form for creating a new testimonial
+     */
+    public function create(): Response
+    {
+        return Inertia::render('Admin/Testimonials/Create', [
+            'testimonial' => null,
+        ]);
+    }
+
+    /**
+     * Show form for editing a testimonial
+     */
+    public function edit(string $id): Response
+    {
+        $testimonial = Testimonial::findOrFail($id);
+        return Inertia::render('Admin/Testimonials/Create', [
+            'testimonial' => $testimonial,
+        ]);
+    }
+
+    /**
      * Get all testimonials
      */
     public function list(): JsonResponse
