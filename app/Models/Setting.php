@@ -81,7 +81,6 @@ class Setting extends Model
     public static function getGroup(string $group): array
     {
         return static::where('group', $group)
-            ->where('is_active', true)
             ->get()
             ->pluck('typed_value', 'key')
             ->toArray();
