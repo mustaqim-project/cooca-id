@@ -45,6 +45,8 @@ return new class extends Migration
             $table->index('transaction_id');
             $table->index('level');
             $table->index('status');
+            $table->index(['affiliator_id', 'status']);
+            $table->index('cleared_at');
         });
     }
 

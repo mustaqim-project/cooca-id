@@ -52,6 +52,9 @@ return new class extends Migration
             $table->index('invoice_number');
             $table->index('status');
             $table->index('midtrans_order_id');
+            $table->index(['status', 'paid_at']);
+            $table->index('subscription_id');
+            $table->index('created_at');
         });
     }
 

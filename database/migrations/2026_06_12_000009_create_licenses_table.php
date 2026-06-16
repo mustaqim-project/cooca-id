@@ -18,11 +18,15 @@ return new class extends Migration
             $table->uuid('customer_id');
             $table->uuid('product_id');
             $table->uuid('subscription_plan_id');
+            $table->uuid('erp_request_id')->nullable();
+            $table->uuid('domain_id')->nullable();
             $table->string('license_code', 16)->unique();
             $table->string('token_code', 16)->unique();
             $table->string('domain')->unique();
             $table->enum('status', ['inactive', 'active', 'expired', 'revoked'])->default('inactive');
+            $table->boolean('is_trial')->default(false);
             $table->timestamp('activated_at')->nullable();
+            $table->timestamp('starts_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->timestamp('revoked_at')->nullable();
             $table->uuid('revoked_by')->nullable();
@@ -45,6 +49,16 @@ return new class extends Migration
                 ->on('subscription_plans')
                 ->onDelete('cascade');
 
+            $table->foreign('erp_request_id')
+                ->references('id')
+                ->on('erp_requests')
+                ->onDelete('set null');
+
+            $table->foreign('domain_id')
+                ->references('id')
+                ->on('domains')
+                ->onDelete('set null');
+
             $table->foreign('revoked_by')
                 ->references('id')
                 ->on('admins')
@@ -55,6 +69,10 @@ return new class extends Migration
             $table->index('license_code');
             $table->index('token_code');
             $table->index('status');
+            $table->index('erp_request_id');
+            $table->index('domain_id');
+            $table->index('is_trial');
+            $table->index('starts_at');
         });
     }
 

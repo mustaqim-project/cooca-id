@@ -42,6 +42,9 @@ return new class extends Migration
             $table->index('customer_id');
             $table->index('license_id');
             $table->index('status');
+            $table->index('expires_at');
+            $table->index(['customer_id', 'status']);
+            $table->index('started_at');
         });
     }
 

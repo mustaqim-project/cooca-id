@@ -24,11 +24,15 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->integer('order')->default(0);
             $table->uuid('customer_id')->nullable();
-            $table->foreignUuid('customer_id')->nullable()->constrained('customers')->onDelete('set null');
             $table->uuid('created_by')->nullable();
             $table->uuid('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('customer_id')
+                ->references('id')
+                ->on('customers')
+                ->onDelete('set null');
 
             // Indexes
             $table->index('is_featured');
