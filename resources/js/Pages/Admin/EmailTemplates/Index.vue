@@ -70,10 +70,6 @@ const deleteTemplate = (template: Template) => {
 };
 </script>
 
-<script setup lang="ts">
-import { ref } from 'vue';
-</script>
-
 <template>
     <Head title="Template Email" />
 

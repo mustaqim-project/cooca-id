@@ -1,0 +1,1142 @@
+@extends('layouts.guest')
+
+@section('title', 'Blog Detail - ' . ($setting->company_name ?? config('app.name')))
+
+@section('content')
+<!-- READING PROGRESS BAR -->
+    <div class="reading-progress" id="readingProgress" style="width:0%;"></div>
+
+    
+
+    
+
+    <!-- ARTICLE HEADER -->
+    <section style="padding:140px 0 30px;position:relative;overflow:hidden;background:var(--hero-bg);transition:background var(--transition);">
+        <div style="position:absolute;border-radius:50%;filter:blur(80px);opacity:var(--hero-orb-opacity);pointer-events:none;width:400px;height:400px;background:var(--primary);top:-100px;right:-80px;"></div>
+        <div style="position:absolute;border-radius:50%;filter:blur(60px);opacity:var(--hero-orb-opacity);pointer-events:none;width:250px;height:250px;background:var(--accent);bottom:-60px;left:-40px;"></div>
+        <div style="position:absolute;inset:0;background-image:linear-gradient(var(--hero-grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--hero-grid-color) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;"></div>
+        <div class="container position-relative" style="z-index:2;">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-xl-7">
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb-custom reveal mb-3">
+                        <a href="{{ route('home') }}">Home</a><span class="sep">›</span>
+                        <a href="{{ route('blog.index') }}">Blog</a><span class="sep">›</span>
+                        <span class="current">Article</span>
+                    </div>
+                    <!-- Category Badge -->
+                    <span class="blog-cat reveal rv1" style="background:rgba(37,99,235,.12);color:var(--primary);margin-bottom:16px;">Featured</span>
+                    <!-- Title -->
+                    <h1 class="reveal rv1" style="font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:800;letter-spacing:-0.03em;line-height:1.2;margin-bottom:16px;">
+                        The Real Cost of Running Your Business on <span style="background:linear-gradient(135deg,var(--accent),var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">7 Different SaaS Tools</span>
+                    </h1>
+                    <!-- Meta -->
+                    <div class="d-flex align-items-center flex-wrap gap-3 reveal rv2" style="margin-bottom:24px;">
+                        <div class="blog-author">
+                            <div class="author-avatar">AR</div>
+                            <span style="font-size:.88rem;color:var(--text);font-weight:600;">Arif Rahman</span>
+                        </div>
+                        <span style="color:var(--border);">•</span>
+                        <span style="font-size:.85rem;color:var(--text-muted);"><i class="bi bi-calendar3 me-1"></i> June 1, 2026</span>
+                        <span style="color:var(--border);">•</span>
+                        <span style="font-size:.85rem;color:var(--text-muted);"><i class="bi bi-clock me-1"></i> 12 min read</span>
+                        <span style="color:var(--border);">•</span>
+                        <span style="font-size:.85rem;color:var(--text-muted);"><i class="bi bi-eye me-1"></i> 8,420 views</span>
+                    </div>
+                    <!-- Share -->
+                    <div class="share-bar reveal rv3">
+                        <span class="share-label">Share:</span>
+                        <button class="share-btn" title="Share on Twitter" onclick="window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(window.location.href),'_blank')"><i class="bi bi-twitter-x"></i></button>
+                        <button class="share-btn" title="Share on LinkedIn" onclick="window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(window.location.href),'_blank')"><i class="bi bi-linkedin"></i></button>
+                        <button class="share-btn" title="Share on Facebook" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href),'_blank')"><i class="bi bi-facebook"></i></button>
+                        <button class="share-btn" title="Copy link" onclick="navigator.clipboard.writeText(window.location.href);this.innerHTML='<i class=&quot;bi bi-check-lg&quot;></i>';setTimeout(()=>this.innerHTML='<i class=&quot;bi bi-link-45deg&quot;></i>',2000)"><i class="bi bi-link-45deg"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURED IMAGE HEADLINE SECTION (Dummy Image) -->
+    <div class="container reveal">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <div class="featured-image-section">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=600&fit=crop&crop=edges" alt="Business SaaS cost analysis illustration" onerror="this.onerror=null;this.src='https://placehold.co/1200x600/2563eb/ffffff?text=The+Real+Cost+of+SaaS';">
+                    <div class="image-caption">
+                        <i class="bi bi-camera"></i>
+                        <span>Illustration: Fragmented software tools can silently drain your business resources.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ARTICLE BODY -->
+    <section style="padding:0 0 80px;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <!-- SIDEBAR: TOC (desktop) -->
+                <div class="col-lg-3 order-lg-1 d-none d-lg-block">
+                    <div class="toc-widget reveal">
+                        <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:12px;">Table of Contents</div>
+                        <ul class="toc-list" id="tocList">
+                            <li><a href="#section-1" class="toc-h2 active-toc">The Hidden Cost of Fragmentation</a></li>
+                            <li><a href="#section-2" class="toc-h2">Three Business Profiles We Modeled</a></li>
+                            <li><a href="#section-3" class="toc-h3">Profile A: Retail Store (12 employees)</a></li>
+                            <li><a href="#section-4" class="toc-h3">Profile B: Restaurant Chain (3 outlets)</a></li>
+                            <li><a href="#section-5" class="toc-h3">Profile C: Independent Clinic</a></li>
+                            <li><a href="#section-6" class="toc-h2">The 5-Year Cost Comparison</a></li>
+                            <li><a href="#section-7" class="toc-h2">The Hidden Costs Nobody Talks About</a></li>
+                            <li><a href="#section-8" class="toc-h2">What a Unified System Actually Looks Like</a></li>
+                            <li><a href="#section-9" class="toc-h2">The Verdict: Integration Debt Is Real</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- MAIN CONTENT -->
+                <div class="col-lg-7 col-xl-7 order-lg-2">
+                    <article class="article-content reveal" id="articleBody">
+                        <p><strong>Every business owner knows the feeling.</strong> You sign up for one tool to handle accounting. Then another for inventory. Then a third for payroll. Before you know it, your team is juggling seven different logins, seven different interfaces, and seven different monthly bills — none of which talk to each other.</p>
+
+                        <p>It feels manageable at first. But over time, the cracks start to show. A sales record doesn't sync to the general ledger. Inventory counts in the POS don't match what the warehouse system says. Payroll runs with data that's two weeks out of date. And every month, you're paying subscription fees that quietly eat into margins you thought were healthy.</p>
+
+                        <p>We decided to run the numbers. We modeled the true cost — cash, time, and error-related losses — of running a business on seven separate SaaS tools versus a single unified business system. The results were eye-opening, even for us.</p>
+
+                        <h2 id="section-1">The Hidden Cost of Fragmentation</h2>
+
+                        <p>Before we dive into the numbers, let's define what we mean by "cost." Most business owners only count the subscription fees. But the real cost of fragmented software has at least four dimensions:</p>
+
+                        <ol>
+                            <li><strong>Direct subscription costs</strong> — the monthly or annual fees you pay to each vendor.</li>
+                            <li><strong>Integration costs</strong> — the time, tools (like Zapier or Make), and sometimes developer hours needed to make systems talk to each other.</li>
+                            <li><strong>Error costs</strong> — mistakes that happen when data is manually transferred between systems or when integrations fail silently.</li>
+                            <li><strong>Opportunity costs</strong> — the strategic insights you never get because your data lives in seven different silos and nobody has time to consolidate it.</li>
+                        </ol>
+
+                        <div class="highlight-box">
+                            <p><strong>💡 Key Insight:</strong> In our analysis, subscription fees accounted for only about 40% of the total cost of fragmentation. The other 60% came from integration maintenance, error correction, and lost opportunities — the costs most owners never explicitly track.</p>
+                        </div>
+
+                        <h2 id="section-2">Three Business Profiles We Modeled</h2>
+
+                        <p>To make this analysis practical, we built financial models for three common Indonesian business profiles. Each profile uses a typical "best-of-breed" SaaS stack — the kind of setup we see most frequently among our clients before they switch to COOCA.</p>
+
+                        <h3 id="section-3">Profile A: Retail Store (12 employees)</h3>
+                        <p>A single-location retail business selling consumer goods. They run a POS system, separate accounting software, a standalone inventory tool, a payroll service, a CRM for customer loyalty, a separate e-commerce platform integration, and a reporting dashboard they built themselves. Seven tools total.</p>
+
+                        <h3 id="section-4">Profile B: Restaurant Chain (3 outlets)</h3>
+                        <p>A growing F&B business with three outlets across one city. Each outlet has its own POS terminal. They use separate systems for kitchen management, supplier ordering, accounting, payroll for 45 employees, and a basic CRM for their loyalty program. Six tools, plus spreadsheets to fill the gaps.</p>
+
+                        <h3 id="section-5">Profile C: Independent Clinic</h3>
+                        <p>A medical clinic with 8 staff members including two doctors. They use an EMR system, separate billing software, a pharmacy inventory tool, payroll, a patient communication app (WhatsApp-based but managed manually), and an accounting package. Six tools, with significant manual data entry between them.</p>
+
+                        <h2 id="section-6">The 5-Year Cost Comparison</h2>
+
+                        <p>We projected costs over five years, including annual subscription increases (we used a conservative 8% year-over-year, which is below the industry average for SaaS price hikes). Here's what we found for Profile A (Retail Store):</p>
+
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Cost Category</th>
+                                        <th>7 Separate Tools</th>
+                                        <th>Unified System (COOCA)</th>
+                                        <th>Difference</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Subscription Fees (5-year total)</td>
+                                        <td>Rp 198,000,000</td>
+                                        <td>Rp 45,000,000 <br><small style="color:var(--success);">(lifetime license)</small></td>
+                                        <td class="table-highlight" style="color:var(--success);">-77%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Integration Tools & Maintenance</td>
+                                        <td>Rp 36,000,000</td>
+                                        <td>Rp 0</td>
+                                        <td class="table-highlight" style="color:var(--success);">-100%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Staff Time Spent on Data Reconciliation</td>
+                                        <td>Rp 72,000,000 <br><small>(~3 hrs/week at Rp 50k/hr)</small></td>
+                                        <td>Rp 8,000,000 <br><small>(~20 min/week)</small></td>
+                                        <td class="table-highlight" style="color:var(--success);">-89%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Estimated Error-Related Losses</td>
+                                        <td>Rp 45,000,000</td>
+                                        <td>Rp 5,000,000</td>
+                                        <td class="table-highlight" style="color:var(--success);">-89%</td>
+                                    </tr>
+                                    <tr style="border-top:2px solid var(--table-border);">
+                                        <td><strong>Total 5-Year Cost</strong></td>
+                                        <td><strong style="color:#EF4444;">Rp 351,000,000</strong></td>
+                                        <td><strong style="color:var(--success);">Rp 58,000,000</strong></td>
+                                        <td class="table-highlight" style="color:var(--success);"><strong>-83%</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <p>The numbers for Profile B (Restaurant Chain) were even starker — a total 5-year cost difference of nearly Rp 520 million, largely because multi-outlet operations multiply the integration complexity. Profile C (Clinic) showed a Rp 280 million difference over five years.</p>
+
+                        <h2 id="section-7">The Hidden Costs Nobody Talks About</h2>
+
+                        <p>Beyond the spreadsheet numbers, our interviews with business owners revealed costs that are harder to quantify but deeply felt:</p>
+
+                        <blockquote>
+                            <p>"Every time one of my staff quits, I have to reset passwords for seven different systems. Training a new hire takes two extra days just because they have to learn where everything lives. It's exhausting."</p>
+                            <footer style="margin-top:8px;font-size:.85rem;color:var(--text-muted);font-style:normal;">— Restaurant owner, Jakarta (3 outlets, 6 SaaS tools)</footer>
+                        </blockquote>
+
+                        <ul>
+                            <li><strong>Onboarding drag:</strong> New employees need 2–3 extra days to get comfortable with multiple disconnected systems.</li>
+                            <li><strong>Vendor fatigue:</strong> Managing seven vendor relationships, seven renewal dates, and seven support teams is a cognitive load business owners underestimate.</li>
+                            <li><strong>Security gaps:</strong> When data flows between seven systems, your attack surface multiplies. Most businesses don't audit all their integrations regularly.</li>
+                            <li><strong>Reporting blind spots:</strong> When asked "how profitable was last month?", owners using fragmented systems often need 3–5 days to compile a reliable answer — if they can answer it at all.</li>
+                        </ul>
+
+                        <h2 id="section-8">What a Unified System Actually Looks Like</h2>
+
+                        <p>The alternative isn't just "one tool instead of seven." It's a fundamentally different operating model. In a unified business system like COOCA:</p>
+
+                        <div class="highlight-box">
+                            <p><strong>🔗 One database, one source of truth.</strong> When a sales transaction happens, inventory updates instantly, the general ledger receives the entry automatically, and the CRM records the customer's purchase history — all without a single integration or manual data transfer.</p>
+                        </div>
+
+                        <p>This means:</p>
+                        <ul>
+                            <li>Your profit & loss statement is always current, not a week behind.</li>
+                            <li>Inventory counts are accurate in real time, not "close enough."</li>
+                            <li>Payroll runs with actual attendance data, not estimates.</li>
+                            <li>Customer insights are automatically connected to transaction history.</li>
+                        </ul>
+
+                        <p>And critically: you own the software with a lifetime license. There's no annual price hike, no vendor suddenly changing their API pricing, no "we're deprecating this feature" email that forces you to find yet another tool.</p>
+
+                        <h2 id="section-9">The Verdict: Integration Debt Is Real</h2>
+
+                        <p>Software developers talk about "technical debt" — the cost of shortcuts that compound over time. Business owners face something similar: <strong>integration debt</strong>. Every new SaaS tool you add creates connections that need to be maintained, data that needs to be reconciled, and complexity that compounds.</p>
+
+                        <p>For a small business with 10–50 employees, the five-year cost of integration debt routinely exceeds Rp 250 million. That's money that could go toward hiring, expansion, or simply higher margins.</p>
+
+                        <p><strong>The question isn't whether you can afford a unified system. It's whether you can afford not to have one.</strong></p>
+
+                        <p style="margin-top:32px;font-size:.9rem;font-style:italic;color:var(--text-muted);">
+                            <em>Disclosure: COOCA is a unified business system with a lifetime license model. The cost comparisons in this article are based on publicly available pricing for commonly used SaaS tools in Indonesia as of May 2026. Your actual costs may vary based on specific tools, team size, and usage patterns.</em>
+                        </p>
+                    </article>
+
+                    <!-- TAGS -->
+                    <div class="d-flex flex-wrap gap-2 mt-4 reveal" style="padding-top:24px;border-top:1px solid var(--border);">
+                        <span style="font-size:.78rem;font-weight:700;color:var(--text-muted);margin-right:4px;align-self:center;">Tags:</span>
+                        <span class="blog-cat" style="background:rgba(37,99,235,.08);color:var(--primary);cursor:pointer;">SaaS Cost</span>
+                        <span class="blog-cat" style="background:rgba(16,185,129,.08);color:#10B981;cursor:pointer;">Finance</span>
+                        <span class="blog-cat" style="background:rgba(245,158,11,.08);color:#F59E0B;cursor:pointer;">Business Strategy</span>
+                        <span class="blog-cat" style="background:rgba(124,58,237,.08);color:#7C3AED;cursor:pointer;">ROI Analysis</span>
+                        <span class="blog-cat" style="background:rgba(56,189,248,.08);color:var(--accent);cursor:pointer;">Integration</span>
+                    </div>
+
+                    <!-- AUTHOR BIO -->
+                    <div class="author-bio-card reveal mt-4">
+                        <div class="author-avatar-lg">AR</div>
+                        <div>
+                            <div style="font-weight:700;font-size:1.05rem;color:var(--text);margin-bottom:4px;">Arif Rahman</div>
+                            <p style="font-size:.85rem;margin-bottom:8px;">Head of Business Intelligence at COOCA. Former financial controller for a 200-employee retail group. Arif has spent 12 years helping SMBs untangle their operational software and build systems that actually scale.</p>
+                            <div class="d-flex gap-2">
+                                <a href="#" style="font-size:.85rem;color:var(--accent);"><i class="bi bi-twitter-x me-1"></i>@arifrahman</a>
+                                <span style="color:var(--border);">|</span>
+                                <a href="#" style="font-size:.85rem;color:var(--accent);"><i class="bi bi-linkedin me-1"></i>LinkedIn</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SHARE BOTTOM -->
+                    <div class="share-bar mt-4 reveal" style="justify-content:center;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+                        <span class="share-label">Share this article:</span>
+                        <button class="share-btn" title="Share on Twitter" onclick="window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(window.location.href),'_blank')"><i class="bi bi-twitter-x"></i></button>
+                        <button class="share-btn" title="Share on LinkedIn" onclick="window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(window.location.href),'_blank')"><i class="bi bi-linkedin"></i></button>
+                        <button class="share-btn" title="Share on Facebook" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href),'_blank')"><i class="bi bi-facebook"></i></button>
+                        <button class="share-btn" title="Share via WhatsApp" onclick="window.open('https://wa.me/?text='+encodeURIComponent(window.location.href),'_blank')"><i class="bi bi-whatsapp"></i></button>
+                        <button class="share-btn" title="Copy link" onclick="navigator.clipboard.writeText(window.location.href);this.innerHTML='<i class=&quot;bi bi-check-lg&quot;></i>';setTimeout(()=>this.innerHTML='<i class=&quot;bi bi-link-45deg&quot;></i>',2000)"><i class="bi bi-link-45deg"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RELATED ARTICLES -->
+    <section style="padding:0 0 80px;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-10">
+                    <div class="section-label reveal">Keep Reading</div>
+                    <h3 class="reveal rv1" style="font-size:1.6rem;margin-bottom:32px;">Related Articles</h3>
+                    <div class="row g-4">
+                        <div class="col-md-4 reveal rv2">
+                            <div class="related-card card-c blog-card">
+                                <div class="related-thumb" style="background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(37,99,235,.08));">💰</div>
+                                <div class="blog-body">
+                                    <span class="blog-cat" style="background:rgba(16,185,129,.1);color:#10B981;">Finance</span>
+                                    <div class="blog-title-sm"><a href="#">Lifetime License vs. SaaS Subscription: A 5-Year Cost Analysis for SMBs</a></div>
+                                    <p class="blog-excerpt">We modeled the true 5-year cost of subscription software vs. a lifetime license for three business types.</p>
+                                    <div class="blog-meta">
+                                        <div class="blog-author"><div class="author-avatar">RH</div><span>Reza Hidayat</span></div>
+                                        <span>10 min</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 reveal rv3">
+                            <div class="related-card card-c blog-card">
+                                <div class="related-thumb" style="background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(16,185,129,.08));">📱</div>
+                                <div class="blog-body">
+                                    <span class="blog-cat" style="background:rgba(37,99,235,.1);color:var(--primary);">Operations</span>
+                                    <div class="blog-title-sm"><a href="#">WhatsApp as a Business Operating Layer: Beyond Simple Notifications</a></div>
+                                    <p class="blog-excerpt">Forward-thinking SMBs are using WhatsApp as a core business communication and automation backbone.</p>
+                                    <div class="blog-meta">
+                                        <div class="blog-author"><div class="author-avatar">RH</div><span>Reza Hidayat</span></div>
+                                        <span>6 min</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 reveal rv4">
+                            <div class="related-card card-c blog-card">
+                                <div class="related-thumb" style="background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(239,68,68,.08));">🍜</div>
+                                <div class="blog-body">
+                                    <span class="blog-cat" style="background:rgba(245,158,11,.1);color:#F59E0B;">Industry Guide</span>
+                                    <div class="blog-title-sm"><a href="#">How Top-Performing Restaurants Use Real-Time Data to Cut Food Waste by 30%</a></div>
+                                    <p class="blog-excerpt">Here's the operational system that high-performing restaurants use to track, predict, and eliminate waste.</p>
+                                    <div class="blog-meta">
+                                        <div class="blog-author"><div class="author-avatar">DK</div><span>Dian Kusuma</span></div>
+                                        <span>8 min</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @include('partials.newsletter')
+
+    <!-- CTA -->
+    <section style="padding:0 0 100px;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-xl-7 text-center">
+                    <div class="card-c reveal" style="padding:40px;background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(56,189,248,.04));border-color:rgba(56,189,248,.18);">
+                        <div style="font-size:2.5rem;margin-bottom:16px;">🚀</div>
+                        <h3 style="font-size:1.5rem;margin-bottom:8px;">Ready to Consolidate Your Stack?</h3>
+                        <p style="margin-bottom:24px;">Try COOCA free for 30 days. See what a unified business system actually feels like — no commitment, no credit card.</p>
+                        <a href="{{ route('customer.register') }}" class="btn-cooca btn-primary-c" style="font-size:1rem;padding:16px 36px;">Start Free Trial <i class="bi bi-arrow-right"></i></a>
+                        <p style="font-size:.78rem;margin-top:12px;color:var(--text-muted);">Lifetime license available. Own your software.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    
+@endsection
+
+@push('styles')
+<style>
+:root {
+            --bg: #020617;
+            --card: #0f172a;
+            --card-alt: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --accent: #38bdf8;
+            --success: #10b981;
+            --border: rgba(56, 189, 248, 0.12);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --glass: rgba(15, 23, 42, 0.65);
+            --glass-border: rgba(56, 189, 248, 0.14);
+            --radius: 16px;
+            --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Inter', -apple-system, sans-serif;
+            --hero-bg: linear-gradient(160deg, var(--bg) 0%, #0f172a 40%, #1e3a5f 70%, var(--bg) 100%);
+            --hero-grid-color: rgba(56, 189, 248, 0.03);
+            --hero-orb-opacity: 0.1;
+            --blockquote-bg: rgba(37, 99, 235, 0.06);
+            --blockquote-border: #2563eb;
+            --code-bg: #1e293b;
+            --table-border: rgba(56, 189, 248, 0.15);
+            --table-stripe: rgba(56, 189, 248, 0.04);
+            --image-overlay: rgba(2, 6, 23, 0.4);
+        }
+        [data-theme="light"] {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --card-alt: #f1f5f9;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --border: rgba(37, 99, 235, 0.12);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(37, 99, 235, 0.1);
+            --hero-bg: linear-gradient(160deg, #ffffff 0%, #f1f5f9 30%, #e2e8f0 70%, #ffffff 100%);
+            --hero-grid-color: rgba(37, 99, 235, 0.08);
+            --hero-orb-opacity: 0.04;
+            --blockquote-bg: rgba(37, 99, 235, 0.04);
+            --blockquote-border: #2563eb;
+            --code-bg: #f1f5f9;
+            --table-border: rgba(37, 99, 235, 0.12);
+            --table-stripe: rgba(37, 99, 235, 0.03);
+            --image-overlay: rgba(255, 255, 255, 0.1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            transition: background var(--transition), color var(--transition);
+        }
+        p {
+            color: var(--text-muted);
+        }
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+        }
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color var(--transition);
+        }
+        a:hover {
+            color: var(--primary);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        /* NAVBAR */
+        .navbar-cooca {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+            padding: 16px 0;
+            transition: all var(--transition);
+            background: transparent;
+        }
+        .navbar-cooca.scrolled {
+            padding: 10px 0;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .navbar-brand-cooca {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+        .nav-link-cooca {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 8px 16px !important;
+            transition: color var(--transition);
+        }
+        .nav-link-cooca:hover,
+        .nav-link-cooca.active {
+            color: var(--accent) !important;
+        }
+        .theme-toggle {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-size: 1.1rem;
+        }
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* BUTTONS */
+        .btn-cooca {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-decoration: none;
+        }
+        .btn-primary-c {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary-c:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.45);
+            color: #fff;
+        }
+        .btn-outline-c {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-outline-c:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .btn-sm-c {
+            padding: 10px 22px;
+            font-size: 0.85rem;
+            border-radius: 10px;
+        }
+
+        /* BADGES */
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+        .blog-cat {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            padding: 4px 12px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+
+        /* CARDS */
+        .card-c {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: all var(--transition);
+        }
+        .card-c:hover {
+            border-color: rgba(56, 189, 248, 0.25);
+            box-shadow: 0 20px 60px rgba(56, 189, 248, 0.08);
+        }
+        .blog-card {
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .blog-card:hover {
+            transform: translateY(-6px);
+        }
+        .blog-thumb {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .blog-body {
+            padding: 24px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .blog-title-sm {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            color: var(--text);
+        }
+        .blog-title-sm a {
+            color: var(--text);
+            transition: color var(--transition);
+        }
+        .blog-title-sm a:hover {
+            color: var(--accent);
+        }
+        .blog-excerpt {
+            font-size: 0.87rem;
+            flex-grow: 1;
+            margin-bottom: 16px;
+        }
+        .blog-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+        .blog-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .author-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .author-avatar-lg {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        /* FEATURED IMAGE SECTION */
+        .featured-image-section {
+            margin: 40px 0 50px;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            background: var(--card);
+        }
+        .featured-image-section img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            max-height: 500px;
+        }
+        .image-caption {
+            padding: 14px 24px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--card-alt);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .image-caption i {
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        /* ARTICLE TYPOGRAPHY */
+        .article-content {
+            font-size: 1.05rem;
+            line-height: 1.85;
+            color: var(--text-muted);
+        }
+        .article-content h2 {
+            font-size: 1.6rem;
+            margin-top: 48px;
+            margin-bottom: 20px;
+            color: var(--text);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .article-content h3 {
+            font-size: 1.25rem;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            color: var(--text);
+            font-weight: 600;
+        }
+        .article-content p {
+            margin-bottom: 20px;
+        }
+        .article-content ul,
+        .article-content ol {
+            margin-bottom: 20px;
+            padding-left: 24px;
+            color: var(--text-muted);
+        }
+        .article-content li {
+            margin-bottom: 8px;
+        }
+        .article-content blockquote {
+            background: var(--blockquote-bg);
+            border-left: 4px solid var(--blockquote-border);
+            padding: 20px 24px;
+            margin: 28px 0;
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            color: var(--text);
+        }
+        .article-content blockquote p {
+            margin-bottom: 0;
+            color: var(--text);
+        }
+        .article-content strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        .article-content .highlight-box {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(56, 189, 248, 0.04));
+            border: 1px solid rgba(56, 189, 248, 0.18);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 28px 0;
+        }
+        .article-content .highlight-box p {
+            margin-bottom: 0;
+        }
+        .article-content .highlight-box strong {
+            color: var(--accent);
+        }
+        .article-content .table-wrapper {
+            overflow-x: auto;
+            margin: 28px 0;
+            border-radius: 12px;
+            border: 1px solid var(--table-border);
+        }
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .article-content table th {
+            background: var(--card-alt);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text);
+            border-bottom: 2px solid var(--table-border);
+            white-space: nowrap;
+        }
+        .article-content table td {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+        .article-content table tr:nth-child(even) td {
+            background: var(--table-stripe);
+        }
+        .article-content table tr:last-child td {
+            border-bottom: none;
+        }
+        .article-content .table-highlight {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* SHARE */
+        .share-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-size: 1rem;
+        }
+        .share-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--card-alt);
+        }
+        .share-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-right: 4px;
+        }
+
+        /* TOC */
+        .toc-widget {
+            position: sticky;
+            top: 100px;
+        }
+        .toc-widget .toc-list {
+            list-style: none;
+            padding: 0;
+        }
+        .toc-widget .toc-list li {
+            margin-bottom: 6px;
+        }
+        .toc-widget .toc-list a {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            transition: color var(--transition);
+            display: block;
+            padding: 6px 0;
+            border-left: 2px solid transparent;
+            padding-left: 14px;
+        }
+        .toc-widget .toc-list a:hover,
+        .toc-widget .toc-list a.active-toc {
+            color: var(--accent);
+            border-left-color: var(--accent);
+        }
+        .toc-widget .toc-list a.toc-h2 {
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+        .toc-widget .toc-list a.toc-h3 {
+            padding-left: 28px;
+            font-size: 0.8rem;
+        }
+
+        /* AUTHOR BIO */
+        .author-bio-card {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            padding: 28px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(56, 189, 248, 0.03));
+            border: 1px solid var(--border);
+        }
+
+        /* RELATED */
+        .related-card {
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .related-thumb {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        /* NEWSLETTER */
+        .newsletter-box {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(56, 189, 248, 0.06));
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            border-radius: 24px;
+            padding: 48px;
+            text-align: center;
+        }
+        .newsletter-input {
+            display: flex;
+            gap: 12px;
+            max-width: 480px;
+            margin: 24px auto 0;
+        }
+        .form-control-c {
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color var(--transition);
+            width: 100%;
+        }
+        .form-control-c:focus {
+            border-color: var(--accent);
+        }
+        .form-control-c::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* FOOTER */
+        .footer {
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            padding: 60px 0 30px;
+        }
+        .footer-brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .footer-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            max-width: 280px;
+            line-height: 1.6;
+        }
+        .footer-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            transition: color var(--transition);
+        }
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        .footer-socials {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .footer-socials a {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-alt);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+        }
+        .footer-socials a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        .footer-bottom {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .footer-bottom p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb-custom {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .breadcrumb-custom a {
+            color: var(--text-muted);
+            transition: color var(--transition);
+        }
+        .breadcrumb-custom a:hover {
+            color: var(--accent);
+        }
+        .breadcrumb-custom .sep {
+            font-size: 0.7rem;
+            color: var(--border);
+        }
+        .breadcrumb-custom .current {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* PROGRESS BAR */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            z-index: 1060;
+            transition: width 0.1s linear;
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* ANIMATIONS */
+        .reveal {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.7s cubic-bezier(.4, 0, .2, 1), transform 0.7s cubic-bezier(.4, 0, .2, 1);
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .rv1 {
+            transition-delay: 0.1s;
+        }
+        .rv2 {
+            transition-delay: 0.2s;
+        }
+        .rv3 {
+            transition-delay: 0.3s;
+        }
+        .rv4 {
+            transition-delay: 0.4s;
+        }
+        .section-label {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .offcanvas-cooca {
+            background: var(--glass) !important;
+            backdrop-filter: blur(30px);
+            border-left: 1px solid var(--glass-border);
+        }
+        .offcanvas-cooca .btn-close {
+            filter: invert(1);
+        }
+        [data-theme="light"] .offcanvas-cooca .btn-close {
+            filter: none;
+        }
+        .offcanvas-cooca .nav-link-cooca {
+            display: block;
+            padding: 14px 0 !important;
+            font-size: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        @media (max-width: 991px) {
+            .toc-widget {
+                position: static;
+                margin-bottom: 32px;
+            }
+            .author-bio-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .featured-image-section img {
+                max-height: 350px;
+            }
+        }
+        @media (max-width: 767px) {
+            .newsletter-input {
+                flex-direction: column;
+            }
+            .article-content h2 {
+                font-size: 1.35rem;
+                margin-top: 36px;
+            }
+            .article-content {
+                font-size: 0.98rem;
+            }
+            .share-bar {
+                gap: 4px;
+            }
+            .share-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+            .featured-image-section {
+                border-radius: 16px;
+                margin: 30px 0 40px;
+            }
+            .featured-image-section img {
+                max-height: 240px;
+            }
+        }
+</style>
+@endpush

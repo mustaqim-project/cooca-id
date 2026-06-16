@@ -20,7 +20,6 @@ class SettingsSeeder extends Seeder
                 'value' => '25',
                 'type' => 'float',
                 'group' => 'affiliate',
-                'label' => 'Level 1 Commission Rate (%)',
                 'description' => 'Commission percentage for level 1 affiliates',
                 'is_public' => false,
             ],
@@ -29,7 +28,6 @@ class SettingsSeeder extends Seeder
                 'value' => '5',
                 'type' => 'float',
                 'group' => 'affiliate',
-                'label' => 'Level 2 Commission Rate (%)',
                 'description' => 'Commission percentage for level 2 affiliates',
                 'is_public' => false,
             ],
@@ -38,29 +36,26 @@ class SettingsSeeder extends Seeder
                 'value' => '1',
                 'type' => 'boolean',
                 'group' => 'affiliate',
-                'label' => 'Enable Recurring Commission',
                 'description' => 'Whether affiliates earn commission on renewals',
                 'is_public' => false,
             ],
-            
+
             // Trial Settings
             [
                 'key' => 'trial.duration_days',
                 'value' => '14',
                 'type' => 'integer',
                 'group' => 'trial',
-                'label' => 'Trial Duration (Days)',
                 'description' => 'Number of days for free trial period',
                 'is_public' => true,
             ],
-            
+
             // Withdrawal Settings
             [
                 'key' => 'withdrawal.minimum_amount',
                 'value' => '50000',
                 'type' => 'float',
                 'group' => 'withdrawal',
-                'label' => 'Minimum Withdrawal Amount',
                 'description' => 'Minimum amount required for withdrawal request (IDR)',
                 'is_public' => true,
             ],
@@ -69,18 +64,16 @@ class SettingsSeeder extends Seeder
                 'value' => '0',
                 'type' => 'float',
                 'group' => 'withdrawal',
-                'label' => 'Withdrawal Fee (%)',
                 'description' => 'Fee percentage charged on withdrawals',
                 'is_public' => true,
             ],
-            
+
             // Notification Settings
             [
                 'key' => 'notification.email_enabled',
                 'value' => '1',
                 'type' => 'boolean',
                 'group' => 'notification',
-                'label' => 'Enable Email Notifications',
                 'description' => 'Whether to send email notifications',
                 'is_public' => false,
             ],
@@ -89,18 +82,16 @@ class SettingsSeeder extends Seeder
                 'value' => '1',
                 'type' => 'boolean',
                 'group' => 'notification',
-                'label' => 'Enable WhatsApp Notifications',
                 'description' => 'Whether to send WhatsApp notifications',
                 'is_public' => false,
             ],
-            
+
             // System Settings
             [
                 'key' => 'system.maintenance_mode',
                 'value' => '0',
                 'type' => 'boolean',
                 'group' => 'system',
-                'label' => 'Maintenance Mode',
                 'description' => 'Enable maintenance mode',
                 'is_public' => false,
             ],
@@ -109,8 +100,67 @@ class SettingsSeeder extends Seeder
                 'value' => '1',
                 'type' => 'boolean',
                 'group' => 'system',
-                'label' => 'Registration Enabled',
                 'description' => 'Allow new user registrations',
+                'is_public' => true,
+            ],
+
+            // SEO Settings
+            [
+                'key' => 'seo.title',
+                'value' => 'COOCA - Business System That Works Like an Asset',
+                'type' => 'string',
+                'group' => 'seo',
+                'description' => 'Website SEO title',
+                'is_public' => true,
+            ],
+            [
+                'key' => 'seo.description',
+                'value' => 'Stop losing revenue to fragmented systems. COOCA is the integrated business infrastructure that gives you lifetime license protection, modular ERP, and a system that scales with your ambition.',
+                'type' => 'string',
+                'group' => 'seo',
+                'description' => 'Website SEO description',
+                'is_public' => true,
+            ],
+            [
+                'key' => 'seo.og_image',
+                'value' => 'images/og-default.jpg',
+                'type' => 'string',
+                'group' => 'seo',
+                'description' => 'Open Graph image URL',
+                'is_public' => true,
+            ],
+
+            // Branding Settings
+            [
+                'key' => 'branding.name',
+                'value' => 'COOCA',
+                'type' => 'string',
+                'group' => 'branding',
+                'description' => 'Company branding name',
+                'is_public' => true,
+            ],
+            [
+                'key' => 'branding.tagline',
+                'value' => 'The Business System That Works Like an Asset',
+                'type' => 'string',
+                'group' => 'branding',
+                'description' => 'Company tagline',
+                'is_public' => true,
+            ],
+            [
+                'key' => 'branding.favicon',
+                'value' => 'favicon.ico',
+                'type' => 'string',
+                'group' => 'branding',
+                'description' => 'Favicon file path',
+                'is_public' => true,
+            ],
+            [
+                'key' => 'branding.apple_touch_icon',
+                'value' => 'images/apple-touch-icon.png',
+                'type' => 'string',
+                'group' => 'branding',
+                'description' => 'Apple touch icon file path',
                 'is_public' => true,
             ],
         ];

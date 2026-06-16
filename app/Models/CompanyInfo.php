@@ -10,6 +10,8 @@ class CompanyInfo extends Model
 {
     use HasFactory, SoftDeletes, HasUuids;
 
+    protected $table = 'company_info';
+
     protected $fillable = [
         'key',
         'value',

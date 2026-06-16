@@ -1,154 +1,316 @@
-@extends('layouts.auth')
+@extends('layouts.guest')
 
-@section('title', 'Admin Login')
-@section('description', 'Secure login access for system administrators')
+@section('title', 'Admin Login - ' . ($setting->company_name ?? config('app.name')))
 
-@section('auth_content')
-<div class="row g-0 min-vh-100">
-    <!-- Left Side: Branding & Info (Dynamic from Settings) -->
-    <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center p-5 bg-gradient-primary text-white position-relative overflow-hidden">
-        <!-- Animated Background Elements -->
-        <div class="position-absolute top-0 start-0 w-100 h-100 z-0 opacity-20">
-            <div class="shape shape-1 floating"></div>
-            <div class="shape shape-2 floating delay-1"></div>
-            <div class="shape shape-3 floating delay-2"></div>
-        </div>
+@section('content')
+<!-- ========== NAVBAR (unified) ========== -->
 
-        <div class="position-relative z-1">
-            <div class="mb-4">
-                <img src="{{ setting('logo_light', asset('images/logo-light.svg')) }}" alt="{{ setting('app_name', 'System Admin') }}" class="img-fluid" style="max-height: 60px;">
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="auth-layout">
+    <!-- LEFT VISUAL PANEL -->
+    <div class="auth-left auth-panel">
+        <div class="orb" style="width:500px;height:500px;background:#2563EB;top:-150px;right:-100px;"></div>
+        <div class="orb" style="width:300px;height:300px;background:#38BDF8;bottom:-80px;left:-60px;"></div>
+        <div class="grid-bg"></div>
+        <div class="left-content">
+            <div class="d-flex align-items-center justify-content-center gap-3 mb-5">
+                <div class="logo-icon">C</div>
+                <span class="brand-name" style="font-size:1.8rem;font-weight:800;">COOCA</span>
             </div>
-            
-            <h1 class="display-4 fw-bold mb-3">{{ setting('admin_welcome_title', 'Welcome Back, Administrator') }}</h1>
-            <p class="lead mb-4 opacity-75">{{ setting('admin_welcome_desc', 'Manage your system, users, and content from one centralized dashboard.') }}</p>
-            
-            <div class="feature-list mt-5">
-                @php
-                    $adminFeatures = [
-                        ['icon' => 'bi-shield-lock', 'text' => setting('feat_1', 'Secure Access Control')],
-                        ['icon' => 'bi-speedometer2', 'text' => setting('feat_2', 'Real-time Analytics')],
-                        ['icon' => 'bi-palette', 'text' => setting('feat_3', 'CMS & Page Builder')]
-                    ];
-                @endphp
-                @foreach($adminFeatures as $feat)
-                <div class="d-flex align-items-center mb-3">
-                    <div class="icon-box bg-white bg-opacity-10 rounded-circle p-2 me-3">
-                        <i class="{{ $feat['icon'] }} fs-5"></i>
-                    </div>
-                    <span class="fs-5">{{ $feat['text'] }}</span>
+            <h2>Master Control <span class="text-gradient">Admin Portal.</span></h2>
+            <p style="font-size:.95rem;color:rgba(248,250,252,.6);margin-top:12px;">Access the core management system to oversee all tenants and affiliators.</p>
+            <div class="trust-items">
+                <div class="trust-item">
+                    <div class="trust-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                    <div class="trust-text"><strong style="color:#F8FAFC;">Isolated Environment</strong> — Your data, your system. Zero cross-tenant risk.</div>
                 </div>
-                @endforeach
-            </div>
-
-            <div class="mt-5 pt-4 border-top border-white border-opacity-25">
-                <div class="d-flex align-items-center">
-                    <div class="avatar-group me-3">
-                        <img src="https://ui-avatars.com/api/?name=Dev+Team&background=random" class="rounded-circle border border-2 border-white" width="40" alt="User">
-                    </div>
-                    <div>
-                        <small class="d-block opacity-75">{{ setting('support_text', 'Need help?') }}</small>
-                        <a href="mailto:{{ setting('support_email', 'support@system.com') }}" class="text-white fw-bold text-decoration-none">{{ setting('support_email', 'support@system.com') }}</a>
-                    </div>
+                <div class="trust-item">
+                    <div class="trust-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <div class="trust-text"><strong style="color:#F8FAFC;">Always On</strong> — 99.9% uptime SLA. Business doesn't wait, and neither do we.</div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                    <div class="trust-text"><strong style="color:#F8FAFC;">Real-Time Insight</strong> — Full visibility into every transaction, team member, and rupiah.</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Right Side: Login Form -->
-    <div class="col-lg-6 d-flex align-items-center justify-content-center p-4 p-lg-5 bg-body">
-        <div class="w-100" style="max-width: 480px;">
-            <div class="text-center text-lg-start mb-5">
-                <h2 class="fw-bold mb-2">{{ setting('admin_login_title', 'Administrator Login') }}</h2>
-                <p class="text-muted">{{ setting('admin_login_subtitle', 'Enter your credentials to access the admin panel') }}</p>
+    <!-- RIGHT FORM PANEL -->
+    <div class="auth-right auth-panel">
+        <div class="form-panel">
+            <!-- Mobile only brand -->
+            <div class="d-flex align-items-center gap-3 d-md-none mb-4">
+                <div class="logo-icon">C</div>
+                <span class="brand-name" style="font-size:1.8rem;font-weight:800;">COOCA</span>
             </div>
 
-            @if ($errors->any())
-                <div class="alert alert-danger d-flex align-items-center" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    <ul class="mb-0 ps-2">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+            <div class="form-title">Welcome back</div>
+            <p class="form-subtitle">Log in to COOCA Administration. </p>
+
+            <!-- SOCIAL LOGIN -->
+            <button class="social-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Continue with Google
+            </button>
+            <button class="social-btn">
+                <i class="bi bi-microsoft" style="color:#00A4EF;"></i>
+                Continue with Microsoft
+            </button>
+
+            <div class="divider"><span>or continue with email</span></div>
+
+            <!-- ERROR -->
+            @if(session('error') || $errors->any())
+            <div class="error-msg" id="errorMsg" style="display: flex;">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                {{ session('error') ?? 'Invalid email or password. Please try again.' }}
+            </div>
             @endif
 
-            <form action="{{ route('admin.login.submit') }}" method="POST" class="needs-validation" novalidate>
+            <!-- FORM -->
+            <form id="loginForm" method="POST" action="{{ route('admin.login.submit') }}" novalidate>
                 @csrf
-                
-                <!-- Email Input -->
-                <div class="form-floating mb-3">
-                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" id="adminEmail" placeholder="name@example.com" value="{{ old('email') }}" required autofocus>
-                    <label for="adminEmail">{{ __('Email Address') }}</label>
-                    @error('email')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Password Input -->
-                <div class="form-floating mb-3">
-                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" id="adminPassword" placeholder="Password" required>
-                    <label for="adminPassword">{{ __('Password') }}</label>
-                    @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Remember Me & Forgot Password -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
-                        <label class="form-check-label text-muted" for="rememberMe">
-                            {{ __('Remember me') }}
-                        </label>
+                <div class="input-wrap">
+                    <label class="input-label">Email Address</label>
+                    <div style="position:relative;">
+                        <i class="bi bi-envelope input-icon"></i>
+                        <input type="email" name="email" class="input-field @error('email') is-invalid @enderror" id="emailField" placeholder="you@company.com" value="{{ old('email') }}" required autocomplete="email">
+                        @error('email')
+                            <div class="invalid-feedback" style="color: red; font-size: 0.85rem; margin-top: 5px;">{{ $message }}</div>
+                        @enderror
                     </div>
-                    <a href="{{ route('admin.password.request') }}" class="text-decoration-none small fw-medium">
-                        {{ __('Forgot password?') }}
-                    </a>
                 </div>
-
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary btn-lg w-100 py-3 mb-4 shadow-sm hover-lift">
-                    <span class="d-flex align-items-center justify-content-center">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>
-                        {{ __('Sign In as Admin') }}
-                    </span>
+                <div class="input-wrap">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <label class="input-label">Password</label>
+                        <a href="{{ route('admin.password.request') }}" style="font-size:.82rem;">Forgot password?</a>
+                    </div>
+                    <div style="position:relative;">
+                        <i class="bi bi-lock input-icon"></i>
+                        <input type="password" name="password" class="input-field @error('password') is-invalid @enderror" id="passwordField" placeholder="Your password" required autocomplete="current-password">
+                        <span class="input-toggle" id="pwToggle"><i class="bi bi-eye" id="pwIcon"></i></span>
+                        @error('password')
+                            <div class="invalid-feedback" style="color: red; font-size: 0.85rem; margin-top: 5px;">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="check-wrap">
+                    <input type="checkbox" name="remember" id="rememberMe">
+                    <label for="rememberMe">Keep me logged in for 30 days</label>
+                </div>
+                <button type="submit" class="btn-cooca btn-cooca-primary" style="width:100%;padding:15px;font-size:1rem;border-radius:12px;" id="submitBtn">
+                    <span id="btnText">Log In to Dashboard</span>
+                    <i class="bi bi-arrow-right" id="btnIcon"></i>
                 </button>
             </form>
 
-            <div class="text-center mt-4">
-                <p class="text-muted small">
-                    {{ __('Protected by enterprise grade security') }}
-                    <i class="bi bi-shield-check text-success ms-1"></i>
-                </p>
-            </div>
+            <p style="text-align:center;font-size:.82rem;margin-top:28px;color:var(--text-muted);">
+                By logging in, you agree to our <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.
+            </p>
+            <p style="text-align:center;font-size:.9rem;margin-top:16px;">
+                
+            </p>
         </div>
     </div>
-</div>
+</main>
+
+<!-- ========== FOOTER (unified) ========== -->
+
 @endsection
 
 @push('styles')
 <style>
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, var(--bs-primary) 0%, #0d6efd 100%);
-    }
-    .floating {
-        animation: float 6s ease-in-out infinite;
-    }
-    .delay-1 { animation-delay: 1s; }
-    .delay-2 { animation-delay: 2s; }
-    @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-20px); }
-        100% { transform: translateY(0px); }
-    }
-    .shape {
-        position: absolute;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-    }
-    .shape-1 { width: 200px; height: 200px; top: 10%; left: 10%; }
-    .shape-2 { width: 300px; height: 300px; bottom: 10%; right: 10%; }
-    .shape-3 { width: 150px; height: 150px; top: 40%; left: 60%; }
+:root {
+            --bg: #020617;
+            --card: #0F172A;
+            --card-alt: #1E293B;
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            --primary: #2563EB;
+            --secondary: #1E40AF;
+            --accent: #38BDF8;
+            --success: #10B981;
+            --border: rgba(56, 189, 248, 0.12);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.6);
+            --glass: rgba(15, 23, 42, 0.65);
+            --glass-border: rgba(56, 189, 248, 0.14);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-lg: 24px;
+            --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Inter', -apple-system, sans-serif;
+            --navbar-height: 72px;
+            --footer-bg: #0B1120;
+        }
+        [data-theme="light"] {
+            --bg: #F8FAFC;
+            --card: #FFFFFF;
+            --card-alt: #F1F5F9;
+            --text: #0F172A;
+            --text-muted: #475569;
+            --primary: #2563EB;
+            --secondary: #7C3AED;
+            --accent: #0EA5E9;
+            --success: #10B981;
+            --border: rgba(37, 99, 235, 0.12);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.1);
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(37, 99, 235, 0.1);
+            --footer-bg: #E2E8F0;
+        }
+
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        html{scroll-behavior:smooth;overflow-x:hidden;}
+        body{
+            font-family:var(--font);
+            background:var(--bg);
+            color:var(--text);
+            line-height:1.7;
+            transition:background var(--transition),color var(--transition);
+            overflow-x:hidden;
+            -webkit-font-smoothing:antialiased;
+            display:flex;
+            flex-direction:column;
+            min-height:100vh;
+        }
+        img{max-width:100%;height:auto;}
+        a{color:var(--accent);text-decoration:none;transition:color var(--transition);}
+        a:hover{color:var(--primary);}
+        h1,h2,h3,h4,h5,h6{font-weight:700;line-height:1.2;letter-spacing:-0.02em;}
+        p{color:var(--text-muted);}
+        ::-webkit-scrollbar{width:6px;}
+        ::-webkit-scrollbar-track{background:var(--bg);}
+        ::-webkit-scrollbar-thumb{background:var(--primary);border-radius:3px;}
+        .section-padding{padding:100px 0;}
+        .glass{background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:var(--radius);}
+        .text-gradient{background:linear-gradient(135deg,var(--accent),var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .badge-glow{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:50px;font-size:0.75rem;font-weight:600;letter-spacing:0.05em;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.2);color:var(--accent);text-transform:uppercase;}
+        .section-label{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:50px;font-size:0.8rem;font-weight:600;letter-spacing:0.08em;background:rgba(37,99,235,0.1);border:1px solid rgba(37,99,235,0.2);color:var(--primary);text-transform:uppercase;margin-bottom:16px;}
+        .btn-cooca{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:12px;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden;text-decoration:none;}
+        .btn-cooca-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;box-shadow:0 4px 20px rgba(37,99,235,0.3);}
+        .btn-cooca-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(37,99,235,0.45);color:#fff;}
+        .btn-cooca-success{background:linear-gradient(135deg,#10B981,#059669);color:#fff;box-shadow:0 4px 20px rgba(16,185,129,0.3);}
+        .btn-cooca-success:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(16,185,129,0.45);color:#fff;}
+        .btn-cooca-outline{background:transparent;color:var(--text);border:1px solid var(--border);}
+        .btn-cooca-outline:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px);}
+        .btn-cooca-sm{padding:10px 22px;font-size:0.85rem;border-radius:10px;}
+        .btn-cooca .btn-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);transform:scale(0);animation:ripple 0.6s linear;pointer-events:none;}
+        @keyframes ripple{to{transform:scale(4);opacity:0;}}
+        .card-3d{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:all var(--transition);position:relative;overflow:hidden;}
+        @keyframes float{0%,100%{transform:translateY(0px);}50%{transform:translateY(-20px);}}
+        @keyframes float-delay{0%,100%{transform:translateY(0px);}50%{transform:translateY(-15px);}}
+        @keyframes float-slow{0%,100%{transform:translateY(0px);}50%{transform:translateY(-10px);}}
+        @keyframes pulse-scale{0%{opacity:1;transform:scale(1);}50%{opacity:0.7;transform:scale(1.05);}100%{opacity:1;transform:scale(1);}}
+        @keyframes fade-in-scale{0%{opacity:0;transform:scale(0.8);}100%{opacity:1;transform:scale(1);}}
+        .reveal{opacity:0;transform:translateY(40px);transition:opacity 0.8s cubic-bezier(0.4,0,0.2,1),transform 0.8s cubic-bezier(0.4,0,0.2,1);}
+        .reveal.revealed{opacity:1;transform:translateY(0);}
+        .reveal-delay-1{transition-delay:0.1s;}
+        .reveal-delay-2{transition-delay:0.2s;}
+        .reveal-delay-3{transition-delay:0.3s;}
+        .reveal-delay-4{transition-delay:0.4s;}
+        .reveal-delay-5{transition-delay:0.5s;}
+
+        /* ========== NAVBAR (unified from pricing) ========== */
+        .navbar-cooca{position:fixed;top:0;left:0;right:0;z-index:1050;padding:16px 0;transition:all var(--transition);background:transparent;}
+        .navbar-cooca.scrolled{padding:10px 0;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border);box-shadow:0 4px 30px rgba(0,0,0,0.1);}
+        .navbar-brand-cooca{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--text)!important;display:flex;align-items:center;gap:10px;}
+        .navbar-brand-cooca .logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;font-weight:800;}
+        .nav-link-cooca{color:var(--text-muted)!important;font-weight:500;font-size:0.9rem;padding:8px 16px!important;transition:color var(--transition);position:relative;}
+        .nav-link-cooca:hover,.nav-link-cooca.active{color:var(--accent)!important;}
+        .nav-link-cooca::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:2px;background:var(--accent);transition:width var(--transition);border-radius:1px;}
+        .nav-link-cooca:hover::after{width:60%;}
+        .theme-toggle{width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--transition);font-size:1.1rem;}
+        .theme-toggle:hover{border-color:var(--accent);color:var(--accent);transform:rotate(20deg);}
+        .login-dropdown-wrapper{position:relative;}
+        .login-dropdown-menu{position:absolute;top:calc(100% + 10px);right:0;min-width:190px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);padding:8px 0;opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity 0.25s ease,transform 0.25s ease,visibility 0.25s ease;z-index:1060;}
+        .login-dropdown-menu.show{opacity:1;visibility:visible;transform:translateY(0);}
+        .dropdown-item-c{display:flex;align-items:center;gap:10px;padding:12px 20px;font-size:0.9rem;font-weight:500;color:var(--text);text-decoration:none;transition:all 0.2s ease;white-space:nowrap;}
+        .dropdown-item-c:hover{background:rgba(56,189,248,0.08);color:var(--accent);}
+        .dropdown-item-c i{font-size:1rem;color:var(--text-muted);transition:color 0.2s ease;}
+        .dropdown-item-c:hover i{color:var(--accent);}
+        .whatsapp-float{position:fixed;bottom:28px;right:28px;z-index:999;width:56px;height:56px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 6px 24px rgba(37,211,102,0.35);transition:all var(--transition);text-decoration:none;}
+        .whatsapp-float:hover{transform:scale(1.1);box-shadow:0 10px 32px rgba(37,211,102,0.5);color:#fff;}
+        .whatsapp-float .pulse-ring{position:absolute;inset:-6px;border-radius:50%;border:2px solid #25D366;animation:pulse-ring 2s ease-out infinite;}
+        @keyframes pulse-ring{0%{transform:scale(0.8);opacity:1;}100%{transform:scale(1.6);opacity:0;}}
+        .offcanvas-cooca{background:var(--glass)!important;backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-left:1px solid var(--glass-border);}
+        .offcanvas-cooca .offcanvas-header{border-bottom:1px solid var(--border);}
+        .offcanvas-cooca .offcanvas-title{font-weight:800;}
+        .offcanvas-cooca .btn-close{filter:invert(1);}
+        [data-theme="light"] .offcanvas-cooca .btn-close{filter:none;}
+        .offcanvas-cooca .nav-link-cooca{display:block;padding:14px 0!important;font-size:1rem;border-bottom:1px solid var(--border);}
+        .offcanvas-cooca .nav-link-cooca::after{display:none;}
+        .offcanvas-cooca .theme-toggle{width:100%;height:auto;padding:12px 16px;border-radius:10px;justify-content:flex-start;gap:10px;font-size:0.9rem;font-weight:500;background:var(--card-alt);border:1px solid var(--border);color:var(--text);}
+        .offcanvas-cooca .theme-toggle:hover{border-color:var(--accent);color:var(--accent);transform:none;}
+        .offcanvas-cooca .offcanvas-login-group{display:flex;flex-direction:column;gap:8px;}
+        .offcanvas-cooca .offcanvas-login-group a{width:100%;justify-content:center;}
+        .offcanvas-cooca .offcanvas-login-divider{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);text-align:center;padding:4px 0;}
+
+        /* ========== AUTH LAYOUT ========== */
+        .auth-layout{flex:1;display:grid;grid-template-columns:1fr 1fr;margin-top:var(--navbar-height);min-height:calc(100vh - var(--navbar-height));}
+        .auth-panel{display:flex;align-items:center;justify-content:center;padding:48px 40px;}
+        .auth-left{background:linear-gradient(160deg,#020617 0%,#0F172A 40%,#1E3A5F 80%,#020617 100%);position:relative;overflow:hidden;}
+        .auth-right{background:var(--bg);}
+        .grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(56,189,248,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.04) 1px,transparent 1px);background-size:60px 60px;}
+        .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;pointer-events:none;}
+        .left-content{position:relative;z-index:2;max-width:420px;text-align:center;}
+        .left-content h2{font-size:2rem;font-weight:800;line-height:1.2;margin-bottom:16px;letter-spacing:-0.02em;}
+        .text-gradient{background:linear-gradient(135deg,var(--accent),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .trust-items{display:flex;flex-direction:column;gap:12px;margin-top:36px;text-align:left;}
+        .trust-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(56,189,248,.1);border-radius:12px;}
+        .trust-icon{width:36px;height:36px;border-radius:10px;background:rgba(56,189,248,.1);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:1rem;flex-shrink:0;}
+        .trust-text{font-size:.85rem;color:rgba(248,250,252,.7);}
+        .form-panel{width:100%;max-width:420px;}
+        .form-title{font-size:1.8rem;font-weight:800;margin-bottom:6px;letter-spacing:-0.02em;}
+        .form-subtitle{font-size:.92rem;margin-bottom:32px;}
+        .input-wrap{position:relative;margin-bottom:16px;}
+        .input-label{font-size:.82rem;font-weight:600;margin-bottom:8px;display:block;color:var(--text);}
+        .input-field{width:100%;padding:14px 16px 14px 46px;border-radius:12px;border:1px solid var(--border);background:var(--card-alt);color:var(--text);font-family:var(--font);font-size:.95rem;outline:none;transition:all var(--transition);}
+        .input-field:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(56,189,248,.1);background:var(--card);}
+        .input-field::placeholder{color:var(--text-muted);}
+        .input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:1rem;pointer-events:none;}
+        .input-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text-muted);font-size:1rem;transition:color var(--transition);}
+        .input-toggle:hover{color:var(--accent);}
+        .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+        .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+        .divider span{font-size:.78rem;color:var(--text-muted);white-space:nowrap;}
+        .social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text);font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer;transition:all var(--transition);margin-bottom:10px;}
+        .social-btn:hover{border-color:var(--accent);background:rgba(56,189,248,.04);}
+        .check-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+        .check-wrap input[type="checkbox"]{width:18px;height:18px;accent-color:var(--primary);border-radius:4px;cursor:pointer;flex-shrink:0;}
+        .check-wrap label{font-size:.85rem;color:var(--text-muted);cursor:pointer;}
+        .error-msg{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:12px 16px;font-size:.85rem;color:#EF4444;margin-bottom:16px;display:none;}
+
+        /* ========== FOOTER (unified) ========== */
+        .footer{padding:60px 0 30px;border-top:1px solid var(--border);background:var(--card);}
+        .footer-brand{font-size:1.4rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+        .footer-brand .logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.9rem;font-weight:800;}
+        .footer-desc{font-size:0.88rem;color:var(--text-muted);margin-bottom:20px;max-width:300px;}
+        .footer-title{font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;color:var(--text);}
+        .footer-links{list-style:none;padding:0;}
+        .footer-links li{margin-bottom:10px;}
+        .footer-links a{color:var(--text-muted);font-size:0.88rem;transition:color var(--transition);}
+        .footer-links a:hover{color:var(--accent);}
+        .footer-bottom{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+        .footer-bottom p{font-size:0.82rem;color:var(--text-muted);margin:0;}
+        .footer-socials{display:flex;gap:12px;}
+        .footer-socials a{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--card-alt);color:var(--text-muted);border:1px solid var(--border);transition:all var(--transition);font-size:1rem;}
+        .footer-socials a:hover{color:var(--accent);border-color:var(--accent);transform:translateY(-2px);}
+
+        /* ========== RESPONSIVE ========== */
+        @media(max-width:767px){
+            .auth-layout{grid-template-columns:1fr;}
+            .auth-left{display:none;}
+            .auth-right{min-height:calc(100vh - var(--navbar-height));}
+            .auth-panel{padding:32px 24px;}
+            .footer-bottom{justify-content:center;text-align:center;flex-direction:column;}
+        }
+        @media(max-width:575px){
+            .whatsapp-float{width:48px;height:48px;bottom:20px;right:16px;font-size:1.4rem;}
+            .whatsapp-float .pulse-ring{inset:-4px;}
+        }
 </style>
 @endpush

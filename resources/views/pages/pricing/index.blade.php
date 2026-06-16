@@ -1,0 +1,1199 @@
+@extends('layouts.guest')
+
+@section('title', 'Pricing - ' . ($setting->company_name ?? config('app.name')))
+
+@section('content')
+<!-- NAVBAR (STANDARDIZED) -->
+    
+
+    
+
+    <!-- HERO -->
+    <section class="hero-section">
+        <div class="hero-bg-orb hero-bg-orb-1"></div>
+        <div class="hero-bg-orb hero-bg-orb-2"></div>
+        <div class="hero-bg-orb hero-bg-orb-3"></div>
+        <div class="grid-bg"></div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center" style="position:relative;z-index:2;">
+                    <div class="badge-glow reveal mb-4">
+                        <i class="bi bi-tag-fill"></i> {{ setting('pricing.hero.badge', 'Transparent Pricing') }}
+                    </div>
+                    <h1 class="reveal reveal-delay-1" style="font-size:clamp(2.4rem,5vw,4rem);">
+                        {!! setting('pricing.hero.title', 'Simple Pricing. <span class="text-gradient">Honest Value.</span>') !!}
+                    </h1>
+                    <p class="reveal reveal-delay-2" style="font-size:1.15rem;max-width:600px;margin:20px auto 0;">
+                        {!! setting('pricing.hero.subtitle', 'All plans include full access to all modules with unlimited users. No hidden tiers. No module paywalls. Choose how you want to invest — not whether you can access the system.') !!}
+                    </p>
+                </div>
+            </div>
+            <!-- Free Trial 30 Days CTA -->
+            <div class="free-trial-cta reveal reveal-delay-3" style="display:flex;justify-content:center;margin-top:40px;">
+                <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-primary" style="padding:18px 48px;font-size:1.1rem;border-radius:50px;">
+                    <i class="bi bi-gift-fill"></i> Start Free 30-Day Trial — No Credit Card
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING CARDS -->
+    <section class="section-padding">
+        <div class="container">
+            <div class="row g-4 justify-content-center align-items-stretch">
+                <!-- MONTHLY -->
+                <div class="col-lg col-md-6 reveal">
+                    <div class="pricing-card">
+                        <div class="plan-name">Monthly</div>
+                        <div class="plan-price"><span class="currency">Rp</span>690K<span class="suffix">–990K</span></div>
+                        <div class="plan-period">per month</div>
+                        <div class="plan-desc">Flexible entry point. Pay as you go. Cancel anytime.</div>
+                        <ul class="plan-features">
+                            <li><i class="bi bi-check-circle-fill"></i> Full access to all modules</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Unlimited users</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Dedicated isolated environment</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Email support (48h response)</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Automatic updates</li>
+                            <li><i class="bi bi-x-circle"></i> AI Assistant</li>
+                            <li><i class="bi bi-x-circle"></i> Priority support</li>
+                        </ul>
+                        <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-outline" style="width:100%;justify-content:center;">Start Monthly</a>
+                    </div>
+                </div>
+                <!-- 3 MONTHS -->
+                <div class="col-lg col-md-6 reveal reveal-delay-1">
+                    <div class="pricing-card">
+                        <div class="plan-name">3 Months</div>
+                        <div class="plan-price"><span class="currency">Rp</span>1,99jt<span class="suffix">–2,79jt</span></div>
+                        <div class="plan-period">per quarter · save up to 10%</div>
+                        <div class="plan-desc">Commitment that saves. Best for businesses testing at scale.</div>
+                        <ul class="plan-features">
+                            <li><i class="bi bi-check-circle-fill"></i> Full access to all modules</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Unlimited users</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Dedicated isolated environment</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Priority email support (24h)</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Automatic updates</li>
+                            <li><i class="bi bi-x-circle"></i> AI Assistant</li>
+                            <li><i class="bi bi-x-circle"></i> Phone support</li>
+                        </ul>
+                        <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-outline" style="width:100%;justify-content:center;">Start 3 Months</a>
+                    </div>
+                </div>
+                <!-- ANNUAL -->
+                <div class="col-lg col-md-6 reveal reveal-delay-2">
+                    <div class="pricing-card popular">
+                        <div class="pricing-badge">Most Popular</div>
+                        <div class="plan-name">Annual</div>
+                        <div class="plan-price"><span class="currency">Rp</span>5,9jt<span class="suffix">–7,9jt</span></div>
+                        <div class="plan-period">per year · save up to 30%</div>
+                        <div class="plan-desc">The smartest long-term investment before going lifetime.</div>
+                        <ul class="plan-features">
+                            <li><i class="bi bi-check-circle-fill"></i> Full access to all modules</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Unlimited users</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Dedicated isolated environment</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Priority support (8h response)</li>
+                            <li><i class="bi bi-check-circle-fill"></i> AI Assistant included</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Migration assistance</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Automatic updates</li>
+                        </ul>
+                        <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-primary" style="width:100%;justify-content:center;">Start Annual</a>
+                    </div>
+                </div>
+                <!-- LIFETIME -->
+                <div class="col-lg col-md-6 reveal reveal-delay-3">
+                    <div class="pricing-card" style="border-color:rgba(16,185,129,0.3);">
+                        <div class="plan-name">Lifetime</div>
+                        <div class="plan-price"><span class="currency">Rp</span>19,9jt</div>
+                        <div class="plan-period">one-time · yours forever</div>
+                        <div class="plan-desc">Zero recurring fees. One investment. Permanent ownership.</div>
+                        <ul class="plan-features">
+                            <li><i class="bi bi-check-circle-fill"></i> Full access to all modules</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Unlimited users</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Dedicated isolated environment</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Dedicated support line</li>
+                            <li><i class="bi bi-check-circle-fill"></i> AI Assistant included</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Lifetime feature updates</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Maintenance: Rp2,4–3,6jt/yr</li>
+                        </ul>
+                        <a href="{{ route('customer.register') }}" class="btn-cooca" style="width:100%;justify-content:center;background:linear-gradient(135deg,#10B981,#059669);color:#fff;box-shadow:0 4px 20px rgba(16,185,129,.3);">Own It Forever</a>
+                    </div>
+                </div>
+                <!-- ENTERPRISE -->
+                <div class="col-lg col-md-6 reveal reveal-delay-4">
+                    <div class="pricing-card" style="border:2px dashed rgba(56,189,248,0.2);">
+                        <div class="plan-name">Enterprise <span style="font-size:0.68rem;background:rgba(56,189,248,0.1);color:var(--accent);padding:3px 10px;border-radius:50px;margin-left:6px;vertical-align:middle;">Custom</span></div>
+                        <div class="plan-price" style="font-size:1.6rem;">Let's Talk</div>
+                        <div class="plan-period">tailored to your scale</div>
+                        <div class="plan-desc">Multiple branches, custom integrations, white-label, or on-premise deployment.</div>
+                        <ul class="plan-features">
+                            <li><i class="bi bi-check-circle-fill"></i> Full module access</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Unlimited users</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Custom integrations (API)</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Dedicated account manager</li>
+                            <li><i class="bi bi-check-circle-fill"></i> SLA contract</li>
+                            <li><i class="bi bi-check-circle-fill"></i> On-premise option</li>
+                            <li><i class="bi bi-check-circle-fill"></i> White-label available</li>
+                        </ul>
+                        <a href="{{ route('contact') }}" class="btn-cooca btn-cooca-outline" style="width:100%;justify-content:center;">Contact Sales <i class="bi bi-chat-dots"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMPARISON TABLE -->
+    <section class="section-padding" style="background:var(--card-alt);">
+        <div class="container">
+            <div class="text-center mb-5">
+                <div class="section-label reveal"><i class="bi bi-table"></i> {{ setting('pricing.compare.badge', 'Feature Comparison') }}</div>
+                <h2 class="section-title reveal reveal-delay-1">{!! setting('pricing.compare.title', 'Side-by-Side <span class="text-gradient">Plan Breakdown</span>') !!}</h2>
+            </div>
+            <div class="compare-wrap reveal">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th style="min-width:200px;">Feature</th>
+                            <th>Monthly</th>
+                            <th>Quarterly</th>
+                            <th style="color:var(--accent);">Annual ★</th>
+                            <th style="color:#10B981;">Lifetime</th>
+                            <th>Enterprise</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="cat-row"><td colspan="6">Core System</td></tr>
+                        <tr><td>All modules access</td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td></tr>
+                        <tr><td>Unlimited users</td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td></tr>
+                        <tr><td>Isolated environment</td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td></tr>
+                        <tr><td>Automatic updates</td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td></tr>
+                        <tr class="cat-row"><td colspan="6">Intelligence</td></tr>
+                        <tr><td>AI Assistant</td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td></tr>
+                        <tr><td>Advanced analytics</td><td>Basic</td><td>Standard</td><td>Full</td><td>Full</td><td>Custom</td></tr>
+                        <tr class="cat-row"><td colspan="6">Support</td></tr>
+                        <tr><td>Response time</td><td>48 hrs</td><td>24 hrs</td><td>8 hrs</td><td>Dedicated</td><td>SLA-based</td></tr>
+                        <tr><td>Migration assistance</td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td><td><i class="bi bi-check-circle-fill check"></i></td></tr>
+                        <tr><td>Dedicated account manager</td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-check-circle-fill check"></i></td></tr>
+                        <tr class="cat-row"><td colspan="6">Ownership</td></tr>
+                        <tr><td>License type</td><td>Subscription</td><td>Subscription</td><td>Subscription</td><td>Perpetual</td><td>Custom</td></tr>
+                        <tr><td>On-premise option</td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-check-circle-fill check"></i></td></tr>
+                        <tr><td>White-label</td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-x-circle cross"></i></td><td><i class="bi bi-check-circle-fill check"></i></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING FAQ -->
+    <section class="section-padding">
+        <div class="container">
+            <div class="text-center mb-5">
+                <div class="section-label reveal"><i class="bi bi-question-circle-fill"></i> {{ setting('pricing.faq.badge', 'Pricing FAQ') }}</div>
+                <h2 class="section-title reveal reveal-delay-1">{!! setting('pricing.faq.title', 'Questions About <span class="text-gradient">Investment?</span>') !!}</h2>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAcc">
+                        <div class="accordion-item reveal">
+                            <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#pf1">Is there really no credit card required for the trial?</button></h2>
+                            <div id="pf1" class="accordion-collapse collapse show" data-bs-parent="#faqAcc"><div class="accordion-body">Correct. Sign up, choose your industry, and get 30 days of full access with zero payment information required. If you choose to continue after the trial, we'll ask for payment then — never before.</div></div>
+                        </div>
+                        <div class="accordion-item reveal reveal-delay-1">
+                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pf2">Can I switch plans mid-subscription?</button></h2>
+                            <div id="pf2" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">Yes. You can upgrade at any time and we'll prorate the difference. Downgrading takes effect at the start of your next billing cycle. Upgrading to Lifetime is also available at any point — just contact our team.</div></div>
+                        </div>
+                        <div class="accordion-item reveal reveal-delay-2">
+                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pf3">What does the Lifetime maintenance fee cover?</button></h2>
+                            <div id="pf3" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">Lifetime license owners pay a small optional maintenance fee (Rp2.4–3.6jt/year) that covers server infrastructure, security patches, and continued feature updates. The core system remains yours whether or not you pay maintenance — but updates require an active maintenance subscription.</div></div>
+                        </div>
+                        <div class="accordion-item reveal reveal-delay-3">
+                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pf4">Do prices differ between industries?</button></h2>
+                            <div id="pf4" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">The price ranges reflect different industry configurations. Simpler setups (e.g., Laundry, Salon) start at the lower end. More complex infrastructure needs (e.g., Hotel PMS, Clinic EMR) are toward the upper range. Our team will quote you exactly during onboarding.</div></div>
+                        </div>
+                        <div class="accordion-item reveal reveal-delay-4">
+                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pf5">Is there a refund policy?</button></h2>
+                            <div id="pf5" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">We offer a 14-day money-back guarantee on all paid plans. If you're not satisfied for any reason within 14 days of your first payment, we'll refund you in full — no questions asked.</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section-padding" style="background:var(--card-alt);">
+        <div class="container text-center">
+            <h2 class="reveal" style="font-size:clamp(1.8rem,3.5vw,2.8rem);">{!! setting('pricing.cta.title', 'Start Free. <span class="text-gradient">Upgrade When Ready.</span>') !!}</h2>
+            <p class="reveal reveal-delay-1" style="max-width:480px;margin:16px auto 36px;">{!! setting('pricing.cta.subtitle', '30 days. Full access. No credit card. The only risk is not finding out how much revenue you\'ve been leaving on the table.') !!}</p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap reveal reveal-delay-2">
+                <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-primary" style="padding:16px 40px;">Start Free Trial <i class="bi bi-arrow-right"></i></a>
+                <a href="{{ route('contact') }}" class="btn-cooca btn-cooca-outline" style="padding:16px 40px;">Talk to Sales</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    
+@endsection
+
+@push('styles')
+<style>
+:root {
+            --bg: #020617;
+            --card: #0F172A;
+            --card-alt: #1E293B;
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            --primary: #2563EB;
+            --secondary: #1E40AF;
+            --accent: #38BDF8;
+            --success: #10B981;
+            --border: rgba(56, 189, 248, 0.12);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.6);
+            --glass: rgba(15, 23, 42, 0.65);
+            --glass-border: rgba(56, 189, 248, 0.14);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-lg: 24px;
+            --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --hero-gradient: linear-gradient(160deg, #020617 0%, #0F172A 35%, #1E3A5F 65%, #020617 100%);
+        }
+        [data-theme="light"] {
+            --bg: #F8FAFC;
+            --card: #FFFFFF;
+            --card-alt: #F1F5F9;
+            --text: #0F172A;
+            --text-muted: #475569;
+            --primary: #2563EB;
+            --secondary: #7C3AED;
+            --accent: #0EA5E9;
+            --border: rgba(37, 99, 235, 0.12);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.1);
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(37, 99, 235, 0.1);
+            --hero-gradient: linear-gradient(160deg, #F8FAFC 0%, #EFF6FF 35%, #DBEAFE 65%, #F8FAFC 100%);
+        }
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            transition: background var(--transition), color var(--transition);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color var(--transition);
+        }
+        a:hover {
+            color: var(--primary);
+        }
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        h1 {
+            font-size: clamp(2.4rem, 5vw, 4.2rem);
+        }
+        h2 {
+            font-size: clamp(1.8rem, 3.5vw, 3rem);
+        }
+        h3 {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+        }
+        p {
+            color: var(--text-muted);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        .section-padding {
+            padding: 100px 0;
+        }
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent), var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .badge-glow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .section-title {
+            margin-bottom: 16px;
+        }
+        .section-subtitle {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 48px;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .btn-cooca {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+        .btn-cooca-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        }
+        .btn-cooca-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.45);
+            color: #fff;
+        }
+        .btn-cooca-success {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+        .btn-cooca-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.45);
+            color: #fff;
+        }
+        .btn-cooca-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-cooca-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .btn-cooca-sm {
+            padding: 10px 22px;
+            font-size: 0.85rem;
+            border-radius: 10px;
+        }
+        .btn-cooca .btn-ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        .card-3d {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        .card-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+        .card-3d:hover::before {
+            opacity: 1;
+        }
+        .card-3d:hover {
+            transform: translateY(-8px);
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 20px 60px rgba(56, 189, 248, 0.08), var(--shadow);
+        }
+        .card-3d .card-glow {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.05) 0%, transparent 60%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+        .card-3d:hover .card-glow {
+            opacity: 1;
+        }
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        @keyframes float-delay {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+        @keyframes float-slow {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        @keyframes pulse-scale {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        @keyframes fade-in-scale {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .float-anim {
+            animation: float 6s ease-in-out infinite;
+        }
+        .float-anim-delay {
+            animation: float-delay 5s ease-in-out 1s infinite;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-delay-1 {
+            transition-delay: 0.1s;
+        }
+        .reveal-delay-2 {
+            transition-delay: 0.2s;
+        }
+        .reveal-delay-3 {
+            transition-delay: 0.3s;
+        }
+        .reveal-delay-4 {
+            transition-delay: 0.4s;
+        }
+        .reveal-delay-5 {
+            transition-delay: 0.5s;
+        }
+        .navbar-cooca {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+            padding: 16px 0;
+            transition: all var(--transition);
+            background: transparent;
+        }
+        .navbar-cooca.scrolled {
+            padding: 10px 0;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand-cooca {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar-brand-cooca .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+        .nav-link-cooca {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 8px 16px !important;
+            transition: color var(--transition);
+            position: relative;
+        }
+        .nav-link-cooca:hover,
+        .nav-link-cooca.active {
+            color: var(--accent) !important;
+        }
+        .nav-link-cooca::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width var(--transition);
+            border-radius: 1px;
+        }
+        .nav-link-cooca:hover::after {
+            width: 60%;
+        }
+        .theme-toggle {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-size: 1.1rem;
+        }
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: rotate(20deg);
+        }
+
+        /* ========== LOGIN DROPDOWN ========== */
+        .login-dropdown-wrapper {
+            position: relative;
+        }
+        .login-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 190px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            padding: 8px 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+            z-index: 1060;
+        }
+        .login-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .dropdown-item-c {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .dropdown-item-c:hover {
+            background: rgba(56, 189, 248, 0.08);
+            color: var(--accent);
+        }
+        .dropdown-item-c i {
+            font-size: 1rem;
+            color: var(--text-muted);
+            transition: color 0.2s ease;
+        }
+        .dropdown-item-c:hover i {
+            color: var(--accent);
+        }
+        /* ========== END LOGIN DROPDOWN ========== */
+
+        .hero-section {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            padding-top: 120px;
+            padding-bottom: 80px;
+            position: relative;
+            overflow: hidden;
+            background: var(--hero-gradient);
+        }
+        .hero-bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.12;
+            pointer-events: none;
+        }
+        .hero-bg-orb-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--primary);
+            top: -200px;
+            right: -100px;
+        }
+        .hero-bg-orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            bottom: -100px;
+            left: -100px;
+        }
+        .hero-bg-orb-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--secondary);
+            top: 50%;
+            left: 40%;
+            animation: float 8s ease-in-out infinite;
+        }
+        .grid-bg {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+        .pricing-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 36px 32px;
+        }
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+        .pricing-card:hover::before {
+            opacity: 1;
+        }
+        .pricing-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 20px 60px rgba(56, 189, 248, 0.08), var(--shadow);
+        }
+        .pricing-card.popular {
+            border-color: var(--accent);
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.12);
+        }
+        .pricing-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            z-index: 2;
+        }
+        .pricing-card.popular .pricing-badge {
+            z-index: 3;
+        }
+        .plan-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .plan-price {
+            font-size: 2.4rem;
+            font-weight: 800;
+            margin: 16px 0 4px;
+            color: var(--text);
+        }
+        .plan-price .currency {
+            font-size: 1rem;
+            vertical-align: super;
+            font-weight: 600;
+        }
+        .plan-price .suffix {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        .plan-period {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .plan-desc {
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+            color: var(--text-muted);
+        }
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+            margin-bottom: 24px;
+        }
+        .plan-features li {
+            padding: 9px 0;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+        .plan-features li i.bi-check-circle-fill {
+            color: var(--accent);
+        }
+        .plan-features li i.bi-x-circle {
+            color: var(--text-muted);
+            opacity: 0.4;
+        }
+        .compare-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+        .compare-table thead th {
+            background: var(--card-alt);
+            padding: 16px 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-muted);
+        }
+        .compare-table thead th:first-child {
+            text-align: left;
+        }
+        .compare-table tbody td {
+            padding: 14px 20px;
+            font-size: 0.88rem;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .compare-table tbody td:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .compare-table tbody tr:hover td {
+            background: rgba(56, 189, 248, 0.03);
+        }
+        .compare-table .check {
+            color: var(--accent);
+            font-size: 1rem;
+        }
+        .compare-table .cross {
+            color: var(--text-muted);
+            opacity: 0.35;
+            font-size: 1rem;
+        }
+        .compare-table .cat-row td {
+            background: rgba(37, 99, 235, 0.05);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+            padding: 10px 20px;
+        }
+        .accordion-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius) !important;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .accordion-button {
+            background: transparent;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 18px 24px;
+            box-shadow: none;
+        }
+        .accordion-button:not(.collapsed) {
+            background: transparent;
+            color: var(--accent);
+        }
+        .accordion-button::after {
+            filter: invert(1);
+        }
+        [data-theme="light"] .accordion-button::after {
+            filter: none;
+        }
+        .accordion-body {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            padding: 0 24px 18px;
+        }
+        .footer {
+            padding: 60px 0 30px;
+            border-top: 1px solid var(--border);
+            background: var(--card);
+        }
+        .footer-brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-brand .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+        .footer-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            max-width: 300px;
+        }
+        .footer-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            transition: color var(--transition);
+        }
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        .footer-bottom {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .footer-bottom p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        .footer-socials {
+            display: flex;
+            gap: 12px;
+        }
+        .footer-socials a {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-alt);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+            font-size: 1rem;
+        }
+        .footer-socials a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .whatsapp-float {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 999;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #25D366;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            box-shadow: 0 6px 24px rgba(37, 211, 102, 0.35);
+            transition: all var(--transition);
+            text-decoration: none;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 32px rgba(37, 211, 102, 0.5);
+            color: #fff;
+        }
+        .whatsapp-float .pulse-ring {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid #25D366;
+            animation: pulse-ring 2s ease-out infinite;
+        }
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.6);
+                opacity: 0;
+            }
+        }
+        .offcanvas-cooca {
+            background: var(--glass) !important;
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-left: 1px solid var(--glass-border);
+        }
+        .offcanvas-cooca .offcanvas-header {
+            border-bottom: 1px solid var(--border);
+        }
+        .offcanvas-cooca .offcanvas-title {
+            font-weight: 800;
+        }
+        .offcanvas-cooca .btn-close {
+            filter: invert(1);
+        }
+        [data-theme="light"] .offcanvas-cooca .btn-close {
+            filter: none;
+        }
+        .offcanvas-cooca .nav-link-cooca {
+            display: block;
+            padding: 14px 0 !important;
+            font-size: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .offcanvas-cooca .nav-link-cooca::after {
+            display: none;
+        }
+        .offcanvas-cooca .theme-toggle {
+            width: 100%;
+            height: auto;
+            padding: 12px 16px;
+            border-radius: 10px;
+            justify-content: flex-start;
+            gap: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: var(--card-alt);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .offcanvas-cooca .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: none;
+        }
+        .offcanvas-cooca .offcanvas-login-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .offcanvas-cooca .offcanvas-login-group a {
+            width: 100%;
+            justify-content: center;
+        }
+        .offcanvas-cooca .offcanvas-login-divider {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 4px 0;
+        }
+
+        /* =====================================
+           RESPONSIVE FIX PATCH
+        ===================================== */
+        .pricing-card.popular {
+            overflow: visible;
+        }
+        @media (max-width: 767.98px) {
+            .section-padding {
+                padding: 60px 0;
+            }
+            .hero-section {
+                padding-top: 100px;
+                padding-bottom: 60px;
+            }
+            .footer-bottom {
+                justify-content: center;
+                text-align: center;
+                flex-direction: column;
+            }
+            .pricing-card {
+                margin-bottom: 20px;
+            }
+        }
+        @media (max-width: 575.98px) {
+            .hero-cta {
+                flex-direction: column;
+            }
+            .whatsapp-float {
+                width: 48px;
+                height: 48px;
+                bottom: 20px;
+                right: 16px;
+                font-size: 1.4rem;
+            }
+            .whatsapp-float .pulse-ring {
+                inset: -4px;
+            }
+        }
+</style>
+@endpush

@@ -44,34 +44,46 @@ class FullDatabaseSeeder extends Seeder
         $this->command->info('Seeding Affiliators...');
         $affiliators = Affiliator::factory()->count(10)->create();
 
-        // Seed Product Categories
-        $this->command->info('Seeding Product Categories...');
-        $categories = ProductCategory::factory()->count(8)->create();
+        // Use existing categories or create new ones
+        $categories = ProductCategory::all();
+        if ($categories->isEmpty()) {
+            $this->command->info('No categories found, seeding categories...');
+            $categories = ProductCategory::factory()->count(8)->create();
+        }
 
-        // Seed Products
-        $this->command->info('Seeding Products...');
+        // Seed more Products
+        $this->command->info('Seeding Additional Products...');
         Product::factory()
-            ->count(30)
-            ->for(array_rand($categories->all(), 1), 'category')
+            ->count(15)
+            ->sequence(fn($sequence) => [
+                'category_id' => $categories->random()->id,
+            ])
             ->create();
 
-        // Seed Subscription Plans
-        $this->command->info('Seeding Subscription Plans...');
-        $plans = SubscriptionPlan::factory()->count(4)->create();
+        // Use existing subscription plans or create new ones
+        $plans = SubscriptionPlan::all();
+        if ($plans->isEmpty()) {
+            $this->command->info('No plans found, seeding plans...');
+            $plans = SubscriptionPlan::factory()->count(4)->create();
+        }
 
         // Seed Subscriptions
         $this->command->info('Seeding Subscriptions...');
         Subscription::factory()
             ->count(15)
-            ->for(array_rand($plans->all(), 1), 'plan')
-            ->for(array_rand($customers->all(), 1), 'customer')
+            ->sequence(fn($sequence) => [
+                'subscription_plan_id' => $plans->random()->id,
+                'customer_id' => $customers->random()->id,
+            ])
             ->create();
 
         // Seed Licenses
         $this->command->info('Seeding Licenses...');
         License::factory()
             ->count(25)
-            ->for(array_rand($customers->all(), 1), 'customer')
+            ->sequence(fn($sequence) => [
+                'customer_id' => $customers->random()->id,
+            ])
             ->create();
 
         // Seed Vouchers
@@ -82,37 +94,41 @@ class FullDatabaseSeeder extends Seeder
         $this->command->info('Seeding Transactions...');
         Transaction::factory()
             ->count(40)
-            ->for(array_rand($customers->all(), 1), 'customer')
+            ->sequence(fn($sequence) => [
+                'customer_id' => $customers->random()->id,
+            ])
             ->create();
 
         // Seed Invoices
         $this->command->info('Seeding Invoices...');
         Invoice::factory()
             ->count(30)
-            ->for(array_rand($customers->all(), 1), 'customer')
+            ->sequence(fn($sequence) => [
+                'customer_id' => $customers->random()->id,
+            ])
             ->create();
 
         // Seed Affiliate Commissions
         $this->command->info('Seeding Affiliate Commissions...');
         AffiliateCommission::factory()
             ->count(20)
-            ->for(array_rand($affiliators->all(), 1), 'affiliator')
+            ->sequence(fn($sequence) => [
+                'affiliator_id' => $affiliators->random()->id,
+            ])
             ->create();
 
         // Seed Affiliate Withdrawals
         $this->command->info('Seeding Affiliate Withdrawals...');
         AffiliateWithdrawal::factory()
             ->count(8)
-            ->for(array_rand($affiliators->all(), 1), 'affiliator')
+            ->sequence(fn($sequence) => [
+                'affiliator_id' => $affiliators->random()->id,
+            ])
             ->create();
 
         // Seed Pages
         $this->command->info('Seeding Pages...');
         Page::factory()->count(5)->create();
-
-        // Seed Blog Posts
-        $this->command->info('Seeding Blog Posts...');
-        BlogPost::factory()->count(10)->create();
 
         // Seed Email Campaigns
         $this->command->info('Seeding Email Campaigns...');
@@ -122,21 +138,27 @@ class FullDatabaseSeeder extends Seeder
         $this->command->info('Seeding Tickets...');
         $tickets = Ticket::factory()
             ->count(15)
-            ->for(array_rand($customers->all(), 1), 'customer')
+            ->sequence(fn($sequence) => [
+                'customer_id' => $customers->random()->id,
+            ])
             ->create();
 
         // Seed Ticket Replies
         $this->command->info('Seeding Ticket Replies...');
         TicketReply::factory()
             ->count(30)
-            ->for(array_rand($tickets->all(), 1), 'ticket')
+            ->sequence(fn($sequence) => [
+                'ticket_id' => $tickets->random()->id,
+            ])
             ->create();
 
         // Seed Reviews
         $this->command->info('Seeding Reviews...');
         Review::factory()
             ->count(25)
-            ->for(array_rand($customers->all(), 1), 'customer')
+            ->sequence(fn($sequence) => [
+                'customer_id' => $customers->random()->id,
+            ])
             ->create();
 
         $this->command->info('Database seeding completed successfully!');
