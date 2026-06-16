@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.guest')
 
 @section('title', 'Cooca.id - SaaS ERP Platform')
 @section('meta_description', 'Platform SaaS ERP multi-tenant untuk berbagai industri dengan sistem lisensi dan affiliate 2-tier')

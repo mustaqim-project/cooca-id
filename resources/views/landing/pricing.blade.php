@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.guest')
 
 @section('title', 'Pricing - Cooca.id')
 @section('meta_description', 'Harga transparan untuk berbagai paket ERP. Mulai dari trial gratis hingga enterprise.')

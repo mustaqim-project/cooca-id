@@ -243,6 +243,14 @@ class LandingController extends Controller
     }
 
     /**
+     * Display the solutions page.
+     */
+    public function solution()
+    {
+        return view('landing.solution');
+    }
+
+    /**
      * Display the features page.
      */
     public function features()
