@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.guest')
 
 @section('title', 'Affiliate Program - Cooca.id')
 @section('meta_description', 'Bergabung dengan program affiliate Cooca.id dan dapatkan komisi 25% L1 + 5% L2 seumur hidup.')

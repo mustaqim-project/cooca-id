@@ -24,6 +24,7 @@ Route::get('/about', [LandingController::class, 'about'])->name('about');
 Route::get('/pricing', [LandingController::class, 'pricing'])->name('pricing');
 Route::get('/contact', [LandingController::class, 'contact'])->name('contact');
 Route::get('/affiliate', [LandingController::class, 'affiliate'])->name('affiliate');
+Route::get('/solutions', [LandingController::class, 'solution'])->name('solutions');
 Route::get('/features', [LandingController::class, 'features'])->name('features');
 Route::get('/faq', [LandingController::class, 'faq'])->name('faq');
 Route::get('/docs', [LandingController::class, 'docs'])->name('docs');
@@ -57,9 +58,9 @@ RateLimiter::for('customer-register', function ($request) {
 Route::prefix('customer')->name('customer.')->group(function () {
     Route::middleware('guest:customer')->group(function () {
         Route::get('login', [AuthController::class, 'showCustomerLogin'])->name('login');
-        Route::post('login', [AuthController::class, 'customerLogin'])->middleware('throttle:customer-login');
+        Route::post('login', [AuthController::class, 'customerLogin'])->middleware('throttle:customer-login')->name('login.submit');
         Route::get('register', [AuthController::class, 'showCustomerRegister'])->name('register');
-        Route::post('register', [AuthController::class, 'customerRegister'])->middleware('throttle:customer-register');
+        Route::post('register', [AuthController::class, 'customerRegister'])->middleware('throttle:customer-register')->name('register.submit');
 
         // Google OAuth
         Route::get('auth/google', [AuthController::class, 'redirectToGoogleCustomer'])->name('auth.google');
@@ -76,12 +77,14 @@ Route::prefix('customer')->name('customer.')->group(function () {
         Route::post('logout', [AuthController::class, 'customerLogout'])->name('logout');
     });
 });
+
+// Affiliator Auth Routes
 Route::prefix('affiliator')->name('affiliator.')->group(function () {
     Route::middleware('guest:affiliator')->group(function () {
         Route::get('login', [AuthController::class, 'showAffiliatorLogin'])->name('login');
-        Route::post('login', [AuthController::class, 'affiliatorLogin']);
+        Route::post('login', [AuthController::class, 'affiliatorLogin'])->name('login.submit');
         Route::get('register', [AuthController::class, 'showAffiliatorRegister'])->name('register');
-        Route::post('register', [AuthController::class, 'affiliatorRegister']);
+        Route::post('register', [AuthController::class, 'affiliatorRegister'])->name('register.submit');
         
         // Password Reset for Affiliator
         Route::get('forgot-password', [PasswordResetController::class, 'showAffiliatorForgotPassword'])->name('password.request');
@@ -99,7 +102,7 @@ Route::prefix('affiliator')->name('affiliator.')->group(function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest:admin')->group(function () {
         Route::get('login', [AuthController::class, 'showAdminLogin'])->name('login');
-        Route::post('login', [AuthController::class, 'adminLogin']);
+        Route::post('login', [AuthController::class, 'adminLogin'])->name('login.submit');
         
         // Password Reset for Admin
         Route::get('forgot-password', [PasswordResetController::class, 'showAdminForgotPassword'])->name('password.request');
@@ -112,3 +115,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('logout', [AuthController::class, 'adminLogout'])->name('logout');
     });
 });
+
+// Legal Pages Routes (CMS Managed)
+Route::get('/terms-of-service', [LandingController::class, 'terms'])->name('page.terms');
+Route::get('/privacy-policy', [LandingController::class, 'privacy'])->name('page.privacy');

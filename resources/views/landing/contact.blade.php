@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.guest')
 
 @section('title', 'Contact Us - Cooca.id')
 @section('meta_description', 'Hubungi tim Cooca.id untuk pertanyaan, dukungan, atau demo produk.')
