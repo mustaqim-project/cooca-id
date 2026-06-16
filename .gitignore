@@ -1,80 +1,49 @@
-# Environment and config files
-.env
+# Laravel-specific ignores
+/database/migrations/*.php
+/storage/
+/vendor/
+!.env
 .env.local
-*.env.*
-
-# Logs
+.env.*
 *.log
-
-# Backup and temporary files
-*.bak
-*.tmp
-*~
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# PHP specific
-*.php~
-.php_cs.cache
-.phpunit.result.cache
-
-# IDE specific
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Build and distribution
-dist/
-build/
-target/
-
 # Dependencies
 node_modules/
-vendor/
 composer.lock
-
-# Cache directories
-__pycache__/
-*.pyc
-*.pyo
-.Python
-venv/
-.venv/
-
-# Coverage reports
+# Compiled and build artifacts
+*.o
+*.obj
+*.out
+# Logs and temp files
+*.tmp
+*.swp
+# Environment
+.env
+.env.local
+.env.*
+# Editors
+.vscode/
+.idea/
+# OS
+.DS_Store
+Thumbs.db
+# Cache and test
+.cache/
 coverage/
 htmlcov/
 .coverage
-
-# Test and debugging
-*.log
-*.tmp
-test/
-tests/
-
-# Compression archives
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
+dist/
+build/
+__pycache__/
+.pyc
+.class
+.so
+.a
+.dll
+.exe
+.zig-cache/
+zig-cache/
+julia-*/
