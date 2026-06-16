@@ -294,6 +294,7 @@ return [
          */
         'strategy' => DefaultStrategy::class,
 
+        'strategy_options' => [
             /*
              * Retention policy:
              * - Keep ALL backups for 7 days (harian)
