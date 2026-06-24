@@ -10,10 +10,6 @@ final class SendPaymentConfirmation
 {
     public function handle(PaymentPaid $event): void
     {
-        SendPaymentConfirmationJob::dispatch(
-            $event->transaction->customer,
-            $event->transaction->invoice_number,
-            $event->transaction->net_amount,
-        );
+        SendPaymentConfirmationJob::dispatch($event->transaction);
     }
 }

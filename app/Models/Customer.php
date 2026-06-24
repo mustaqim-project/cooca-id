@@ -12,6 +12,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 
 final class Customer extends Authenticatable
@@ -33,6 +35,15 @@ final class Customer extends Authenticatable
         'password',
         'google_id',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Customer $customer): void {
+            if (blank($customer->password)) {
+                $customer->password = Hash::make(Str::random(32));
+            }
+        });
+    }
 
     public function affiliator(): BelongsTo
     {

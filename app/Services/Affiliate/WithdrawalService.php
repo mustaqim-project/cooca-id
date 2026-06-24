@@ -22,7 +22,7 @@ class WithdrawalService
     {
         DB::beginTransaction();
         try {
-            $wallet = AffiliateWallet::where('user_id', $affiliate->id)->firstOrFail();
+            $wallet = AffiliateWallet::where('affiliator_id', $affiliate->id)->firstOrFail();
             
             $amount = (float) ($data['amount'] ?? 0);
 
@@ -124,7 +124,7 @@ class WithdrawalService
         DB::beginTransaction();
         try {
             // Refund to wallet
-            $wallet = AffiliateWallet::where('user_id', $withdrawal->affiliate_id)->firstOrFail();
+            $wallet = AffiliateWallet::where('affiliator_id', $withdrawal->affiliate_id)->firstOrFail();
             $wallet->increment('balance', $withdrawal->amount);
 
             $withdrawal->update([

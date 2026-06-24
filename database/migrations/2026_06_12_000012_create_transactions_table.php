@@ -17,6 +17,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('customer_id');
             $table->uuid('subscription_id')->nullable();
+            $table->string('type')->default('subscription_new');
             $table->string('invoice_number')->unique();
             $table->decimal('gross_amount', 15, 2);
             $table->decimal('voucher_discount', 15, 2)->default(0);
@@ -49,6 +50,7 @@ return new class extends Migration
                 ->onDelete('set null');
 
             $table->index('customer_id');
+            $table->index('type');
             $table->index('invoice_number');
             $table->index('status');
             $table->index('midtrans_order_id');

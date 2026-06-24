@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Cache;
  */
 final class AdminRepository extends BaseRepository implements AdminRepositoryInterface
 {
-    public function __construct(private readonly Admin $model)
+    public function __construct(Admin $model)
     {
         parent::__construct($model);
     }

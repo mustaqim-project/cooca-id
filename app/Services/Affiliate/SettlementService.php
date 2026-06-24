@@ -31,7 +31,7 @@ class SettlementService
                 ]);
 
                 // Move from pending_balance to balance in wallet
-                $wallet = AffiliateWallet::where('user_id', $commission->affiliate_id)->first();
+                $wallet = AffiliateWallet::where('affiliator_id', $commission->affiliate_id)->first();
                 
                 if ($wallet) {
                     $wallet->decrement('pending_balance', $commission->commission_amount);

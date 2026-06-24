@@ -31,10 +31,10 @@ final class SendPaymentConfirmationJob implements ShouldQueue
             }
 
             // Dispatch email notification
-            $this->transaction->notify(
+            $customer->notify(
                 new \App\Notifications\Customer\PaymentConfirmedNotification(
                     $this->transaction->invoice_number,
-                    $this->transaction->net_amount
+                    (float) $this->transaction->net_amount
                 )
             );
 
@@ -47,7 +47,7 @@ final class SendPaymentConfirmationJob implements ShouldQueue
                 "Terima kasih telah menggunakan COOCA.ID",
                 $customer->name,
                 $this->transaction->invoice_number,
-                number_format($this->transaction->net_amount, 0, ',', '.')
+                number_format((float) $this->transaction->net_amount, 0, ',', '.')
             );
             $whatsappService->send($customer->phone ?? $customer->email, $message);
         } catch (\Throwable $e) {

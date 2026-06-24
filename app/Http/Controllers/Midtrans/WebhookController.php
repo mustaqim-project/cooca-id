@@ -153,7 +153,7 @@ class WebhookController extends Controller
     private function verifySignature(Request $request): bool
     {
         $payload = $request->all();
-        $providedSignature = $payload['signature_key'] ?? null;
+        $providedSignature = $payload['signature_key'] ?? $request->header('X-Signature-Key');
 
         if (!$providedSignature) {
             Log::warning('Midtrans webhook: Missing signature_key', [

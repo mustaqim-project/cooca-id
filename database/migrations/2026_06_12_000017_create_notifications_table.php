@@ -19,9 +19,9 @@ return new class extends Migration
             $table->morphs('notifiable');
 
             $table->string('type');
-            $table->enum('channel', ['email', 'whatsapp', 'database']);
+            $table->enum('channel', ['email', 'whatsapp', 'database'])->default('database');
             $table->string('subject')->nullable();
-            $table->text('message');
+            $table->text('message')->nullable();
             $table->json('data')->nullable();
 
             $table->timestamp('read_at')->nullable();
@@ -29,6 +29,7 @@ return new class extends Migration
             $table->timestamp('failed_at')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('type');
             $table->index('channel');

@@ -23,6 +23,7 @@ final class Invoice extends Model
         'status',
         'issued_at',
         'due_at',
+        'paid_at',
         'pdf_path',
     ];
 
@@ -30,6 +31,7 @@ final class Invoice extends Model
         'amount' => 'decimal:2',
         'issued_at' => 'datetime',
         'due_at' => 'datetime',
+        'paid_at' => 'datetime',
     ];
 
     public const STATUS_DRAFT = 'draft';

@@ -6,7 +6,6 @@ use Tests\TestCase;
 use App\Models\Customer;
 use App\Models\Transaction;
 use App\Models\Invoice;
-use App\Models\Subscription;
 use App\Services\Payment\MidtransSignatureValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
@@ -133,7 +132,26 @@ final class MidtransWebhookSignatureTest extends TestCase
     {
         // Create a customer and transaction first
         $customer = Customer::factory()->create();
-        $invoice = Invoice::factory()->create(['customer_id' => $customer->id]);
+        $invoiceNumber = 'INV-TEST-WEBHOOK-001';
+        $transaction = Transaction::create([
+            'customer_id' => $customer->id,
+            'invoice_number' => $invoiceNumber,
+            'gross_amount' => 100000,
+            'voucher_discount' => 0,
+            'net_amount' => 100000,
+            'payment_gateway' => 'midtrans',
+            'midtrans_order_id' => $invoiceNumber,
+            'status' => 'pending',
+        ]);
+        $invoice = Invoice::create([
+            'transaction_id' => $transaction->id,
+            'customer_id' => $customer->id,
+            'invoice_number' => $invoiceNumber,
+            'amount' => 100000,
+            'status' => 'issued',
+            'issued_at' => now(),
+            'due_at' => now()->addDay(),
+        ]);
         
         $payload = [
             'order_id' => $invoice->invoice_number,
@@ -153,8 +171,7 @@ final class MidtransWebhookSignatureTest extends TestCase
             'Content-Type' => 'application/json',
         ]);
 
-        // Should not return 401 (signature validated)
-        $this->assertNotEquals(401, $response->status());
+        $response->assertOk();
     }
 
     /**
@@ -187,7 +204,12 @@ final class MidtransWebhookSignatureTest extends TestCase
      */
     public function test_invalid_signature_attempts_are_logged(): void
     {
-        Log::fake();
+        Log::shouldReceive('critical')
+            ->once()
+            ->withArgs(fn (string $message, array $context): bool =>
+                str_contains($message, 'POTENTIAL FRAUD')
+                && ($context['order_id'] ?? null) === 'ORDER-LOG-TEST'
+            );
 
         $payload = [
             'order_id' => 'ORDER-LOG-TEST',
@@ -196,10 +218,5 @@ final class MidtransWebhookSignatureTest extends TestCase
         ];
 
         $this->validator->validate($payload, 'invalid_signature');
-
-        Log::assertLogged(
-            fn ($log) => $log->level === 'critical' 
-                && str_contains($log->message, 'POTENTIAL FRAUD')
-        );
     }
 }

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->enum('status', ['draft', 'issued', 'paid', 'overdue', 'cancelled'])->default('draft');
             $table->timestamp('issued_at')->nullable();
             $table->timestamp('due_at')->nullable();
+            $table->timestamp('paid_at')->nullable();
             $table->string('pdf_path')->nullable();
             $table->timestamps();
 

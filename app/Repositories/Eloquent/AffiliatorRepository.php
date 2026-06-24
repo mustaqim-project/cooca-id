@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
  */
 final class AffiliatorRepository extends BaseRepository implements AffiliatorRepositoryInterface
 {
-    public function __construct(private readonly Affiliator $model)
+    public function __construct(Affiliator $model)
     {
         parent::__construct($model);
     }

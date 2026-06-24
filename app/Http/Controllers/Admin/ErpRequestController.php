@@ -58,7 +58,7 @@ final class ErpRequestController extends Controller
             'description' => "ERP request approved for customer {$erpRequest->customer->email}",
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'metadata' => ['erp_request_id' => $erpRequest->id->toString()],
+            'metadata' => ['erp_request_id' => $erpRequest->id],
         ]);
 
         return redirect()->back()->with('success', 'ERP request approved successfully.');
@@ -85,7 +85,7 @@ final class ErpRequestController extends Controller
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'metadata' => [
-                'erp_request_id' => $erpRequest->id->toString(),
+                'erp_request_id' => $erpRequest->id,
                 'reason' => $validated['rejection_reason'],
             ],
         ]);

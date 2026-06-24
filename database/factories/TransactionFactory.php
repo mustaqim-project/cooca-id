@@ -25,6 +25,7 @@ class TransactionFactory extends Factory
             'id' => (string) Str::uuid(),
             'customer_id' => \App\Models\Customer::inRandomOrder()->first()?->id ?? \App\Models\Customer::factory(),
             'subscription_id' => \App\Models\Subscription::inRandomOrder()->first()?->id ?? \App\Models\Subscription::factory(),
+            'type' => fake()->randomElement(['subscription_new', 'subscription_renewal']),
             'invoice_number' => 'INV-' . strtoupper(Str::random(10)),
             'gross_amount' => $grossAmount,
             'voucher_discount' => $voucherDiscount,

@@ -52,7 +52,7 @@ final class PaymentService
 
         if ($response->failed()) {
             Log::error('Midtrans Snap creation failed', [
-                'transaction_id' => $transaction->id->toString(),
+                'transaction_id' => (string) $transaction->id,
                 'response' => $response->body(),
             ]);
 
@@ -63,7 +63,7 @@ final class PaymentService
 
         // Update transaction with Midtrans info
         DB::table('transactions')
-            ->where('id', $transaction->id->toString())
+            ->where('id', (string) $transaction->id)
             ->update([
                 'midtrans_order_id' => $data['order_id'],
                 'midtrans_transaction_id' => $data['transaction_id'] ?? null,
@@ -97,7 +97,7 @@ final class PaymentService
 
             // Log to midtrans_transactions table for idempotency tracking
             MidtransTransaction::create([
-                'transaction_id' => $transaction->id->toString(),
+                'transaction_id' => (string) $transaction->id,
                 'order_id' => $transaction->midtrans_order_id,
                 'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
                 'currency' => $payload['currency'] ?? 'IDR',
@@ -111,7 +111,7 @@ final class PaymentService
             ]);
 
             // Update related invoice
-            $invoice = Invoice::where('transaction_id', $transaction->id->toString())->first();
+            $invoice = Invoice::where('transaction_id', (string) $transaction->id)->first();
             if ($invoice) {
                 $invoice->update([
                     'status' => 'paid',
@@ -133,14 +133,14 @@ final class PaymentService
             ProcessCommissionJob::dispatch($transaction);
 
             Log::info('PaymentService: Transaction marked as paid', [
-                'transaction_id' => $transaction->id->toString(),
+                'transaction_id' => (string) $transaction->id,
                 'invoice_number' => $transaction->invoice_number,
                 'amount' => $transaction->net_amount,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('PaymentService: Failed to mark transaction as paid', [
-                'transaction_id' => $transaction->id->toString(),
+                'transaction_id' => (string) $transaction->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -167,7 +167,7 @@ final class PaymentService
 
             // Log to midtrans_transactions table
             MidtransTransaction::create([
-                'transaction_id' => $transaction->id->toString(),
+                'transaction_id' => (string) $transaction->id,
                 'order_id' => $transaction->midtrans_order_id,
                 'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
                 'currency' => $payload['currency'] ?? 'IDR',
@@ -181,7 +181,7 @@ final class PaymentService
             DB::commit();
 
             Log::info('PaymentService: Transaction marked as pending', [
-                'transaction_id' => $transaction->id->toString(),
+                'transaction_id' => (string) $transaction->id,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -210,7 +210,7 @@ final class PaymentService
 
             // Log to midtrans_transactions table
             MidtransTransaction::create([
-                'transaction_id' => $transaction->id->toString(),
+                'transaction_id' => (string) $transaction->id,
                 'order_id' => $transaction->midtrans_order_id,
                 'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
                 'currency' => $payload['currency'] ?? 'IDR',
@@ -222,7 +222,7 @@ final class PaymentService
             ]);
 
             // Update related invoice
-            $invoice = Invoice::where('transaction_id', $transaction->id->toString())->first();
+            $invoice = Invoice::where('transaction_id', (string) $transaction->id)->first();
             if ($invoice) {
                 $invoice->update(['status' => 'failed']);
             }
@@ -233,7 +233,7 @@ final class PaymentService
             SendPaymentConfirmationJob::dispatch($transaction);
 
             Log::warning('PaymentService: Transaction marked as failed', [
-                'transaction_id' => $transaction->id->toString(),
+                'transaction_id' => (string) $transaction->id,
                 'reason' => $failureReason,
             ]);
         } catch (\Exception $e) {
@@ -262,7 +262,7 @@ final class PaymentService
 
             // Log to midtrans_transactions table
             MidtransTransaction::create([
-                'transaction_id' => $transaction->id->toString(),
+                'transaction_id' => (string) $transaction->id,
                 'order_id' => $transaction->midtrans_order_id,
                 'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
                 'currency' => $payload['currency'] ?? 'IDR',
@@ -274,7 +274,7 @@ final class PaymentService
             ]);
 
             // Update related invoice
-            $invoice = Invoice::where('transaction_id', $transaction->id->toString())->first();
+            $invoice = Invoice::where('transaction_id', (string) $transaction->id)->first();
             if ($invoice) {
                 $invoice->update(['status' => 'refunded']);
             }
@@ -293,7 +293,7 @@ final class PaymentService
             SendPaymentConfirmationJob::dispatch($transaction);
 
             Log::info('PaymentService: Transaction marked as refunded', [
-                'transaction_id' => $transaction->id->toString(),
+                'transaction_id' => (string) $transaction->id,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -346,7 +346,7 @@ final class PaymentService
         }
 
         DB::table('transactions')
-            ->where('id', $transaction->id->toString())
+            ->where('id', (string) $transaction->id)
             ->update($updateData);
 
         return $transaction->fresh();
@@ -382,7 +382,7 @@ final class PaymentService
 
         if ($response->failed()) {
             Log::error('Midtrans refund failed', [
-                'transaction_id' => $transaction->id->toString(),
+                'transaction_id' => (string) $transaction->id,
                 'response' => $response->body(),
             ]);
 
@@ -390,7 +390,7 @@ final class PaymentService
         }
 
         DB::table('transactions')
-            ->where('id', $transaction->id->toString())
+            ->where('id', (string) $transaction->id)
             ->update([
                 'status' => 'refunded',
                 'refunded_at' => now(),

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Notifications\Affiliator;
 
+use App\Traits\HasQueueConfiguration;
+
 use App\Models\AffiliateCommission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,11 +32,11 @@ final class CommissionEarnedNotification extends Notification implements ShouldQ
             ->greeting('Hello ' . $notifiable->name . '!')
             ->line('Congratulations! You have earned a new commission.')
             ->line('Commission Details:')
-            ->line('- Amount: Rp ' . number_format($this->commission->amount, 0, ',', '.'))
+            ->line('- Amount: Rp ' . number_format((float) $this->commission->commission_amount, 0, ',', '.'))
             ->line('- Level: ' . $this->commission->level)
-            ->line('- From Transaction: ' . $this->commission->transaction->invoice->invoice_number ?? 'N/A')
+            ->line('- From Transaction: ' . ($this->commission->transaction?->invoice_number ?? 'N/A'))
             ->line('- Status: ' . ucfirst($this->commission->status))
-            ->action('View Your Wallet', route('affiliator.wallet.index'))
+            ->action('View Commissions', route('affiliator.commissions.index'))
             ->line('Keep promoting COOCA.ID to earn more commissions!')
             ->salutation('Thank you for being part of our affiliate program');
     }
@@ -43,10 +45,10 @@ final class CommissionEarnedNotification extends Notification implements ShouldQ
     {
         return [
             'type' => 'commission_earned',
-            'commission_id' => $this->commission->id->toString(),
-            'amount' => $this->commission->amount,
+            'commission_id' => (string) $this->commission->id,
+            'amount' => $this->commission->commission_amount,
             'level' => $this->commission->level,
-            'message' => 'You have earned a new commission of Rp ' . number_format($this->commission->amount, 0, ',', '.'),
+            'message' => 'You have earned a new commission of Rp ' . number_format((float) $this->commission->commission_amount, 0, ',', '.'),
         ];
     }
 }

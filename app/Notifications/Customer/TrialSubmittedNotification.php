@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Notifications\Customer;
 
+use App\Traits\HasQueueConfiguration;
+
 use App\Models\ErpRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -41,7 +43,7 @@ final class TrialSubmittedNotification extends Notification implements ShouldQue
     {
         return [
             'type' => 'trial_submitted',
-            'erp_request_id' => $this->erpRequest->id->toString(),
+            'erp_request_id' => $this->erpRequest->id,
             'product_name' => $this->erpRequest->product->name,
             'message' => 'Your ERP trial request has been submitted successfully.',
         ];

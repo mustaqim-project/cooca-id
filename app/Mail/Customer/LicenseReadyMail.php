@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Mail\Customer;
 
+use App\Traits\HasQueueConfiguration;
+
 use App\Models\Customer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

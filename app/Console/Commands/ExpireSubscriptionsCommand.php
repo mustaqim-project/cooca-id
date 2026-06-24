@@ -46,12 +46,12 @@ final class ExpireSubscriptionsCommand extends Command
                 $count++;
 
                 Log::info('Subscription expired', [
-                    'subscription_id' => $subscription->id->toString(),
+                    'subscription_id' => $subscription->id,
                     'customer_id' => $subscription->customer_id->toString(),
                 ]);
             } catch (\Exception $e) {
                 Log::error('Failed to expire subscription', [
-                    'subscription_id' => $subscription->id->toString(),
+                    'subscription_id' => $subscription->id,
                     'error' => $e->getMessage(),
                 ]);
             }

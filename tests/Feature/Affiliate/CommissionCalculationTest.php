@@ -9,6 +9,8 @@ use App\Models\Subscription;
 use App\Models\Transaction;
 use App\Models\AffiliateCommission;
 use App\Models\AffiliateWallet;
+use App\Models\Product;
+use App\Models\License;
 use App\Services\Affiliate\CommissionCalculationService;
 use App\Services\Affiliate\RecurringCommissionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -60,16 +62,23 @@ class CommissionCalculationTest extends TestCase
         ]);
 
         // Create plan and subscription
-        $plan = SubscriptionPlan::create([
+        $product = Product::factory()->create();
+        $plan = SubscriptionPlan::factory()->create([
+            'product_id' => $product->id,
             'name' => 'Test Plan',
-            'code' => 'TEST',
             'price' => 100000,
-            'billing_cycle' => 'monthly',
+            'duration_months' => 1,
             'is_active' => true,
+        ]);
+        $license = License::factory()->active()->create([
+            'customer_id' => $customer->id,
+            'product_id' => $product->id,
+            'subscription_plan_id' => $plan->id,
         ]);
 
         $subscription = Subscription::create([
             'customer_id' => $customer->id,
+            'license_id' => $license->id,
             'subscription_plan_id' => $plan->id,
             'status' => 'active',
         ]);
@@ -78,6 +87,7 @@ class CommissionCalculationTest extends TestCase
         $transaction = Transaction::create([
             'customer_id' => $customer->id,
             'subscription_id' => $subscription->id,
+            'invoice_number' => 'INV-AFF-001',
             'type' => 'subscription_new',
             'status' => 'paid',
             'gross_amount' => 100000,
@@ -135,16 +145,23 @@ class CommissionCalculationTest extends TestCase
             'affiliator_id' => $affiliate->id,
         ]);
 
-        $plan = SubscriptionPlan::create([
+        $product = Product::factory()->create();
+        $plan = SubscriptionPlan::factory()->create([
+            'product_id' => $product->id,
             'name' => 'Test Plan',
-            'code' => 'TEST',
             'price' => 100000,
-            'billing_cycle' => 'monthly',
+            'duration_months' => 1,
             'is_active' => true,
+        ]);
+        $license = License::factory()->active()->create([
+            'customer_id' => $customer->id,
+            'product_id' => $product->id,
+            'subscription_plan_id' => $plan->id,
         ]);
 
         $subscription = Subscription::create([
             'customer_id' => $customer->id,
+            'license_id' => $license->id,
             'subscription_plan_id' => $plan->id,
             'status' => 'active',
         ]);
@@ -153,6 +170,7 @@ class CommissionCalculationTest extends TestCase
         $renewalTransaction = Transaction::create([
             'customer_id' => $customer->id,
             'subscription_id' => $subscription->id,
+            'invoice_number' => 'INV-AFF-002',
             'type' => 'subscription_renewal',
             'status' => 'paid',
             'gross_amount' => 100000,
@@ -207,16 +225,23 @@ class CommissionCalculationTest extends TestCase
             'affiliator_id' => null,
         ]);
 
-        $plan = SubscriptionPlan::create([
+        $product = Product::factory()->create();
+        $plan = SubscriptionPlan::factory()->create([
+            'product_id' => $product->id,
             'name' => 'Test Plan',
-            'code' => 'TEST',
             'price' => 100000,
-            'billing_cycle' => 'monthly',
+            'duration_months' => 1,
             'is_active' => true,
+        ]);
+        $license = License::factory()->active()->create([
+            'customer_id' => $customer->id,
+            'product_id' => $product->id,
+            'subscription_plan_id' => $plan->id,
         ]);
 
         $subscription = Subscription::create([
             'customer_id' => $customer->id,
+            'license_id' => $license->id,
             'subscription_plan_id' => $plan->id,
             'status' => 'active',
         ]);
@@ -224,6 +249,7 @@ class CommissionCalculationTest extends TestCase
         $transaction = Transaction::create([
             'customer_id' => $customer->id,
             'subscription_id' => $subscription->id,
+            'invoice_number' => 'INV-AFF-003',
             'type' => 'subscription_new',
             'status' => 'paid',
             'gross_amount' => 100000,

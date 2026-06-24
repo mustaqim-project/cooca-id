@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Notifications\Customer;
 
+use App\Traits\HasQueueConfiguration;
+
 use App\Models\License;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -42,7 +44,7 @@ final class TrialExpiredNotification extends Notification implements ShouldQueue
     {
         return [
             'type' => 'trial_expired',
-            'license_id' => $this->license->id->toString(),
+            'license_id' => $this->license->id,
             'license_code' => $this->license->license_code,
             'expired_at' => $this->license->expires_at->toIso8601String(),
             'message' => 'Your trial period has expired. Please upgrade to continue using our services.',

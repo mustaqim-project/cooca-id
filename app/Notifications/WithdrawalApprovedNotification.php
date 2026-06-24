@@ -2,6 +2,8 @@
 
 namespace App\Notifications;
 
+use App\Traits\HasQueueConfiguration;
+
 use App\Models\AffiliateWithdrawal;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

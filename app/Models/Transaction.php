@@ -38,6 +38,7 @@ final class Transaction extends Model
     protected $fillable = [
         'customer_id',
         'subscription_id',
+        'type',
         'invoice_number',
         'gross_amount',
         'voucher_discount',
@@ -105,6 +106,11 @@ final class Transaction extends Model
     public function affiliateCommissions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(AffiliateCommission::class, 'transaction_id');
+    }
+
+    public function commissions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->affiliateCommissions();
     }
 
     public function scopePaid($query): \Illuminate\Database\Eloquent\Builder

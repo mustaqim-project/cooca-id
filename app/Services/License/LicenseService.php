@@ -89,7 +89,7 @@ final class LicenseService
                 'status' => 'active',
                 'message' => 'License is valid',
                 'license' => [
-                    'id' => $license->id->toString(),
+                    'id' => $license->id,
                     'customer_id' => $license->customer_id->toString(),
                     'product_id' => $license->product_id->toString(),
                     'domain' => $license->domain,

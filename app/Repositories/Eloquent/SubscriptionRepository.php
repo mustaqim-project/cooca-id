@@ -26,6 +26,58 @@ final class SubscriptionRepository extends BaseRepository implements Subscriptio
             ->get();
     }
 
+    public function getByCustomer(string $customerId): Collection
+    {
+        return $this->findByCustomerId($customerId);
+    }
+
+    public function getActiveByCustomer(string $customerId): Collection
+    {
+        return $this->model
+            ->where('customer_id', $customerId)
+            ->active()
+            ->with(['license.product', 'subscriptionPlan'])
+            ->orderBy('expires_at')
+            ->get();
+    }
+
+    public function getByLicense(string $licenseId): Collection
+    {
+        return $this->model
+            ->where('license_id', $licenseId)
+            ->with(['customer', 'license.product', 'subscriptionPlan'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function getByPlan(string $planId): Collection
+    {
+        return $this->model
+            ->where('subscription_plan_id', $planId)
+            ->with(['customer', 'license.product', 'subscriptionPlan'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function getExpiringSoon(int $days = 7): Collection
+    {
+        return $this->getExpiringSubscriptions($days);
+    }
+
+    public function countActive(): int
+    {
+        return $this->model->active()->count();
+    }
+
+    public function customerHasActiveSubscription(string $customerId, string $productId): bool
+    {
+        return $this->model
+            ->where('customer_id', $customerId)
+            ->active()
+            ->whereHas('license', fn ($query) => $query->where('product_id', $productId))
+            ->exists();
+    }
+
     public function getActiveSubscriptions(): Collection
     {
         return $this->model

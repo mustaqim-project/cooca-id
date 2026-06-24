@@ -35,7 +35,12 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
             ->get();
     }
 
-    public function getPendingsByAffiliator(string $affiliatorId): Collection
+    public function getByAffiliator(string $affiliatorId): Collection
+    {
+        return $this->findByAffiliatorId($affiliatorId);
+    }
+
+    public function getPendingByAffiliator(string $affiliatorId): Collection
     {
         return $this->model
             ->where('affiliator_id', $affiliatorId)
@@ -43,6 +48,11 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
             ->with(['transaction', 'customer'])
             ->orderBy('created_at')
             ->get();
+    }
+
+    public function getPendingsByAffiliator(string $affiliatorId): Collection
+    {
+        return $this->getPendingByAffiliator($affiliatorId);
     }
 
     public function getClearedByAffiliator(string $affiliatorId): Collection
@@ -63,6 +73,19 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
             ->sum('commission_amount');
     }
 
+    public function getTotalByAffiliatorAndStatus(string $affiliatorId, string $status): float
+    {
+        return (float) $this->model
+            ->where('affiliator_id', $affiliatorId)
+            ->where('status', $status)
+            ->sum('commission_amount');
+    }
+
+    public function calculatePendingBalance(string $affiliatorId): float
+    {
+        return $this->getTotalByAffiliatorAndStatus($affiliatorId, 'pending');
+    }
+
     public function getTotalClearedBalance(string $affiliatorId): float
     {
         return $this->model
@@ -71,7 +94,21 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
             ->sum('commission_amount');
     }
 
-    public function markAsCleared(string $commissionId): bool
+    public function markAsCleared(array $commissionIds): bool
+    {
+        if ($commissionIds === []) {
+            return true;
+        }
+
+        return $this->model
+            ->whereIn('id', $commissionIds)
+            ->update([
+                'status' => 'cleared',
+                'cleared_at' => Carbon::now(),
+            ]) === count($commissionIds);
+    }
+
+    public function markOneAsCleared(string $commissionId): bool
     {
         $commission = $this->model->find($commissionId);
         
@@ -117,6 +154,29 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
             ->where('affiliator_id', $affiliatorId)
             ->where('level', $level)
             ->with(['transaction', 'customer'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function getByTransaction(string $transactionId): Collection
+    {
+        return $this->findByTransactionId($transactionId);
+    }
+
+    public function getLevel1Commissions(): Collection
+    {
+        return $this->model
+            ->where('level', 1)
+            ->with(['affiliator', 'transaction', 'customer'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function getLevel2Commissions(): Collection
+    {
+        return $this->model
+            ->where('level', 2)
+            ->with(['affiliator', 'transaction', 'customer'])
             ->orderBy('created_at', 'desc')
             ->get();
     }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Notifications\Customer;
 
+use App\Traits\HasQueueConfiguration;
+
 use App\Models\License;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -44,7 +46,7 @@ final class TrialActivatedNotification extends Notification implements ShouldQue
     {
         return [
             'type' => 'trial_activated',
-            'license_id' => $this->license->id->toString(),
+            'license_id' => $this->license->id,
             'license_code' => $this->license->license_code,
             'domain' => $this->license->domain,
             'trial_ends_at' => $this->trialEndsAt->toIso8601String(),

@@ -115,7 +115,7 @@ final class MidtransWebhookController extends Controller
 
                 Log::info('MidtransWebhookController: Webhook processed successfully', [
                     'order_id' => $orderId,
-                    'transaction_id' => $transaction->id->toString(),
+                    'transaction_id' => (string) $transaction->id,
                     'status' => $transactionStatus,
                 ]);
 

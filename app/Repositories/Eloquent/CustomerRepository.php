@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
  */
 final class CustomerRepository extends BaseRepository implements CustomerRepositoryInterface
 {
-    public function __construct(private readonly Customer $model)
+    public function __construct(Customer $model)
     {
         parent::__construct($model);
     }

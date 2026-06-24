@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Notifications\Affiliator;
 
+use App\Traits\HasQueueConfiguration;
+
 use App\Models\AffiliateWithdrawal;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -43,7 +45,7 @@ final class WithdrawalApprovedNotification extends Notification implements Shoul
     {
         return [
             'type' => 'withdrawal_approved',
-            'withdrawal_id' => $this->withdrawal->id->toString(),
+            'withdrawal_id' => $this->withdrawal->id,
             'amount' => $this->withdrawal->amount,
             'message' => 'Your withdrawal of Rp ' . number_format($this->withdrawal->amount, 0, ',', '.') . ' has been approved.',
         ];

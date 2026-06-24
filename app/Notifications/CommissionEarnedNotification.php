@@ -2,6 +2,8 @@
 
 namespace App\Notifications;
 
+use App\Traits\HasQueueConfiguration;
+
 use App\Models\AffiliateCommission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -37,7 +39,7 @@ class CommissionEarnedNotification extends Notification implements ShouldQueue
             ->line('Detail Komisi:')
             ->line('- Jumlah: Rp ' . number_format($this->commission->commission_amount, 0, ',', '.'))
             ->line('- Level: ' . ($this->commission->level === 1 ? 'Level 1 (Direct)' : 'Level 2 (Upline)'))
-            ->line('- Dari Order: ' . $this->commission->order->id)
+            ->line('- Dari Invoice: ' . ($this->commission->transaction?->invoice_number ?? 'N/A'))
             ->line('- Status: Pending (akan cair dalam 7 hari)')
             ->action('Lihat Detail', url('/affiliator/commissions'))
             ->line('Terima kasih telah menjadi bagian dari program afiliasi COOCA.ID!');
@@ -50,10 +52,10 @@ class CommissionEarnedNotification extends Notification implements ShouldQueue
     {
         return [
             'title' => 'Komisi Baru Diterima',
-            'message' => 'Anda menerima komisi Rp ' . number_format($this->commission->commission_amount, 0, ',', '.') . ' dari order #' . $this->commission->order->id,
+            'message' => 'Anda menerima komisi Rp ' . number_format((float) $this->commission->commission_amount, 0, ',', '.') . ' dari invoice ' . ($this->commission->transaction?->invoice_number ?? 'N/A'),
             'type' => 'commission_earned',
             'commission_id' => $this->commission->id,
-            'order_id' => $this->commission->order_id,
+            'transaction_id' => $this->commission->transaction_id,
             'amount' => $this->commission->commission_amount,
             'url' => '/affiliator/commissions',
         ];

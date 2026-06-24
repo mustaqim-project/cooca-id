@@ -46,10 +46,10 @@ final class TrialActivationService
             ]);
 
             LicenseLog::log(
-                $license->id->toString(),
+                $license->id,
                 LicenseLog::ACTION_GENERATED,
                 'License generated for trial activation',
-                ['erp_request_id' => $erpRequest->id->toString(), 'trial_days' => $trialDays],
+                ['erp_request_id' => $erpRequest->id, 'trial_days' => $trialDays],
                 request()->ip(),
                 request()->userAgent()
             );
@@ -112,7 +112,7 @@ final class TrialActivationService
             ]);
         }
 
-        return $plan->id->toString();
+        return $plan->id;
     }
 
     private function generateUniqueCode(): string
@@ -134,9 +134,9 @@ final class TrialActivationService
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
             'metadata' => [
-                'erp_request_id' => $erpRequest->id->toString(),
+                'erp_request_id' => $erpRequest->id,
                 'customer_id' => $erpRequest->customer_id->toString(),
-                'license_id' => $license->id->toString(),
+                'license_id' => $license->id,
                 'license_code' => $license->license_code,
             ],
         ]);

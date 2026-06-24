@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 final class Affiliator extends Authenticatable
 {
@@ -42,6 +44,23 @@ final class Affiliator extends Authenticatable
             ...parent::casts(),
             'balance' => 'decimal:2',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Affiliator $affiliator): void {
+            if (blank($affiliator->password)) {
+                $affiliator->password = Hash::make(Str::random(32));
+            }
+
+            if (blank($affiliator->referral_code)) {
+                do {
+                    $code = strtoupper(Str::random(8));
+                } while (self::where('referral_code', $code)->exists());
+
+                $affiliator->referral_code = $code;
+            }
+        });
     }
 
     public function parent(): BelongsTo

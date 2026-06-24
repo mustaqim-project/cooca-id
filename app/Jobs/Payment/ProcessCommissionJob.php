@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Jobs\Payment;
 
-use App\Events\Affiliate\CommissionCalculated;
 use App\Models\Transaction;
 use App\Services\Affiliate\AffiliateService;
 use Illuminate\Bus\Queueable;
@@ -27,8 +26,6 @@ final class ProcessCommissionJob implements ShouldQueue
     {
         try {
             $affiliateService->processCommissions($this->transaction);
-            
-            CommissionCalculated::dispatch($this->transaction);
         } catch (\Throwable $e) {
             report($e);
             throw $e;

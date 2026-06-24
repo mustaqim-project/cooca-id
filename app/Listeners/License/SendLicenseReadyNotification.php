@@ -12,7 +12,10 @@ final class SendLicenseReadyNotification
     {
         SendLicenseReadyJob::dispatch(
             $event->license->customer,
-            $event->license,
+            $event->license->license_code,
+            $event->license->token_code,
+            $event->license->domain,
+            $event->license->product?->name ?? 'COOCA ERP',
         );
     }
 }
