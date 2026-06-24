@@ -17,24 +17,26 @@ final class AffiliateWithdrawal extends Model
     protected $fillable = [
         'affiliator_id',
         'amount',
-        'bank_name',
+        'fee',
+        'net_amount',
+        'withdrawal_method',
         'account_number',
-        'account_holder',
-        'notes',
+        'account_name',
         'status',
         'approved_by',
         'approved_at',
-        'rejected_by',
         'rejected_at',
         'rejection_reason',
-        'requested_at',
+        'paid_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'fee' => 'decimal:2',
+        'net_amount' => 'decimal:2',
         'approved_at' => 'datetime',
         'rejected_at' => 'datetime',
-        'requested_at' => 'datetime',
+        'paid_at' => 'datetime',
     ];
 
     public const STATUS_PENDING = 'pending';
@@ -64,7 +66,27 @@ final class AffiliateWithdrawal extends Model
 
     public function rejector(): BelongsTo
     {
-        return $this->belongsTo(Admin::class, 'rejected_by');
+        return $this->belongsTo(Admin::class, 'approved_by');
+    }
+
+    public function getPaymentMethodAttribute(): ?string
+    {
+        return $this->withdrawal_method;
+    }
+
+    public function getMethodAttribute(): ?string
+    {
+        return $this->withdrawal_method;
+    }
+
+    public function getBankNameAttribute(): ?string
+    {
+        return $this->withdrawal_method;
+    }
+
+    public function getAccountHolderAttribute(): ?string
+    {
+        return $this->account_name;
     }
 
     public function getFormattedAmountAttribute(): string

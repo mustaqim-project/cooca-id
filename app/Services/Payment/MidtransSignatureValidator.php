@@ -2,6 +2,7 @@
 
 namespace App\Services\Payment;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -15,8 +16,8 @@ final class MidtransSignatureValidator
 
     public function __construct()
     {
-        $this->serverKey = config('services.midtrans.server_key', '');
-        $this->sandbox = config('services.midtrans.sandbox', true);
+        $this->serverKey = (string) Setting::get('payment.midtrans_server_key', config('services.midtrans.server_key', ''));
+        $this->sandbox = (bool) Setting::get('payment.midtrans_sandbox', config('services.midtrans.sandbox', true));
     }
 
     /**

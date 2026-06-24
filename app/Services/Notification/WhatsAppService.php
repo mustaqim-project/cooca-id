@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services\Notification;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -13,7 +14,7 @@ final class WhatsAppService
 
     public function __construct()
     {
-        $this->token = config('services.fonnte.token', '');
+        $this->token = (string) Setting::get('notification.fonnte_token', config('services.fonnte.token', ''));
     }
 
     /**

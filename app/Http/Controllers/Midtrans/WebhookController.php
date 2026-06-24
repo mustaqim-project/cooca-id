@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Midtrans;
 
 use App\Http\Controllers\Controller;
 use App\Models\MidtransTransaction;
+use App\Models\Setting;
 use App\Models\Transaction;
 use App\Services\Payment\PaymentService;
 use Illuminate\Http\Request;
@@ -175,7 +176,7 @@ class WebhookController extends Controller
             }
         }
 
-        $serverKey = config('services.midtrans.server_key');
+        $serverKey = Setting::get('payment.midtrans_server_key', config('services.midtrans.server_key'));
         
         if (empty($serverKey)) {
             Log::error('Midtrans webhook: Server key not configured');

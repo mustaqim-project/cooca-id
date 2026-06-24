@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTOs\Affiliate;
 
+use App\Models\Setting;
 use Ramsey\Uuid\UuidInterface;
 
 final readonly class CommissionData
@@ -49,13 +50,13 @@ final readonly class CommissionData
 
     /**
      * Calculate commission amount based on gross amount and level
-     * L1 = 25%, L2 = 5% of GROSS_AMOUNT (not net_amount)
+     * L1 and L2 percentages are configured in database settings.
      */
     public static function calculateCommission(float $grossAmount, int $level): float
     {
         $percent = match ($level) {
-            1 => 25.0,
-            2 => 5.0,
+            1 => (float) Setting::get('affiliate.commission_rate_level_1', config('affiliate.commission_rate_level_1', 25)),
+            2 => (float) Setting::get('affiliate.commission_rate_level_2', config('affiliate.commission_rate_level_2', 5)),
             default => 0.0,
         };
 

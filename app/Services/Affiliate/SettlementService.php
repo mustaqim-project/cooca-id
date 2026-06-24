@@ -18,7 +18,7 @@ class SettlementService
 
         // Get all pending commissions that are older than the settlement period (e.g., 7 days)
         $pendingCommissions = AffiliateCommission::where('status', 'pending')
-            ->where('calculated_at', '<=', now()->subDays(7))
+            ->where('created_at', '<=', now()->subDays(7))
             ->get();
 
         DB::beginTransaction();
@@ -26,17 +26,18 @@ class SettlementService
             foreach ($pendingCommissions as $commission) {
                 // Update commission status
                 $commission->update([
-                    'status' => 'settled',
-                    'settled_at' => now(),
+                    'status' => 'cleared',
+                    'cleared_at' => now(),
                 ]);
 
                 // Move from pending_balance to balance in wallet
-                $wallet = AffiliateWallet::where('affiliator_id', $commission->affiliate_id)->first();
+                $wallet = AffiliateWallet::firstOrCreate(
+                    ['affiliator_id' => $commission->affiliator_id],
+                    ['balance' => 0, 'pending_balance' => 0]
+                );
                 
-                if ($wallet) {
-                    $wallet->decrement('pending_balance', $commission->commission_amount);
-                    $wallet->increment('balance', $commission->commission_amount);
-                }
+                $wallet->decrement('pending_balance', $commission->commission_amount);
+                $wallet->increment('balance', $commission->commission_amount);
 
                 $settledCount++;
             }
@@ -74,11 +75,11 @@ class SettlementService
         $pendingAmount = AffiliateCommission::where('status', 'pending')->sum('commission_amount');
         
         $readyToSettle = AffiliateCommission::where('status', 'pending')
-            ->where('calculated_at', '<=', now()->subDays(7))
+            ->where('created_at', '<=', now()->subDays(7))
             ->count();
         
         $readyToSettleAmount = AffiliateCommission::where('status', 'pending')
-            ->where('calculated_at', '<=', now()->subDays(7))
+            ->where('created_at', '<=', now()->subDays(7))
             ->sum('commission_amount');
 
         return [

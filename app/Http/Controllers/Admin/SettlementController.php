@@ -8,6 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\AffiliateWithdrawalResource;
 use App\Services\Affiliate\AffiliateService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,14 +28,27 @@ final class SettlementController extends Controller
         $withdrawals = $this->affiliateService->getWithdrawalsPaginated(15);
 
         return Inertia::render('Admin/Settlements/Index', [
-            'withdrawals' => AffiliateWithdrawalResource::collection($withdrawals),
+            'settlements' => AffiliateWithdrawalResource::collection($withdrawals),
+        ]);
+    }
+
+    public function show(string $id): Response
+    {
+        $withdrawal = $this->affiliateService->findWithdrawalById($id);
+
+        if (!$withdrawal) {
+            abort(404, 'Withdrawal not found');
+        }
+
+        return Inertia::render('Admin/Settlements/Show', [
+            'settlement' => (new AffiliateWithdrawalResource($withdrawal))->resolve(),
         ]);
     }
 
     /**
      * Approve the specified withdrawal request.
      */
-    public function approve(string $id, string $adminId): JsonResponse
+    public function approve(string $id): RedirectResponse|JsonResponse
     {
         $withdrawal = $this->affiliateService->findWithdrawalById($id);
 
@@ -40,7 +56,14 @@ final class SettlementController extends Controller
             return response()->json(['message' => 'Withdrawal not found'], 404);
         }
 
-        $this->affiliateService->approveWithdrawal($id, $adminId);
+        $adminId = Auth::guard('admin')->id();
+        abort_if($adminId === null, 403);
+
+        $this->affiliateService->approveWithdrawal($id, (string) $adminId);
+
+        if (!request()->expectsJson()) {
+            return back()->with('success', 'Withdrawal approved successfully');
+        }
 
         return response()->json([
             'message' => 'Withdrawal approved successfully',
@@ -51,7 +74,7 @@ final class SettlementController extends Controller
     /**
      * Reject the specified withdrawal request.
      */
-    public function reject(string $id, string $adminId, string $reason): JsonResponse
+    public function reject(Request $request, string $id): RedirectResponse|JsonResponse
     {
         $withdrawal = $this->affiliateService->findWithdrawalById($id);
 
@@ -59,7 +82,16 @@ final class SettlementController extends Controller
             return response()->json(['message' => 'Withdrawal not found'], 404);
         }
 
-        $this->affiliateService->rejectWithdrawal($id, $adminId, $reason);
+        $reason = (string) $request->input('reason', 'Rejected by admin');
+
+        $adminId = Auth::guard('admin')->id();
+        abort_if($adminId === null, 403);
+
+        $this->affiliateService->rejectWithdrawal($id, (string) $adminId, $reason);
+
+        if (!$request->expectsJson()) {
+            return back()->with('success', 'Withdrawal rejected');
+        }
 
         return response()->json([
             'message' => 'Withdrawal rejected',

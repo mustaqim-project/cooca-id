@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Models\MidtransTransaction;
 use App\Models\Invoice;
 use App\Models\Subscription;
+use App\Models\Setting;
 use App\Jobs\Notification\SendPaymentConfirmationJob;
 use App\Jobs\Payment\ProcessCommissionJob;
 use App\Jobs\Subscription\ActivateSubscriptionJob;
@@ -23,8 +24,8 @@ final class PaymentService
 
     public function __construct()
     {
-        $this->midtransServerKey = config('services.midtrans.server_key', '');
-        $this->midtransSandbox = config('services.midtrans.sandbox', true);
+        $this->midtransServerKey = (string) Setting::get('payment.midtrans_server_key', config('services.midtrans.server_key', ''));
+        $this->midtransSandbox = (bool) Setting::get('payment.midtrans_sandbox', config('services.midtrans.sandbox', true));
     }
 
     /**

@@ -2,33 +2,32 @@
 
 namespace App\Services\Affiliate;
 
-use App\Models\User;
+use App\Models\Affiliator;
 use App\Models\AffiliateWallet;
 use App\Models\AffiliateWithdrawal;
-use App\Models\AffiliateCommission;
+use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 
 class WithdrawalService
 {
     /**
-     * Minimum withdrawal amount
-     */
-    const MINIMUM_WITHDRAWAL = 100000; // IDR
-
-    /**
      * Create a withdrawal request
      */
-    public function createWithdrawal(User $affiliate, array $data): AffiliateWithdrawal
+    public function createWithdrawal(Affiliator $affiliate, array $data): AffiliateWithdrawal
     {
         DB::beginTransaction();
         try {
-            $wallet = AffiliateWallet::where('affiliator_id', $affiliate->id)->firstOrFail();
+            $wallet = AffiliateWallet::firstOrCreate(
+                ['affiliator_id' => $affiliate->id],
+                ['balance' => 0, 'pending_balance' => 0]
+            );
             
             $amount = (float) ($data['amount'] ?? 0);
+            $minimumWithdrawal = (float) Setting::get('affiliate.minimum_withdrawal', config('affiliate.minimum_withdrawal', 50000));
 
             // Validate minimum amount
-            if ($amount < self::MINIMUM_WITHDRAWAL) {
-                throw new \InvalidArgumentException("Minimum withdrawal is Rp " . number_format(self::MINIMUM_WITHDRAWAL, 0, ',', '.'));
+            if ($amount < $minimumWithdrawal) {
+                throw new \InvalidArgumentException("Minimum withdrawal is Rp " . number_format($minimumWithdrawal, 0, ',', '.'));
             }
 
             // Validate sufficient balance
@@ -38,17 +37,23 @@ class WithdrawalService
 
             // Deduct from wallet
             $wallet->decrement('balance', $amount);
+            $affiliate->decrement('balance', $amount);
+
+            $withdrawalMethod = $data['withdrawal_method'] ?? $data['method'] ?? 'bank';
+            $fee = $withdrawalMethod === 'bank'
+                ? (float) Setting::get('affiliate.withdrawal_fee_bank', config('affiliate.withdrawal_fee_bank', 2500))
+                : (float) Setting::get('affiliate.withdrawal_fee_ewallet', config('affiliate.withdrawal_fee_ewallet', 1000));
 
             // Create withdrawal request
             $withdrawal = AffiliateWithdrawal::create([
-                'affiliate_id' => $affiliate->id,
+                'affiliator_id' => $affiliate->id,
                 'amount' => $amount,
-                'bank_name' => $data['bank_name'],
+                'fee' => $fee,
+                'net_amount' => max(0, $amount - $fee),
+                'withdrawal_method' => $withdrawalMethod,
                 'account_number' => $data['account_number'],
-                'account_holder' => $data['account_holder'],
-                'notes' => $data['notes'] ?? null,
+                'account_name' => $data['account_name'] ?? $data['account_holder'] ?? $affiliate->name,
                 'status' => 'pending',
-                'requested_at' => now(),
             ]);
 
             DB::commit();
@@ -95,7 +100,7 @@ class WithdrawalService
                 'user_type' => 'admin',
                 'action' => 'withdrawal_approved',
                 'module' => 'Affiliate',
-                'description' => "Withdrawal approved for user {$withdrawal->affiliate_id}",
+                'description' => "Withdrawal approved for user {$withdrawal->affiliator_id}",
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
                 'metadata' => [
@@ -105,7 +110,7 @@ class WithdrawalService
             ]);
 
             // Send notification
-            $withdrawal->affiliate->notify(
+            $withdrawal->affiliator->notify(
                 new \App\Notifications\WithdrawalApprovedNotification($withdrawal)
             );
 
@@ -124,12 +129,13 @@ class WithdrawalService
         DB::beginTransaction();
         try {
             // Refund to wallet
-            $wallet = AffiliateWallet::where('affiliator_id', $withdrawal->affiliate_id)->firstOrFail();
+            $wallet = AffiliateWallet::where('affiliator_id', $withdrawal->affiliator_id)->firstOrFail();
             $wallet->increment('balance', $withdrawal->amount);
+            $withdrawal->affiliator?->increment('balance', $withdrawal->amount);
 
             $withdrawal->update([
                 'status' => 'rejected',
-                'rejected_by' => $processedBy,
+                'approved_by' => $processedBy,
                 'rejected_at' => now(),
                 'rejection_reason' => $reason,
             ]);
@@ -140,7 +146,7 @@ class WithdrawalService
                 'user_type' => 'admin',
                 'action' => 'withdrawal_rejected',
                 'module' => 'Affiliate',
-                'description' => "Withdrawal rejected for user {$withdrawal->affiliate_id}: {$reason}",
+                'description' => "Withdrawal rejected for user {$withdrawal->affiliator_id}: {$reason}",
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
                 'metadata' => [
@@ -150,7 +156,7 @@ class WithdrawalService
             ]);
 
             // Send notification
-            $withdrawal->affiliate->notify(
+            $withdrawal->affiliator->notify(
                 new \App\Notifications\WithdrawalRejectedNotification($withdrawal, $reason)
             );
 
@@ -164,13 +170,13 @@ class WithdrawalService
     /**
      * Get withdrawal statistics for an affiliate
      */
-    public function getStatistics(User $affiliate): array
+    public function getStatistics(Affiliator $affiliate): array
     {
-        $totalWithdrawn = AffiliateWithdrawal::where('affiliate_id', $affiliate->id)
+        $totalWithdrawn = AffiliateWithdrawal::where('affiliator_id', $affiliate->id)
             ->where('status', 'approved')
             ->sum('amount');
 
-        $pendingWithdrawals = AffiliateWithdrawal::where('affiliate_id', $affiliate->id)
+        $pendingWithdrawals = AffiliateWithdrawal::where('affiliator_id', $affiliate->id)
             ->where('status', 'pending')
             ->sum('amount');
 

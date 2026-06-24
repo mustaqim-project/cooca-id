@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Services\Affiliate;
 
+use App\Models\AffiliateWallet;
 use App\Models\Affiliator;
 use App\Models\Transaction;
 use App\Models\AffiliateCommission;
+use App\Models\AffiliateWithdrawal;
+use App\Models\Setting;
 use App\DTOs\Affiliate\CommissionData;
 use App\Repositories\Contracts\AffiliateCommissionRepositoryInterface;
 use App\Repositories\Contracts\AffiliatorRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 final class AffiliateService
 {
-    // Commission percentages (from GROSS_AMOUNT, not net_amount)
-    private const float L1_COMMISSION_PERCENT = 25.0;
-    private const float L2_COMMISSION_PERCENT = 5.0;
-
     public function __construct(
         private readonly AffiliateCommissionRepositoryInterface $commissionRepository,
         private readonly AffiliatorRepositoryInterface $affiliatorRepository,
@@ -43,6 +43,7 @@ final class AffiliateService
             // Level 1: Direct referrer (25% of gross_amount)
             $l1Affiliator = $customer->affiliator;
             if ($l1Affiliator) {
+                $l1CommissionPercent = $this->commissionPercent(1);
                 $l1CommissionAmount = CommissionData::calculateCommission(
                     $transaction->gross_amount,
                     1
@@ -54,20 +55,20 @@ final class AffiliateService
                     customerId: $customer->id,
                     level: 1,
                     grossAmount: $transaction->gross_amount,
-                    commissionPercent: self::L1_COMMISSION_PERCENT,
+                    commissionPercent: $l1CommissionPercent,
                     commissionAmount: $l1CommissionAmount,
                 );
 
                 $commissions[] = $l1Commission;
                 $totalCommission += $l1CommissionAmount;
 
-                // Update L1 affiliator balance
-                $this->updateAffiliatorBalance($l1Affiliator->id, $l1CommissionAmount);
+                $this->incrementPendingBalance($l1Affiliator->id, $l1CommissionAmount);
 
                 // Level 2: Parent affiliator (5% of gross_amount)
                 if ($l1Affiliator->parent_affiliator_id) {
                     $l2Affiliator = $l1Affiliator->parent;
                     if ($l2Affiliator) {
+                        $l2CommissionPercent = $this->commissionPercent(2);
                         $l2CommissionAmount = CommissionData::calculateCommission(
                             $transaction->gross_amount,
                             2
@@ -79,15 +80,14 @@ final class AffiliateService
                             customerId: $customer->id,
                             level: 2,
                             grossAmount: $transaction->gross_amount,
-                            commissionPercent: self::L2_COMMISSION_PERCENT,
+                            commissionPercent: $l2CommissionPercent,
                             commissionAmount: $l2CommissionAmount,
                         );
 
                         $commissions[] = $l2Commission;
                         $totalCommission += $l2CommissionAmount;
 
-                        // Update L2 affiliator balance
-                        $this->updateAffiliatorBalance($l2Affiliator->id, $l2CommissionAmount);
+                        $this->incrementPendingBalance($l2Affiliator->id, $l2CommissionAmount);
                     }
                 }
             }
@@ -103,9 +103,9 @@ final class AffiliateService
      * Create a commission record
      */
     private function createCommission(
-        \Ramsey\Uuid\UuidInterface $affiliatorId,
-        \Ramsey\Uuid\UuidInterface $transactionId,
-        \Ramsey\Uuid\UuidInterface $customerId,
+        string $affiliatorId,
+        string $transactionId,
+        string $customerId,
         int $level,
         float $grossAmount,
         float $commissionPercent,
@@ -123,13 +123,34 @@ final class AffiliateService
         ]);
     }
 
-    /**
-     * Update affiliator balance
-     */
-    private function updateAffiliatorBalance(\Ramsey\Uuid\UuidInterface $affiliatorId, float $amount): void
+    private function commissionPercent(int $level): float
     {
+        return match ($level) {
+            1 => (float) Setting::get('affiliate.commission_rate_level_1', config('affiliate.commission_rate_level_1', 25)),
+            2 => (float) Setting::get('affiliate.commission_rate_level_2', config('affiliate.commission_rate_level_2', 5)),
+            default => 0.0,
+        };
+    }
+
+    private function wallet(string $affiliatorId): AffiliateWallet
+    {
+        return AffiliateWallet::firstOrCreate(
+            ['affiliator_id' => $affiliatorId],
+            ['balance' => 0, 'pending_balance' => 0]
+        );
+    }
+
+    private function incrementPendingBalance(string $affiliatorId, float $amount): void
+    {
+        $this->wallet($affiliatorId)->increment('pending_balance', $amount);
+    }
+
+    private function incrementAvailableBalance(string $affiliatorId, float $amount): void
+    {
+        $this->wallet($affiliatorId)->increment('balance', $amount);
+
         DB::table('affiliators')
-            ->where('id', $affiliatorId->toString())
+            ->where('id', $affiliatorId)
             ->increment('balance', $amount);
     }
 
@@ -145,8 +166,11 @@ final class AffiliateService
                 'status' => 'cancelled',
             ]);
 
-            // Deduct from affiliator balance
-            $this->updateAffiliatorBalance($commission->affiliator_id, -$commission->commission_amount);
+            if ($commission->status === AffiliateCommission::STATUS_CLEARED) {
+                $this->incrementAvailableBalance($commission->affiliator_id, -(float) $commission->commission_amount);
+            } else {
+                $this->incrementPendingBalance($commission->affiliator_id, -(float) $commission->commission_amount);
+            }
         }
     }
 
@@ -157,13 +181,20 @@ final class AffiliateService
     {
         $clearedCount = 0;
 
-        $commissions = $this->commissionRepository->getPendingCommissionsBefore($beforeDate);
+        $commissions = AffiliateCommission::query()
+            ->where('status', AffiliateCommission::STATUS_PENDING)
+            ->where('created_at', '<=', $beforeDate)
+            ->get();
 
         foreach ($commissions as $commission) {
             $this->commissionRepository->update($commission->id, [
-                'status' => 'cleared',
+                'status' => AffiliateCommission::STATUS_CLEARED,
                 'cleared_at' => now(),
             ]);
+
+            $this->incrementPendingBalance($commission->affiliator_id, -(float) $commission->commission_amount);
+            $this->incrementAvailableBalance($commission->affiliator_id, (float) $commission->commission_amount);
+
             $clearedCount++;
         }
 
@@ -175,7 +206,13 @@ final class AffiliateService
      */
     public function getTotalCommission(Affiliator $affiliator, ?string $status = null): float
     {
-        return $this->commissionRepository->getTotalByAffiliator($affiliator->id, $status);
+        $query = AffiliateCommission::query()->where('affiliator_id', $affiliator->id);
+
+        if ($status !== null) {
+            $query->where('status', $status);
+        }
+
+        return (float) $query->sum('commission_amount');
     }
 
     /**
@@ -184,8 +221,156 @@ final class AffiliateService
     public function getCommissionBreakdown(Affiliator $affiliator): array
     {
         return [
-            'level_1' => $this->commissionRepository->getTotalByAffiliatorAndLevel($affiliator->id, 1),
-            'level_2' => $this->commissionRepository->getTotalByAffiliatorAndLevel($affiliator->id, 2),
+            'level_1' => (float) AffiliateCommission::query()
+                ->where('affiliator_id', $affiliator->id)
+                ->where('level', 1)
+                ->sum('commission_amount'),
+            'level_2' => (float) AffiliateCommission::query()
+                ->where('affiliator_id', $affiliator->id)
+                ->where('level', 2)
+                ->sum('commission_amount'),
         ];
+    }
+
+    public function getAvailableBalance(string $affiliatorId): float
+    {
+        return (float) $this->wallet($affiliatorId)->balance;
+    }
+
+    public function requestWithdrawal(
+        string $affiliatorId,
+        float $amount,
+        string $withdrawalMethod,
+        string $accountNumber,
+        string $accountName
+    ): AffiliateWithdrawal {
+        return DB::transaction(function () use ($affiliatorId, $amount, $withdrawalMethod, $accountNumber, $accountName) {
+            $minimumWithdrawal = (float) Setting::get('affiliate.minimum_withdrawal', config('affiliate.minimum_withdrawal', 50000));
+            if ($amount < $minimumWithdrawal) {
+                throw new \InvalidArgumentException('Minimum withdrawal is Rp ' . number_format($minimumWithdrawal, 0, ',', '.'));
+            }
+
+            $this->wallet($affiliatorId);
+
+            $wallet = AffiliateWallet::query()
+                ->where('affiliator_id', $affiliatorId)
+                ->lockForUpdate()
+                ->first();
+            if (!$wallet || (float) $wallet->balance < $amount) {
+                throw new \InvalidArgumentException('Insufficient wallet balance');
+            }
+
+            $fee = $this->withdrawalFee($withdrawalMethod);
+            $netAmount = max(0, $amount - $fee);
+
+            $wallet->decrement('balance', $amount);
+            DB::table('affiliators')->where('id', $affiliatorId)->decrement('balance', $amount);
+
+            return AffiliateWithdrawal::create([
+                'affiliator_id' => $affiliatorId,
+                'amount' => $amount,
+                'fee' => $fee,
+                'net_amount' => $netAmount,
+                'withdrawal_method' => $withdrawalMethod,
+                'account_number' => $accountNumber,
+                'account_name' => $accountName,
+                'status' => AffiliateWithdrawal::STATUS_PENDING,
+            ]);
+        });
+    }
+
+    public function getWithdrawals(string $affiliatorId, int $perPage = 15): LengthAwarePaginator
+    {
+        return AffiliateWithdrawal::query()
+            ->where('affiliator_id', $affiliatorId)
+            ->latest()
+            ->paginate($perPage);
+    }
+
+    public function getWithdrawalHistory(string $affiliatorId)
+    {
+        return AffiliateWithdrawal::query()
+            ->where('affiliator_id', $affiliatorId)
+            ->latest()
+            ->get();
+    }
+
+    public function getWithdrawalById(string $id, string $affiliatorId): ?AffiliateWithdrawal
+    {
+        return AffiliateWithdrawal::query()
+            ->where('id', $id)
+            ->where('affiliator_id', $affiliatorId)
+            ->first();
+    }
+
+    public function getWithdrawalsPaginated(int $perPage = 15): LengthAwarePaginator
+    {
+        return AffiliateWithdrawal::query()
+            ->with('affiliator')
+            ->latest()
+            ->paginate($perPage);
+    }
+
+    public function findWithdrawalById(string $id): ?AffiliateWithdrawal
+    {
+        return AffiliateWithdrawal::query()
+            ->with('affiliator')
+            ->find($id);
+    }
+
+    public function approveWithdrawal(string $id, string $adminId): void
+    {
+        AffiliateWithdrawal::query()
+            ->where('id', $id)
+            ->where('status', AffiliateWithdrawal::STATUS_PENDING)
+            ->update([
+                'status' => AffiliateWithdrawal::STATUS_APPROVED,
+                'approved_by' => $adminId,
+                'approved_at' => now(),
+            ]);
+    }
+
+    public function rejectWithdrawal(string $id, string $adminId, string $reason): void
+    {
+        DB::transaction(function () use ($id, $adminId, $reason): void {
+            $withdrawal = AffiliateWithdrawal::query()
+                ->where('id', $id)
+                ->where('status', AffiliateWithdrawal::STATUS_PENDING)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $this->incrementAvailableBalance($withdrawal->affiliator_id, (float) $withdrawal->amount);
+
+            $withdrawal->update([
+                'status' => AffiliateWithdrawal::STATUS_REJECTED,
+                'approved_by' => $adminId,
+                'rejected_at' => now(),
+                'rejection_reason' => $reason,
+            ]);
+        });
+    }
+
+    public function markWithdrawalAsPaid(string $id): void
+    {
+        AffiliateWithdrawal::query()
+            ->where('id', $id)
+            ->where('status', AffiliateWithdrawal::STATUS_APPROVED)
+            ->update([
+                'status' => AffiliateWithdrawal::STATUS_PAID,
+                'paid_at' => now(),
+            ]);
+    }
+
+    private function withdrawalFee(string $withdrawalMethod): float
+    {
+        $settingKey = $withdrawalMethod === 'bank'
+            ? 'affiliate.withdrawal_fee_bank'
+            : 'affiliate.withdrawal_fee_ewallet';
+
+        $configKey = $withdrawalMethod === 'bank'
+            ? 'affiliate.withdrawal_fee_bank'
+            : 'affiliate.withdrawal_fee_ewallet';
+
+        return (float) Setting::get($settingKey, config($configKey, 0));
     }
 }

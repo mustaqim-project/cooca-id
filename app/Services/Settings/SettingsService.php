@@ -64,9 +64,9 @@ class SettingsService
     public function getCommissionRate(int $level): float
     {
         $key = match ($level) {
-            1 => 'affiliate_commission_level_1',
-            2 => 'affiliate_commission_level_2',
-            default => 'affiliate_commission_level_' . $level,
+            1 => 'affiliate.commission_rate_level_1',
+            2 => 'affiliate.commission_rate_level_2',
+            default => 'affiliate.commission_rate_level_' . $level,
         };
 
         return (float) $this->get($key, $level === 1 ? 25.0 : 5.0);
@@ -77,7 +77,7 @@ class SettingsService
      */
     public function getTrialDuration(): int
     {
-        return (int) $this->get('trial_duration_days', 14);
+        return (int) $this->get('subscription.trial_duration_days', config('affiliate.trial_duration_days', 14));
     }
 
     /**
@@ -85,7 +85,7 @@ class SettingsService
      */
     public function getWithdrawalFee(): float
     {
-        return (float) $this->get('withdrawal_fee', 0);
+        return (float) $this->get('affiliate.withdrawal_fee_bank', config('affiliate.withdrawal_fee_bank', 0));
     }
 
     /**
