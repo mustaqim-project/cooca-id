@@ -116,6 +116,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
+Route::get('/login', [LandingController::class, 'showCustomerLogin'])->name('login');
+
 // Legal Pages Routes (CMS Managed)
-Route::get('/terms-of-service', [LandingController::class, 'terms'])->name('page.terms');
-Route::get('/privacy-policy', [LandingController::class, 'privacy'])->name('page.privacy');

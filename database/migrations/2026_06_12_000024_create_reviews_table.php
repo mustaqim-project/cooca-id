@@ -34,10 +34,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('approved_by')
-                ->references('id')
-                ->on('admins')
-                ->nullOnDelete();
+            
 
             $table->index('reviewer_type');
             $table->index('rating');

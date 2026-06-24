@@ -43,7 +43,7 @@ return [
     ],
 
     'fonnte' => [
-        'token' => env('FONNTE_TOKEN'),
+        'token' => env('FONNTE_API_KEY'),
     ],
 
     'google' => [

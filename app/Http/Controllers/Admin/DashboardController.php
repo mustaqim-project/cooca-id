@@ -28,10 +28,10 @@ final class DashboardController extends Controller
     public function index(): Response
     {
         // Revenue Statistics
-        $totalRevenue = Transaction::where('status', 'paid')->sum('amount');
+        $totalRevenue = Transaction::where('status', 'paid')->sum('net_amount');
         $monthlyRevenue = Transaction::where('status', 'paid')
             ->whereMonth('created_at', now()->month)
-            ->sum('amount');
+            ->sum('net_amount');
         
         // Customer Statistics
         $totalCustomers = Customer::count();
