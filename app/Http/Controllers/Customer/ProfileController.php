@@ -9,7 +9,7 @@ use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Inertia\Inertia;
+
 
 /**
  * Customer Profile Controller
@@ -25,7 +25,7 @@ class ProfileController extends Controller
     {
         $customer = Auth::guard('customer')->user();
 
-        return Inertia::render('Customer/Profile/Edit', [
+        return view('customer.profile.edit', [
             'customer' => $customer,
         ]);
     }

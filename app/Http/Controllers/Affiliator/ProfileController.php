@@ -9,7 +9,7 @@ use App\Models\Affiliator as AffiliatorModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Inertia\Inertia;
+
 
 /**
  * Affiliator Profile Controller
@@ -25,7 +25,7 @@ class ProfileController extends Controller
     {
         $affiliator = Auth::guard('affiliator')->user();
 
-        return Inertia::render('Affiliator/Profile/Edit', [
+        return view('affiliator.profile.edit', [
             'user' => [
                 'id' => $affiliator->id,
                 'name' => $affiliator->name,

@@ -7,8 +7,8 @@ use App\Models\Testimonial;
 use App\Services\Cms\ContentService;
 use App\Http\Requests\Admin\TestimonialRequest;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 
 class TestimonialController extends Controller
 {
@@ -21,7 +21,7 @@ class TestimonialController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('Admin/Testimonials/Index', [
+        return view('admin.testimonials.index', [
             'testimonials' => Testimonial::with(['customer', 'creator', 'updater'])
                 ->orderBy('order')
                 ->get(),
@@ -33,7 +33,7 @@ class TestimonialController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Admin/Testimonials/Create', [
+        return view('admin.testimonials.create', [
             'testimonial' => null,
         ]);
     }
@@ -44,7 +44,7 @@ class TestimonialController extends Controller
     public function edit(string $id): Response
     {
         $testimonial = Testimonial::findOrFail($id);
-        return Inertia::render('Admin/Testimonials/Create', [
+        return view('admin.testimonials.create', [
             'testimonial' => $testimonial,
         ]);
     }

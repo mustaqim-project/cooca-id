@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\AffiliatorResource;
 use App\Repositories\Contracts\AffiliatorRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 
 final class DownlineController extends Controller
 {
@@ -25,19 +25,19 @@ final class DownlineController extends Controller
         $affiliator = Auth::guard('affiliator')->user();
         $downlines = $this->affiliatorRepository->getDownlines($affiliator->getKey());
 
-        return Inertia::render('Affiliator/Downlines/Index', [
+        return view('affiliator.downlines.index', [
             'downlines' => AffiliatorResource::collection($downlines),
         ]);
     }
 
-    public function tree(): \Inertia\Response
+    public function tree(): Illuminate\View\View
     {
-        return \Inertia\Inertia::render('Affiliator/Downlines/Tree');
+        return view('affiliator.downlines.Tree');
     }
 
-    public function stats(): \Inertia\Response
+    public function stats(): Illuminate\View\View
     {
-        return \Inertia\Inertia::render('Affiliator/Downlines/Stats');
+        return view('affiliator.downlines.Stats');
     }
 
 }

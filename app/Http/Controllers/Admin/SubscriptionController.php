@@ -9,7 +9,7 @@ use App\Models\Subscription;
 use App\Models\Customer;
 use App\Models\License;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+
 
 /**
  * Admin Subscription Controller
@@ -49,7 +49,7 @@ class SubscriptionController extends Controller
             'cancelled' => Subscription::where('status', 'cancelled')->count(),
         ];
 
-        return Inertia::render('Admin/Subscriptions/Index', [
+        return view('admin.subscriptions.index', [
             'subscriptions' => $subscriptions,
             'stats' => $stats,
             'filters' => [
@@ -94,7 +94,7 @@ class SubscriptionController extends Controller
             ];
         }
 
-        return Inertia::render('Admin/Subscriptions/Show', [
+        return view('admin.subscriptions.show', [
             'subscription' => $subscription,
             'timeline' => collect($timeline)->sortByDesc('date')->values()->all(),
         ]);

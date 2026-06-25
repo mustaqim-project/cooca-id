@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+
 
 /**
  * Admin Ticket Controller
@@ -56,7 +56,7 @@ class TicketController extends Controller
             'closed' => Ticket::where('status', 'closed')->count(),
         ];
 
-        return Inertia::render('Admin/Tickets/Index', [
+        return view('admin.tickets.index', [
             'tickets' => $tickets,
             'stats' => $stats,
             'filters' => [
@@ -75,7 +75,7 @@ class TicketController extends Controller
     {
         $ticket->load(['customer', 'assignedTo', 'replies.user']);
 
-        return Inertia::render('Admin/Tickets/Show', [
+        return view('admin.tickets.show', [
             'ticket' => $ticket,
         ]);
     }

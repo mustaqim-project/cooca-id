@@ -10,8 +10,7 @@ use App\Models\Subscription;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\View\View;
 
 /**
  * Customer Dashboard Controller
@@ -23,7 +22,7 @@ final class DashboardController extends Controller
     /**
      * Display customer dashboard with comprehensive statistics.
      */
-    public function index(): Response
+    public function index(): View
     {
         $customer = Auth::guard('customer')->user();
 
@@ -84,7 +83,7 @@ final class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return Inertia::render('Customer/Dashboard/Index', [
+        return view('customer.dashboard.index', [
             'stats' => [
                 'activeLicenses' => $activeLicenses,
                 'expiringLicenses' => $expiringLicenses,

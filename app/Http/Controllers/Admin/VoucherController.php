@@ -9,8 +9,8 @@ use App\Http\Requests\Admin\CreateVoucherRequest;
 use App\Http\Resources\Admin\VoucherResource;
 use App\Services\Voucher\VoucherService;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 
 final class VoucherController extends Controller
 {
@@ -25,7 +25,7 @@ final class VoucherController extends Controller
     {
         $vouchers = $this->voucherService->paginate(15);
 
-        return Inertia::render('Admin/Vouchers/Index', [
+        return view('admin.vouchers.index', [
             'vouchers' => VoucherResource::collection($vouchers),
         ]);
     }

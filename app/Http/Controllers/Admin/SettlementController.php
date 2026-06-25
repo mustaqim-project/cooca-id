@@ -11,8 +11,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 
 final class SettlementController extends Controller
 {
@@ -27,7 +27,7 @@ final class SettlementController extends Controller
     {
         $withdrawals = $this->affiliateService->getWithdrawalsPaginated(15);
 
-        return Inertia::render('Admin/Settlements/Index', [
+        return view('admin.settlements.index', [
             'settlements' => AffiliateWithdrawalResource::collection($withdrawals),
         ]);
     }
@@ -40,7 +40,7 @@ final class SettlementController extends Controller
             abort(404, 'Withdrawal not found');
         }
 
-        return Inertia::render('Admin/Settlements/Show', [
+        return view('admin.settlements.show', [
             'settlement' => (new AffiliateWithdrawalResource($withdrawal))->resolve(),
         ]);
     }

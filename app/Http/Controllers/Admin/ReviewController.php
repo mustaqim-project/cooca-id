@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Review;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+
 
 /**
  * Admin Review Controller
@@ -56,7 +56,7 @@ class ReviewController extends Controller
             'average_rating' => round(Review::where('status', 'approved')->avg('rating') ?? 0, 2),
         ];
 
-        return Inertia::render('Admin/Reviews/Index', [
+        return view('admin.reviews.index', [
             'reviews' => $reviews,
             'stats' => $stats,
             'filters' => [

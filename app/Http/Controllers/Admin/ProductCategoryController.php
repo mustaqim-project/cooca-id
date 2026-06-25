@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -43,7 +43,7 @@ class ProductCategoryController extends Controller
 
         $categories = $query->orderBy('sort_order')->paginate(20)->withQueryString();
 
-        return Inertia::render('Admin/ProductCategories/Index', [
+        return view('admin.productcategories.index', [
             'categories' => $categories,
             'filters' => [
                 'search' => $request->get('search'),
@@ -57,7 +57,7 @@ class ProductCategoryController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Admin/ProductCategories/Create', [
+        return view('admin.productcategories.create', [
             'category' => null,
         ]);
     }
@@ -98,7 +98,7 @@ class ProductCategoryController extends Controller
      */
     public function show(ProductCategory $category): Response
     {
-        return Inertia::render('Admin/ProductCategories/Show', [
+        return view('admin.productcategories.show', [
             'category' => $category->load('products'),
         ]);
     }
@@ -108,7 +108,7 @@ class ProductCategoryController extends Controller
      */
     public function edit(ProductCategory $category): Response
     {
-        return Inertia::render('Admin/ProductCategories/Edit', [
+        return view('admin.productcategories.edit', [
             'category' => $category,
         ]);
     }

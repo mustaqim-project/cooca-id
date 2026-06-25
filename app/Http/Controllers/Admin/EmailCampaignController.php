@@ -9,7 +9,7 @@ use App\Models\EmailCampaign;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+
 
 /**
  * Admin Email Campaign Controller
@@ -38,7 +38,7 @@ class EmailCampaignController extends Controller
             'scheduled' => EmailCampaign::where('status', 'scheduled')->count(),
         ];
 
-        return Inertia::render('Admin/EmailCampaigns/Index', [
+        return view('admin.emailcampaigns.index', [
             'campaigns' => $campaigns,
             'stats' => $stats,
             'filters' => [
@@ -54,7 +54,7 @@ class EmailCampaignController extends Controller
     {
         $customerCount = Customer::where('is_active', true)->count();
 
-        return Inertia::render('Admin/EmailCampaigns/Create', [
+        return view('admin.emailcampaigns.create', [
             'campaign' => null,
             'customerCount' => $customerCount,
         ]);
@@ -93,7 +93,7 @@ class EmailCampaignController extends Controller
     {
         $campaign->load(['createdBy']);
 
-        return Inertia::render('Admin/EmailCampaigns/Show', [
+        return view('admin.emailcampaigns.show', [
             'campaign' => $campaign,
         ]);
     }
