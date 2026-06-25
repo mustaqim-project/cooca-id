@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\LicenseResource;
 use App\Services\License\LicenseService;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 use Illuminate\Http\RedirectResponse;
 
 final class LicenseController extends Controller
@@ -26,7 +26,7 @@ final class LicenseController extends Controller
         $customer = Auth::guard('customer')->user();
         $licenses = \App\Models\License::where('customer_id', $customer->getKey())->get();
 
-        return Inertia::render('Customer/Licenses/Index', [
+        return view('customer.licenses.index', [
             'licenses' => LicenseResource::collection($licenses),
         ]);
     }
@@ -43,7 +43,7 @@ final class LicenseController extends Controller
             abort(404, 'License not found');
         }
 
-        return Inertia::render('Customer/Licenses/Show', [
+        return view('customer.licenses.show', [
             'license' => new LicenseResource($license),
         ]);
     }
@@ -78,7 +78,7 @@ final class LicenseController extends Controller
             abort(404, 'License not found');
         }
 
-        return Inertia::render('Customer/Licenses/Credentials', [
+        return view('customer.Licenses/Credentials', [
             'license' => new LicenseResource($license),
         ]);
     }

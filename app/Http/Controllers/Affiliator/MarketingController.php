@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+
 
 /**
  * Affiliator Marketing Controller
@@ -45,7 +45,7 @@ class MarketingController extends Controller
             'total_conversions' => 0,
         ];
 
-        return Inertia::render('Affiliator/MarketingMaterials/Index', [
+        return view('affiliator.marketing.index', [
             'products' => $products,
             'stats' => $stats,
         ]);
@@ -82,7 +82,7 @@ class MarketingController extends Controller
             ],
         ];
 
-        return Inertia::render('Affiliator/MarketingMaterials/Banners', [
+        return view('affiliator.marketing.banners', [
             'banners' => $banners,
         ]);
     }
@@ -130,7 +130,7 @@ class MarketingController extends Controller
             'whatsapp' => "Halo! Saya ingin merekomendasikan Cooca.id untuk mengelola bisnis Anda. Platform ERP SaaS yang lengkap dengan fitur canggih. Coba gratis di sini: {$baseReferralLink}",
         ];
 
-        return Inertia::render('Affiliator/MarketingMaterials/Links', [
+        return view('affiliator.marketing.links', [
             'links' => $links,
             'socialMediaTemplates' => $socialMediaTemplates,
             'referralCode' => $affiliator->referral_code,

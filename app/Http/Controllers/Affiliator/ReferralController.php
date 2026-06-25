@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\CustomerResource;
 use App\Repositories\Contracts\AffiliatorRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 
 final class ReferralController extends Controller
 {
@@ -25,15 +25,15 @@ final class ReferralController extends Controller
         $affiliator = Auth::guard('affiliator')->user();
         $referrals = \App\Models\Customer::where('affiliator_id', $affiliator->getKey())->paginate(15);
 
-        return Inertia::render('Affiliator/Referrals/Index', [
+        return view('affiliator.referrals.index', [
             'referrals' => CustomerResource::collection($referrals),
             'referral_link' => route('customer.register', ['referral' => $affiliator->referral_code]),
         ]);
     }
 
-    public function stats(): \Inertia\Response
+    public function stats(): Illuminate\View\View
     {
-        return \Inertia\Inertia::render('Affiliator/Referrals/Stats');
+        return view('affiliator.referrals.Stats');
     }
 
 }

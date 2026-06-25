@@ -7,8 +7,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\EmailTemplate;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -52,7 +52,7 @@ class EmailTemplateController extends Controller
             ->whereNotNull('category')
             ->pluck('category');
 
-        return Inertia::render('Admin/EmailTemplates/Index', [
+        return view('admin.emailtemplates.index', [
             'templates' => $templates,
             'categories' => $categories,
             'filters' => [
@@ -68,7 +68,7 @@ class EmailTemplateController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Admin/EmailTemplates/Create', [
+        return view('admin.emailtemplates.create', [
             'template' => null,
             'categories' => EmailTemplate::select('category')
                 ->distinct()
@@ -112,7 +112,7 @@ class EmailTemplateController extends Controller
      */
     public function show(EmailTemplate $template): Response
     {
-        return Inertia::render('Admin/EmailTemplates/Show', [
+        return view('admin.emailtemplates.show', [
             'template' => $template->load(['creator', 'updater']),
         ]);
     }
@@ -122,7 +122,7 @@ class EmailTemplateController extends Controller
      */
     public function edit(EmailTemplate $template): Response
     {
-        return Inertia::render('Admin/EmailTemplates/Edit', [
+        return view('admin.emailtemplates.edit', [
             'template' => $template,
             'categories' => EmailTemplate::select('category')
                 ->distinct()

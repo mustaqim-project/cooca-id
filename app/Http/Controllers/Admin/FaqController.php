@@ -7,8 +7,8 @@ use App\Models\Faq;
 use App\Services\Cms\ContentService;
 use App\Http\Requests\Admin\FaqRequest;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 
 class FaqController extends Controller
 {
@@ -21,7 +21,7 @@ class FaqController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('Admin/Faqs/Index', [
+        return view('admin.faqs.index', [
             'faqs' => Faq::with(['creator', 'updater'])
                 ->orderBy('order')
                 ->get(),
@@ -36,7 +36,7 @@ class FaqController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Admin/Faqs/Create', [
+        return view('admin.faqs.create', [
             'faq' => null,
         ]);
     }
@@ -47,7 +47,7 @@ class FaqController extends Controller
     public function edit(string $id): Response
     {
         $faq = Faq::findOrFail($id);
-        return Inertia::render('Admin/Faqs/Create', [
+        return view('admin.faqs.create', [
             'faq' => $faq,
         ]);
     }

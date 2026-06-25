@@ -12,8 +12,7 @@ use App\Models\Transaction;
 use App\Models\AffiliateWithdrawal;
 use App\Models\Subscription;
 use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\View\View;
 
 /**
  * Admin Dashboard Controller
@@ -25,7 +24,7 @@ final class DashboardController extends Controller
     /**
      * Display admin dashboard with comprehensive statistics.
      */
-    public function index(): Response
+    public function index(): View
     {
         // Revenue Statistics
         $totalRevenue = Transaction::where('status', 'paid')->sum('net_amount');
@@ -95,7 +94,7 @@ final class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return Inertia::render('Admin/Dashboard/Index', [
+        return view('admin.dashboard.index', [
             'stats' => [
                 'totalCustomers' => $totalCustomers,
                 'totalAffiliators' => $totalAffiliators,

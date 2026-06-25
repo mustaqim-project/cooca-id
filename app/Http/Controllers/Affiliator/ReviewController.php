@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+
 
 /**
  * Affiliator Review Controller
@@ -52,7 +52,7 @@ class ReviewController extends Controller
                 ->avg('rating') ?? 0, 2),
         ];
 
-        return Inertia::render('Affiliator/Reviews/Index', [
+        return view('affiliator.reviews.index', [
             'reviews' => $reviews,
             'stats' => $stats,
             'filters' => [
@@ -73,7 +73,7 @@ class ReviewController extends Controller
         $customer = \App\Models\Customer::where('email', $affiliator->email)->first();
 
         if (!$customer) {
-            return Inertia::render('Affiliator/Reviews/MyReviews', [
+            return view('affiliator.reviews.MyReviews', [
                 'reviews' => [],
                 'stats' => [
                     'total' => 0,
@@ -97,7 +97,7 @@ class ReviewController extends Controller
             'rejected' => Review::where('customer_id', $customer->id)->where('status', 'rejected')->count(),
         ];
 
-        return Inertia::render('Affiliator/Reviews/MyReviews', [
+        return view('affiliator.reviews.MyReviews', [
             'reviews' => $reviews,
             'stats' => $stats,
         ]);

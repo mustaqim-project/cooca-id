@@ -7,8 +7,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\ProductResource;
 use App\Repositories\Contracts\ProductRepositoryInterface;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\View\View;
 
 final class ProductController extends Controller
 {
@@ -19,19 +18,19 @@ final class ProductController extends Controller
     /**
      * Display listing of available products.
      */
-    public function index(): Response
+    public function index(): View
     {
         $products = $this->productRepository->getActiveProducts();
 
-        return Inertia::render('Customer/Products/Index', [
-            'products' => ProductResource::collection($products),
+        return view('customer.products.index', [
+            'products' => $products,
         ]);
     }
 
     /**
      * Display the specified product.
      */
-    public function show(string $slug): Response
+    public function show(string $slug): View
     {
         $product = $this->productRepository->findBySlug($slug);
 
@@ -39,8 +38,8 @@ final class ProductController extends Controller
             abort(404, 'Product not found');
         }
 
-        return Inertia::render('Customer/Products/Show', [
-            'product' => new ProductResource($product),
+        return view('customer.products.show', [
+            'product' => $product,
             'plans' => $product->subscriptionPlans()->where('is_active', true)->get(),
         ]);
     }

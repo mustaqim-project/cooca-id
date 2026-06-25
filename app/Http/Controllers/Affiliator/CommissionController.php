@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\CommissionResource;
 use App\Services\Affiliate\AffiliateService;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 
 final class CommissionController extends Controller
 {
@@ -25,16 +25,16 @@ final class CommissionController extends Controller
         $affiliator = Auth::guard('affiliator')->user();
         $commissions = \App\Models\AffiliateCommission::where('affiliator_id', $affiliator->getKey())->paginate(15);
 
-        return Inertia::render('Affiliator/Commissions/Index', [
+        return view('affiliator.commissions.index', [
             'commissions' => \Illuminate\Http\Resources\Json\JsonResource::collection($commissions),
         ]);
     }
 
-    public function stats(): \Inertia\Response
+    public function stats(): Illuminate\View\View
     {
         $affiliator = Auth::guard('affiliator')->user();
         
-        return \Inertia\Inertia::render('Affiliator/Commissions/Stats', [
+        return view('affiliator.commissions.Stats', [
             'total_commission' => $this->affiliateService->getTotalCommission($affiliator),
             'cleared_commission' => $this->affiliateService->getTotalCommission($affiliator, 'cleared'),
             'pending_commission' => $this->affiliateService->getTotalCommission($affiliator, 'pending'),

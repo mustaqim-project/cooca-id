@@ -10,7 +10,7 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Inertia\Inertia;
+
 
 /**
  * Customer Invoice Controller
@@ -51,7 +51,7 @@ class InvoiceController extends Controller
                 ->count(),
         ];
 
-        return Inertia::render('Customer/Invoices/Index', [
+        return view('customer.invoices.index', [
             'invoices' => $invoices,
             'stats' => $stats,
             'filters' => [
@@ -73,7 +73,7 @@ class InvoiceController extends Controller
 
         $invoice->load(['subscription.product', 'transaction']);
 
-        return Inertia::render('Customer/Invoices/Show', [
+        return view('customer.invoices.show', [
             'invoice' => $invoice,
         ]);
     }

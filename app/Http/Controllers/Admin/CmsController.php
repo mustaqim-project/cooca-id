@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+
 
 /**
  * Admin CMS Controller
@@ -37,7 +37,7 @@ class CmsController extends Controller
 
         $pages = $query->paginate(20)->withQueryString();
 
-        return Inertia::render('Admin/Cms/Pages/Index', [
+        return view('admin.Cms/Pages, index', [
             'pages' => $pages,
             'filters' => [
                 'search' => $request->get('search'),
@@ -51,7 +51,7 @@ class CmsController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Admin/Cms/Pages/Create', [
+        return view('admin.Cms/Pages, create', [
             'page' => null,
         ]);
     }
@@ -86,7 +86,7 @@ class CmsController extends Controller
      */
     public function show(Page $page)
     {
-        return Inertia::render('Admin/Cms/Pages/Show', [
+        return view('admin.Cms/Pages, show', [
             'page' => $page->load('author'),
         ]);
     }
@@ -96,7 +96,7 @@ class CmsController extends Controller
      */
     public function edit(Page $page)
     {
-        return Inertia::render('Admin/Cms/Pages/Edit', [
+        return view('admin.Cms/Pages, edit', [
             'page' => $page,
         ]);
     }

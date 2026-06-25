@@ -11,8 +11,8 @@ use App\Http\Requests\Admin\GenerateLicenseRequest;
 use App\Http\Resources\Admin\LicenseResource;
 use App\Services\License\LicenseService;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 
 final class LicenseController extends Controller
 {
@@ -28,7 +28,7 @@ final class LicenseController extends Controller
     {
         $licenses = $this->licenseService->paginate(15);
 
-        return Inertia::render('Admin/Licenses/Index', [
+        return view('admin.licenses.index', [
             'licenses' => LicenseResource::collection($licenses),
         ]);
     }

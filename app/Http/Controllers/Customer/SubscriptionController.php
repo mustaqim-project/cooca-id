@@ -19,22 +19,22 @@ final class SubscriptionController extends Controller
         private readonly CreateSubscriptionAction $createSubscriptionAction
     ) {}
 
-    public function index(): \Inertia\Response
+    public function index(): Illuminate\View\View
     {
         $subscriptions = \App\Models\Subscription::where('customer_id', Auth::guard('customer')->id())
             ->paginate(15);
             
-        return \Inertia\Inertia::render('Customer/Subscriptions/Index', [
+        return view('customer.subscriptions.index', [
             'subscriptions' => $subscriptions
         ]);
     }
 
-    public function create(): \Inertia\Response
+    public function create(): Illuminate\View\View
     {
-        return \Inertia\Inertia::render('Customer/Subscriptions/Create');
+        return view('customer.subscriptions.create');
     }
 
-    public function show(string $subscription): \Inertia\Response
+    public function show(string $subscription): Illuminate\View\View
     {
         $subscription = \App\Models\Subscription::where('id', $subscription)
             ->where('customer_id', Auth::guard('customer')->id())
@@ -44,7 +44,7 @@ final class SubscriptionController extends Controller
             abort(404);
         }
 
-        return \Inertia\Inertia::render('Customer/Subscriptions/Show', [
+        return view('customer.subscriptions.show', [
             'subscription' => $subscription
         ]);
     }

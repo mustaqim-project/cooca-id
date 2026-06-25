@@ -11,7 +11,7 @@ use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Inertia\Inertia;
+
 
 /**
  * Customer Review Controller
@@ -49,7 +49,7 @@ class ReviewController extends Controller
             'rejected' => Review::where('customer_id', $customer->id)->where('status', 'rejected')->count(),
         ];
 
-        return Inertia::render('Customer/Reviews/Index', [
+        return view('customer.reviews.index', [
             'reviews' => $reviews,
             'stats' => $stats,
             'filters' => [

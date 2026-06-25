@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ErpRequest;
 use App\Services\License\TrialActivationService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 
 final class ErpRequestController extends Controller
 {
@@ -36,7 +36,7 @@ final class ErpRequestController extends Controller
             ->latest()
             ->paginate(20);
 
-        return Inertia::render('Admin/ErpRequests/Index', [
+        return view('admin.erprequests.index', [
             'requests' => $requests,
         ]);
     }
@@ -45,7 +45,7 @@ final class ErpRequestController extends Controller
     {
         $request->load(['customer', 'product', 'affiliator', 'approvedBy', 'domains', 'license']);
 
-        return Inertia::render('Admin/ErpRequests/Show', [
+        return view('admin.erprequests.show', [
             'request' => $request,
         ]);
     }

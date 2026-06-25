@@ -10,8 +10,7 @@ use App\Http\Resources\Admin\ProductResource;
 use App\Models\Product;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\View\View;
 
 final class ProductController extends Controller
 {
@@ -22,12 +21,12 @@ final class ProductController extends Controller
     /**
      * Display listing of products.
      */
-    public function index(): Response
+    public function index(): View
     {
         $products = $this->productRepository->paginateWithFilters(15);
 
-        return Inertia::render('Admin/Products/Index', [
-            'products' => ProductResource::collection($products),
+        return view('admin.products.index', [
+            'products' => $products,
         ]);
     }
 

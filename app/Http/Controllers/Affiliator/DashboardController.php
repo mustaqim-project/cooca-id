@@ -9,8 +9,7 @@ use App\Models\AffiliateCommission;
 use App\Models\AffiliateWithdrawal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\View\View;
 
 /**
  * Affiliator Dashboard Controller
@@ -22,7 +21,7 @@ final class DashboardController extends Controller
     /**
      * Display affiliator dashboard with comprehensive statistics.
      */
-    public function index(): Response
+    public function index(): View
     {
         $affiliator = Auth::guard('affiliator')->user();
         
@@ -111,7 +110,7 @@ final class DashboardController extends Controller
             ->where('status', 'paid')
             ->avg('amount') ?? 0;
 
-        return Inertia::render('Affiliator/Dashboard/Index', [
+        return view('affiliator.dashboard.index', [
             'stats' => [
                 'totalReferrals' => $totalReferrals,
                 'activeReferrals' => $activeReferrals,

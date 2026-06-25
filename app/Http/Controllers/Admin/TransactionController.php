@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\TransactionResource;
 use App\Services\Payment\PaymentService;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 
 final class TransactionController extends Controller
 {
@@ -24,7 +24,7 @@ final class TransactionController extends Controller
     {
         $transactions = $this->paymentService->getTransactionsPaginated(15);
 
-        return Inertia::render('Admin/Transactions/Index', [
+        return view('admin.transactions.index', [
             'transactions' => TransactionResource::collection($transactions),
         ]);
     }
@@ -40,7 +40,7 @@ final class TransactionController extends Controller
             abort(404, 'Transaction not found');
         }
 
-        return Inertia::render('Admin/Transactions/Show', [
+        return view('admin.transactions.show', [
             'transaction' => new TransactionResource($transaction),
         ]);
     }

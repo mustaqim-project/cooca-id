@@ -1,108 +1,69 @@
-# =========================
-# Production-safe Laravel .gitignore
-# =========================
+```
+# Laravel-specific ignores
+vendor/
+storage/
+bootstrap/cache/
+
+# Environment specific files
+.env*
+!.env.example
+
+# Compiled files
+*.php~
+*.pyc
+*.class
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
 
 # Dependencies
-/vendor/
 node_modules/
-composer.lock
-package-lock.json
-pnpm-lock.yaml
-yarn.lock
-
-# Package manager logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
 
-# Environment files
-.env
-.env.local
-.env.*
-!.env.example
-!.env.testing
-
-# Laravel framework output
-/storage/*.key
-/storage/app/*
-!storage/app/.gitkeep
-/storage/framework/cache/*
-/storage/framework/sessions/*
-/storage/framework/views/*
-/storage/logs/*
-/bootstrap/cache/*.php
-/public/storage
-/public/hot
-/public/build
-
-# Build / compiled assets
-/dist/
+# Build artifacts
+dist/
 build/
+target/
 coverage/
-.nyc_output/
-*.map
-*.tsbuildinfo
-
-# Cache and temp files
-*.tmp
-*.temp
-*.swp
-*.swo
-*~
-.cache/
-.tmp/
-.tmp/**
-
-# Testing / QA artifacts
-phpunit.xml.dist
-.phpunit.result.cache
-.phpunit.cache
-coverage.xml
 htmlcov/
-.phpunit.*
 .coverage
-.coverage.*
+
+# Cache directories
+.cache/
 .mypy_cache/
 .pytest_cache/
-.hypothesis/
+.gradle/
+.npm/
+.bower/
 
-# IDE and editor files
-.vscode/
-.idea/
-*.code-workspace
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
-Desktop.ini
 
-# Binary / compiled junk
-*.o
-*.obj
-*.out
-*.class
-*.so
-*.a
-*.dll
-*.exe
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
 
-# Other tool caches
-.gradle/
-target/
-.zig-cache/
-zig-cache/
-.jest/
-.parcel-cache/
-.next/
-.nuxt/
-.vuepress/dist
-.storybook-static/
-.vercel/
-.netlify/
-
-# Local DB / runtime artifacts
-*.sqlite
-*.sqlite-journal
-*.db
-
+# Testing
+.phpunit.result.cache
+```

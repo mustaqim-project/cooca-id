@@ -9,7 +9,7 @@ use App\Models\BlogPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Inertia\Inertia;
+
 
 /**
  * Admin Blog Controller
@@ -51,7 +51,7 @@ class BlogController extends Controller
             ->whereNotNull('category')
             ->pluck('category');
 
-        return Inertia::render('Admin/Blog/Index', [
+        return view('admin.blog.index', [
             'posts' => $posts,
             'categories' => $categories,
             'filters' => [
@@ -67,7 +67,7 @@ class BlogController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Admin/Blog/Create', [
+        return view('admin.blog.create', [
             'post' => null,
             'categories' => BlogPost::select('category')
                 ->distinct()
@@ -118,7 +118,7 @@ class BlogController extends Controller
      */
     public function show(BlogPost $post)
     {
-        return Inertia::render('Admin/Blog/Show', [
+        return view('admin.blog.show', [
             'post' => $post->load('author'),
         ]);
     }
@@ -128,7 +128,7 @@ class BlogController extends Controller
      */
     public function edit(BlogPost $post)
     {
-        return Inertia::render('Admin/Blog/Edit', [
+        return view('admin.blog.edit', [
             'post' => $post,
             'categories' => BlogPost::select('category')
                 ->distinct()

@@ -9,8 +9,7 @@ use App\Http\Resources\Admin\CustomerResource;
 use App\Models\Customer;
 use App\Repositories\Contracts\CustomerRepositoryInterface;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\View\View;
 
 final class CustomerController extends Controller
 {
@@ -21,19 +20,19 @@ final class CustomerController extends Controller
     /**
      * Display listing of customers.
      */
-    public function index(): Response
+    public function index(): View
     {
         $customers = $this->customerRepository->paginate(15);
 
-        return Inertia::render('Admin/Customers/Index', [
-            'customers' => CustomerResource::collection($customers),
+        return view('admin.customers.index', [
+            'customers' => $customers,
         ]);
     }
 
     /**
      * Display the specified customer.
      */
-    public function show(string $id): Response
+    public function show(string $id): View
     {
         $customer = $this->customerRepository->find($id);
 
@@ -41,8 +40,8 @@ final class CustomerController extends Controller
             abort(404, 'Customer not found');
         }
 
-        return Inertia::render('Admin/Customers/Show', [
-            'customer' => new CustomerResource($customer),
+        return view('admin.customers.show', [
+            'customer' => $customer,
         ]);
     }
 

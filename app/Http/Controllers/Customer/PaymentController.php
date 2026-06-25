@@ -12,7 +12,7 @@ use App\Services\Payment\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+
 
 final class PaymentController extends Controller
 {
@@ -21,17 +21,17 @@ final class PaymentController extends Controller
         private readonly ProcessPaymentAction $processPaymentAction
     ) {}
 
-    public function index(): \Inertia\Response
+    public function index(): Illuminate\View\View
     {
         $payments = \App\Models\Transaction::where('customer_id', Auth::guard('customer')->id())
             ->paginate(15);
             
-        return Inertia::render('Customer/Payments/Index', [
+        return view('customer.payments.index', [
             'payments' => $payments
         ]);
     }
 
-    public function show(string $payment): \Inertia\Response
+    public function show(string $payment): Illuminate\View\View
     {
         $transaction = \App\Models\Transaction::where('id', $payment)
             ->where('customer_id', Auth::guard('customer')->id())
@@ -41,7 +41,7 @@ final class PaymentController extends Controller
             abort(404);
         }
 
-        return Inertia::render('Customer/Payments/Show', [
+        return view('customer.payments.show', [
             'payment' => $transaction
         ]);
     }
@@ -90,7 +90,7 @@ final class PaymentController extends Controller
      */
     public function success(): Response
     {
-        return Inertia::render('Customer/Payments/Success');
+        return view('customer.Payments/Success');
     }
 
     /**
@@ -98,7 +98,7 @@ final class PaymentController extends Controller
      */
     public function pending(): Response
     {
-        return Inertia::render('Customer/Payments/Pending');
+        return view('customer.Payments/Pending');
     }
 
     /**
@@ -106,6 +106,6 @@ final class PaymentController extends Controller
      */
     public function failed(): Response
     {
-        return Inertia::render('Customer/Payments/Failed');
+        return view('customer.Payments/Failed');
     }
 }

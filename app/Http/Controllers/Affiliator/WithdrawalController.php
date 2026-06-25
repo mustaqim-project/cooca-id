@@ -10,8 +10,8 @@ use App\Services\Affiliate\AffiliateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Setting;
-use Inertia\Inertia;
-use Inertia\Response;
+
+
 
 final class WithdrawalController extends Controller
 {
@@ -47,7 +47,7 @@ final class WithdrawalController extends Controller
         $affiliator = Auth::guard('affiliator')->user();
         $withdrawals = $this->affiliateService->getWithdrawals($affiliator->getKey());
 
-        return Inertia::render('Affiliator/Withdrawals/Index', [
+        return view('affiliator.withdrawals.index', [
             'withdrawals' => $withdrawals,
             'balance' => $this->affiliateService->getAvailableBalance($affiliator->getKey()),
             'minimumWithdrawal' => (float) Setting::get('affiliate.minimum_withdrawal', config('affiliate.minimum_withdrawal', 50000)),
@@ -62,7 +62,7 @@ final class WithdrawalController extends Controller
         $affiliator = Auth::guard('affiliator')->user();
         $balance = $this->affiliateService->getAvailableBalance($affiliator->getKey());
 
-        return Inertia::render('Affiliator/Withdrawals/Create', [
+        return view('affiliator.withdrawals.create', [
             'availableBalance' => $balance,
             'withdrawalFee' => [
                 'bank' => (float) Setting::get('affiliate.withdrawal_fee_bank', config('affiliate.withdrawal_fee_bank', 2500)),
@@ -90,7 +90,7 @@ final class WithdrawalController extends Controller
             abort(404, 'Withdrawal not found');
         }
 
-        return Inertia::render('Affiliator/Withdrawals/Show', [
+        return view('affiliator.withdrawals.show', [
             'withdrawal' => $withdrawal,
         ]);
     }
@@ -103,7 +103,7 @@ final class WithdrawalController extends Controller
         $affiliator = Auth::guard('affiliator')->user();
         $withdrawals = $this->affiliateService->getWithdrawalHistory($affiliator->getKey());
 
-        return Inertia::render('Affiliator/Withdrawals/History', [
+        return view('affiliator.withdrawals.History', [
             'withdrawals' => $withdrawals,
         ]);
     }

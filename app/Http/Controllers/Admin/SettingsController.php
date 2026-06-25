@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+
 
 /**
  * Admin Settings Controller
@@ -39,7 +39,7 @@ class SettingsController extends Controller
             'minimum_withdrawal' => (float) Setting::get('affiliate.minimum_withdrawal', config('affiliate.minimum_withdrawal', 50000)),
         ];
 
-        return Inertia::render('Admin/Settings/Index', [
+        return view('admin.settings.index', [
             'settings' => $settings,
         ]);
     }
