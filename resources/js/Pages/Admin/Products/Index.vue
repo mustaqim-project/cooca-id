@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AdminLayout from '@/Layouts/AdminLayout.vue';
+defineOptions({ layout: AdminLayout });
 import { Head, Link } from '@inertiajs/vue3';
 
 interface Product {

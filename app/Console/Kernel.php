@@ -32,4 +32,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('subscriptions:send-expiry-reminders')
             ->dailyAt('10:00')
             ->timezone('Asia/Jakarta');
+
+        // Database backups
+        $schedule->command('backup:clean')->daily()->at('01:00');
+        $schedule->command('backup:run')->daily()->at('01:30');
     }

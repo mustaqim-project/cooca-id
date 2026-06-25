@@ -41,7 +41,7 @@ final class VoucherRepository extends BaseRepository implements VoucherRepositor
             ->get();
     }
 
-    public function validateVoucher(string $code, float $purchaseAmount, string $customerId): array
+    public function validateVoucher(string $code, string $customerId, float $amount, ?string $productId = null): array
     {
         $voucher = $this->findByCode($code);
 
@@ -76,7 +76,7 @@ final class VoucherRepository extends BaseRepository implements VoucherRepositor
         }
 
         // Check minimum purchase
-        if ($purchaseAmount < $voucher->min_purchase) {
+        if ($amount < $voucher->min_purchase) {
             return [
                 'valid' => false,
                 'message' => 'Minimum purchase amount not met (minimum: ' . number_format($voucher->min_purchase, 2) . ')',
@@ -101,7 +101,7 @@ final class VoucherRepository extends BaseRepository implements VoucherRepositor
         }
 
         // Calculate discount
-        $discount = $this->calculateDiscount($voucher, $purchaseAmount);
+        $discount = $this->calculateDiscount($voucher, $amount);
 
         return [
             'valid' => true,
@@ -161,5 +161,37 @@ final class VoucherRepository extends BaseRepository implements VoucherRepositor
         $voucher->decrement('used_count');
 
         return true;
+    }
+
+    public function getApplicableToProduct(string $productId): Collection
+    {
+        return $this->model
+            ->where('is_active', true)
+            ->where(function ($query) use ($productId) {
+                $query->whereNull('applicable_products')
+                      ->orWhereJsonContains('applicable_products', $productId);
+            })
+            ->get();
+    }
+
+    public function getByType(string $type): Collection
+    {
+        return $this->model->where('type', $type)->get();
+    }
+
+    public function customerHasUsedVoucher(string $voucherId, string $customerId): bool
+    {
+        return $this->getUsageCountByCustomer($voucherId, $customerId) > 0;
+    }
+
+    public function getUsageCountByCustomer(string $voucherId, string $customerId): int
+    {
+        // Assuming there is a voucher_usages table or relation.
+        // If not, we might need to adapt. Let's assume a relation `usages()` exists on the model as seen in validateVoucher.
+        $voucher = $this->model->find($voucherId);
+        if (!$voucher) {
+            return 0;
+        }
+        return $voucher->usages()->where('customer_id', $customerId)->count();
     }
 }

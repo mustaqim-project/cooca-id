@@ -29,4 +29,15 @@ final class DownlineController extends Controller
             'downlines' => AffiliatorResource::collection($downlines),
         ]);
     }
+
+    public function tree(): \Inertia\Response
+    {
+        return \Inertia\Inertia::render('Affiliator/Downlines/Tree');
+    }
+
+    public function stats(): \Inertia\Response
+    {
+        return \Inertia\Inertia::render('Affiliator/Downlines/Stats');
+    }
+
 }

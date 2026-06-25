@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import CustomerLayout from '@/Layouts/CustomerLayout.vue';
+defineOptions({ layout: CustomerLayout });
 import { ref } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';

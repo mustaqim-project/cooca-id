@@ -9,11 +9,11 @@ use App\Repositories\Contracts\VoucherUsageRepositoryInterface;
 use Ramsey\Uuid\UuidInterface;
 use Illuminate\Database\Eloquent\Collection;
 
-final class VoucherUsageRepository extends Repository implements VoucherUsageRepositoryInterface
+final class VoucherUsageRepository extends BaseRepository implements VoucherUsageRepositoryInterface
 {
-    public function getModel(): string
+    public function __construct(VoucherUsage $model)
     {
-        return VoucherUsage::class;
+        parent::__construct($model);
     }
 
     /**

@@ -31,7 +31,8 @@ Schedule::command('reports:generate-weekly')->weeklyOn(1, '09:00')->name('Genera
 
 // Monthly Tasks
 Schedule::command('affiliates:calculate-monthly')->monthlyOn(1, '00:00')->name('Calculate monthly affiliate stats');
-Schedule::command('database:backup')->monthlyOn(1, '04:00')->name('Monthly database backup');
+Schedule::command('backup:clean')->dailyAt('01:00');
+Schedule::command('backup:run')->dailyAt('01:30');
 
 // Custom Artisan Commands (to be created)
 Artisan::command('licenses:expire', function () {
@@ -58,6 +59,3 @@ Artisan::command('affiliates:calculate-monthly', function () {
     $this->info('Calculating monthly affiliate statistics...');
 })->purpose('Calculate and store monthly affiliate performance metrics');
 
-Artisan::command('database:backup', function () {
-    $this->info('Creating database backup...');
-})->purpose('Create monthly database backup');

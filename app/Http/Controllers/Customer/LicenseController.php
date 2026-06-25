@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\LicenseResource;
-use App\Services\LicenseService;
+use App\Services\License\LicenseService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,7 +24,7 @@ final class LicenseController extends Controller
     public function index(): Response
     {
         $customer = Auth::guard('customer')->user();
-        $licenses = $this->licenseService->getByCustomer($customer->getKey());
+        $licenses = \App\Models\License::where('customer_id', $customer->getKey())->get();
 
         return Inertia::render('Customer/Licenses/Index', [
             'licenses' => LicenseResource::collection($licenses),
@@ -37,7 +37,7 @@ final class LicenseController extends Controller
     public function show(string $id): Response
     {
         $customer = Auth::guard('customer')->user();
-        $license = $this->licenseService->findByIdAndCustomer($id, $customer->getKey());
+        $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->first();
 
         if (!$license) {
             abort(404, 'License not found');
@@ -56,7 +56,8 @@ final class LicenseController extends Controller
         $customer = Auth::guard('customer')->user();
         
         try {
-            $license = $this->licenseService->activateLicense($id, $customer->getKey());
+            $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->firstOrFail();
+            $license->update(['status' => 'active', 'activated_at' => now()]);
             
             return redirect()->route('customer.licenses.credentials', $license->id)
                 ->with('success', 'License activated successfully!');
@@ -71,7 +72,7 @@ final class LicenseController extends Controller
     public function credentials(string $id): Response
     {
         $customer = Auth::guard('customer')->user();
-        $license = $this->licenseService->findByIdAndCustomer($id, $customer->getKey());
+        $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->first();
 
         if (!$license) {
             abort(404, 'License not found');

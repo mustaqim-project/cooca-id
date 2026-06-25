@@ -45,7 +45,7 @@ final class AffiliateService
             if ($l1Affiliator) {
                 $l1CommissionPercent = $this->commissionPercent(1);
                 $l1CommissionAmount = CommissionData::calculateCommission(
-                    $transaction->gross_amount,
+                    (float) $transaction->gross_amount,
                     1
                 );
 
@@ -54,7 +54,7 @@ final class AffiliateService
                     transactionId: $transaction->id,
                     customerId: $customer->id,
                     level: 1,
-                    grossAmount: $transaction->gross_amount,
+                    grossAmount: (float) $transaction->gross_amount,
                     commissionPercent: $l1CommissionPercent,
                     commissionAmount: $l1CommissionAmount,
                 );
@@ -70,7 +70,7 @@ final class AffiliateService
                     if ($l2Affiliator) {
                         $l2CommissionPercent = $this->commissionPercent(2);
                         $l2CommissionAmount = CommissionData::calculateCommission(
-                            $transaction->gross_amount,
+                            (float) $transaction->gross_amount,
                             2
                         );
 
@@ -79,7 +79,7 @@ final class AffiliateService
                             transactionId: $transaction->id,
                             customerId: $customer->id,
                             level: 2,
-                            grossAmount: $transaction->gross_amount,
+                            grossAmount: (float) $transaction->gross_amount,
                             commissionPercent: $l2CommissionPercent,
                             commissionAmount: $l2CommissionAmount,
                         );

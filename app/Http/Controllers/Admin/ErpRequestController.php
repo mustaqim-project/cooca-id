@@ -17,6 +17,19 @@ final class ErpRequestController extends Controller
         private readonly TrialActivationService $trialActivationService,
     ) {}
 
+    private function authorizeManagement(): void
+    {
+        $admin = auth()->guard('admin')->user();
+        if (!$admin) {
+            abort(401, 'Unauthenticated.');
+        }
+
+        $permissions = $admin->permissions ?? [];
+        if (!in_array('manage_erp_requests', $permissions) && !in_array('super_admin', $permissions)) {
+            abort(403, 'Unauthorized action.');
+        }
+    }
+
     public function index(): Response
     {
         $requests = ErpRequest::with(['customer', 'product', 'affiliator', 'approvedBy'])
@@ -39,6 +52,8 @@ final class ErpRequestController extends Controller
 
     public function approve(Request $request, ErpRequest $erpRequest)
     {
+        $this->authorizeManagement();
+
         $validated = $request->validate([
             'admin_notes' => 'nullable|string|max:1000',
         ]);
@@ -66,6 +81,7 @@ final class ErpRequestController extends Controller
 
     public function reject(Request $request, ErpRequest $erpRequest)
     {
+        $this->authorizeManagement();
         $validated = $request->validate([
             'rejection_reason' => 'required|string|max:1000',
         ]);
@@ -95,6 +111,7 @@ final class ErpRequestController extends Controller
 
     public function markWaitingSetup(ErpRequest $erpRequest)
     {
+        $this->authorizeManagement();
         $erpRequest->update(['status' => ErpRequest::STATUS_WAITING_SETUP]);
 
         return redirect()->back()->with('success', 'Status updated to Waiting Setup.');
@@ -102,6 +119,7 @@ final class ErpRequestController extends Controller
 
     public function markInSetup(Request $request, ErpRequest $erpRequest)
     {
+        $this->authorizeManagement();
         $erpRequest->markInSetup();
 
         \App\Models\ActivityLog::create([
@@ -119,12 +137,14 @@ final class ErpRequestController extends Controller
 
     public function markDomainSetup(ErpRequest $erpRequest)
     {
+        $this->authorizeManagement();
         $erpRequest->markDomainSetup();
         return redirect()->back()->with('success', 'Status updated to Domain Setup.');
     }
 
     public function markTesting(Request $request, ErpRequest $erpRequest)
     {
+        $this->authorizeManagement();
         $erpRequest->markTesting();
 
         \App\Models\ActivityLog::create([
@@ -142,6 +162,7 @@ final class ErpRequestController extends Controller
 
     public function confirmReady(Request $request, ErpRequest $erpRequest)
     {
+        $this->authorizeManagement();
         $validated = $request->validate([
             'trial_days' => 'integer|min:1|max:365',
         ]);

@@ -41,102 +41,38 @@
     <section class="section-padding">
         <div class="container">
             <div class="row g-4 justify-content-center align-items-stretch">
-                <!-- MONTHLY -->
-                <div class="col-lg col-md-6 reveal">
-                    <div class="pricing-card">
-                        <div class="plan-name">Monthly</div>
-                        <div class="plan-price"><span class="currency">Rp</span>690K<span class="suffix">–990K</span></div>
-                        <div class="plan-period">per month</div>
-                        <div class="plan-desc">Flexible entry point. Pay as you go. Cancel anytime.</div>
-                        <ul class="plan-features">
-                            <li><i class="bi bi-check-circle-fill"></i> Full access to all modules</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Unlimited users</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Dedicated isolated environment</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Email support (48h response)</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Automatic updates</li>
-                            <li><i class="bi bi-x-circle"></i> AI Assistant</li>
-                            <li><i class="bi bi-x-circle"></i> Priority support</li>
-                        </ul>
-                        <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-outline" style="width:100%;justify-content:center;">Start Monthly</a>
+                @forelse($products as $product)
+                    @if($products->count() > 1)
+                    <div class="col-12 text-center mt-5 mb-3">
+                        <h3 class="text-white" style="font-size: 1.5rem;">{{ $product->name }}</h3>
+                        <p class="text-muted">{{ $product->description }}</p>
                     </div>
-                </div>
-                <!-- 3 MONTHS -->
-                <div class="col-lg col-md-6 reveal reveal-delay-1">
-                    <div class="pricing-card">
-                        <div class="plan-name">3 Months</div>
-                        <div class="plan-price"><span class="currency">Rp</span>1,99jt<span class="suffix">–2,79jt</span></div>
-                        <div class="plan-period">per quarter · save up to 10%</div>
-                        <div class="plan-desc">Commitment that saves. Best for businesses testing at scale.</div>
-                        <ul class="plan-features">
-                            <li><i class="bi bi-check-circle-fill"></i> Full access to all modules</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Unlimited users</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Dedicated isolated environment</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Priority email support (24h)</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Automatic updates</li>
-                            <li><i class="bi bi-x-circle"></i> AI Assistant</li>
-                            <li><i class="bi bi-x-circle"></i> Phone support</li>
-                        </ul>
-                        <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-outline" style="width:100%;justify-content:center;">Start 3 Months</a>
+                    @endif
+                    @foreach($product->subscriptionPlans as $index => $plan)
+                        <div class="col-lg col-md-6 reveal reveal-delay-{{ $index % 5 }}">
+                            <div class="pricing-card {{ $index == 2 ? 'popular' : '' }}" {!! $plan->duration_months == 0 ? 'style="border-color:rgba(16,185,129,0.3);"' : '' !!}>
+                                @if($index == 2)
+                                <div class="pricing-badge">Most Popular</div>
+                                @endif
+                                <div class="plan-name">{{ $plan->name }}</div>
+                                <div class="plan-price"><span class="currency">Rp</span>{{ number_format($plan->price, 0, ',', '.') }}</div>
+                                <div class="plan-period">{{ $plan->duration_months > 0 ? $plan->duration_months . ' months' : 'Lifetime' }}</div>
+                                <div class="plan-desc">Subscription plan for {{ $product->name }}</div>
+                                <ul class="plan-features">
+                                    <li><i class="bi bi-check-circle-fill"></i> Full access to all modules</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Unlimited users</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Dedicated isolated environment</li>
+                                    <li><i class="bi bi-check-circle-fill"></i> Automatic updates</li>
+                                </ul>
+                                <a href="{{ route('customer.register') }}" class="btn-cooca {{ $index == 2 ? 'btn-cooca-primary' : 'btn-cooca-outline' }}" style="width:100%;justify-content:center;">Get {{ $plan->name }}</a>
+                            </div>
+                        </div>
+                    @endforeach
+                @empty
+                    <div class="col-12 text-center">
+                        <p class="text-muted">Pricing information is currently unavailable. Please contact sales.</p>
                     </div>
-                </div>
-                <!-- ANNUAL -->
-                <div class="col-lg col-md-6 reveal reveal-delay-2">
-                    <div class="pricing-card popular">
-                        <div class="pricing-badge">Most Popular</div>
-                        <div class="plan-name">Annual</div>
-                        <div class="plan-price"><span class="currency">Rp</span>5,9jt<span class="suffix">–7,9jt</span></div>
-                        <div class="plan-period">per year · save up to 30%</div>
-                        <div class="plan-desc">The smartest long-term investment before going lifetime.</div>
-                        <ul class="plan-features">
-                            <li><i class="bi bi-check-circle-fill"></i> Full access to all modules</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Unlimited users</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Dedicated isolated environment</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Priority support (8h response)</li>
-                            <li><i class="bi bi-check-circle-fill"></i> AI Assistant included</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Migration assistance</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Automatic updates</li>
-                        </ul>
-                        <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-primary" style="width:100%;justify-content:center;">Start Annual</a>
-                    </div>
-                </div>
-                <!-- LIFETIME -->
-                <div class="col-lg col-md-6 reveal reveal-delay-3">
-                    <div class="pricing-card" style="border-color:rgba(16,185,129,0.3);">
-                        <div class="plan-name">Lifetime</div>
-                        <div class="plan-price"><span class="currency">Rp</span>19,9jt</div>
-                        <div class="plan-period">one-time · yours forever</div>
-                        <div class="plan-desc">Zero recurring fees. One investment. Permanent ownership.</div>
-                        <ul class="plan-features">
-                            <li><i class="bi bi-check-circle-fill"></i> Full access to all modules</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Unlimited users</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Dedicated isolated environment</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Dedicated support line</li>
-                            <li><i class="bi bi-check-circle-fill"></i> AI Assistant included</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Lifetime feature updates</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Maintenance: Rp2,4–3,6jt/yr</li>
-                        </ul>
-                        <a href="{{ route('customer.register') }}" class="btn-cooca" style="width:100%;justify-content:center;background:linear-gradient(135deg,#10B981,#059669);color:#fff;box-shadow:0 4px 20px rgba(16,185,129,.3);">Own It Forever</a>
-                    </div>
-                </div>
-                <!-- ENTERPRISE -->
-                <div class="col-lg col-md-6 reveal reveal-delay-4">
-                    <div class="pricing-card" style="border:2px dashed rgba(56,189,248,0.2);">
-                        <div class="plan-name">Enterprise <span style="font-size:0.68rem;background:rgba(56,189,248,0.1);color:var(--accent);padding:3px 10px;border-radius:50px;margin-left:6px;vertical-align:middle;">Custom</span></div>
-                        <div class="plan-price" style="font-size:1.6rem;">Let's Talk</div>
-                        <div class="plan-period">tailored to your scale</div>
-                        <div class="plan-desc">Multiple branches, custom integrations, white-label, or on-premise deployment.</div>
-                        <ul class="plan-features">
-                            <li><i class="bi bi-check-circle-fill"></i> Full module access</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Unlimited users</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Custom integrations (API)</li>
-                            <li><i class="bi bi-check-circle-fill"></i> Dedicated account manager</li>
-                            <li><i class="bi bi-check-circle-fill"></i> SLA contract</li>
-                            <li><i class="bi bi-check-circle-fill"></i> On-premise option</li>
-                            <li><i class="bi bi-check-circle-fill"></i> White-label available</li>
-                        </ul>
-                        <a href="{{ route('contact') }}" class="btn-cooca btn-cooca-outline" style="width:100%;justify-content:center;">Contact Sales <i class="bi bi-chat-dots"></i></a>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </section>

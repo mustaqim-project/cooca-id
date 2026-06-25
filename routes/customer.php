@@ -22,7 +22,7 @@ use App\Http\Controllers\Customer\ProfileController;
 |
 */
 
-Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'throttle:customer'])->group(function () {
+Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'verified', 'throttle:customer'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

@@ -98,7 +98,8 @@ return [
          * The database dump can be compressed to decrease disk space usage.
          * GzipCompressor shrinks dumps ~80%, highly recommended.
          */
-        'database_dump_compressor' => Spatie\DbDumper\Compressors\GzipCompressor::class,
+        // 'database_dump_compressor' => Spatie\DbDumper\Compressors\GzipCompressor::class,
+        'database_dump_compressor' => null,
 
         /*
          * Timestamp format for the dump filename.
@@ -124,7 +125,7 @@ return [
              *
              * For more check https://www.php.net/manual/zip.constants.php and confirm it's supported by your system.
              */
-            'compression_method' => ZipArchive::CM_DEFAULT,
+            'compression_method' => ZipArchive::CM_STORE,
 
             /*
              * The compression level corresponding to the used algorithm; an integer between 0 and 9.

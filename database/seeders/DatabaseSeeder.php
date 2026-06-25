@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             SubscriptionPlanSeeder::class,
             TestimonialSeeder::class,
             FAQSeeder::class,
-            BlogPostSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

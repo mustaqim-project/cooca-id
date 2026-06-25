@@ -23,11 +23,17 @@ final class ReferralController extends Controller
     public function index(): Response
     {
         $affiliator = Auth::guard('affiliator')->user();
-        $referrals = $this->affiliatorRepository->getReferrals($affiliator->getKey());
+        $referrals = \App\Models\Customer::where('affiliator_id', $affiliator->getKey())->paginate(15);
 
         return Inertia::render('Affiliator/Referrals/Index', [
             'referrals' => CustomerResource::collection($referrals),
             'referral_link' => route('customer.register', ['referral' => $affiliator->referral_code]),
         ]);
     }
+
+    public function stats(): \Inertia\Response
+    {
+        return \Inertia\Inertia::render('Affiliator/Referrals/Stats');
+    }
+
 }

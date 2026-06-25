@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Actions\GenerateLicenseAction;
+use App\Actions\License\GenerateLicense\GenerateLicenseAction;
 use App\DTOs\LicenseData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\GenerateLicenseRequest;
 use App\Http\Resources\Admin\LicenseResource;
-use App\Services\LicenseService;
+use App\Services\License\LicenseService;
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;

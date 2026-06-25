@@ -203,4 +203,43 @@ final class LicenseService
     {
         return 'license:validate:' . implode(':', $parts);
     }
+
+    /**
+     * Paginate licenses
+     */
+    public function paginate(int $perPage = 15): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        return $this->licenseRepository->paginate($perPage);
+    }
+
+    /**
+     * Find license by ID
+     */
+    public function findById(string $id): ?License
+    {
+        return $this->licenseRepository->findById($id);
+    }
+
+    /**
+     * Revoke license wrapper
+     */
+    public function revoke(string $id, ?string $revokedBy, ?string $reason): void
+    {
+        $license = $this->findById($id);
+        if ($license) {
+            $adminId = $revokedBy ? \Ramsey\Uuid\Uuid::fromString($revokedBy) : null;
+            $this->revokeLicense($license, $reason ?? 'No reason provided', $adminId);
+        }
+    }
+
+    /**
+     * Activate license wrapper
+     */
+    public function activate(string $id): void
+    {
+        $license = $this->findById($id);
+        if ($license) {
+            $this->activateLicense($license, now(), now()->addYear());
+        }
+    }
 }

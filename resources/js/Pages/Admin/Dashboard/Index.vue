@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AdminLayout from '@/Layouts/AdminLayout.vue';
+defineOptions({ layout: AdminLayout });
 import { Head, Link } from '@inertiajs/vue3';
 import StatCards from '@/Components/ui/StatCards.vue';
 
@@ -46,7 +48,7 @@ const statsData = [
     },
     {
         title: 'Monthly Revenue',
-        value: `Rp ${props.stats.monthlyRevenue.toLocaleString('id-ID')}`,
+        value: `Rp ${Number(props.stats.monthlyRevenue).toLocaleString('id-ID')}`,
         change: props.stats.revenueChange,
         icon: 'currency-dollar',
         color: 'yellow' as const
@@ -143,10 +145,10 @@ const transactionColumns = [
                                     {{ transaction.invoice_number }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ transaction.customer_name }}
+                                    {{ transaction.customer?.name || '-' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    Rp {{ transaction.gross_amount.toLocaleString('id-ID') }}
+                                    Rp {{ Number(transaction.gross_amount).toLocaleString('id-ID') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span

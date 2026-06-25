@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Customer;
 
-use App\Actions\ProcessPaymentAction;
+use App\Actions\Payment\ProcessPayment\ProcessPaymentAction;
 use App\DTOs\TransactionData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\ProcessPaymentRequest;
-use App\Services\PaymentService;
+use App\Services\Payment\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +20,31 @@ final class PaymentController extends Controller
         private readonly PaymentService $paymentService,
         private readonly ProcessPaymentAction $processPaymentAction
     ) {}
+
+    public function index(): \Inertia\Response
+    {
+        $payments = \App\Models\Transaction::where('customer_id', Auth::guard('customer')->id())
+            ->paginate(15);
+            
+        return Inertia::render('Customer/Payments/Index', [
+            'payments' => $payments
+        ]);
+    }
+
+    public function show(string $payment): \Inertia\Response
+    {
+        $transaction = \App\Models\Transaction::where('id', $payment)
+            ->where('customer_id', Auth::guard('customer')->id())
+            ->first();
+            
+        if (!$transaction) {
+            abort(404);
+        }
+
+        return Inertia::render('Customer/Payments/Show', [
+            'payment' => $transaction
+        ]);
+    }
 
     /**
      * Process payment for subscription.

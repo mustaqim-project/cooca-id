@@ -9,11 +9,11 @@ use App\Repositories\Contracts\SubscriptionPlanRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
-final class SubscriptionPlanRepository extends Repository implements SubscriptionPlanRepositoryInterface
+final class SubscriptionPlanRepository extends BaseRepository implements SubscriptionPlanRepositoryInterface
 {
-    public function getModel(): string
+    public function __construct(SubscriptionPlan $model)
     {
-        return SubscriptionPlan::class;
+        parent::__construct($model);
     }
 
     /**

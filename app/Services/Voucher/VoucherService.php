@@ -184,4 +184,52 @@ final class VoucherService
 
         return $availableVouchers;
     }
+
+    /**
+     * Paginate vouchers
+     */
+    public function paginate(int $perPage = 15): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        return $this->voucherRepository->paginate($perPage);
+    }
+
+    /**
+     * Create a new voucher
+     */
+    public function create(array $data): Voucher
+    {
+        return $this->voucherRepository->create($data);
+    }
+
+    /**
+     * Find voucher by ID
+     */
+    public function findById(string $id): ?Voucher
+    {
+        return $this->voucherRepository->find($id);
+    }
+
+    /**
+     * Update an existing voucher
+     */
+    public function update(string $id, array $data): bool
+    {
+        return $this->voucherRepository->update($id, $data);
+    }
+
+    /**
+     * Activate a voucher
+     */
+    public function activate(string $id): bool
+    {
+        return $this->voucherRepository->update($id, ['is_active' => true]);
+    }
+
+    /**
+     * Deactivate a voucher
+     */
+    public function deactivate(string $id): bool
+    {
+        return $this->voucherRepository->update($id, ['is_active' => false]);
+    }
 }

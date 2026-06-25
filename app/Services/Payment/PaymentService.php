@@ -419,4 +419,36 @@ final class PaymentService
             ? 'https://api.sandbox.midtrans.com/v2'
             : 'https://api.midtrans.com/v2';
     }
+
+    /**
+     * Paginate transactions
+     */
+    public function getTransactionsPaginated(int $perPage = 15): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        return Transaction::with(['customer', 'subscription', 'product'])
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+    }
+
+    /**
+     * Find transaction by ID
+     */
+    public function findTransactionById(string $id): ?Transaction
+    {
+        return Transaction::with(['customer', 'subscription', 'product', 'invoice'])->find($id);
+    }
+
+    /**
+     * Refund a transaction wrapper
+     */
+    public function refundTransaction(string $id, ?string $reason): array
+    {
+        $transaction = $this->findTransactionById($id);
+        if (!$transaction) {
+            throw new \RuntimeException('Transaction not found');
+        }
+        
+        // This simulates a full refund based on net amount
+        return $this->refund($transaction, (float) $transaction->net_amount);
+    }
 }

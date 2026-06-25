@@ -136,4 +136,5 @@ class MarketingController extends Controller
             'referralCode' => $affiliator->referral_code,
         ]);
     }
+
 }

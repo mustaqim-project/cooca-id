@@ -61,4 +61,57 @@ final class ProductRepository extends BaseRepository implements ProductRepositor
     {
         Cache::tags(['products'])->flush();
     }
+
+    public function getByCategory(string $categoryId): Collection
+    {
+        return $this->model
+            ->where('category_id', $categoryId)
+            ->where('is_active', true)
+            ->with(['category', 'subscriptionPlans'])
+            ->orderBy('sort_order')
+            ->get();
+    }
+
+    public function paginateWithFilters(int $perPage = 15, array $filters = []): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        $query = $this->model->with(['category', 'subscriptionPlans']);
+
+        if (!empty($filters['search'])) {
+            $query->where('name', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('description', 'like', '%' . $filters['search'] . '%');
+        }
+
+        if (!empty($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
+        }
+
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+
+        return $query->orderBy('sort_order')->paginate($perPage);
+    }
+
+    public function search(string $query): Collection
+    {
+        return $this->model
+            ->where('is_active', true)
+            ->where(function($q) use ($query) {
+                $q->where('name', 'like', '%' . $query . '%')
+                  ->orWhere('description', 'like', '%' . $query . '%');
+            })
+            ->with(['category', 'subscriptionPlans'])
+            ->get();
+    }
+
+    public function slugExists(string $slug, ?string $excludeId = null): bool
+    {
+        $query = $this->model->where('slug', $slug);
+        
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->exists();
+    }
 }

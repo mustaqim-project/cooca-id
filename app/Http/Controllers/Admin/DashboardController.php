@@ -78,7 +78,7 @@ final class DashboardController extends Controller
                 'revenue' => Transaction::where('status', 'paid')
                     ->whereYear('created_at', $month->year)
                     ->whereMonth('created_at', $month->month)
-                    ->sum('amount'),
+                    ->sum('net_amount'),
                 'customers' => Customer::whereYear('created_at', $month->year)
                     ->whereMonth('created_at', $month->month)
                     ->count(),

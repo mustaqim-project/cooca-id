@@ -24,7 +24,7 @@ final class ProductController extends Controller
      */
     public function index(): Response
     {
-        $products = $this->productRepository->paginate(15);
+        $products = $this->productRepository->paginateWithFilters(15);
 
         return Inertia::render('Admin/Products/Index', [
             'products' => ProductResource::collection($products),

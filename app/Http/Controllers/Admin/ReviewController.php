@@ -53,7 +53,7 @@ class ReviewController extends Controller
             'pending' => Review::where('status', 'pending')->count(),
             'approved' => Review::where('status', 'approved')->count(),
             'rejected' => Review::where('status', 'rejected')->count(),
-            'average_rating' => round(Review::where('status', 'approved')->avg('rating'), 2),
+            'average_rating' => round(Review::where('status', 'approved')->avg('rating') ?? 0, 2),
         ];
 
         return Inertia::render('Admin/Reviews/Index', [

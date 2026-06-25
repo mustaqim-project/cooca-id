@@ -49,7 +49,7 @@ class ReviewController extends Controller
             'approved' => Review::whereIn('customer_id', $customerIds)->where('status', 'approved')->count(),
             'average_rating' => round(Review::whereIn('customer_id', $customerIds)
                 ->where('status', 'approved')
-                ->avg('rating'), 2),
+                ->avg('rating') ?? 0, 2),
         ];
 
         return Inertia::render('Affiliator/Reviews/Index', [
