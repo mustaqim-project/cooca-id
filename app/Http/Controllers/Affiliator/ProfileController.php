@@ -26,7 +26,18 @@ class ProfileController extends Controller
         $affiliator = Auth::guard('affiliator')->user();
 
         return Inertia::render('Affiliator/Profile/Edit', [
-            'affiliator' => $affiliator,
+            'user' => [
+                'id' => $affiliator->id,
+                'name' => $affiliator->name,
+                'email' => $affiliator->email,
+                'phone' => null,
+                'google_id' => $affiliator->google_id,
+            ],
+            'bank_account' => [
+                'bank_name' => $affiliator->bank_name,
+                'account_number' => $affiliator->bank_account,
+                'account_holder' => $affiliator->name,
+            ],
         ]);
     }
 
@@ -40,14 +51,6 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:affiliators,email,' . $affiliator->id,
-            'phone' => 'nullable|string|max:20',
-            'bio' => 'nullable|string|max:1000',
-            'website' => 'nullable|url|max:255',
-            'social_media' => 'nullable|array',
-            'social_media.facebook' => 'nullable|url|max:255',
-            'social_media.twitter' => 'nullable|url|max:255',
-            'social_media.instagram' => 'nullable|url|max:255',
-            'social_media.linkedin' => 'nullable|url|max:255',
         ]);
 
         $affiliator->update($validated);
@@ -65,19 +68,12 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'bank_name' => 'required|string|max:100',
             'account_number' => 'required|string|max:50',
-            'account_name' => 'required|string|max:255',
-            'withdrawal_method' => 'required|in:bank,ewallet',
-            'ewallet_provider' => 'nullable|string|max:100',
-            'ewallet_number' => 'nullable|string|max:50',
+            'account_holder' => 'nullable|string|max:255',
         ]);
 
         $affiliator->update([
             'bank_name' => $validated['bank_name'],
-            'account_number' => $validated['account_number'],
-            'account_name' => $validated['account_name'],
-            'withdrawal_method' => $validated['withdrawal_method'],
-            'ewallet_provider' => $validated['ewallet_provider'] ?? null,
-            'ewallet_number' => $validated['ewallet_number'] ?? null,
+            'bank_account' => $validated['account_number'],
         ]);
 
         return back()->with('success', 'Bank account updated successfully.');
@@ -92,7 +88,7 @@ class ProfileController extends Controller
 
         $validated = $request->validate([
             'current_password' => 'required|string',
-            'password' => 'required|string|min:8|confirmed',
+            'new_password' => 'required|string|min:8|confirmed',
         ]);
 
         // Verify current password
@@ -101,7 +97,7 @@ class ProfileController extends Controller
         }
 
         $affiliator->update([
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($validated['new_password']),
         ]);
 
         return back()->with('success', 'Password updated successfully.');

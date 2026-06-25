@@ -69,7 +69,11 @@ class SettingsService
             default => 'affiliate.commission_rate_level_' . $level,
         };
 
-        return (float) $this->get($key, $level === 1 ? 25.0 : 5.0);
+        $fallback = $level === 1
+            ? config('affiliate.commission_rate_level_1', 25)
+            : config('affiliate.commission_rate_level_2', 5);
+
+        return (float) $this->get($key, $fallback);
     }
 
     /**

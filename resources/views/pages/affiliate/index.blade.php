@@ -229,6 +229,16 @@
     </section>
 
     <!-- ==================== COMMISSION EXPLAINER (VISUAL FLOW - UPDATED INTERACTIVE) ==================== -->
+    @php
+        $commissionExampleSales = 100000000;
+        $commissionLevelOneRate = (float) setting('affiliate.commission_rate_level_1', config('affiliate.commission_rate_level_1', 25));
+        $commissionLevelTwoRate = (float) setting('affiliate.commission_rate_level_2', config('affiliate.commission_rate_level_2', 5));
+        $commissionLevelOneRateText = rtrim(rtrim(number_format($commissionLevelOneRate, 2, ',', '.'), '0'), ',');
+        $commissionLevelTwoRateText = rtrim(rtrim(number_format($commissionLevelTwoRate, 2, ',', '.'), '0'), ',');
+        $commissionLevelOneAmount = $commissionExampleSales * ($commissionLevelOneRate / 100);
+        $commissionLevelTwoAmount = $commissionExampleSales * ($commissionLevelTwoRate / 100);
+        $commissionTotalAmount = $commissionLevelOneAmount + $commissionLevelTwoAmount;
+    @endphp
     <section class="section-padding" id="commission-explainer" style="background:var(--card-alt);">
         <div class="container">
             <div class="text-center">
@@ -241,18 +251,18 @@
             <div class="commission-flow-container">
                 <!-- Baris 1: Affiliate A Menjual -->
                 <div class="commission-flow-row reveal">
-                    <div class="commission-mini-card" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Peran Kamu" data-bs-content="Sebagai Affiliate A, kamu mempromosikan COOCA dan berhasil menjual paket langganan senilai total Rp100.000.000.">
+                    <div class="commission-mini-card" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Peran Kamu" data-bs-content="Sebagai Affiliate A, kamu mempromosikan COOCA dan berhasil menjual paket langganan senilai total Rp{{ number_format($commissionExampleSales, 0, ',', '.') }}.">
                         <div class="cmc-icon">🤝</div>
                         <div class="cmc-label">Kamu (Affiliate A)</div>
-                        <div class="cmc-value" style="color:var(--accent);">Rp100.000.000</div>
+                        <div class="cmc-value" style="color:var(--accent);">Rp{{ number_format($commissionExampleSales, 0, ',', '.') }}</div>
                         <div class="cmc-sub">Total Penjualan Pribadi</div>
                         <i class="bi bi-info-circle commission-popover-icon"></i>
                     </div>
                     <div class="commission-flow-arrow">→</div>
-                    <div class="commission-mini-card highlight-override" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Komisi Langsung 25%" data-bs-content="Dari penjualanmu sendiri, kamu langsung mendapat 25% komisi. Itu artinya Rp25.000.000 masuk ke saldo kamu.">
+                    <div class="commission-mini-card highlight-override" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Komisi Langsung {{ $commissionLevelOneRateText }}%" data-bs-content="Dari penjualanmu sendiri, kamu mendapat {{ $commissionLevelOneRateText }}% komisi. Itu artinya Rp{{ number_format($commissionLevelOneAmount, 0, ',', '.') }} masuk ke saldo kamu.">
                         <div class="cmc-icon">💰</div>
-                        <div class="cmc-label">Komisi Kamu (25%)</div>
-                        <div class="cmc-value" style="color:#10B981;">Rp25.000.000</div>
+                        <div class="cmc-label">Komisi Kamu ({{ $commissionLevelOneRateText }}%)</div>
+                        <div class="cmc-value" style="color:#10B981;">Rp{{ number_format($commissionLevelOneAmount, 0, ',', '.') }}</div>
                         <div class="cmc-sub">Direct Commission</div>
                         <i class="bi bi-info-circle commission-popover-icon"></i>
                     </div>
@@ -263,18 +273,18 @@
 
                 <!-- Baris 2: Affiliate B di bawah A menjual -->
                 <div class="commission-flow-row reveal reveal-delay-1">
-                    <div class="commission-mini-card" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Tim Affiliate Kamu" data-bs-content="Affiliate B adalah orang yang kamu rekrut menjadi tim. Dia juga berjualan dan menghasilkan Rp100.000.000.">
+                    <div class="commission-mini-card" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Tim Affiliate Kamu" data-bs-content="Affiliate B adalah orang yang kamu rekrut menjadi tim. Dia juga berjualan dan menghasilkan Rp{{ number_format($commissionExampleSales, 0, ',', '.') }}.">
                         <div class="cmc-icon">👥</div>
                         <div class="cmc-label">Affiliate B (Tim Kamu)</div>
-                        <div class="cmc-value" style="color:var(--accent);">Rp100.000.000</div>
+                        <div class="cmc-value" style="color:var(--accent);">Rp{{ number_format($commissionExampleSales, 0, ',', '.') }}</div>
                         <div class="cmc-sub">Penjualan Tim</div>
                         <i class="bi bi-info-circle commission-popover-icon"></i>
                     </div>
                     <div class="commission-flow-arrow">→</div>
-                    <div class="commission-mini-card" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Komisi Affiliate B" data-bs-content="Affiliate B juga mendapatkan 25% dari penjualannya sendiri, jadi dia dapat Rp25.000.000. Komisi ini tidak mengurangi komisi kamu.">
+                    <div class="commission-mini-card" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Komisi Affiliate B" data-bs-content="Affiliate B juga mendapatkan {{ $commissionLevelOneRateText }}% dari penjualannya sendiri, jadi dia dapat Rp{{ number_format($commissionLevelOneAmount, 0, ',', '.') }}. Komisi ini tidak mengurangi komisi kamu.">
                         <div class="cmc-icon">💸</div>
-                        <div class="cmc-label">Komisi B (25%)</div>
-                        <div class="cmc-value" style="color:#10B981;">Rp25.000.000</div>
+                        <div class="cmc-label">Komisi B ({{ $commissionLevelOneRateText }}%)</div>
+                        <div class="cmc-value" style="color:#10B981;">Rp{{ number_format($commissionLevelOneAmount, 0, ',', '.') }}</div>
                         <div class="cmc-sub">Untuk Affiliate B</div>
                         <i class="bi bi-info-circle commission-popover-icon"></i>
                     </div>
@@ -285,19 +295,19 @@
 
                 <!-- Baris 3: Override untuk A -->
                 <div class="commission-flow-row reveal reveal-delay-2">
-                    <div class="commission-mini-card highlight-override" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Bonus Override 5%" data-bs-content="Karena kamu memiliki tim, kamu mendapat bonus 5% dari total penjualan Affiliate B. Itu tambahan Rp5.000.000 tanpa mengurangi komisi B.">
+                    <div class="commission-mini-card highlight-override" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Bonus Override {{ $commissionLevelTwoRateText }}%" data-bs-content="Karena kamu memiliki tim, kamu mendapat bonus {{ $commissionLevelTwoRateText }}% dari total penjualan Affiliate B. Itu tambahan Rp{{ number_format($commissionLevelTwoAmount, 0, ',', '.') }} tanpa mengurangi komisi B.">
                         <div class="cmc-icon">🎁</div>
                         <div class="cmc-label">Bonus Override Kamu</div>
-                        <div class="cmc-value" style="color:#10B981;font-size:1.6rem;">+Rp5.000.000</div>
-                        <div class="cmc-sub">5% dari penjualan tim</div>
+                        <div class="cmc-value" style="color:#10B981;font-size:1.6rem;">+Rp{{ number_format($commissionLevelTwoAmount, 0, ',', '.') }}</div>
+                        <div class="cmc-sub">{{ $commissionLevelTwoRateText }}% dari penjualan tim</div>
                         <i class="bi bi-info-circle commission-popover-icon"></i>
                     </div>
                     <div class="commission-flow-arrow" style="color:#10B981;">+</div>
-                    <div class="commission-mini-card highlight-override" style="border:2px solid rgba(16,185,129,0.6);background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(37,99,235,0.06));" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Total Komisi Kamu" data-bs-content="Gabungan komisi langsung (Rp25jt) + bonus override (Rp5jt) = Rp30.000.000. Inilah kekuatan membangun jaringan!">
+                    <div class="commission-mini-card highlight-override" style="border:2px solid rgba(16,185,129,0.6);background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(37,99,235,0.06));" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top" title="Total Komisi Kamu" data-bs-content="Gabungan komisi langsung (Rp{{ number_format($commissionLevelOneAmount, 0, ',', '.') }}) + bonus override (Rp{{ number_format($commissionLevelTwoAmount, 0, ',', '.') }}) = Rp{{ number_format($commissionTotalAmount, 0, ',', '.') }}. Inilah kekuatan membangun jaringan!">
                         <div class="cmc-icon">🚀</div>
                         <div class="cmc-label">Total Komisi Kamu</div>
-                        <div class="cmc-value" style="color:#10B981;font-size:1.8rem;font-weight:900;">Rp30.000.000</div>
-                        <div class="cmc-sub">Rp25jt + Rp5jt override</div>
+                        <div class="cmc-value" style="color:#10B981;font-size:1.8rem;font-weight:900;">Rp{{ number_format($commissionTotalAmount, 0, ',', '.') }}</div>
+                        <div class="cmc-sub">Direct + override</div>
                         <i class="bi bi-info-circle commission-popover-icon"></i>
                     </div>
                 </div>

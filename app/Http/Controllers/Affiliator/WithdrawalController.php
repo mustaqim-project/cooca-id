@@ -50,6 +50,7 @@ final class WithdrawalController extends Controller
         return Inertia::render('Affiliator/Withdrawals/Index', [
             'withdrawals' => $withdrawals,
             'balance' => $this->affiliateService->getAvailableBalance($affiliator->getKey()),
+            'minimumWithdrawal' => (float) Setting::get('affiliate.minimum_withdrawal', config('affiliate.minimum_withdrawal', 50000)),
         ]);
     }
 
@@ -67,6 +68,7 @@ final class WithdrawalController extends Controller
                 'bank' => (float) Setting::get('affiliate.withdrawal_fee_bank', config('affiliate.withdrawal_fee_bank', 2500)),
                 'ewallet' => (float) Setting::get('affiliate.withdrawal_fee_ewallet', config('affiliate.withdrawal_fee_ewallet', 1000)),
             ],
+            'minimumWithdrawal' => (float) Setting::get('affiliate.minimum_withdrawal', config('affiliate.minimum_withdrawal', 50000)),
             'bankAccount' => [
                 'bank_name' => $affiliator->bank_name ?? '',
                 'account_number' => $affiliator->bank_account ?? '',

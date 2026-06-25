@@ -109,7 +109,7 @@
                         <label class="input-label">Bank Name</label>
                         <div class="position-relative">
                             <i class="bi bi-building input-icon"></i>
-                            <input type="text" name="bank_name" class="input-field" placeholder="e.g. BCA, Mandiri" value="{{ old('business_name') }}">
+                            <input type="text" name="bank_name" class="input-field" placeholder="e.g. BCA, Mandiri" value="{{ old('bank_name') }}">
                         </div>
                     </div>
                     
@@ -117,14 +117,15 @@
                         <label class="input-label">Parent Referral Code (Optional)</label>
                         <div class="position-relative">
                             <i class="bi bi-ticket-detailed input-icon"></i>
-                            <input type="text" name="parent_referral_code"
+                            <input type="text" name="parent_referral_code" class="input-field" placeholder="Enter referral code if you have one" value="{{ old('parent_referral_code') }}">
+                        </div>
+                    </div>
+
                     <div class="input-wrap mt-3">
                         <label class="input-label">Bank Account Number</label>
                         <div class="position-relative">
                             <i class="bi bi-credit-card input-icon"></i>
                             <input type="text" name="bank_account" class="input-field" placeholder="1234567890" value="{{ old('bank_account') }}">
-                        </div>
-                    </div> class="input-field" placeholder="Enter referral code if you have one" value="{{ old('referral_code') }}">
                         </div>
                     </div>
                     

@@ -15,7 +15,7 @@
                         <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-6 text-white mb-6">
                             <h3 class="text-sm font-medium opacity-80">Available Balance</h3>
                             <p class="text-3xl font-bold mt-2">Rp {{ formatCurrency(balance) }}</p>
-                            <p class="text-xs mt-2 opacity-70">Minimum withdrawal: Rp 50,000</p>
+                            <p class="text-xs mt-2 opacity-70">Minimum withdrawal: Rp {{ formatCurrency(minimumWithdrawal) }}</p>
                         </div>
 
                         <!-- Filters -->
@@ -113,6 +113,7 @@ import AffiliatorLayout from '@/Layouts/AffiliatorLayout.vue';
 
 const withdrawals = ref({ data: [], current_page: 1, last_page: 1 });
 const balance = ref(0);
+const minimumWithdrawal = ref(0);
 const status = ref('');
 
 const fetchWithdrawals = (page = 1) => {
@@ -125,6 +126,7 @@ const fetchWithdrawals = (page = 1) => {
         onSuccess: (response) => {
             withdrawals.value = response.props.withdrawals;
             balance.value = response.props.balance || 0;
+            minimumWithdrawal.value = response.props.minimumWithdrawal || 0;
         }
     });
 };

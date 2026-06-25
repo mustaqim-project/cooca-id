@@ -47,8 +47,8 @@ Route::prefix('affiliator')->name('affiliator.')->middleware(['auth:affiliator',
     Route::get('/withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
     Route::post('/withdrawals', [WithdrawalController::class, 'store'])->name('withdrawals.store');
     Route::get('/withdrawals/create', [WithdrawalController::class, 'create'])->name('withdrawals.create');
-    Route::get('/withdrawals/{withdrawal}', [WithdrawalController::class, 'show'])->name('withdrawals.show');
     Route::get('/withdrawals/history', [WithdrawalController::class, 'history'])->name('withdrawals.history');
+    Route::get('/withdrawals/{withdrawal}', [WithdrawalController::class, 'show'])->name('withdrawals.show');
 
     // Reviews (from customers about products via affiliate link)
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');

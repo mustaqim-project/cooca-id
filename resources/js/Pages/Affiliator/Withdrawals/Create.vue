@@ -9,6 +9,7 @@ interface Props {
         bank: number;
         ewallet: number;
     };
+    minimumWithdrawal: number;
     bankAccount?: {
         bank_name: string;
         account_number: string;
@@ -39,7 +40,7 @@ const maxAmount = computed(() => {
     return props.availableBalance;
 });
 
-const minAmount = 50000; // Minimum withdrawal Rp 50.000
+const minAmount = computed(() => props.minimumWithdrawal);
 
 const submitWithdrawal = () => {
     form.post(route('affiliator.withdrawals.store'), {
@@ -109,10 +110,10 @@ const submitWithdrawal = () => {
                                     id="amount"
                                     v-model.number="form.amount"
                                     type="number"
-                                    min="minAmount"
+                                    :min="minAmount"
                                     :max="maxAmount"
                                     class="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                    placeholder="Minimum Rp 50.000"
+                                    :placeholder="`Minimum Rp ${minAmount.toLocaleString('id-ID')}`"
                                     required
                                 />
                                 <span v-if="form.errors.amount" class="text-red-500 text-xs mt-1">{{ form.errors.amount }}</span>
