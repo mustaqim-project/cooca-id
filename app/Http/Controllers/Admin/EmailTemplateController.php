@@ -21,7 +21,7 @@ class EmailTemplateController extends Controller
     /**
      * Display a listing of email templates.
      */
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $query = EmailTemplate::with(['creator', 'updater'])->latest('created_at');
 
@@ -66,7 +66,7 @@ class EmailTemplateController extends Controller
     /**
      * Show the form for creating a new template.
      */
-    public function create(): Response
+    public function create()
     {
         return view('admin.emailtemplates.create', [
             'template' => null,
@@ -80,7 +80,7 @@ class EmailTemplateController extends Controller
     /**
      * Store a newly created template in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -110,7 +110,7 @@ class EmailTemplateController extends Controller
     /**
      * Display the specified template.
      */
-    public function show(EmailTemplate $template): Response
+    public function show(EmailTemplate $template)
     {
         return view('admin.emailtemplates.show', [
             'template' => $template->load(['creator', 'updater']),
@@ -120,7 +120,7 @@ class EmailTemplateController extends Controller
     /**
      * Show the form for editing the specified template.
      */
-    public function edit(EmailTemplate $template): Response
+    public function edit(EmailTemplate $template)
     {
         return view('admin.emailtemplates.edit', [
             'template' => $template,
@@ -134,7 +134,7 @@ class EmailTemplateController extends Controller
     /**
      * Update the specified template in storage.
      */
-    public function update(Request $request, EmailTemplate $template): JsonResponse
+    public function update(Request $request, EmailTemplate $template)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -164,7 +164,7 @@ class EmailTemplateController extends Controller
     /**
      * Remove the specified template from storage.
      */
-    public function destroy(EmailTemplate $template): JsonResponse
+    public function destroy(EmailTemplate $template)
     {
         $template->delete();
 
@@ -177,7 +177,7 @@ class EmailTemplateController extends Controller
     /**
      * Toggle active status
      */
-    public function toggleActive(EmailTemplate $template): JsonResponse
+    public function toggleActive(EmailTemplate $template)
     {
         $template->update(['is_active' => !$template->is_active]);
 
@@ -191,7 +191,7 @@ class EmailTemplateController extends Controller
     /**
      * Preview template with sample data
      */
-    public function preview(EmailTemplate $template): JsonResponse
+    public function preview(EmailTemplate $template)
     {
         $sampleData = [];
         

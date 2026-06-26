@@ -18,21 +18,21 @@ class BlogPostFactory extends Factory
      */
     public function definition(): array
     {
-        $title = fake()->unique()->sentence(4);
+        $title = fake()->unique()->sentence(6);
         
         return [
             'id' => (string) Str::uuid(),
             'title' => rtrim($title, '.'),
             'slug' => Str::slug($title),
-            'excerpt' => fake()->sentence(15),
-            'content' => fake()->paragraphs(5, true),
-            'featured_image' => fake()->optional(0.7)->imageUrl(1200, 630, 'blog', true),
-            'author_id' => \App\Models\Admin::factory(),
-            'category' => fake()->randomElement(['Technology', 'Business', 'Tutorial', 'News', 'Updates']),
-            'tags' => json_encode([fake()->word(), fake()->word(), fake()->word()]),
-            'is_published' => fake()->boolean(80),
-            'published_at' => fake()->optional(0.8)->dateTimeBetween('-6 months', 'now'),
-            'views_count' => fake()->numberBetween(0, 5000),
+            'excerpt' => fake()->sentence(20),
+            'content' => fake()->paragraphs(6, true),
+            'featured_image' => fake()->optional(0.7)->imageUrl(1200, 630, 'business', true),
+            'author_id' => \App\Models\Admin::inRandomOrder()->first()?->id ?? \App\Models\Admin::factory(),
+            'category' => fake()->randomElement(['Retail', 'Restaurant', 'Hotel', 'Clinic', 'AI & Automation', 'Revenue Optimization', 'Case Studies']),
+            'tags' => ['SaaS', 'Business', 'Indonesia', 'Operations', 'Growth'],
+            'is_published' => fake()->boolean(85),
+            'published_at' => fake()->optional(0.85)->dateTimeBetween('-6 months', 'now'),
+            'views_count' => fake()->numberBetween(100, 15000),
         ];
     }
 
@@ -64,7 +64,7 @@ class BlogPostFactory extends Factory
     public function popular(): static
     {
         return $this->state(fn (array $attributes) => [
-            'views_count' => fake()->numberBetween(1000, 10000),
+            'views_count' => fake()->numberBetween(5000, 25000),
         ]);
     }
 }

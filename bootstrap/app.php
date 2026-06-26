@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             SecurityHeadersMiddleware::class,
             \App\Http\Middleware\ActivityLogger::class,
+            \App\Http\Middleware\SetLocale::class,
         ]);
 
         $middleware->api(append: [

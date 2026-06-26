@@ -23,7 +23,7 @@ final class SettlementController extends Controller
     /**
      * Display listing of withdrawal requests.
      */
-    public function index(): Response
+    public function index()
     {
         $withdrawals = $this->affiliateService->getWithdrawalsPaginated(15);
 
@@ -32,7 +32,7 @@ final class SettlementController extends Controller
         ]);
     }
 
-    public function show(string $id): Response
+    public function show(string $id)
     {
         $withdrawal = $this->affiliateService->findWithdrawalById($id);
 
@@ -48,33 +48,26 @@ final class SettlementController extends Controller
     /**
      * Approve the specified withdrawal request.
      */
-    public function approve(string $id): RedirectResponse|JsonResponse
+    public function approve(string $id): JsonResponse
     {
         $withdrawal = $this->affiliateService->findWithdrawalById($id);
 
         if (!$withdrawal) {
-            return response()->json(['message' => 'Withdrawal not found'], 404);
+            return response()->json(['message' => 'Withdrawal request not found'], 404);
         }
 
-        $adminId = Auth::guard('admin')->id();
-        abort_if($adminId === null, 403);
-
-        $this->affiliateService->approveWithdrawal($id, (string) $adminId);
-
-        if (!request()->expectsJson()) {
-            return back()->with('success', 'Withdrawal approved successfully');
+        try {
+            $this->affiliateService->approveWithdrawal($id, (string) auth()->id());
+            return response()->json(['message' => 'Withdrawal approved successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error approving withdrawal: ' . $e->getMessage()], 500);
         }
-
-        return response()->json([
-            'message' => 'Withdrawal approved successfully',
-            'data' => new AffiliateWithdrawalResource($withdrawal->fresh()),
-        ]);
     }
 
     /**
      * Reject the specified withdrawal request.
      */
-    public function reject(Request $request, string $id): RedirectResponse|JsonResponse
+    public function reject(Request $request, string $id): JsonResponse
     {
         $withdrawal = $this->affiliateService->findWithdrawalById($id);
 
@@ -102,7 +95,7 @@ final class SettlementController extends Controller
     /**
      * Mark withdrawal as paid.
      */
-    public function markAsPaid(string $id): JsonResponse
+    public function markAsPaid(string $id)
     {
         $withdrawal = $this->affiliateService->findWithdrawalById($id);
 

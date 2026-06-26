@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder
         // Run seeders in the correct order
         $this->call([
             SettingsSeeder::class,
+            CmsSettingSeeder::class,
+            LandingCmsSeeder::class,
             CompanyInfoSeeder::class,
             ProductCategorySeeder::class,
             ProductSeeder::class,
@@ -21,6 +23,10 @@ class DatabaseSeeder extends Seeder
             TestimonialSeeder::class,
             FAQSeeder::class,
             UserSeeder::class,
+            AdminAffiliatorCustomerSeeder::class,
+            BlogPostSeeder::class,
+            AffiliateCommissionScenarioSeeder::class,
+            FullDatabaseSeeder::class,
         ]);
     }
 }

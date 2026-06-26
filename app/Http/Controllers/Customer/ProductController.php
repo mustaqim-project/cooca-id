@@ -18,7 +18,7 @@ final class ProductController extends Controller
     /**
      * Display listing of available products.
      */
-    public function index(): View
+    public function index()
     {
         $products = $this->productRepository->getActiveProducts();
 
@@ -30,7 +30,7 @@ final class ProductController extends Controller
     /**
      * Display the specified product.
      */
-    public function show(string $slug): View
+    public function show(string $slug)
     {
         $product = $this->productRepository->findBySlug($slug);
 

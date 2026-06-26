@@ -19,7 +19,7 @@ final class ReferralController extends Controller
     /**
      * Display listing of referrals.
      */
-    public function index(): View
+    public function index()
     {
         $affiliator = Auth::guard('affiliator')->user();
         $referrals = \App\Models\Customer::where('affiliator_id', $affiliator->getKey())->paginate(15);
@@ -30,7 +30,7 @@ final class ReferralController extends Controller
         ]);
     }
 
-    public function stats(): Illuminate\View\View
+    public function stats()
     {
         return view('affiliator.referrals.stats');
     }

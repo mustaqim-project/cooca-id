@@ -19,7 +19,7 @@ final class TransactionController extends Controller
     /**
      * Display listing of transactions.
      */
-    public function index(): View
+    public function index()
     {
         $transactions = $this->paymentService->getTransactionsPaginated(15);
 
@@ -31,7 +31,7 @@ final class TransactionController extends Controller
     /**
      * Display the specified transaction.
      */
-    public function show(string $id): View
+    public function show(string $id)
     {
         $transaction = $this->paymentService->findTransactionById($id);
 
@@ -47,7 +47,7 @@ final class TransactionController extends Controller
     /**
      * Mark transaction as paid (manual override).
      */
-    public function markAsPaid(string $id): JsonResponse
+    public function markAsPaid(string $id)
     {
         $transaction = $this->paymentService->findTransactionById($id);
 
@@ -66,7 +66,7 @@ final class TransactionController extends Controller
     /**
      * Refund the specified transaction.
      */
-    public function refund(string $id, array $data): JsonResponse
+    public function refund(string $id, array $data)
     {
         $transaction = $this->paymentService->findTransactionById($id);
 

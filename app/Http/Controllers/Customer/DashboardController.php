@@ -22,7 +22,7 @@ final class DashboardController extends Controller
     /**
      * Display customer dashboard with comprehensive statistics.
      */
-    public function index(): View
+    public function index()
     {
         $customer = Auth::guard('customer')->user();
 

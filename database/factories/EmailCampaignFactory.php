@@ -20,19 +20,19 @@ class EmailCampaignFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'name' => fake()->unique()->sentence(3),
-            'subject' => fake()->sentence(5),
-            'content' => fake()->paragraphs(3, true),
-            'recipient_type' => fake()->randomElement(['customers', 'affiliators', 'all']),
-            'segment_criteria' => json_encode([fake()->word() => fake()->word()]),
-            'total_recipients' => 0,
-            'sent_count' => 0,
-            'opened_count' => 0,
-            'clicked_count' => 0,
+            'name' => fake()->unique()->sentence(4),
+            'subject' => fake()->sentence(6),
+            'content' => fake()->paragraphs(4, true),
+            'recipient_type' => fake()->randomElement(['all_customers', 'segment', 'specific']),
+            'segment_criteria' => ['status' => 'active', 'min_spent' => 500000],
+            'total_recipients' => fake()->numberBetween(100, 5000),
+            'sent_count' => fake()->numberBetween(100, 5000),
+            'opened_count' => fake()->numberBetween(50, 4000),
+            'clicked_count' => fake()->numberBetween(10, 2000),
             'status' => fake()->randomElement(['draft', 'scheduled', 'sending', 'completed', 'failed']),
-            'scheduled_at' => null,
-            'sent_at' => null,
-            'created_by' => \App\Models\Admin::factory(),
+            'scheduled_at' => fake()->optional(0.5)->dateTimeBetween('now', '+1 week'),
+            'sent_at' => fake()->optional(0.6)->dateTimeBetween('-2 months', 'now'),
+            'created_by' => \App\Models\Admin::inRandomOrder()->first()?->id ?? \App\Models\Admin::factory(),
         ];
     }
 
@@ -65,10 +65,10 @@ class EmailCampaignFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'completed',
             'sent_at' => now()->subDays(5),
-            'total_recipients' => fake()->numberBetween(100, 10000),
-            'sent_count' => fake()->numberBetween(100, 10000),
-            'opened_count' => fake()->numberBetween(10, 5000),
-            'clicked_count' => fake()->numberBetween(5, 2000),
+            'total_recipients' => fake()->numberBetween(500, 15000),
+            'sent_count' => fake()->numberBetween(500, 15000),
+            'opened_count' => fake()->numberBetween(200, 10000),
+            'clicked_count' => fake()->numberBetween(50, 5000),
         ]);
     }
 

@@ -7,10 +7,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 final class AffiliateWithdrawal extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
     protected $table = 'affiliate_withdrawals';
 

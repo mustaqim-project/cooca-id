@@ -12,54 +12,35 @@ class ProductCategorySeeder extends Seeder
      */
     public function run(): void
     {
+        // Truncate and reseed to match home page tabs
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        ProductCategory::truncate();
+        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+
         $categories = [
             [
-                'name' => 'Restaurant Management',
-                'slug' => 'restaurant-management',
-                'description' => 'Complete ERP solution for restaurant operations',
-                'is_active' => true,
+                'name'        => 'Commerce & Retail',
+                'slug'        => 'commerce-retail',
+                'description' => 'Solusi ERP terintegrasi untuk bisnis ritel, salon, laundry, dan usaha perdagangan.',
+                'icon'        => 'bi-bag-check',
+                'sort_order'  => 1,
+                'is_active'   => true,
             ],
             [
-                'name' => 'Healthcare System',
-                'slug' => 'healthcare-system',
-                'description' => 'Medical practice and clinic management system',
-                'is_active' => true,
+                'name'        => 'Hospitality & Services',
+                'slug'        => 'hospitality-services',
+                'description' => 'Sistem manajemen untuk restoran, hotel, dan bisnis penyewaan aset.',
+                'icon'        => 'bi-building',
+                'sort_order'  => 2,
+                'is_active'   => true,
             ],
             [
-                'name' => 'Automotive Services',
-                'slug' => 'automotive-services',
-                'description' => 'Auto repair and maintenance management',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Retail Management',
-                'slug' => 'retail-management',
-                'description' => 'Point of sale and inventory management',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Educational Institutions',
-                'slug' => 'educational-institutions',
-                'description' => 'School and university management system',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Hotel & Hospitality',
-                'slug' => 'hotel-hospitality',
-                'description' => 'Hotel booking and property management',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Manufacturing',
-                'slug' => 'manufacturing',
-                'description' => 'Production and supply chain management',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Professional Services',
-                'slug' => 'professional-services',
-                'description' => 'Consulting and service provider management',
-                'is_active' => true,
+                'name'        => 'Health & Professional',
+                'slug'        => 'health-professional',
+                'description' => 'Platform digital untuk klinik, bengkel, dan lembaga pendidikan.',
+                'icon'        => 'bi-briefcase',
+                'sort_order'  => 3,
+                'is_active'   => true,
             ],
         ];
 
@@ -67,6 +48,6 @@ class ProductCategorySeeder extends Seeder
             ProductCategory::create($category);
         }
 
-        $this->command->info('Product categories seeded successfully.');
+        $this->command->info('Product categories seeded successfully (3 categories).');
     }
 }

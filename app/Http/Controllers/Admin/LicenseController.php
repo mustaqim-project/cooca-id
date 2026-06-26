@@ -25,7 +25,7 @@ final class LicenseController extends Controller
     /**
      * Display listing of licenses.
      */
-    public function index(): View
+    public function index()
     {
         $licenses = $this->licenseService->paginate(15);
 
@@ -37,7 +37,7 @@ final class LicenseController extends Controller
     /**
      * Generate new license codes.
      */
-    public function generate(GenerateLicenseRequest $request): JsonResponse
+    public function generate(GenerateLicenseRequest $request)
     {
         $data = $request->validated();
         
@@ -60,7 +60,7 @@ final class LicenseController extends Controller
     /**
      * Revoke the specified license.
      */
-    public function revoke(string $id, array $data): JsonResponse
+    public function revoke(string $id, array $data)
     {
         $license = $this->licenseService->findById($id);
 
@@ -79,7 +79,7 @@ final class LicenseController extends Controller
     /**
      * Activate the specified license.
      */
-    public function activate(string $id): JsonResponse
+    public function activate(string $id)
     {
         $license = $this->licenseService->findById($id);
 

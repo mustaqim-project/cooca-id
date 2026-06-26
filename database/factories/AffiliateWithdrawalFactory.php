@@ -18,7 +18,7 @@ class AffiliateWithdrawalFactory extends Factory
      */
     public function definition(): array
     {
-        $amount = fake()->randomFloat(2, 100, 5000);
+        $amount = fake()->randomElement([1000000, 2500000, 5000000, 10000000, 25000000]);
         $fee = $amount * 0.02; // 2% fee
         
         return [
@@ -31,11 +31,11 @@ class AffiliateWithdrawalFactory extends Factory
             'account_number' => fake()->bankAccountNumber(),
             'account_name' => fake()->name(),
             'status' => fake()->randomElement(['pending', 'approved', 'rejected', 'paid']),
-            'approved_by' => null,
-            'approved_at' => null,
+            'approved_by' => \App\Models\Admin::inRandomOrder()->first()?->id ?? null,
+            'approved_at' => fake()->optional(0.7)->dateTimeBetween('-6 months', 'now'),
             'rejected_at' => null,
             'rejection_reason' => null,
-            'paid_at' => null,
+            'paid_at' => fake()->optional(0.7)->dateTimeBetween('-6 months', 'now'),
         ];
     }
 

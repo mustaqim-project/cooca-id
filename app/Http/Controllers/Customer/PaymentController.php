@@ -21,7 +21,7 @@ final class PaymentController extends Controller
         private readonly ProcessPaymentAction $processPaymentAction
     ) {}
 
-    public function index(): Illuminate\View\View
+    public function index()
     {
         $payments = \App\Models\Transaction::where('customer_id', Auth::guard('customer')->id())
             ->paginate(15);
@@ -31,7 +31,7 @@ final class PaymentController extends Controller
         ]);
     }
 
-    public function show(string $payment): Illuminate\View\View
+    public function show(string $payment)
     {
         $transaction = \App\Models\Transaction::where('id', $payment)
             ->where('customer_id', Auth::guard('customer')->id())
@@ -49,7 +49,7 @@ final class PaymentController extends Controller
     /**
      * Process payment for subscription.
      */
-    public function store(ProcessPaymentRequest $request): JsonResponse
+    public function store(ProcessPaymentRequest $request)
     {
         $customer = Auth::guard('customer')->user();
         $data = $request->validated();
@@ -74,7 +74,7 @@ final class PaymentController extends Controller
     /**
      * Handle Midtrans redirect/callback.
      */
-    public function callback(string $orderId): RedirectResponse
+    public function callback(string $orderId)
     {
         $transaction = $this->paymentService->findTransactionByOrderId($orderId);
 
@@ -88,7 +88,7 @@ final class PaymentController extends Controller
     /**
      * Display payment success page.
      */
-    public function success(): Illuminate\View\View
+    public function success()
     {
         return view('customer.payments.success');
     }
@@ -96,7 +96,7 @@ final class PaymentController extends Controller
     /**
      * Display payment pending page.
      */
-    public function pending(): Illuminate\View\View
+    public function pending()
     {
         return view('customer.payments.pending');
     }
@@ -104,7 +104,7 @@ final class PaymentController extends Controller
     /**
      * Display payment failed page.
      */
-    public function failed(): Illuminate\View\View
+    public function failed()
     {
         return view('customer.payments.failed');
     }

@@ -18,23 +18,26 @@ class VoucherFactory extends Factory
      */
     public function definition(): array
     {
+        $type = fake()->randomElement(['percent', 'nominal']);
+        $value = $type === 'percent' ? fake()->randomElement([10, 15, 20, 25, 30]) : fake()->randomElement([50000, 100000, 150000, 250000]);
+        
         return [
             'id' => (string) Str::uuid(),
-            'code' => strtoupper(fake()->unique()->lexify('VOUCHER-???-###')),
+            'code' => strtoupper(fake()->unique()->lexify('COOCA-???-###')),
             'name' => fake()->sentence(3),
             'description' => fake()->optional(0.7)->paragraph(),
-            'type' => fake()->randomElement(['percent', 'nominal']),
-            'value' => fake()->randomFloat(2, 5, 50),
-            'min_purchase' => fake()->randomFloat(2, 50, 500),
-            'max_discount' => fake()->optional(0.5)->randomFloat(2, 50, 200),
-            'max_usage' => fake()->optional(0.7)->numberBetween(10, 1000),
-            'used_count' => 0,
-            'per_user_limit' => fake()->optional(0.5)->numberBetween(1, 5),
+            'type' => $type,
+            'value' => $value,
+            'min_purchase' => fake()->randomElement([250000, 500000, 1000000]),
+            'max_discount' => $type === 'percent' ? fake()->randomElement([100000, 250000, 500000]) : null,
+            'max_usage' => fake()->optional(0.7)->numberBetween(50, 1000),
+            'used_count' => fake()->numberBetween(0, 40),
+            'per_user_limit' => fake()->numberBetween(1, 5),
             'valid_from' => now()->subDays(10),
             'valid_until' => now()->addDays(30),
             'is_active' => true,
             'applicable_products' => null,
-            'created_by' => \App\Models\Admin::factory(),
+            'created_by' => \App\Models\Admin::inRandomOrder()->first()?->id ?? \App\Models\Admin::factory(),
         ];
     }
 
@@ -45,7 +48,8 @@ class VoucherFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'type' => 'percent',
-            'value' => fake()->randomFloat(2, 5, 50),
+            'value' => fake()->randomElement([10, 15, 20, 25, 30]),
+            'max_discount' => fake()->randomElement([100000, 250000, 500000]),
         ]);
     }
 
@@ -56,7 +60,8 @@ class VoucherFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'type' => 'nominal',
-            'value' => fake()->randomFloat(2, 10000, 500000),
+            'value' => fake()->randomElement([50000, 100000, 150000, 250000]),
+            'max_discount' => null,
         ]);
     }
 

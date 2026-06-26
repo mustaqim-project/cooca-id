@@ -14,6 +14,10 @@ class BlogPostSeeder extends Seeder
      */
     public function run(): void
     {
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        BlogPost::truncate();
+        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+
         $admin = Admin::first();
         $adminId = $admin ? $admin->id : null;
 

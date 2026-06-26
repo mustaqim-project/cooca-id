@@ -18,8 +18,11 @@ class TransactionFactory extends Factory
      */
     public function definition(): array
     {
-        $grossAmount = fake()->randomFloat(2, 50, 2000);
-        $voucherDiscount = fake()->optional(0.3)->randomFloat(2, 5, 100) ?? 0;
+        $grossAmount = fake()->randomElement([250000, 500000, 750000, 1500000, 2500000, 5000000, 7500000, 12500000]);
+        $voucherDiscount = fake()->optional(0.3)->randomElement([50000, 100000, 150000, 250000]) ?? 0;
+        if ($voucherDiscount >= $grossAmount) {
+            $voucherDiscount = 0;
+        }
         
         return [
             'id' => (string) Str::uuid(),
@@ -37,7 +40,7 @@ class TransactionFactory extends Factory
             'midtrans_transaction_id' => fake()->optional(0.7)->uuid(),
             'midtrans_status' => fake()->optional(0.7)->randomElement(['pending', 'capture', 'settlement', 'deny', 'cancel']),
             'status' => fake()->randomElement(['pending', 'paid', 'failed', 'refunded']),
-            'paid_at' => null,
+            'paid_at' => fake()->optional(0.7)->dateTimeBetween('-1 year', 'now'),
             'failed_at' => null,
             'refunded_at' => null,
         ];
@@ -94,7 +97,7 @@ class TransactionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'voucher_id' => \App\Models\Voucher::factory(),
-            'voucher_discount' => fake()->randomFloat(2, 10, 200),
+            'voucher_discount' => fake()->randomElement([50000, 100000, 200000]),
         ]);
     }
 }

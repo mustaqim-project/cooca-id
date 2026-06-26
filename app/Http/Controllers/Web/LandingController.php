@@ -42,7 +42,7 @@ class LandingController extends Controller
     {
         $products = Product::where('is_active', true)
             ->with(['category', 'subscriptionPlans'])
-            ->limit(6)
+            ->ordered()
             ->get();
         return view('pages.home.index', compact('products'));
     }
@@ -61,7 +61,7 @@ class LandingController extends Controller
     public function pricing()
     {
         $products = Product::where('is_active', true)
-            ->with(['subscriptionPlans' => function ($query) {
+            ->with(['category', 'subscriptionPlans' => function ($query) {
                 $query->where('is_active', true)->orderBy('price');
             }])
             ->get();
@@ -89,15 +89,23 @@ class LandingController extends Controller
      */
     public function solution()
     {
-        return view('pages.solutions.index');
+        $products = Product::where('is_active', true)
+            ->with(['category', 'subscriptionPlans' => function ($query) {
+                $query->where('is_active', true)->orderBy('price');
+            }])
+            ->get();
+        return view('pages.solutions.index', compact('products'));
     }
 
     /**
-     * Display the features page.
+     * Switch session language/locale.
      */
-    public function features()
+    public function switchLang(string $locale)
     {
-        return view('pages.features.index');
+        if (in_array($locale, ['id', 'en'])) {
+            session()->put('locale', $locale);
+        }
+        return Redirect::back();
     }
 
     /**
@@ -140,11 +148,12 @@ class LandingController extends Controller
         $products = Product::where('is_active', true)
             ->with(['category', 'subscriptionPlans'])
             ->get();
-
         return view('pages.products.index', compact('products'));
     }
 
+
     /* ========================================== */
+
 
     /**
      * Display a listing of blog posts.
@@ -163,7 +172,6 @@ class LandingController extends Controller
             ->pluck('category');
 
         $featuredPosts = BlogPost::where('is_published', true)
-            ->where('is_featured', true)
             ->with(['author'])
             ->latest('published_at')
             ->limit(3)
@@ -250,7 +258,7 @@ class LandingController extends Controller
 
     /* ==================== CUSTOMER AUTH ==================== */
 
-    public function customerRegister(RegisterCustomerRequest $request): RedirectResponse
+    public function customerRegister(RegisterCustomerRequest $request)
     {
         $customer = $this->authService->registerCustomer($request->validated());
 
@@ -261,7 +269,7 @@ class LandingController extends Controller
             ->with('success', 'Registrasi berhasil! Selamat datang di Cooca.id');
     }
 
-    public function customerLogin(LoginCustomerRequest $request): RedirectResponse
+    public function customerLogin(LoginCustomerRequest $request)
     {
         if (!Auth::guard('customer')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             return back()
@@ -274,7 +282,7 @@ class LandingController extends Controller
         return redirect()->intended(route('customer.dashboard'));
     }
 
-    public function customerLogout(Request $request): RedirectResponse
+    public function customerLogout(Request $request)
     {
         Auth::guard('customer')->logout();
         $request->session()->invalidate();
@@ -283,12 +291,12 @@ class LandingController extends Controller
         return redirect()->route('home')->with('success', 'Anda telah logout.');
     }
 
-    public function redirectToGoogleCustomer(): RedirectResponse
+    public function redirectToGoogleCustomer()
     {
         return Socialite::guard('customer')->redirect();
     }
 
-    public function handleGoogleCallbackCustomer(): RedirectResponse
+    public function handleGoogleCallbackCustomer()
     {
         try {
             $customer = $this->authService->handleGoogleCallback('customer');
@@ -304,7 +312,7 @@ class LandingController extends Controller
 
     /* ==================== AFFILIATOR AUTH ==================== */
 
-    public function affiliatorRegister(RegisterAffiliatorRequest $request): RedirectResponse
+    public function affiliatorRegister(RegisterAffiliatorRequest $request)
     {
         $affiliator = $this->authService->registerAffiliator($request->validated());
 
@@ -315,7 +323,7 @@ class LandingController extends Controller
             ->with('success', 'Registrasi affiliator berhasil!');
     }
 
-    public function affiliatorLogin(LoginAffiliatorRequest $request): RedirectResponse
+    public function affiliatorLogin(LoginAffiliatorRequest $request)
     {
         if (!Auth::guard('affiliator')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             return back()
@@ -328,7 +336,7 @@ class LandingController extends Controller
         return redirect()->intended(route('affiliator.dashboard'));
     }
 
-    public function affiliatorLogout(Request $request): RedirectResponse
+    public function affiliatorLogout(Request $request)
     {
         Auth::guard('affiliator')->logout();
         $request->session()->invalidate();
@@ -339,7 +347,7 @@ class LandingController extends Controller
 
     /* ==================== ADMIN AUTH ==================== */
 
-    public function adminLogin(LoginAdminRequest $request): RedirectResponse
+    public function adminLogin(LoginAdminRequest $request)
     {
         if (!Auth::guard('admin')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             return back()
@@ -352,7 +360,7 @@ class LandingController extends Controller
         return redirect()->intended(route('admin.dashboard'));
     }
 
-    public function adminLogout(Request $request): RedirectResponse
+    public function adminLogout(Request $request)
     {
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
@@ -362,27 +370,27 @@ class LandingController extends Controller
     }
 
 
-    public function showAdminLogin(): View
+    public function showAdminLogin()
     {
         return view('auth.admin.login');
     }
 
-    public function showCustomerLogin(): View
+    public function showCustomerLogin()
     {
         return view('auth.customer.login');
     }
 
-    public function showCustomerRegister(): View
+    public function showCustomerRegister()
     {
         return view('auth.customer.register');
     }
 
-    public function showAffiliatorLogin(): View
+    public function showAffiliatorLogin()
     {
         return view('auth.affiliator.login');
     }
 
-    public function showAffiliatorRegister(): View
+    public function showAffiliatorRegister()
     {
         return view('auth.affiliator.register');
     }
@@ -392,7 +400,7 @@ class LandingController extends Controller
     /**
      * Display the password reset link request view for customers.
      */
-    public function showCustomerForgotPassword(): View
+    public function showCustomerForgotPassword()
     {
         return view('auth.customer.forgot-password');
     }
@@ -400,7 +408,7 @@ class LandingController extends Controller
     /**
      * Handle sending password reset email for customers.
      */
-    public function sendCustomerResetLink(Request $request): RedirectResponse
+    public function sendCustomerResetLink(Request $request)
     {
         $request->validate([
             'email' => 'required|email|exists:customers,email',
@@ -420,7 +428,7 @@ class LandingController extends Controller
     /**
      * Display the password reset view for customers.
      */
-    public function showCustomerReset(Request $request, string $token): View
+    public function showCustomerReset(Request $request, string $token)
     {
         return view('auth.customer.reset-password', [
             'email' => $request->email,
@@ -431,7 +439,7 @@ class LandingController extends Controller
     /**
      * Handle password reset for customers.
      */
-    public function resetCustomerPassword(Request $request): RedirectResponse
+    public function resetCustomerPassword(Request $request)
     {
         $request->validate([
             'token' => 'required',
@@ -460,7 +468,7 @@ class LandingController extends Controller
     /**
      * Display the password reset link request view for affiliators.
      */
-    public function showAffiliatorForgotPassword(): View
+    public function showAffiliatorForgotPassword()
     {
         return view('auth.affiliator.forgot-password');
     }
@@ -468,7 +476,7 @@ class LandingController extends Controller
     /**
      * Handle sending password reset email for affiliators.
      */
-    public function sendAffiliatorResetLink(Request $request): RedirectResponse
+    public function sendAffiliatorResetLink(Request $request)
     {
         $request->validate([
             'email' => 'required|email|exists:affiliators,email',
@@ -488,7 +496,7 @@ class LandingController extends Controller
     /**
      * Display the password reset view for affiliators.
      */
-    public function showAffiliatorReset(Request $request, string $token): View
+    public function showAffiliatorReset(Request $request, string $token)
     {
         return view('auth.affiliator.reset-password', [
             'email' => $request->email,
@@ -499,7 +507,7 @@ class LandingController extends Controller
     /**
      * Handle password reset for affiliators.
      */
-    public function resetAffiliatorPassword(Request $request): RedirectResponse
+    public function resetAffiliatorPassword(Request $request)
     {
         $request->validate([
             'token' => 'required',
@@ -528,7 +536,7 @@ class LandingController extends Controller
     /**
      * Display the password reset link request view for admins.
      */
-    public function showAdminForgotPassword(): View
+    public function showAdminForgotPassword()
     {
         return view('auth.admin.forgot-password');
     }
@@ -536,7 +544,7 @@ class LandingController extends Controller
     /**
      * Handle sending password reset email for admins.
      */
-    public function sendAdminResetLink(Request $request): RedirectResponse
+    public function sendAdminResetLink(Request $request)
     {
         $request->validate([
             'email' => 'required|email|exists:admins,email',
@@ -556,7 +564,7 @@ class LandingController extends Controller
     /**
      * Display the password reset view for admins.
      */
-    public function showAdminReset(Request $request, string $token): View
+    public function showAdminReset(Request $request, string $token)
     {
         return view('auth.admin.reset-password', [
             'email' => $request->email,
@@ -567,7 +575,7 @@ class LandingController extends Controller
     /**
      * Handle password reset for admins.
      */
-    public function resetAdminPassword(Request $request): RedirectResponse
+    public function resetAdminPassword(Request $request)
     {
         $request->validate([
             'token' => 'required',

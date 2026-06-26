@@ -23,10 +23,11 @@ class InvoiceFactory extends Factory
             'transaction_id' => \App\Models\Transaction::inRandomOrder()->first()?->id ?? \App\Models\Transaction::factory(),
             'invoice_number' => 'INV-' . strtoupper(Str::random(10)),
             'customer_id' => \App\Models\Customer::inRandomOrder()->first()?->id ?? \App\Models\Customer::factory(),
-            'amount' => fake()->randomFloat(2, 50, 2000),
-            'status' => fake()->randomElement(['draft', 'sent', 'paid', 'overdue', 'cancelled']),
+            'amount' => fake()->randomElement([250000, 500000, 750000, 1500000, 2500000, 5000000, 7500000, 12500000]),
+            'status' => fake()->randomElement(['draft', 'issued', 'paid', 'overdue', 'cancelled']),
             'issued_at' => fake()->dateTimeBetween('-1 year', 'now'),
             'due_at' => fake()->dateTimeBetween('now', '+1 month'),
+            'paid_at' => fake()->optional(0.7)->dateTimeBetween('-1 year', 'now'),
             'pdf_path' => fake()->optional(0.5)->filePath(),
         ];
     }
@@ -38,6 +39,7 @@ class InvoiceFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'paid',
+            'paid_at' => now(),
         ]);
     }
 

@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->morphs('notifiable');
+            $table->uuidMorphs('notifiable');
 
             $table->string('type');
             $table->enum('channel', ['email', 'whatsapp', 'database'])->default('database');

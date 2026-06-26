@@ -24,7 +24,7 @@ final class DashboardController extends Controller
     /**
      * Display admin dashboard with comprehensive statistics.
      */
-    public function index(): View
+    public function index()
     {
         // Revenue Statistics
         $totalRevenue = Transaction::where('status', 'paid')->sum('net_amount');

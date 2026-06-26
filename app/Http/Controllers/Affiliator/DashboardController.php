@@ -21,7 +21,7 @@ final class DashboardController extends Controller
     /**
      * Display affiliator dashboard with comprehensive statistics.
      */
-    public function index(): View
+    public function index()
     {
         $affiliator = Auth::guard('affiliator')->user();
         

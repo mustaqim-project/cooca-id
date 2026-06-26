@@ -21,7 +21,7 @@ class ProductCategoryController extends Controller
     /**
      * Display a listing of product categories.
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $query = ProductCategory::withCount('products')->latest('created_at');
 
@@ -54,7 +54,7 @@ class ProductCategoryController extends Controller
     /**
      * Show the form for creating a new category.
      */
-    public function create(): View
+    public function create()
     {
         return view('admin.productcategories.create', [
             'category' => null,
@@ -64,7 +64,7 @@ class ProductCategoryController extends Controller
     /**
      * Store a newly created category in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -92,7 +92,7 @@ class ProductCategoryController extends Controller
     /**
      * Display the specified category.
      */
-    public function show(ProductCategory $category): View
+    public function show(ProductCategory $category)
     {
         return view('admin.productcategories.show', [
             'category' => $category->load('products'),
@@ -102,7 +102,7 @@ class ProductCategoryController extends Controller
     /**
      * Show the form for editing the specified category.
      */
-    public function edit(ProductCategory $category): View
+    public function edit(ProductCategory $category)
     {
         return view('admin.productcategories.edit', [
             'category' => $category,
@@ -112,7 +112,7 @@ class ProductCategoryController extends Controller
     /**
      * Update the specified category in storage.
      */
-    public function update(Request $request, ProductCategory $category): RedirectResponse
+    public function update(Request $request, ProductCategory $category)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -139,7 +139,7 @@ class ProductCategoryController extends Controller
     /**
      * Remove the specified category from storage.
      */
-    public function destroy(ProductCategory $category): RedirectResponse
+    public function destroy(ProductCategory $category)
     {
         // Check if category has products
         if ($category->products()->count() > 0) {
@@ -156,7 +156,7 @@ class ProductCategoryController extends Controller
     /**
      * Reorder categories
      */
-    public function reorder(Request $request): JsonResponse
+    public function reorder(Request $request)
     {
         $orderData = $request->input('order', []);
 
@@ -174,7 +174,7 @@ class ProductCategoryController extends Controller
     /**
      * Toggle active status
      */
-    public function toggleActive(ProductCategory $category): JsonResponse
+    public function toggleActive(ProductCategory $category)
     {
         $category->update(['is_active' => !$category->is_active]);
 

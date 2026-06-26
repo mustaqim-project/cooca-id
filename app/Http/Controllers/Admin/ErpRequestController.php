@@ -30,7 +30,7 @@ final class ErpRequestController extends Controller
         }
     }
 
-    public function index(): Response
+    public function index()
     {
         $requests = ErpRequest::with(['customer', 'product', 'affiliator', 'approvedBy'])
             ->latest()
@@ -41,7 +41,7 @@ final class ErpRequestController extends Controller
         ]);
     }
 
-    public function show(ErpRequest $request): Response
+    public function show(ErpRequest $request)
     {
         $request->load(['customer', 'product', 'affiliator', 'approvedBy', 'domains', 'license']);
 

@@ -12,6 +12,10 @@ class FAQSeeder extends Seeder
      */
     public function run(): void
     {
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        Faq::truncate();
+        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+
         $faqs = [
             [
                 'category' => 'General',

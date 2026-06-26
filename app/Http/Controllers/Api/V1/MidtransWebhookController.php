@@ -24,7 +24,7 @@ final class MidtransWebhookController extends Controller
      * Verifies SHA512 signature before processing.
      * Implements idempotency to prevent duplicate processing.
      */
-    public function midtrans(Request $request): JsonResponse
+    public function midtrans(Request $request)
     {
         $rawPayload = $request->getContent();
         $payload = json_decode($rawPayload, true);

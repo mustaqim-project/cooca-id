@@ -20,7 +20,7 @@ final class DownlineController extends Controller
     /**
      * Display listing of downlines (L2 affiliates).
      */
-    public function index(): Response
+    public function index()
     {
         $affiliator = Auth::guard('affiliator')->user();
         $downlines = $this->affiliatorRepository->getDownlines($affiliator->getKey());
@@ -30,12 +30,12 @@ final class DownlineController extends Controller
         ]);
     }
 
-    public function tree(): Illuminate\View\View
+    public function tree()
     {
         return view('affiliator.downlines.tree');
     }
 
-    public function stats(): Illuminate\View\View
+    public function stats()
     {
         return view('affiliator.downlines.stats');
     }

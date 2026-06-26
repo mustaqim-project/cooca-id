@@ -21,7 +21,7 @@ final class AffiliatorController extends Controller
     /**
      * Display listing of affiliators.
      */
-    public function index(): View
+    public function index()
     {
         $affiliators = $this->affiliatorRepository->paginate(15);
 
@@ -31,9 +31,17 @@ final class AffiliatorController extends Controller
     }
 
     /**
+     * Show the form for creating a new affiliator.
+     */
+    public function create()
+    {
+        return view('admin.affiliators.create');
+    }
+
+    /**
      * Store a newly created affiliator.
      */
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -52,7 +60,7 @@ final class AffiliatorController extends Controller
     /**
      * Display the specified affiliator.
      */
-    public function show(string $id): View
+    public function show(string $id)
     {
         $affiliator = $this->affiliatorRepository->find($id);
 
@@ -67,9 +75,25 @@ final class AffiliatorController extends Controller
     }
 
     /**
+     * Show the form for editing the specified affiliator.
+     */
+    public function edit(string $id)
+    {
+        $affiliator = $this->affiliatorRepository->find($id);
+
+        if (!$affiliator) {
+            abort(404, 'Affiliator not found');
+        }
+
+        return view('admin.affiliators.edit', [
+            'affiliator' => $affiliator,
+        ]);
+    }
+
+    /**
      * Update the specified affiliator.
      */
-    public function update(Request $request, string $id): \Illuminate\Http\RedirectResponse
+    public function update(Request $request, string $id)
     {
         $affiliator = $this->affiliatorRepository->find($id);
 
@@ -91,7 +115,7 @@ final class AffiliatorController extends Controller
     /**
      * Remove the specified affiliator.
      */
-    public function destroy(string $id): \Illuminate\Http\RedirectResponse
+    public function destroy(string $id)
     {
         $affiliator = $this->affiliatorRepository->find($id);
 

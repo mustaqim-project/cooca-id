@@ -20,7 +20,7 @@ final class CustomerController extends Controller
     /**
      * Display listing of customers.
      */
-    public function index(): View
+    public function index()
     {
         $customers = $this->customerRepository->paginate(15);
 
@@ -30,9 +30,17 @@ final class CustomerController extends Controller
     }
 
     /**
+     * Show the form for creating a new customer.
+     */
+    public function create()
+    {
+        return view('admin.customers.create');
+    }
+
+    /**
      * Display the specified customer.
      */
-    public function show(string $id): View
+    public function show(string $id)
     {
         $customer = $this->customerRepository->find($id);
 
@@ -46,9 +54,25 @@ final class CustomerController extends Controller
     }
 
     /**
+     * Show the form for editing the specified customer.
+     */
+    public function edit(string $id)
+    {
+        $customer = $this->customerRepository->find($id);
+
+        if (!$customer) {
+            abort(404, 'Customer not found');
+        }
+
+        return view('admin.customers.edit', [
+            'customer' => $customer,
+        ]);
+    }
+
+    /**
      * Store a newly created customer.
      */
-    public function store(\Illuminate\Http\Request $request): \Illuminate\Http\RedirectResponse
+    public function store(\Illuminate\Http\Request $request)
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -68,7 +92,7 @@ final class CustomerController extends Controller
     /**
      * Update the specified customer.
      */
-    public function update(\Illuminate\Http\Request $request, string $id): \Illuminate\Http\RedirectResponse
+    public function update(\Illuminate\Http\Request $request, string $id)
     {
         $customer = $this->customerRepository->find($id);
 
@@ -103,7 +127,7 @@ final class CustomerController extends Controller
     /**
      * Remove the specified customer.
      */
-    public function destroy(string $id): \Illuminate\Http\RedirectResponse
+    public function destroy(string $id)
     {
         $customer = $this->customerRepository->find($id);
 

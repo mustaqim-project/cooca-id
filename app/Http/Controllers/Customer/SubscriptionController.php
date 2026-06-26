@@ -19,7 +19,7 @@ final class SubscriptionController extends Controller
         private readonly CreateSubscriptionAction $createSubscriptionAction
     ) {}
 
-    public function index(): Illuminate\View\View
+    public function index()
     {
         $subscriptions = \App\Models\Subscription::where('customer_id', Auth::guard('customer')->id())
             ->paginate(15);
@@ -29,12 +29,12 @@ final class SubscriptionController extends Controller
         ]);
     }
 
-    public function create(): Illuminate\View\View
+    public function create()
     {
         return view('customer.subscriptions.create');
     }
 
-    public function show(string $subscription): Illuminate\View\View
+    public function show(string $subscription)
     {
         $subscription = \App\Models\Subscription::where('id', $subscription)
             ->where('customer_id', Auth::guard('customer')->id())
@@ -52,7 +52,7 @@ final class SubscriptionController extends Controller
     /**
      * Store a newly created subscription.
      */
-    public function store(CreateSubscriptionRequest $request): JsonResponse
+    public function store(CreateSubscriptionRequest $request)
     {
         $customer = Auth::guard('customer')->user();
         $data = $request->validated();
@@ -76,7 +76,7 @@ final class SubscriptionController extends Controller
     /**
      * Cancel the specified subscription.
      */
-    public function cancel(string $id): JsonResponse
+    public function cancel(string $id)
     {
         $customer = Auth::guard('customer')->user();
         $subscription = \App\Models\Subscription::where('id', $id)
@@ -97,7 +97,7 @@ final class SubscriptionController extends Controller
     /**
      * Renew the specified subscription.
      */
-    public function renew(string $id): JsonResponse
+    public function renew(string $id)
     {
         $customer = Auth::guard('customer')->user();
         $subscription = \App\Models\Subscription::where('id', $id)

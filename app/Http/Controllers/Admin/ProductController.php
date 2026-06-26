@@ -22,7 +22,7 @@ final class ProductController extends Controller
     /**
      * Display listing of products.
      */
-    public function index(): View
+    public function index()
     {
         $products = $this->productRepository->paginateWithFilters(15);
         $categories = \App\Models\ProductCategory::where('is_active', true)->orderBy('sort_order')->get();
@@ -36,7 +36,7 @@ final class ProductController extends Controller
     /**
      * Show the form for creating a new product.
      */
-    public function create(): View
+    public function create()
     {
         return view('admin.products.create');
     }
@@ -44,7 +44,7 @@ final class ProductController extends Controller
     /**
      * Display the specified product.
      */
-    public function show(string $id): View
+    public function show(string $id)
     {
         $product = $this->productRepository->find($id);
 
@@ -60,7 +60,7 @@ final class ProductController extends Controller
     /**
      * Show the form for editing the specified product.
      */
-    public function edit(string $id): View
+    public function edit(string $id)
     {
         $product = $this->productRepository->find($id);
 
@@ -76,7 +76,7 @@ final class ProductController extends Controller
     /**
      * Store a newly created product.
      */
-    public function store(StoreProductRequest $request): RedirectResponse
+    public function store(StoreProductRequest $request)
     {
         $data = $request->validated();
         $product = $this->productRepository->create($data);
@@ -88,7 +88,7 @@ final class ProductController extends Controller
     /**
      * Update the specified product.
      */
-    public function update(StoreProductRequest $request, string $id): RedirectResponse
+    public function update(StoreProductRequest $request, string $id)
     {
         $product = $this->productRepository->find($id);
 
@@ -105,7 +105,7 @@ final class ProductController extends Controller
     /**
      * Remove the specified product.
      */
-    public function destroy(string $id): RedirectResponse
+    public function destroy(string $id)
     {
         $product = $this->productRepository->find($id);
 

@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('reviews', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->morphs('reviewable');
+            $table->uuidMorphs('reviewable');
 
             $table->enum('reviewer_type', ['customer', 'affiliator']);
             $table->uuid('reviewer_id');

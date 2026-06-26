@@ -17,7 +17,7 @@ final class LicenseValidationController extends Controller
      * Validate license for ERP client.
      * Triple-check: domain + license_code + token_code
      */
-    public function validate(ValidateLicenseRequest $request): JsonResponse
+    public function validate(ValidateLicenseRequest $request)
     {
         $data = $request->validated();
 
@@ -52,7 +52,7 @@ final class LicenseValidationController extends Controller
     /**
      * Heartbeat endpoint for active licenses.
      */
-    public function heartbeat(string $licenseCode): JsonResponse
+    public function heartbeat(string $licenseCode)
     {
         $license = $this->licenseService->findByCode($licenseCode);
 

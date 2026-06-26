@@ -12,6 +12,7 @@ use App\Models\Transaction;
 use App\Models\Setting;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Seeder for testing multi-level affiliate commission scenarios
@@ -32,62 +33,69 @@ class AffiliateCommissionScenarioSeeder extends Seeder
         $this->command->info('Creating affiliate hierarchy...');
         
         // Level 0: Top affiliate (no parent)
-        $topAffiliate = Affiliator::create([
-            'user_id' => null,
-            'name' => 'Top Affiliate',
-            'email' => 'top.affiliate@test.com',
-            'phone' => '081234567890',
-            'code' => 'TOP001',
-            'status' => 'active',
-            'parent_affiliator_id' => null,
-        ]);
+        $topAffiliate = Affiliator::firstOrCreate(
+            ['email' => 'top.affiliate@test.com'],
+            [
+                'name' => 'Top Affiliate',
+                'password' => bcrypt('password123'),
+                'referral_code' => 'TOP001',
+                'balance' => 0,
+                'parent_affiliator_id' => null,
+            ]
+        );
 
         // Level 1: Direct downline of top affiliate
-        $level1Affiliate = Affiliator::create([
-            'user_id' => null,
-            'name' => 'Level 1 Affiliate',
-            'email' => 'level1.affiliate@test.com',
-            'phone' => '081234567891',
-            'code' => 'LVL001',
-            'status' => 'active',
-            'parent_affiliator_id' => $topAffiliate->id,
-        ]);
+        $level1Affiliate = Affiliator::firstOrCreate(
+            ['email' => 'level1.affiliate@test.com'],
+            [
+                'name' => 'Level 1 Affiliate',
+                'password' => bcrypt('password123'),
+                'referral_code' => 'LVL001',
+                'balance' => 0,
+                'parent_affiliator_id' => $topAffiliate->id,
+            ]
+        );
 
         // Level 2: Downline of level 1 affiliate
-        $level2Affiliate = Affiliator::create([
-            'user_id' => null,
-            'name' => 'Level 2 Affiliate',
-            'email' => 'level2.affiliate@test.com',
-            'phone' => '081234567892',
-            'code' => 'LVL002',
-            'status' => 'active',
-            'parent_affiliator_id' => $level1Affiliate->id,
-        ]);
+        $level2Affiliate = Affiliator::firstOrCreate(
+            ['email' => 'level2.affiliate@test.com'],
+            [
+                'name' => 'Level 2 Affiliate',
+                'password' => bcrypt('password123'),
+                'referral_code' => 'LVL002',
+                'balance' => 0,
+                'parent_affiliator_id' => $level1Affiliate->id,
+            ]
+        );
 
         $this->command->info("Created affiliate hierarchy: {$topAffiliate->name} -> {$level1Affiliate->name} -> {$level2Affiliate->name}");
 
         // Create subscription plans
         $this->command->info('Creating subscription plans...');
         
-        $monthlyPlan = SubscriptionPlan::updateOrCreate(
-            ['code' => 'MONTHLY_TEST'],
+        $product = \App\Models\Product::first() ?? \App\Models\Product::factory()->create();
+
+        $monthlyPlan = SubscriptionPlan::firstOrCreate(
+            ['name' => 'Monthly Test Plan'],
             [
-                'name' => 'Monthly Test Plan',
+                'product_id' => $product->id,
+                'duration_months' => 1,
                 'price' => 100000,
-                'billing_cycle' => 'monthly',
+                'discount_percent' => 0,
                 'is_active' => true,
-                'trial_duration_days' => 14,
+                'sort_order' => 1,
             ]
         );
 
-        $yearlyPlan = SubscriptionPlan::updateOrCreate(
-            ['code' => 'YEARLY_TEST'],
+        $yearlyPlan = SubscriptionPlan::firstOrCreate(
+            ['name' => 'Yearly Test Plan'],
             [
-                'name' => 'Yearly Test Plan',
+                'product_id' => $product->id,
+                'duration_months' => 12,
                 'price' => 1000000,
-                'billing_cycle' => 'yearly',
+                'discount_percent' => 10,
                 'is_active' => true,
-                'trial_duration_days' => 14,
+                'sort_order' => 2,
             ]
         );
 
@@ -95,35 +103,76 @@ class AffiliateCommissionScenarioSeeder extends Seeder
         $this->command->info('Creating test customers...');
 
         // Customer referred by Level 2 affiliate (tests both L1 and L2 commissions)
-        $customerL2 = Customer::create([
-            'name' => 'Customer Level 2',
-            'email' => 'customer.l2@test.com',
-            'phone' => '081234567893',
-            'affiliator_id' => $level2Affiliate->id,
-        ]);
+        $customerL2 = Customer::firstOrCreate(
+            ['email' => 'customer.l2@test.com'],
+            [
+                'name' => 'Customer Level 2',
+                'password' => bcrypt('password123'),
+                'business_name' => 'Business L2',
+                'domain' => 'l2.cooca.id',
+                'affiliator_id' => $level2Affiliate->id,
+            ]
+        );
 
         // Customer referred by Level 1 affiliate (tests only L1 commission)
-        $customerL1 = Customer::create([
-            'name' => 'Customer Level 1',
-            'email' => 'customer.l1@test.com',
-            'phone' => '081234567894',
-            'affiliator_id' => $level1Affiliate->id,
-        ]);
+        $customerL1 = Customer::firstOrCreate(
+            ['email' => 'customer.l1@test.com'],
+            [
+                'name' => 'Customer Level 1',
+                'password' => bcrypt('password123'),
+                'business_name' => 'Business L1',
+                'domain' => 'l1.cooca.id',
+                'affiliator_id' => $level1Affiliate->id,
+            ]
+        );
 
         // Customer referred by Top affiliate (tests only L1 commission)
-        $customerTop = Customer::create([
-            'name' => 'Customer Top',
-            'email' => 'customer.top@test.com',
-            'phone' => '081234567895',
-            'affiliator_id' => $topAffiliate->id,
-        ]);
+        $customerTop = Customer::firstOrCreate(
+            ['email' => 'customer.top@test.com'],
+            [
+                'name' => 'Customer Top',
+                'password' => bcrypt('password123'),
+                'business_name' => 'Business Top',
+                'domain' => 'top.cooca.id',
+                'affiliator_id' => $topAffiliate->id,
+            ]
+        );
 
         // Create subscriptions and transactions
         $this->command->info('Creating subscriptions and transactions...');
 
+        $licenseL2 = License::firstOrCreate(
+            ['license_code' => 'LIC-TEST-L2'],
+            [
+                'customer_id' => $customerL2->id,
+                'product_id' => $product->id,
+                'subscription_plan_id' => $monthlyPlan->id,
+                'token_code' => strtoupper(Str::random(16)),
+                'domain' => 'l2.cooca.id',
+                'status' => 'active',
+                'activated_at' => now(),
+                'expires_at' => now()->addMonth(),
+            ]
+        );
+
+        $licenseL1 = License::firstOrCreate(
+            ['license_code' => 'LIC-TEST-L1'],
+            [
+                'customer_id' => $customerL1->id,
+                'product_id' => $product->id,
+                'subscription_plan_id' => $monthlyPlan->id,
+                'token_code' => strtoupper(Str::random(16)),
+                'domain' => 'l1.cooca.id',
+                'status' => 'active',
+                'activated_at' => now(),
+                'expires_at' => now()->addMonth(),
+            ]
+        );
+
         // Subscription for customer L2 (should generate L1 and L2 commissions)
         $subscriptionL2 = Subscription::create([
             'customer_id' => $customerL2->id,
+            'license_id' => $licenseL2->id,
             'subscription_plan_id' => $monthlyPlan->id,
             'status' => 'active',
             'started_at' => now(),
@@ -134,16 +183,20 @@ class AffiliateCommissionScenarioSeeder extends Seeder
             'customer_id' => $customerL2->id,
             'subscription_id' => $subscriptionL2->id,
             'type' => 'subscription_new',
+            'invoice_number' => 'INV-TEST-' . strtoupper(Str::random(8)),
             'status' => 'paid',
             'gross_amount' => 100000,
+            'voucher_discount' => 0,
             'net_amount' => 100000,
             'payment_method' => 'bank_transfer',
+            'payment_gateway' => 'midtrans',
             'paid_at' => now(),
         ]);
 
         // Subscription for customer L1 (should generate only L1 commission for level1Affiliate)
         $subscriptionL1 = Subscription::create([
             'customer_id' => $customerL1->id,
+            'license_id' => $licenseL1->id,
             'subscription_plan_id' => $monthlyPlan->id,
             'status' => 'active',
             'started_at' => now(),
@@ -154,10 +207,13 @@ class AffiliateCommissionScenarioSeeder extends Seeder
             'customer_id' => $customerL1->id,
             'subscription_id' => $subscriptionL1->id,
             'type' => 'subscription_new',
+            'invoice_number' => 'INV-TEST-' . strtoupper(Str::random(8)),
             'status' => 'paid',
             'gross_amount' => 100000,
+            'voucher_discount' => 0,
             'net_amount' => 100000,
             'payment_method' => 'bank_transfer',
+            'payment_gateway' => 'midtrans',
             'paid_at' => now(),
         ]);
 
@@ -168,10 +224,13 @@ class AffiliateCommissionScenarioSeeder extends Seeder
             'customer_id' => $customerL2->id,
             'subscription_id' => $subscriptionL2->id,
             'type' => 'subscription_renewal',
+            'invoice_number' => 'INV-TEST-' . strtoupper(Str::random(8)),
             'status' => 'paid',
             'gross_amount' => 100000,
+            'voucher_discount' => 0,
             'net_amount' => 100000,
             'payment_method' => 'bank_transfer',
+            'payment_gateway' => 'midtrans',
             'paid_at' => now(),
         ]);
 

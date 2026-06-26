@@ -27,14 +27,29 @@ class ProductFactory extends Factory
             'slug' => Str::slug($name),
             'description' => fake()->paragraphs(3, true),
             'short_description' => fake()->sentence(),
-            'base_price' => fake()->randomFloat(2, 10, 500),
-            'features' => json_encode([fake()->word(), fake()->word(), fake()->word()]),
-            'specifications' => json_encode([fake()->word() => fake()->word(), fake()->word() => fake()->word()]),
+            'base_price' => fake()->randomElement([1500000, 2500000, 3500000, 5000000, 7500000, 12500000]),
+            'features' => [
+                'Advanced Real-time Analytics & Automated Dashboard',
+                'Multi-user Roles & Custom Permissions Management',
+                'Priority 24/7 Support & VIP Account Manager',
+                'Complete API Access & Webhooks Integration',
+                '99.9% Uptime Guarantee SLA & Enterprise Security'
+            ],
+            'specifications' => [
+                'System Architecture' => 'Cloud Native Microservices',
+                'Deployment Model' => 'Multi-tenant SaaS & Dedicated Instance',
+                'Security Compliance' => 'ISO 27001 & SOC 2 Type II Certified',
+                'Backup Frequency' => 'Hourly Automated Snapshots',
+                'Data Hosting' => 'Google Cloud Platform (Jakarta Region)'
+            ],
             'demo_url' => fake()->optional(0.7)->url(),
-            'thumbnail' => fake()->optional(0.8)->imageUrl(640, 480, 'product', true),
-            'screenshots' => json_encode([]),
+            'thumbnail' => fake()->optional(0.8)->imageUrl(640, 480, 'business', true),
+            'screenshots' => [
+                fake()->imageUrl(1280, 720, 'business', true),
+                fake()->imageUrl(1280, 720, 'technics', true),
+            ],
             'is_active' => true,
-            'is_featured' => fake()->boolean(20),
+            'is_featured' => fake()->boolean(30),
             'sort_order' => fake()->numberBetween(1, 100),
         ];
     }

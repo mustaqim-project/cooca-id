@@ -23,7 +23,7 @@ final class VoucherController extends Controller
     /**
      * Display listing of vouchers.
      */
-    public function index(): View
+    public function index()
     {
         $vouchers = $this->voucherService->paginate(15);
 
@@ -32,12 +32,12 @@ final class VoucherController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create()
     {
         return view('admin.vouchers.create');
     }
 
-    public function show(string $id): View
+    public function show(string $id)
     {
         $voucher = $this->voucherService->findById($id);
         if (!$voucher) {
@@ -46,7 +46,7 @@ final class VoucherController extends Controller
         return view('admin.vouchers.show', ['voucher' => new VoucherResource($voucher)]);
     }
 
-    public function edit(string $id): View
+    public function edit(string $id)
     {
         $voucher = $this->voucherService->findById($id);
         if (!$voucher) {
@@ -58,7 +58,7 @@ final class VoucherController extends Controller
     /**
      * Store a newly created voucher.
      */
-    public function store(CreateVoucherRequest $request): RedirectResponse
+    public function store(CreateVoucherRequest $request)
     {
         $data = $request->validated();
         $voucher = $this->voucherService->create($data);
@@ -70,7 +70,7 @@ final class VoucherController extends Controller
     /**
      * Update the specified voucher.
      */
-    public function update(CreateVoucherRequest $request, string $id): RedirectResponse
+    public function update(CreateVoucherRequest $request, string $id)
     {
         $voucher = $this->voucherService->findById($id);
 
@@ -87,7 +87,7 @@ final class VoucherController extends Controller
     /**
      * Activate the specified voucher.
      */
-    public function activate(string $id): RedirectResponse
+    public function activate(string $id)
     {
         $voucher = $this->voucherService->findById($id);
 
@@ -103,7 +103,7 @@ final class VoucherController extends Controller
     /**
      * Deactivate the specified voucher.
      */
-    public function deactivate(string $id): RedirectResponse
+    public function deactivate(string $id)
     {
         $voucher = $this->voucherService->findById($id);
 
@@ -116,7 +116,7 @@ final class VoucherController extends Controller
         return back()->with('success', 'Voucher deactivated successfully.');
     }
 
-    public function destroy(string $id): RedirectResponse
+    public function destroy(string $id)
     {
         $voucher = $this->voucherService->findById($id);
         if (!$voucher) {

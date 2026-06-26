@@ -13,6 +13,10 @@ class SubscriptionPlanSeeder extends Seeder
      */
     public function run(): void
     {
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        SubscriptionPlan::truncate();
+        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+
         $products = Product::all();
 
         foreach ($products as $product) {

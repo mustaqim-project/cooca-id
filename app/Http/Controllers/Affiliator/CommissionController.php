@@ -19,7 +19,7 @@ final class CommissionController extends Controller
     /**
      * Display listing of commissions.
      */
-    public function index(): View
+    public function index()
     {
         $affiliator = Auth::guard('affiliator')->user();
         $commissions = \App\Models\AffiliateCommission::where('affiliator_id', $affiliator->getKey())->paginate(15);
@@ -29,7 +29,7 @@ final class CommissionController extends Controller
         ]);
     }
 
-    public function stats(): Illuminate\View\View
+    public function stats()
     {
         $affiliator = Auth::guard('affiliator')->user();
         

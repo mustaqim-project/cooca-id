@@ -23,7 +23,7 @@ class BlogController extends Controller
     /**
      * Display a listing of blog posts.
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $query = BlogPost::with(['author'])->latest('created_at');
 
@@ -67,7 +67,7 @@ class BlogController extends Controller
     /**
      * Show the form for creating a new post.
      */
-    public function create(): View
+    public function create()
     {
         return view('admin.blog.create', [
             'post' => null,
@@ -81,7 +81,7 @@ class BlogController extends Controller
     /**
      * Store a newly created post in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -118,7 +118,7 @@ class BlogController extends Controller
     /**
      * Display the specified post.
      */
-    public function show(BlogPost $post): View
+    public function show(BlogPost $post)
     {
         return view('admin.blog.show', [
             'post' => $post->load('author'),
@@ -128,7 +128,7 @@ class BlogController extends Controller
     /**
      * Show the form for editing the specified post.
      */
-    public function edit(BlogPost $post): View
+    public function edit(BlogPost $post)
     {
         return view('admin.blog.edit', [
             'post' => $post,
@@ -142,7 +142,7 @@ class BlogController extends Controller
     /**
      * Update the specified post in storage.
      */
-    public function update(Request $request, BlogPost $post): RedirectResponse
+    public function update(Request $request, BlogPost $post)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -178,7 +178,7 @@ class BlogController extends Controller
     /**
      * Remove the specified post from storage.
      */
-    public function destroy(BlogPost $post): RedirectResponse
+    public function destroy(BlogPost $post)
     {
         $post->delete();
 

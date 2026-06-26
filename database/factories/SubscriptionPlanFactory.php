@@ -20,11 +20,11 @@ class SubscriptionPlanFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'product_id' => \App\Models\Product::factory(),
-            'name' => fake()->randomElement(['Basic', 'Standard', 'Premium', 'Enterprise']) . ' Plan',
+            'product_id' => \App\Models\Product::inRandomOrder()->first()?->id ?? \App\Models\Product::factory(),
+            'name' => fake()->randomElement(['Starter', 'Growth', 'Scale', 'Professional', 'Enterprise']) . ' Plan',
             'duration_months' => fake()->randomElement([1, 3, 6, 12]),
-            'price' => fake()->randomFloat(2, 50, 1000),
-            'discount_percent' => fake()->randomFloat(2, 0, 30),
+            'price' => fake()->randomElement([250000, 500000, 750000, 1500000, 2500000, 5000000]),
+            'discount_percent' => fake()->randomElement([0, 10, 15, 20, 25]),
             'is_active' => true,
             'sort_order' => fake()->numberBetween(1, 100),
         ];

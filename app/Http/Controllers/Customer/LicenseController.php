@@ -21,7 +21,7 @@ final class LicenseController extends Controller
     /**
      * Display listing of customer licenses.
      */
-    public function index(): View
+    public function index()
     {
         $customer = Auth::guard('customer')->user();
         $licenses = \App\Models\License::where('customer_id', $customer->getKey())->get();
@@ -34,7 +34,7 @@ final class LicenseController extends Controller
     /**
      * Display the specified license details.
      */
-    public function show(string $id): View
+    public function show(string $id)
     {
         $customer = Auth::guard('customer')->user();
         $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->first();
@@ -51,7 +51,7 @@ final class LicenseController extends Controller
     /**
      * Activate license for customer.
      */
-    public function activate(string $id): RedirectResponse
+    public function activate(string $id)
     {
         $customer = Auth::guard('customer')->user();
         
@@ -69,7 +69,7 @@ final class LicenseController extends Controller
     /**
      * Display license credentials (license code + token).
      */
-    public function credentials(string $id): View
+    public function credentials(string $id)
     {
         $customer = Auth::guard('customer')->user();
         $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->first();

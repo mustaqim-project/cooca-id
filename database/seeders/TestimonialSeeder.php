@@ -12,6 +12,10 @@ class TestimonialSeeder extends Seeder
      */
     public function run(): void
     {
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        Testimonial::truncate();
+        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+
         $testimonials = [
             [
                 'name' => 'Ahmad Rizki',

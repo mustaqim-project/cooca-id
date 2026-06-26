@@ -23,7 +23,7 @@ class ReviewFactory extends Factory
             'reviewable_type' => \App\Models\Product::class,
             'reviewable_id' => \App\Models\Product::inRandomOrder()->first()?->id ?? \App\Models\Product::factory(),
             'reviewer_type' => fake()->randomElement(['customer', 'affiliator']),
-            'reviewer_id' => null,
+            'reviewer_id' => \App\Models\Customer::inRandomOrder()->first()?->id ?? \App\Models\Customer::factory(),
             'rating' => fake()->numberBetween(1, 5),
             'title' => fake()->optional(0.8)->sentence(4),
             'comment' => fake()->paragraphs(2, true),

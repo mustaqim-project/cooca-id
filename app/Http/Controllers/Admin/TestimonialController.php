@@ -19,7 +19,7 @@ class TestimonialController extends Controller
     /**
      * Display testimonials page
      */
-    public function index(): Response
+    public function index()
     {
         return view('admin.testimonials.index', [
             'testimonials' => Testimonial::with(['customer', 'creator', 'updater'])
@@ -31,7 +31,7 @@ class TestimonialController extends Controller
     /**
      * Show form for creating a new testimonial
      */
-    public function create(): Response
+    public function create()
     {
         return view('admin.testimonials.create', [
             'testimonial' => null,
@@ -41,7 +41,7 @@ class TestimonialController extends Controller
     /**
      * Show form for editing a testimonial
      */
-    public function edit(string $id): Response
+    public function edit(string $id)
     {
         $testimonial = Testimonial::findOrFail($id);
         return view('admin.testimonials.create', [
@@ -52,7 +52,7 @@ class TestimonialController extends Controller
     /**
      * Get all testimonials
      */
-    public function list(): JsonResponse
+    public function list()
     {
         $testimonials = Testimonial::with(['customer', 'creator', 'updater'])
             ->orderBy('order')
@@ -67,7 +67,7 @@ class TestimonialController extends Controller
     /**
      * Store a new testimonial
      */
-    public function store(TestimonialRequest $request): JsonResponse
+    public function store(TestimonialRequest $request)
     {
         $data = $request->validated();
         $data['created_by'] = auth()->id();
@@ -84,7 +84,7 @@ class TestimonialController extends Controller
     /**
      * Update an existing testimonial
      */
-    public function update(TestimonialRequest $request, string $id): JsonResponse
+    public function update(TestimonialRequest $request, string $id)
     {
         $testimonial = Testimonial::findOrFail($id);
         $data = $request->validated();
@@ -102,7 +102,7 @@ class TestimonialController extends Controller
     /**
      * Delete a testimonial
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id)
     {
         $testimonial = Testimonial::findOrFail($id);
         $testimonial->delete();
@@ -116,7 +116,7 @@ class TestimonialController extends Controller
     /**
      * Reorder testimonials
      */
-    public function reorder(JsonResponse $request): JsonResponse
+    public function reorder(JsonResponse $request)
     {
         $orderData = $request->input('order', []);
 
@@ -134,7 +134,7 @@ class TestimonialController extends Controller
     /**
      * Toggle featured status
      */
-    public function toggleFeatured(string $id): JsonResponse
+    public function toggleFeatured(string $id)
     {
         $testimonial = Testimonial::findOrFail($id);
         $testimonial->update(['is_featured' => !$testimonial->is_featured]);

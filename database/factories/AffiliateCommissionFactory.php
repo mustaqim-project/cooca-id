@@ -18,8 +18,8 @@ class AffiliateCommissionFactory extends Factory
      */
     public function definition(): array
     {
-        $grossAmount = fake()->randomFloat(2, 100, 2000);
-        $commissionPercent = fake()->randomFloat(2, 5, 30);
+        $grossAmount = fake()->randomElement([500000, 750000, 1500000, 2500000, 5000000, 12500000]);
+        $commissionPercent = fake()->randomElement([10, 15, 20, 25]);
         $commissionAmount = ($grossAmount * $commissionPercent) / 100;
         
         return [
@@ -32,7 +32,7 @@ class AffiliateCommissionFactory extends Factory
             'commission_percent' => $commissionPercent,
             'commission_amount' => $commissionAmount,
             'status' => fake()->randomElement(['pending', 'cleared', 'cancelled']),
-            'cleared_at' => null,
+            'cleared_at' => fake()->optional(0.7)->dateTimeBetween('-6 months', 'now'),
         ];
     }
 

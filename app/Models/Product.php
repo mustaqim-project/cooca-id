@@ -20,6 +20,7 @@ final class Product extends Model
         'category_id',
         'name',
         'slug',
+        'icon',
         'description',
         'short_description',
         'base_price',

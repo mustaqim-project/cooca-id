@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Admin Settings Controller
@@ -22,13 +22,31 @@ class SettingsController extends Controller
     public function index()
     {
         $settings = [
-            'platform_name' => Setting::get('general.platform_name', config('app.name')),
-            'logo_url' => Setting::get('general.logo_url'),
-            'email_support' => Setting::get('general.email_support', config('mail.from.address')),
-            'email_info' => Setting::get('general.email_info', config('mail.from.address')),
-            'email_marketing' => Setting::get('general.email_marketing', config('mail.from.address')),
-            'email_noreply' => Setting::get('general.email_noreply', config('mail.from.address')),
-            'whatsapp_number' => Setting::get('general.whatsapp_number', ''),
+            // General
+            'platform_name' => Setting::get('site.name', config('app.name')),
+            'logo_url' => Setting::get('site.logo', ''),
+            'favicon_url' => Setting::get('site.favicon', ''),
+            'preloader_text' => Setting::get('site.preloader_text', 'COOCA'),
+            
+            // Contact & Footer
+            'email_support' => Setting::get('contact.email', 'hello@cooca.id'),
+            'whatsapp_number' => Setting::get('contact.whatsapp', '6281234567890'),
+            'whatsapp_link' => Setting::get('contact.whatsapp_link', 'https://wa.me/6281234567890'),
+            'footer_description' => Setting::get('footer.description', ''),
+            
+            // Social Media
+            'social_twitter' => Setting::get('social.twitter', ''),
+            'social_linkedin' => Setting::get('social.linkedin', ''),
+            'social_github' => Setting::get('social.github', ''),
+            'social_instagram' => Setting::get('social.instagram', ''),
+            
+            // Landing Page
+            'landing_hero_title' => Setting::get('landing.hero_title', ''),
+            'landing_hero_subtitle' => Setting::get('landing.hero_subtitle', ''),
+            'landing_hero_cta_text' => Setting::get('landing.hero_cta_text', ''),
+            'landing_hero_cta_link' => Setting::get('landing.hero_cta_link', ''),
+
+            // Affiliate & Payment (Existing)
             'midtrans_server_key' => '',
             'midtrans_client_key' => '',
             'midtrans_sandbox' => (bool) Setting::get('payment.midtrans_sandbox', config('services.midtrans.sandbox', true)),
@@ -38,6 +56,12 @@ class SettingsController extends Controller
             'withdrawal_fee_ewallet' => (float) Setting::get('affiliate.withdrawal_fee_ewallet', config('affiliate.withdrawal_fee_ewallet', 1000)),
             'minimum_withdrawal' => (float) Setting::get('affiliate.minimum_withdrawal', config('affiliate.minimum_withdrawal', 50000)),
         ];
+
+        $seoPages = ['home', 'about', 'pricing', 'contact', 'solutions', 'features', 'affiliate', 'faq', 'docs', 'terms', 'privacy'];
+        foreach ($seoPages as $page) {
+            $settings['seo_' . $page . '_title'] = Setting::get('seo.' . $page . '.title', '');
+            $settings['seo_' . $page . '_description'] = Setting::get('seo.' . $page . '.description', '');
+        }
 
         return view('admin.settings.index', [
             'settings' => $settings,
@@ -50,13 +74,31 @@ class SettingsController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
+            // General
             'platform_name' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'logo_url' => ['sometimes', 'nullable', 'url', 'max:2048'],
+            'logo' => ['sometimes', 'nullable', 'image', 'max:2048'],
+            'favicon' => ['sometimes', 'nullable', 'image', 'max:1024'],
+            'preloader_text' => ['sometimes', 'nullable', 'string', 'max:255'],
+
+            // Contact
             'email_support' => ['sometimes', 'nullable', 'email'],
-            'email_info' => ['sometimes', 'nullable', 'email'],
-            'email_marketing' => ['sometimes', 'nullable', 'email'],
-            'email_noreply' => ['sometimes', 'nullable', 'email'],
             'whatsapp_number' => ['sometimes', 'nullable', 'string', 'max:50'],
+            'whatsapp_link' => ['sometimes', 'nullable', 'url', 'max:255'],
+            'footer_description' => ['sometimes', 'nullable', 'string'],
+
+            // Social
+            'social_twitter' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'social_linkedin' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'social_github' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'social_instagram' => ['sometimes', 'nullable', 'string', 'max:255'],
+
+            // Landing
+            'landing_hero_title' => ['sometimes', 'nullable', 'string'],
+            'landing_hero_subtitle' => ['sometimes', 'nullable', 'string'],
+            'landing_hero_cta_text' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'landing_hero_cta_link' => ['sometimes', 'nullable', 'string', 'max:255'],
+
+            // Affiliate & Payment
             'midtrans_server_key' => ['sometimes', 'nullable', 'string'],
             'midtrans_client_key' => ['sometimes', 'nullable', 'string'],
             'midtrans_sandbox' => ['sometimes', 'boolean'],
@@ -67,14 +109,43 @@ class SettingsController extends Controller
             'minimum_withdrawal' => ['sometimes', 'nullable', 'numeric', 'min:0'],
         ]);
 
+        // Handle File Uploads
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('settings', 'public');
+            Setting::updateOrCreate(
+                ['key' => 'site.logo'],
+                ['value' => Storage::url($path), 'type' => 'image', 'group' => 'general']
+            );
+        }
+
+        if ($request->hasFile('favicon')) {
+            $path = $request->file('favicon')->store('settings', 'public');
+            Setting::updateOrCreate(
+                ['key' => 'site.favicon'],
+                ['value' => Storage::url($path), 'type' => 'image', 'group' => 'general']
+            );
+        }
+
+        // Mapping textual fields
         $map = [
-            'platform_name' => ['general.platform_name', 'string', 'general'],
-            'logo_url' => ['general.logo_url', 'string', 'general'],
-            'email_support' => ['general.email_support', 'string', 'general'],
-            'email_info' => ['general.email_info', 'string', 'general'],
-            'email_marketing' => ['general.email_marketing', 'string', 'general'],
-            'email_noreply' => ['general.email_noreply', 'string', 'general'],
-            'whatsapp_number' => ['general.whatsapp_number', 'string', 'general'],
+            'platform_name' => ['site.name', 'string', 'general'],
+            'preloader_text' => ['site.preloader_text', 'string', 'general'],
+
+            'email_support' => ['contact.email', 'string', 'contact'],
+            'whatsapp_number' => ['contact.whatsapp', 'string', 'contact'],
+            'whatsapp_link' => ['contact.whatsapp_link', 'string', 'contact'],
+            'footer_description' => ['footer.description', 'text', 'footer'],
+
+            'social_twitter' => ['social.twitter', 'string', 'social'],
+            'social_linkedin' => ['social.linkedin', 'string', 'social'],
+            'social_github' => ['social.github', 'string', 'social'],
+            'social_instagram' => ['social.instagram', 'string', 'social'],
+
+            'landing_hero_title' => ['landing.hero_title', 'string', 'landing'],
+            'landing_hero_subtitle' => ['landing.hero_subtitle', 'string', 'landing'],
+            'landing_hero_cta_text' => ['landing.hero_cta_text', 'string', 'landing'],
+            'landing_hero_cta_link' => ['landing.hero_cta_link', 'string', 'landing'],
+
             'midtrans_server_key' => ['payment.midtrans_server_key', 'string', 'payment'],
             'midtrans_client_key' => ['payment.midtrans_client_key', 'string', 'payment'],
             'midtrans_sandbox' => ['payment.midtrans_sandbox', 'boolean', 'payment'],
@@ -86,9 +157,13 @@ class SettingsController extends Controller
         ];
 
         foreach ($validated as $field => $value) {
+            if ($field === 'logo' || $field === 'favicon') continue;
+
             if (($field === 'midtrans_server_key' || $field === 'midtrans_client_key') && blank($value)) {
                 continue;
             }
+
+            if (!isset($map[$field])) continue;
 
             [$key, $type, $group] = $map[$field];
 
@@ -103,6 +178,33 @@ class SettingsController extends Controller
             );
         }
 
+        $seoPages = ['home', 'about', 'pricing', 'contact', 'solutions', 'features', 'affiliate', 'faq', 'docs', 'terms', 'privacy'];
+        foreach ($seoPages as $page) {
+            if ($request->has('seo_' . $page . '_title')) {
+                Setting::updateOrCreate(
+                    ['key' => 'seo.' . $page . '.title'],
+                    [
+                        'value' => (string) $request->input('seo_' . $page . '_title'),
+                        'type' => 'string',
+                        'group' => 'seo',
+                        'updated_by' => $request->user('admin')?->id,
+                    ]
+                );
+            }
+            if ($request->has('seo_' . $page . '_description')) {
+                Setting::updateOrCreate(
+                    ['key' => 'seo.' . $page . '.description'],
+                    [
+                        'value' => (string) $request->input('seo_' . $page . '_description'),
+                        'type' => 'text',
+                        'group' => 'seo',
+                        'updated_by' => $request->user('admin')?->id,
+                    ]
+                );
+            }
+        }
+
         return back()->with('success', 'Settings updated successfully.');
     }
 }
+

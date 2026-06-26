@@ -19,7 +19,7 @@ class FaqController extends Controller
     /**
      * Display FAQs page
      */
-    public function index(): Response
+    public function index()
     {
         return view('admin.faqs.index', [
             'faqs' => Faq::with(['creator', 'updater'])
@@ -34,7 +34,7 @@ class FaqController extends Controller
     /**
      * Show form for creating a new FAQ
      */
-    public function create(): Response
+    public function create()
     {
         return view('admin.faqs.create', [
             'faq' => null,
@@ -44,7 +44,7 @@ class FaqController extends Controller
     /**
      * Show form for editing a FAQ
      */
-    public function edit(string $id): Response
+    public function edit(string $id)
     {
         $faq = Faq::findOrFail($id);
         return view('admin.faqs.create', [
@@ -55,7 +55,7 @@ class FaqController extends Controller
     /**
      * Get all FAQs
      */
-    public function list(): JsonResponse
+    public function list()
     {
         $faqs = Faq::with(['creator', 'updater'])
             ->orderBy('order')
@@ -70,7 +70,7 @@ class FaqController extends Controller
     /**
      * Store a new FAQ
      */
-    public function store(FaqRequest $request): JsonResponse
+    public function store(FaqRequest $request)
     {
         $data = $request->validated();
         $data['created_by'] = auth()->id();
@@ -87,7 +87,7 @@ class FaqController extends Controller
     /**
      * Update an existing FAQ
      */
-    public function update(FaqRequest $request, string $id): JsonResponse
+    public function update(FaqRequest $request, string $id)
     {
         $faq = Faq::findOrFail($id);
         $data = $request->validated();
@@ -105,7 +105,7 @@ class FaqController extends Controller
     /**
      * Delete a FAQ
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id)
     {
         $faq = Faq::findOrFail($id);
         $faq->delete();
@@ -119,7 +119,7 @@ class FaqController extends Controller
     /**
      * Reorder FAQs
      */
-    public function reorder(JsonResponse $request): JsonResponse
+    public function reorder(JsonResponse $request)
     {
         $orderData = $request->input('order', []);
 
