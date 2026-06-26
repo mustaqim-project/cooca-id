@@ -8,8 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\AffiliatorResource;
 use App\Repositories\Contracts\AffiliatorRepositoryInterface;
 use Illuminate\Http\JsonResponse;
-
-
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
 
 final class AffiliatorController extends Controller
 {
@@ -20,7 +21,7 @@ final class AffiliatorController extends Controller
     /**
      * Display listing of affiliators.
      */
-    public function index(): Response
+    public function index(): View
     {
         $affiliators = $this->affiliatorRepository->paginate(15);
 
@@ -30,9 +31,28 @@ final class AffiliatorController extends Controller
     }
 
     /**
+     * Store a newly created affiliator.
+     */
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:affiliators',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $validated['password'] = Hash::make($validated['password']);
+
+        $this->affiliatorRepository->create($validated);
+
+        return redirect()->route('admin.affiliators.index')
+            ->with('success', 'Affiliator created successfully.');
+    }
+
+    /**
      * Display the specified affiliator.
      */
-    public function show(string $id): Response
+    public function show(string $id): View
     {
         $affiliator = $this->affiliatorRepository->find($id);
 
@@ -49,35 +69,38 @@ final class AffiliatorController extends Controller
     /**
      * Update the specified affiliator.
      */
-    public function update(string $id, array $data): JsonResponse
+    public function update(Request $request, string $id): \Illuminate\Http\RedirectResponse
     {
         $affiliator = $this->affiliatorRepository->find($id);
 
         if (!$affiliator) {
-            return response()->json(['message' => 'Affiliator not found'], 404);
+            return redirect()->route('admin.affiliators.index')->with('error', 'Affiliator not found');
         }
 
-        $this->affiliatorRepository->update($id, $data);
-
-        return response()->json([
-            'message' => 'Affiliator updated successfully',
-            'data' => new AffiliatorResource($affiliator->fresh()),
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:affiliators,email,' . $id,
+            'is_active' => 'boolean',
         ]);
+
+        $this->affiliatorRepository->update($id, $validated);
+
+        return redirect()->route('admin.affiliators.index')->with('success', 'Affiliator updated successfully');
     }
 
     /**
      * Remove the specified affiliator.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id): \Illuminate\Http\RedirectResponse
     {
         $affiliator = $this->affiliatorRepository->find($id);
 
         if (!$affiliator) {
-            return response()->json(['message' => 'Affiliator not found'], 404);
+            return redirect()->route('admin.affiliators.index')->with('error', 'Affiliator not found');
         }
 
         $this->affiliatorRepository->delete($id);
 
-        return response()->json(['message' => 'Affiliator deleted successfully']);
+        return redirect()->route('admin.affiliators.index')->with('success', 'Affiliator deleted successfully');
     }
 }

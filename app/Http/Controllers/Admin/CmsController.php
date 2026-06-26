@@ -37,7 +37,7 @@ class CmsController extends Controller
 
         $pages = $query->paginate(20)->withQueryString();
 
-        return view('admin.Cms/Pages, index', [
+        return view('admin.cms.pages.index', [
             'pages' => $pages,
             'filters' => [
                 'search' => $request->get('search'),
@@ -51,7 +51,7 @@ class CmsController extends Controller
      */
     public function create()
     {
-        return view('admin.Cms/Pages, create', [
+        return view('admin.cms.pages.create', [
             'page' => null,
         ]);
     }
@@ -86,7 +86,7 @@ class CmsController extends Controller
      */
     public function show(Page $page)
     {
-        return view('admin.Cms/Pages, show', [
+        return view('admin.cms.pages.show', [
             'page' => $page->load('author'),
         ]);
     }
@@ -96,7 +96,7 @@ class CmsController extends Controller
      */
     public function edit(Page $page)
     {
-        return view('admin.Cms/Pages, edit', [
+        return view('admin.cms.pages.edit', [
             'page' => $page,
         ]);
     }

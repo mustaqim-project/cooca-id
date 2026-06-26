@@ -10,6 +10,7 @@ use App\Services\Affiliate\AffiliateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Setting;
+use Illuminate\View\View;
 
 
 
@@ -42,7 +43,7 @@ final class WithdrawalController extends Controller
     /**
      * Display listing of withdrawals.
      */
-    public function index(): Response
+    public function index(): View
     {
         $affiliator = Auth::guard('affiliator')->user();
         $withdrawals = $this->affiliateService->getWithdrawals($affiliator->getKey());
@@ -57,7 +58,7 @@ final class WithdrawalController extends Controller
     /**
      * Show the form for creating a new withdrawal.
      */
-    public function create(): Response
+    public function create(): View
     {
         $affiliator = Auth::guard('affiliator')->user();
         $balance = $this->affiliateService->getAvailableBalance($affiliator->getKey());
@@ -81,7 +82,7 @@ final class WithdrawalController extends Controller
     /**
      * Display the specified withdrawal.
      */
-    public function show(string $id): Response
+    public function show(string $id): View
     {
         $affiliator = Auth::guard('affiliator')->user();
         $withdrawal = $this->affiliateService->getWithdrawalById($id, $affiliator->getKey());
@@ -98,12 +99,12 @@ final class WithdrawalController extends Controller
     /**
      * Display withdrawal history.
      */
-    public function history(): Response
+    public function history(): View
     {
         $affiliator = Auth::guard('affiliator')->user();
         $withdrawals = $this->affiliateService->getWithdrawalHistory($affiliator->getKey());
 
-        return view('affiliator.withdrawals.History', [
+        return view('affiliator.withdrawals.history', [
             'withdrawals' => $withdrawals,
         ]);
     }

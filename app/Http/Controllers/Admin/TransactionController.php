@@ -8,8 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\TransactionResource;
 use App\Services\Payment\PaymentService;
 use Illuminate\Http\JsonResponse;
-
-
+use Illuminate\View\View;
 
 final class TransactionController extends Controller
 {
@@ -20,7 +19,7 @@ final class TransactionController extends Controller
     /**
      * Display listing of transactions.
      */
-    public function index(): Response
+    public function index(): View
     {
         $transactions = $this->paymentService->getTransactionsPaginated(15);
 
@@ -32,7 +31,7 @@ final class TransactionController extends Controller
     /**
      * Display the specified transaction.
      */
-    public function show(string $id): Response
+    public function show(string $id): View
     {
         $transaction = $this->paymentService->findTransactionById($id);
 

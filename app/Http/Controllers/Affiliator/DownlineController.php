@@ -32,12 +32,12 @@ final class DownlineController extends Controller
 
     public function tree(): Illuminate\View\View
     {
-        return view('affiliator.downlines.Tree');
+        return view('affiliator.downlines.tree');
     }
 
     public function stats(): Illuminate\View\View
     {
-        return view('affiliator.downlines.Stats');
+        return view('affiliator.downlines.stats');
     }
 
 }

@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Review;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 
 /**
@@ -19,7 +21,7 @@ class ReviewController extends Controller
     /**
      * Display a listing of reviews.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $query = Review::with(['customer', 'product'])->latest('created_at');
 
@@ -69,9 +71,19 @@ class ReviewController extends Controller
     }
 
     /**
+     * Display the specified review.
+     */
+    public function show(Review $review): View
+    {
+        return view('admin.reviews.show', [
+            'review' => $review->load(['customer', 'product']),
+        ]);
+    }
+
+    /**
      * Approve the specified review.
      */
-    public function approve(Review $review)
+    public function approve(Review $review): RedirectResponse
     {
         $review->update([
             'status' => 'approved',
@@ -84,7 +96,7 @@ class ReviewController extends Controller
     /**
      * Reject the specified review.
      */
-    public function reject(Review $review, Request $request)
+    public function reject(Review $review, Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'rejection_reason' => 'nullable|string|max:500',
@@ -102,7 +114,7 @@ class ReviewController extends Controller
     /**
      * Remove the specified review from storage.
      */
-    public function destroy(Review $review)
+    public function destroy(Review $review): RedirectResponse
     {
         $review->delete();
 

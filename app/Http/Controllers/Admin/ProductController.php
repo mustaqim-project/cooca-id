@@ -10,6 +10,7 @@ use App\Http\Resources\Admin\ProductResource;
 use App\Models\Product;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 final class ProductController extends Controller
@@ -24,58 +25,97 @@ final class ProductController extends Controller
     public function index(): View
     {
         $products = $this->productRepository->paginateWithFilters(15);
+        $categories = \App\Models\ProductCategory::where('is_active', true)->orderBy('sort_order')->get();
 
         return view('admin.products.index', [
             'products' => $products,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new product.
+     */
+    public function create(): View
+    {
+        return view('admin.products.create');
+    }
+
+    /**
+     * Display the specified product.
+     */
+    public function show(string $id): View
+    {
+        $product = $this->productRepository->find($id);
+
+        if (!$product) {
+            abort(404, 'Product not found');
+        }
+
+        return view('admin.products.show', [
+            'product' => $product,
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified product.
+     */
+    public function edit(string $id): View
+    {
+        $product = $this->productRepository->find($id);
+
+        if (!$product) {
+            abort(404, 'Product not found');
+        }
+
+        return view('admin.products.edit', [
+            'product' => $product,
         ]);
     }
 
     /**
      * Store a newly created product.
      */
-    public function store(StoreProductRequest $request): JsonResponse
+    public function store(StoreProductRequest $request): RedirectResponse
     {
         $data = $request->validated();
         $product = $this->productRepository->create($data);
 
-        return response()->json([
-            'message' => 'Product created successfully',
-            'data' => new ProductResource($product),
-        ], 201);
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Product created successfully.');
     }
 
     /**
      * Update the specified product.
      */
-    public function update(StoreProductRequest $request, string $id): JsonResponse
+    public function update(StoreProductRequest $request, string $id): RedirectResponse
     {
         $product = $this->productRepository->find($id);
 
         if (!$product) {
-            return response()->json(['message' => 'Product not found'], 404);
+            return redirect()->route('admin.products.index')->with('error', 'Product not found.');
         }
 
         $this->productRepository->update($id, $request->validated());
 
-        return response()->json([
-            'message' => 'Product updated successfully',
-            'data' => new ProductResource($product->fresh()),
-        ]);
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Product updated successfully.');
     }
 
     /**
      * Remove the specified product.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id): RedirectResponse
     {
         $product = $this->productRepository->find($id);
 
         if (!$product) {
-            return response()->json(['message' => 'Product not found'], 404);
+            return redirect()->route('admin.products.index')->with('error', 'Product not found.');
         }
 
         $this->productRepository->delete($id);
 
-        return response()->json(['message' => 'Product deleted successfully']);
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Product deleted successfully.');
     }
 }

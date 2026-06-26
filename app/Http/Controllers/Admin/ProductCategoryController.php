@@ -8,9 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-
-
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 /**
  * Admin Product Category Controller
@@ -22,7 +21,7 @@ class ProductCategoryController extends Controller
     /**
      * Display a listing of product categories.
      */
-    public function index(Request $request): Response
+    public function index(Request $request): View
     {
         $query = ProductCategory::withCount('products')->latest('created_at');
 
@@ -55,7 +54,7 @@ class ProductCategoryController extends Controller
     /**
      * Show the form for creating a new category.
      */
-    public function create(): Response
+    public function create(): View
     {
         return view('admin.productcategories.create', [
             'category' => null,
@@ -65,7 +64,7 @@ class ProductCategoryController extends Controller
     /**
      * Store a newly created category in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -86,17 +85,14 @@ class ProductCategoryController extends Controller
 
         $category = ProductCategory::create($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Product category created successfully',
-            'data' => $category,
-        ]);
+        return redirect()->route('admin.product-categories.index')
+            ->with('success', 'Product category created successfully.');
     }
 
     /**
      * Display the specified category.
      */
-    public function show(ProductCategory $category): Response
+    public function show(ProductCategory $category): View
     {
         return view('admin.productcategories.show', [
             'category' => $category->load('products'),
@@ -106,7 +102,7 @@ class ProductCategoryController extends Controller
     /**
      * Show the form for editing the specified category.
      */
-    public function edit(ProductCategory $category): Response
+    public function edit(ProductCategory $category): View
     {
         return view('admin.productcategories.edit', [
             'category' => $category,
@@ -116,7 +112,7 @@ class ProductCategoryController extends Controller
     /**
      * Update the specified category in storage.
      */
-    public function update(Request $request, ProductCategory $category): JsonResponse
+    public function update(Request $request, ProductCategory $category): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -136,32 +132,25 @@ class ProductCategoryController extends Controller
 
         $category->update($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Product category updated successfully',
-            'data' => $category,
-        ]);
+        return redirect()->route('admin.product-categories.index')
+            ->with('success', 'Product category updated successfully.');
     }
 
     /**
      * Remove the specified category from storage.
      */
-    public function destroy(ProductCategory $category): JsonResponse
+    public function destroy(ProductCategory $category): RedirectResponse
     {
         // Check if category has products
         if ($category->products()->count() > 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot delete category with existing products',
-            ], 422);
+            return redirect()->route('admin.product-categories.index')
+                ->with('error', 'Cannot delete category with existing products.');
         }
 
         $category->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Product category deleted successfully',
-        ]);
+        return redirect()->route('admin.product-categories.index')
+            ->with('success', 'Product category deleted successfully.');
     }
 
     /**

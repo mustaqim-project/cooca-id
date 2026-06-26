@@ -46,37 +46,73 @@ final class CustomerController extends Controller
     }
 
     /**
+     * Store a newly created customer.
+     */
+    public function store(\Illuminate\Http\Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:customers,email',
+            'password' => 'required|min:8',
+            'phone' => 'nullable|string',
+            'business_name' => 'nullable|string',
+        ]);
+        
+        $data['password'] = \Illuminate\Support\Facades\Hash::make($data['password']);
+
+        $this->customerRepository->create($data);
+
+        return redirect()->route('admin.customers.index')->with('success', 'Customer created successfully.');
+    }
+
+    /**
      * Update the specified customer.
      */
-    public function update(string $id, array $data): JsonResponse
+    public function update(\Illuminate\Http\Request $request, string $id): \Illuminate\Http\RedirectResponse
     {
         $customer = $this->customerRepository->find($id);
 
         if (!$customer) {
-            return response()->json(['message' => 'Customer not found'], 404);
+            return redirect()->route('admin.customers.index')->with('error', 'Customer not found.');
+        }
+
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:customers,email,' . $id,
+            'phone' => 'nullable|string',
+            'business_name' => 'nullable|string',
+        ];
+
+        if ($request->filled('password')) {
+            $rules['password'] = 'required|min:8';
+        }
+
+        $data = $request->validate($rules);
+        
+        if ($request->filled('password')) {
+            $data['password'] = \Illuminate\Support\Facades\Hash::make($data['password']);
+        } else {
+            unset($data['password']);
         }
 
         $this->customerRepository->update($id, $data);
 
-        return response()->json([
-            'message' => 'Customer updated successfully',
-            'data' => new CustomerResource($customer->fresh()),
-        ]);
+        return redirect()->route('admin.customers.index')->with('success', 'Customer updated successfully.');
     }
 
     /**
      * Remove the specified customer.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id): \Illuminate\Http\RedirectResponse
     {
         $customer = $this->customerRepository->find($id);
 
         if (!$customer) {
-            return response()->json(['message' => 'Customer not found'], 404);
+            return redirect()->route('admin.customers.index')->with('error', 'Customer not found.');
         }
 
         $this->customerRepository->delete($id);
 
-        return response()->json(['message' => 'Customer deleted successfully']);
+        return redirect()->route('admin.customers.index')->with('success', 'Customer deleted successfully.');
     }
 }

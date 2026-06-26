@@ -8,8 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\CommissionResource;
 use App\Services\Affiliate\AffiliateService;
 use Illuminate\Support\Facades\Auth;
-
-
+use Illuminate\View\View;
 
 final class CommissionController extends Controller
 {
@@ -20,7 +19,7 @@ final class CommissionController extends Controller
     /**
      * Display listing of commissions.
      */
-    public function index(): Response
+    public function index(): View
     {
         $affiliator = Auth::guard('affiliator')->user();
         $commissions = \App\Models\AffiliateCommission::where('affiliator_id', $affiliator->getKey())->paginate(15);
@@ -34,7 +33,7 @@ final class CommissionController extends Controller
     {
         $affiliator = Auth::guard('affiliator')->user();
         
-        return view('affiliator.commissions.Stats', [
+        return view('affiliator.commissions.stats', [
             'total_commission' => $this->affiliateService->getTotalCommission($affiliator),
             'cleared_commission' => $this->affiliateService->getTotalCommission($affiliator, 'cleared'),
             'pending_commission' => $this->affiliateService->getTotalCommission($affiliator, 'pending'),

@@ -88,24 +88,24 @@ final class PaymentController extends Controller
     /**
      * Display payment success page.
      */
-    public function success(): Response
+    public function success(): Illuminate\View\View
     {
-        return view('customer.Payments/Success');
+        return view('customer.payments.success');
     }
 
     /**
      * Display payment pending page.
      */
-    public function pending(): Response
+    public function pending(): Illuminate\View\View
     {
-        return view('customer.Payments/Pending');
+        return view('customer.payments.pending');
     }
 
     /**
      * Display payment failed page.
      */
-    public function failed(): Response
+    public function failed(): Illuminate\View\View
     {
-        return view('customer.Payments/Failed');
+        return view('customer.payments.failed');
     }
 }

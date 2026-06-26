@@ -8,8 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\CustomerResource;
 use App\Repositories\Contracts\AffiliatorRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
-
-
+use Illuminate\View\View;
 
 final class ReferralController extends Controller
 {
@@ -20,7 +19,7 @@ final class ReferralController extends Controller
     /**
      * Display listing of referrals.
      */
-    public function index(): Response
+    public function index(): View
     {
         $affiliator = Auth::guard('affiliator')->user();
         $referrals = \App\Models\Customer::where('affiliator_id', $affiliator->getKey())->paginate(15);
@@ -33,7 +32,7 @@ final class ReferralController extends Controller
 
     public function stats(): Illuminate\View\View
     {
-        return view('affiliator.referrals.Stats');
+        return view('affiliator.referrals.stats');
     }
 
 }

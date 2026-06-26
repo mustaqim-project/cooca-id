@@ -9,6 +9,8 @@ use App\Http\Requests\Admin\CreateVoucherRequest;
 use App\Http\Resources\Admin\VoucherResource;
 use App\Services\Voucher\VoucherService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 
 
@@ -21,7 +23,7 @@ final class VoucherController extends Controller
     /**
      * Display listing of vouchers.
      */
-    public function index(): Response
+    public function index(): View
     {
         $vouchers = $this->voucherService->paginate(15);
 
@@ -30,74 +32,97 @@ final class VoucherController extends Controller
         ]);
     }
 
+    public function create(): View
+    {
+        return view('admin.vouchers.create');
+    }
+
+    public function show(string $id): View
+    {
+        $voucher = $this->voucherService->findById($id);
+        if (!$voucher) {
+            abort(404, 'Voucher not found');
+        }
+        return view('admin.vouchers.show', ['voucher' => new VoucherResource($voucher)]);
+    }
+
+    public function edit(string $id): View
+    {
+        $voucher = $this->voucherService->findById($id);
+        if (!$voucher) {
+            abort(404, 'Voucher not found');
+        }
+        return view('admin.vouchers.edit', ['voucher' => new VoucherResource($voucher)]);
+    }
+
     /**
      * Store a newly created voucher.
      */
-    public function store(CreateVoucherRequest $request): JsonResponse
+    public function store(CreateVoucherRequest $request): RedirectResponse
     {
         $data = $request->validated();
         $voucher = $this->voucherService->create($data);
 
-        return response()->json([
-            'message' => 'Voucher created successfully',
-            'data' => new VoucherResource($voucher),
-        ], 201);
+        return redirect()->route('admin.vouchers.index')
+            ->with('success', 'Voucher created successfully.');
     }
 
     /**
      * Update the specified voucher.
      */
-    public function update(CreateVoucherRequest $request, string $id): JsonResponse
+    public function update(CreateVoucherRequest $request, string $id): RedirectResponse
     {
         $voucher = $this->voucherService->findById($id);
 
         if (!$voucher) {
-            return response()->json(['message' => 'Voucher not found'], 404);
+            return redirect()->route('admin.vouchers.index')->with('error', 'Voucher not found.');
         }
 
         $this->voucherService->update($id, $request->validated());
 
-        return response()->json([
-            'message' => 'Voucher updated successfully',
-            'data' => new VoucherResource($voucher->fresh()),
-        ]);
+        return redirect()->route('admin.vouchers.index')
+            ->with('success', 'Voucher updated successfully.');
     }
 
     /**
      * Activate the specified voucher.
      */
-    public function activate(string $id): JsonResponse
+    public function activate(string $id): RedirectResponse
     {
         $voucher = $this->voucherService->findById($id);
 
         if (!$voucher) {
-            return response()->json(['message' => 'Voucher not found'], 404);
+            return redirect()->route('admin.vouchers.index')->with('error', 'Voucher not found.');
         }
 
         $this->voucherService->activate($id);
 
-        return response()->json([
-            'message' => 'Voucher activated successfully',
-            'data' => new VoucherResource($voucher->fresh()),
-        ]);
+        return back()->with('success', 'Voucher activated successfully.');
     }
 
     /**
      * Deactivate the specified voucher.
      */
-    public function deactivate(string $id): JsonResponse
+    public function deactivate(string $id): RedirectResponse
     {
         $voucher = $this->voucherService->findById($id);
 
         if (!$voucher) {
-            return response()->json(['message' => 'Voucher not found'], 404);
+            return redirect()->route('admin.vouchers.index')->with('error', 'Voucher not found.');
         }
 
         $this->voucherService->deactivate($id);
 
-        return response()->json([
-            'message' => 'Voucher deactivated successfully',
-            'data' => new VoucherResource($voucher->fresh()),
-        ]);
+        return back()->with('success', 'Voucher deactivated successfully.');
+    }
+
+    public function destroy(string $id): RedirectResponse
+    {
+        $voucher = $this->voucherService->findById($id);
+        if (!$voucher) {
+            return redirect()->route('admin.vouchers.index')->with('error', 'Voucher not found.');
+        }
+        $voucher->delete();
+        return redirect()->route('admin.vouchers.index')->with('success', 'Voucher deleted successfully.');
     }
 }

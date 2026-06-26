@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 
 use Illuminate\Http\RedirectResponse;
-
+use Illuminate\View\View;
 final class LicenseController extends Controller
 {
     public function __construct(
@@ -21,7 +21,7 @@ final class LicenseController extends Controller
     /**
      * Display listing of customer licenses.
      */
-    public function index(): Response
+    public function index(): View
     {
         $customer = Auth::guard('customer')->user();
         $licenses = \App\Models\License::where('customer_id', $customer->getKey())->get();
@@ -34,7 +34,7 @@ final class LicenseController extends Controller
     /**
      * Display the specified license details.
      */
-    public function show(string $id): Response
+    public function show(string $id): View
     {
         $customer = Auth::guard('customer')->user();
         $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->first();
@@ -69,7 +69,7 @@ final class LicenseController extends Controller
     /**
      * Display license credentials (license code + token).
      */
-    public function credentials(string $id): Response
+    public function credentials(string $id): View
     {
         $customer = Auth::guard('customer')->user();
         $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->first();
@@ -78,7 +78,7 @@ final class LicenseController extends Controller
             abort(404, 'License not found');
         }
 
-        return view('customer.Licenses/Credentials', [
+        return view('customer.licenses.credentials', [
             'license' => new LicenseResource($license),
         ]);
     }

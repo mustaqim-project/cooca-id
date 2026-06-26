@@ -4,9 +4,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\SecurityHeadersMiddleware;
-use Inertia\Inertia;
-
-
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: [
@@ -22,7 +19,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             SecurityHeadersMiddleware::class,
-            \App\Http\Middleware\HandleInertiaRequests::class,
             \App\Http\Middleware\ActivityLogger::class,
         ]);
 

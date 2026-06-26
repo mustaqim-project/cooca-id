@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\GenerateLicenseRequest;
 use App\Http\Resources\Admin\LicenseResource;
 use App\Services\License\LicenseService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
 
 
 
@@ -24,7 +25,7 @@ final class LicenseController extends Controller
     /**
      * Display listing of licenses.
      */
-    public function index(): Response
+    public function index(): View
     {
         $licenses = $this->licenseService->paginate(15);
 

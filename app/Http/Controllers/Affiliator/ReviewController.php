@@ -73,7 +73,7 @@ class ReviewController extends Controller
         $customer = \App\Models\Customer::where('email', $affiliator->email)->first();
 
         if (!$customer) {
-            return view('affiliator.reviews.MyReviews', [
+            return view('affiliator.reviews.my_reviews', [
                 'reviews' => [],
                 'stats' => [
                     'total' => 0,
@@ -97,7 +97,7 @@ class ReviewController extends Controller
             'rejected' => Review::where('customer_id', $customer->id)->where('status', 'rejected')->count(),
         ];
 
-        return view('affiliator.reviews.MyReviews', [
+        return view('affiliator.reviews.my_reviews', [
             'reviews' => $reviews,
             'stats' => $stats,
         ]);
