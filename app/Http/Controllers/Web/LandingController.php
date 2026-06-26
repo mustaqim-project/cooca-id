@@ -191,7 +191,7 @@ class LandingController extends Controller
             ->firstOrFail();
 
         // Increment view count
-        $post->increment('view_count');
+        $post->incrementViews();
 
         // Get related posts
         $relatedPosts = BlogPost::where('is_published', true)

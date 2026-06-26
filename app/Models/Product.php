@@ -32,6 +32,7 @@ final class Product extends Model
         'is_active',
         'is_featured',
         'sort_order',
+        'views',
     ];
 
     protected function casts(): array

@@ -229,6 +229,48 @@
         color: var(--success);
         font-size: 1.1rem;
     }
+
+    /* Slider Pricing Styles */
+    .pricing-slider-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 50px;
+        padding: 6px;
+        max-width: 500px;
+        margin: 0 auto 40px;
+        position: relative;
+    }
+    .pricing-slider-btn {
+        flex: 1;
+        text-align: center;
+        padding: 10px 15px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+        border: none;
+        background: transparent;
+    }
+    .pricing-slider-btn.active {
+        color: #fff;
+    }
+    .pricing-slider-bg {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        height: calc(100% - 12px);
+        background: var(--primary);
+        border-radius: 50px;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1;
+    }
 </style>
 @endpush
 @section('content')
@@ -249,7 +291,10 @@
                 </p>
                 <div class="reveal reveal-delay-3" style="display: flex; gap: 16px; flex-wrap: wrap;">
                     <a href="#pricing" class="btn-cooca btn-cooca-primary"><i class="bi bi-cart-fill"></i> {{ __('View Pricing Plans') }}</a>
-                    <a href="{{ route('contact') }}" class="btn-cooca btn-cooca-outline"><i class="bi bi-chat-dots"></i> {{ __('Request Demo') }}</a>
+                    @if($product->demo_url)
+                        <a href="{{ $product->demo_url }}" target="_blank" class="btn-cooca btn-cooca-outline"><i class="bi bi-laptop"></i> {{ __('Live Demo') }}</a>
+                    @endif
+                    <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-outline"><i class="bi bi-person-plus"></i> {{ __('Request Free Trial') }}</a>
                 </div>
             </div>
             <div class="col-lg-6 reveal reveal-delay-2">
@@ -334,41 +379,85 @@
         </div>
 
         @if($product->subscriptionPlans && count($product->subscriptionPlans) > 0)
-            <div class="row g-4 justify-content-center">
+            <div class="pricing-slider-container reveal reveal-delay-1">
+                <div class="pricing-slider-bg" id="slider-bg"></div>
                 @foreach($product->subscriptionPlans as $index => $plan)
-                <div class="col-lg-4 col-md-6 reveal reveal-delay-{{ ($index % 3) + 1 }}">
-                    <div class="pricing-card {{ $plan->is_popular ? 'popular' : '' }}">
-                        @if($plan->is_popular)
-                            <div class="popular-badge">{{ __('Most Popular') }}</div>
-                        @endif
-                        <h3 class="plan-name">{{ $plan->name }}</h3>
-                        <p class="plan-desc">{{ $plan->description ?? __('Best for growing businesses needing complete control.') }}</p>
+                    <button class="pricing-slider-btn {{ $index === 0 ? 'active' : '' }}" onclick="selectPlan({{ $index }}, this)">
+                        @if($plan->duration_months == 1) 1 Bulan
+                        @elseif($plan->duration_months == 3) 3 Bulan
+                        @elseif($plan->duration_months == 12) 1 Tahun
+                        @elseif($plan->duration_months == 999) Lifetime
+                        @else {{ $plan->name }} @endif
+                    </button>
+                @endforeach
+            </div>
+
+            <div class="row justify-content-center reveal reveal-delay-2">
+                <div class="col-lg-5">
+                    @foreach($product->subscriptionPlans as $index => $plan)
+                    <div class="pricing-card popular plan-card-item" id="plan-card-{{ $index }}" style="{{ $index !== 0 ? 'display:none;' : 'display:flex;' }}">
+                        <div class="popular-badge">{{ $plan->duration_months == 999 ? 'Best Value' : ($plan->duration_months == 12 ? 'Most Popular' : 'Flexible') }}</div>
+                        <h3 class="plan-name">{{ $product->name }}</h3>
+                        <p class="plan-desc">
+                            @if($plan->duration_months == 999)
+                                {{ __('Bayar sekali untuk selamanya. Opsi hemat jangka panjang.') }}
+                            @else
+                                {{ __('Berlangganan untuk ') }} {{ $plan->duration_months }} {{ __(' bulan.') }}
+                            @endif
+                        </p>
                         
                         <div class="plan-price-box">
                             <span class="plan-price">Rp {{ number_format($plan->price, 0, ',', '.') }}</span>
-                            <span class="plan-interval">/ {{ $plan->interval ?? __('month') }}</span>
+                            <span class="plan-interval">/ {{ $plan->duration_months == 999 ? __('lifetime') : ($plan->duration_months . ' ' . __('bulan')) }}</span>
                         </div>
 
                         <ul class="plan-features">
-                            @if($plan->features && is_array($plan->features))
-                                @foreach($plan->features as $feature)
-                                <li><i class="bi bi-check-circle-fill"></i> <span>{{ $feature }}</span></li>
-                                @endforeach
-                            @else
-                                <li><i class="bi bi-check-circle-fill"></i> <span>{{ __('Full feature access') }}</span></li>
-                                <li><i class="bi bi-check-circle-fill"></i> <span>{{ __('Unlimited team members') }}</span></li>
-                                <li><i class="bi bi-check-circle-fill"></i> <span>{{ __('Priority email support') }}</span></li>
-                                <li><i class="bi bi-check-circle-fill"></i> <span>{{ __('Automatic updates') }}</span></li>
+                            <li><i class="bi bi-check-circle-fill"></i> <span>{{ __('All core features included') }}</span></li>
+                            <li><i class="bi bi-check-circle-fill"></i> <span>{{ __('Dedicated isolated environment') }}</span></li>
+                            <li><i class="bi bi-check-circle-fill"></i> <span>{{ __('Regular automated security updates') }}</span></li>
+                            <li><i class="bi bi-check-circle-fill"></i> <span>{{ __('Customer success support') }}</span></li>
+                            @if($plan->duration_months == 999)
+                            <li><i class="bi bi-check-circle-fill"></i> <span style="color:var(--accent);font-weight:bold;">{{ __('Maintenance tahunan ringan') }}</span></li>
                             @endif
                         </ul>
 
-                        <a href="{{ route('customer.register') }}" class="btn-cooca {{ $plan->is_popular ? 'btn-cooca-primary' : 'btn-cooca-outline' }}" style="width: 100%; justify-content: center;">
-                            <i class="bi bi-lightning-charge-fill"></i> {{ __('Choose Plan') }}
+                        <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-primary" style="width: 100%; justify-content: center;">
+                            <i class="bi bi-rocket-takeoff-fill"></i> {{ __('Choose Plan') }}
                         </a>
                     </div>
+                    @endforeach
                 </div>
-                @endforeach
             </div>
+
+            <script>
+                function selectPlan(index, element) {
+                    // Update buttons
+                    document.querySelectorAll('.pricing-slider-btn').forEach(btn => btn.classList.remove('active'));
+                    element.classList.add('active');
+
+                    // Move slider background
+                    const sliderBg = document.getElementById('slider-bg');
+                    const btnWidth = element.offsetWidth;
+                    sliderBg.style.width = btnWidth + 'px';
+                    sliderBg.style.transform = `translateX(${element.offsetLeft - 6}px)`;
+
+                    // Show correct card
+                    document.querySelectorAll('.plan-card-item').forEach(card => {
+                        card.style.display = 'none';
+                    });
+                    document.getElementById('plan-card-' + index).style.display = 'flex';
+                }
+
+                // Initial setup for slider width
+                document.addEventListener('DOMContentLoaded', () => {
+                    const firstBtn = document.querySelector('.pricing-slider-btn.active');
+                    if(firstBtn) {
+                        const sliderBg = document.getElementById('slider-bg');
+                        sliderBg.style.width = firstBtn.offsetWidth + 'px';
+                        sliderBg.style.transform = `translateX(${firstBtn.offsetLeft - 6}px)`;
+                    }
+                });
+            </script>
         @else
             <!-- Base Price Fallback Card -->
             <div class="row justify-content-center reveal">

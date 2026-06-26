@@ -48,6 +48,15 @@ class SubscriptionPlanSeeder extends Seeder
                     'is_active' => true,
                     'sort_order' => 3,
                 ],
+                [
+                    'product_id' => $product->id,
+                    'name' => 'Lifetime Plan',
+                    'duration_months' => 999,
+                    'price' => $product->base_price * 30, // Example multiplier for lifetime
+                    'discount_percent' => 30,
+                    'is_active' => true,
+                    'sort_order' => 4,
+                ],
             ];
 
             foreach ($plans as $plan) {

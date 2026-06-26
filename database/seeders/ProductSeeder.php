@@ -44,6 +44,7 @@ class ProductSeeder extends Seeder
                 'is_active'         => true,
                 'is_featured'       => true,
                 'sort_order'        => 1,
+                'demo_url'          => 'https://demo.cooca.id/retail',
             ],
             [
                 'category_id'       => $commerce->id,
@@ -58,6 +59,7 @@ class ProductSeeder extends Seeder
                 'is_active'         => true,
                 'is_featured'       => false,
                 'sort_order'        => 2,
+                'demo_url'          => 'https://demo.cooca.id/salon',
             ],
             [
                 'category_id'       => $commerce->id,
@@ -72,6 +74,7 @@ class ProductSeeder extends Seeder
                 'is_active'         => true,
                 'is_featured'       => false,
                 'sort_order'        => 3,
+                'demo_url'          => 'https://demo.cooca.id/laundry',
             ],
 
             // ── Hospitality & Services ────────────────────────
@@ -88,6 +91,7 @@ class ProductSeeder extends Seeder
                 'is_active'         => true,
                 'is_featured'       => true,
                 'sort_order'        => 4,
+                'demo_url'          => 'https://demo.cooca.id/restaurant',
             ],
             [
                 'category_id'       => $hospitality->id,
@@ -102,6 +106,7 @@ class ProductSeeder extends Seeder
                 'is_active'         => true,
                 'is_featured'       => false,
                 'sort_order'        => 5,
+                'demo_url'          => 'https://demo.cooca.id/hotel',
             ],
             [
                 'category_id'       => $hospitality->id,
@@ -116,6 +121,7 @@ class ProductSeeder extends Seeder
                 'is_active'         => true,
                 'is_featured'       => false,
                 'sort_order'        => 6,
+                'demo_url'          => 'https://demo.cooca.id/rental',
             ],
 
             // ── Health & Professional ─────────────────────────
@@ -132,6 +138,7 @@ class ProductSeeder extends Seeder
                 'is_active'         => true,
                 'is_featured'       => true,
                 'sort_order'        => 7,
+                'demo_url'          => 'https://demo.cooca.id/clinic',
             ],
             [
                 'category_id'       => $health->id,
@@ -146,6 +153,7 @@ class ProductSeeder extends Seeder
                 'is_active'         => true,
                 'is_featured'       => false,
                 'sort_order'        => 8,
+                'demo_url'          => 'https://demo.cooca.id/workshop',
             ],
             [
                 'category_id'       => $health->id,
@@ -160,6 +168,7 @@ class ProductSeeder extends Seeder
                 'is_active'         => true,
                 'is_featured'       => false,
                 'sort_order'        => 9,
+                'demo_url'          => 'https://demo.cooca.id/education',
             ],
         ];
 
