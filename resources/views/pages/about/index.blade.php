@@ -1,127 +1,8 @@
 @extends('layouts.guest')
-
-@section('title', 'About - ' . ($setting->company_name ?? config('app.name')))
-
-@section('content')
-
-
-
-
-
-<!-- ======================== PAGE HERO (content unchanged) ======================== -->
-<section class="page-hero">
-    <div class="page-hero-orb" style="width:600px;height:600px;background:var(--primary);top:-200px;right:-100px;"></div>
-    <div class="page-hero-orb" style="width:400px;height:400px;background:var(--accent);bottom:-100px;left:-100px;"></div>
-    <div class="grid-bg"></div>
-    <div class="container text-center position-relative" style="z-index:2;">
-        <div class="badge-pill reveal mb-4"><i class="bi bi-building-fill"></i> {{ setting('about.hero.badge', 'Our Story') }}</div>
-        <h1 style="font-size:clamp(2.4rem,5vw,4rem);" class="reveal rv1">{!! setting('about.hero.title', 'Built Because We Were <span class="text-gradient">Tired of Renting.</span>') !!}</h1>
-        <p style="font-size:1.15rem;max-width:600px;margin:20px auto 0;" class="reveal rv2">{!! setting('about.hero.subtitle', 'COOCA was born from frustration — with subscription traps, fragmented tools, and software that grows your vendor\'s business more than yours.') !!}</p>
-    </div>
-</section>
-
-<!-- MISSION section (unchanged) -->
-<section class="sec">
-    <div class="container">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6 reveal">
-                <div class="section-label"><i class="bi bi-bullseye"></i> {{ setting('about.mission.badge', 'Mission') }}</div>
-                <h2 style="font-size:clamp(1.8rem,3.5vw,2.8rem);" class="mb-4">{!! setting('about.mission.title', 'Every Business Deserves to <span class="text-gradient">Own Its Infrastructure</span>') !!}</h2>
-                <p class="mb-4">{!! setting('about.mission.p1', 'The SaaS model created a world where businesses rent the tools they depend on — indefinitely. Every month, cash flows out. Every year, the dependency deepens. And if you ever stop paying, you lose everything you built on top of it.') !!}</p>
-                <p class="mb-4">{!! setting('about.mission.p2', 'COOCA flips this model. We believe business software should be an asset that appreciates, not a liability that bleeds. Our lifetime license model gives you permanent ownership with one investment — and our isolated infrastructure ensures your system belongs to you alone.') !!}</p>
-                <div class="d-flex gap-3 flex-wrap">
-                    <a href="{{ route('customer.register') }}" class="btn-cooca btn-primary-c">Start Free Trial <i class="bi bi-arrow-right"></i></a>
-                    <a href="{{ route('solutions') }}" class="btn-cooca btn-outline-c">View Solutions</a>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="row g-3">
-                    <div class="col-6 reveal rv1"><div class="card-c" style="text-align:center;"><div class="stat-val">10K+</div><div class="stat-label">Businesses Powered</div></div></div>
-                    <div class="col-6 reveal rv2"><div class="card-c" style="text-align:center;"><div class="stat-val">99.9%</div><div class="stat-label">Uptime SLA</div></div></div>
-                    <div class="col-6 reveal rv3"><div class="card-c" style="text-align:center;"><div class="stat-val">500M+</div><div class="stat-label">Transactions Processed</div></div></div>
-                    <div class="col-6 reveal rv4"><div class="card-c" style="text-align:center;"><div class="stat-val">9</div><div class="stat-label">Industry Verticals</div></div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- VALUES section (unchanged) -->
-<section class="sec sec-alt">
-    <div class="container">
-        <div class="text-center mb-5">
-            <div class="section-label reveal"><i class="bi bi-gem"></i> {{ setting('about.values.badge', 'Core Values') }}</div>
-            <h2 style="font-size:clamp(1.8rem,3.5vw,2.8rem);" class="reveal rv1">{!! setting('about.values.title', 'The Principles We <span class="text-gradient">Never Compromise</span>') !!}</h2>
-        </div>
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6 reveal"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-shield-fill-check"></i></div><h4 class="mb-3">{{ setting('about.values.1.title', 'Ownership First') }}</h4><p>{!! setting('about.values.1.desc', 'We believe your business system should be an asset you own — not a service you rent. Every product decision is made with ownership in mind.') !!}</p></div></div>
-            <div class="col-lg-4 col-md-6 reveal rv1"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-transparency"></i></div><h4 class="mb-3">{{ setting('about.values.2.title', 'Radical Transparency') }}</h4><p>{!! setting('about.values.2.desc', 'No hidden fees, no surprise upgrades, no dark patterns. Pricing is honest, contracts are simple, and support is real humans — not bots.') !!}</p></div></div>
-            <div class="col-lg-4 col-md-6 reveal rv2"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-lock-fill"></i></div><h4 class="mb-3">{{ setting('about.values.3.title', 'Security as Architecture') }}</h4><p>{!! setting('about.values.3.desc', 'Security isn\'t a feature we added — it\'s the foundation we built on. Isolation, encryption, and domain binding are non-negotiable defaults.') !!}</p></div></div>
-            <div class="col-lg-4 col-md-6 reveal rv3"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-puzzle"></i></div><h4 class="mb-3">{{ setting('about.values.4.title', 'Modular by Design') }}</h4><p>{!! setting('about.values.4.desc', 'Start small, scale intelligently. Every module is built to work alone or in concert with the others — no forced bundles, no wasted spend.') !!}</p></div></div>
-            <div class="col-lg-4 col-md-6 reveal rv4"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-people-fill"></i></div><h4 class="mb-3">{{ setting('about.values.5.title', 'Partner, Not Vendor') }}</h4><p>{!! setting('about.values.5.desc', 'When you grow, we grow. Our affiliate program, migration support, and dedicated success team exist because your success is our business model.') !!}</p></div></div>
-            <div class="col-lg-4 col-md-6 reveal rv1"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-lightning-charge-fill"></i></div><h4 class="mb-3">{{ setting('about.values.6.title', 'Speed Matters') }}</h4><p>{!! setting('about.values.6.desc', '30-minute provisioning, 24/7 support response, automated updates. Business doesn\'t wait — neither do we.') !!}</p></div></div>
-        </div>
-    </div>
-</section>
-
-<!-- TIMELINE (unchanged) -->
-<section class="sec">
-    <div class="container">
-        <div class="row g-5 align-items-start">
-            <div class="col-lg-4 reveal">
-                <div class="section-label"><i class="bi bi-clock-history"></i> {{ setting('about.journey.badge', 'Our Journey') }}</div>
-                <h2 style="font-size:clamp(1.8rem,3.5vw,2.8rem);" class="mb-4">{!! setting('about.journey.title', 'From a <span class="text-gradient">Frustrated Founder</span> to 10,000+ Businesses') !!}</h2>
-                <p>{!! setting('about.journey.subtitle', 'COOCA started as a solution to a problem we lived. As the system matured, so did our conviction: businesses deserved better than the SaaS status quo.') !!}</p>
-            </div>
-            <div class="col-lg-8">
-                <div class="timeline-v">
-                    <div class="tv-item reveal"><div class="tv-dot">20</div><div class="tv-year">2020</div><div class="tv-title">The Problem Identified</div><div class="tv-desc">Our founder's retail business was running 7 different SaaS tools costing Rp12M/month. None of them talked to each other. The idea for COOCA was born.</div></div>
-                    <div class="tv-item reveal rv1"><div class="tv-dot">21</div><div class="tv-year">2021</div><div class="tv-title">First Version Ships</div><div class="tv-desc">COOCA v1 launched with 3 modules (POS, Inventory, CRM) and 50 early access businesses. The lifetime license model was validated in week one.</div></div>
-                    <div class="tv-item reveal rv2"><div class="tv-dot">22</div><div class="tv-year">2022</div><div class="tv-title">Isolation Architecture</div><div class="tv-desc">We rebuilt the infrastructure from scratch around a "1 customer = 1 isolated system" promise after a competitor's data breach affected 50,000 businesses.</div></div>
-                    <div class="tv-item reveal rv3"><div class="tv-dot">23</div><div class="tv-year">2023</div><div class="tv-title">9 Industry Verticals</div><div class="tv-desc">Expanded from Retail to cover Restaurant, Hotel, Clinic, Education, Salon, Laundry, Workshop, and Rental with purpose-built modules for each.</div></div>
-                    <div class="tv-item reveal rv4"><div class="tv-dot">24</div><div class="tv-year">2024</div><div class="tv-title">AI &amp; Automation Layer</div><div class="tv-desc">AI Assistant, Workflow Automation, and WhatsApp Integration launched. 10,000+ businesses now running on COOCA. 500M+ transactions processed.</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- TEAM section (unchanged) -->
-<section class="sec sec-alt">
-    <div class="container">
-        <div class="text-center mb-5">
-            <div class="section-label reveal"><i class="bi bi-person-badge-fill"></i> {{ setting('about.team.badge', 'Leadership') }}</div>
-            <h2 style="font-size:clamp(1.8rem,3.5vw,2.8rem);" class="reveal rv1">{!! setting('about.team.title', 'The Team Behind <span class="text-gradient">the System</span>') !!}</h2>
-            <p class="reveal rv2" style="max-width:500px;margin:16px auto 0;">{!! setting('about.team.subtitle', 'Operators, engineers, and designers who\'ve built and run businesses — and built the tools they wished they had.') !!}</p>
-        </div>
-        <div class="row g-4 justify-content-center">
-            <div class="col-lg-3 col-md-6 reveal"><div class="card-c team-card h-100"><div class="team-avatar">AR</div><div class="team-name">Arif Rahman</div><div class="team-role">Founder & CEO</div><p class="team-bio">Former retail owner who built COOCA after losing Rp200M to fragmented systems. Operator-turned-builder.</p></div></div>
-            <div class="col-lg-3 col-md-6 reveal rv1"><div class="card-c team-card h-100"><div class="team-avatar">SP</div><div class="team-name">Sari Pertiwi</div><div class="team-role">CTO</div><p class="team-bio">10 years in enterprise security architecture. Built the isolated infrastructure that protects 10K+ business systems.</p></div></div>
-            <div class="col-lg-3 col-md-6 reveal rv2"><div class="card-c team-card h-100"><div class="team-avatar">DK</div><div class="team-name">Dian Kusuma</div><div class="team-role">Head of Product</div><p class="team-bio">Previously led product at two fintech unicorns. Obsessed with making enterprise-grade tools feel simple.</p></div></div>
-            <div class="col-lg-3 col-md-6 reveal rv3"><div class="card-c team-card h-100"><div class="team-avatar">RH</div><div class="team-name">Reza Hidayat</div><div class="team-role">Head of Growth</div><p class="team-bio">Scaled the affiliate program from 0 to 2,000 active partners. Believes distribution is the real product.</p></div></div>
-        </div>
-    </div>
-</section>
-
-<!-- CTA (unchanged) -->
-<section class="sec" style="background:linear-gradient(160deg,var(--bg) 0%,#0F172A 50%,var(--bg) 100%);">
-    <div class="container text-center">
-        <h2 style="font-size:clamp(1.8rem,3.5vw,2.8rem);" class="reveal">{!! setting('cta.title', 'Ready to Own Your <span class="text-gradient">Business Infrastructure?</span>') !!}</h2>
-        <p class="reveal rv1" style="max-width:480px;margin:16px auto 36px;">{!! setting('cta.subtitle', 'Join 10,000+ businesses that chose ownership over renting. Start your 30-day free trial — no credit card required.') !!}</p>
-        <div class="d-flex justify-content-center gap-3 flex-wrap reveal rv2">
-            <a href="{{ route('customer.register') }}" class="btn-cooca btn-primary-c" style="padding:16px 40px;">Start Free Trial <i class="bi bi-arrow-right"></i></a>
-            <a href="{{ route('contact') }}" class="btn-cooca btn-outline-c" style="padding:16px 40px;">{{ setting('cta.btn_outline', 'Talk to Sales') }}</a>
-        </div>
-    </div>
-</section>
-
-<!-- ======================== UNIFIED FOOTER ======================== -->
-
-@endsection
-
 @push('styles')
 <style>
-/* ----- DESIGN SYSTEM ROOT VARIABLES (UNIFIED) ----- */
+
+        /* ----- DESIGN SYSTEM ROOT VARIABLES (UNIFIED) ----- */
         :root {
             --bg: #020617;
             --card: #0F172A;
@@ -646,5 +527,121 @@
             .sec { padding: 60px 0; }
             .page-hero { padding: 120px 0 70px; }
         }
+    
 </style>
 @endpush
+@section('content')
+<section class="blog-hero">
+    <div class="blog-hero-orb blog-hero-orb-1"></div>
+    <div class="blog-hero-orb blog-hero-orb-2"></div>
+    <div class="grid-bg"></div>
+    <div class="container text-center position-relative" style="z-index:2;">
+        <div class="badge-glow reveal mb-4">
+            <i class="bi bi-building-fill"></i> {{ __(setting('about.badge', 'Our Story')) }}
+        </div>
+        <h1 class="hero-title reveal reveal-delay-1">
+            {!! __(setting('about.title', 'Built Because We Were <span class="text-gradient">Tired of Renting.</span>')) !!}
+        </h1>
+        <p class="hero-subtitle reveal reveal-delay-2" style="font-size:1.15rem;max-width:600px;margin:20px auto 0;">
+            {{ __(setting('about.subtitle', 'COOCA was born from frustration — with subscription traps, fragmented tools, and software that grows your vendor\'s business more than yours.')) }}
+        </p>
+    </div>
+</section>
+
+<!-- MISSION section -->
+<section class="sec">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 reveal">
+                <div class="section-label"><i class="bi bi-bullseye"></i> {{ __('Mission') }}</div>
+                <h2 style="font-size:clamp(1.8rem,3.5vw,2.8rem);" class="mb-4">{!! __('Every Business Deserves to <span class="text-gradient">Own Its Infrastructure</span>') !!}</h2>
+                <p class="mb-4">{{ __('The SaaS model created a world where businesses rent the tools they depend on — indefinitely. Every month, cash flows out. Every year, the dependency deepens. And if you ever stop paying, you lose everything you built on top of it.') }}</p>
+                <p class="mb-4">{{ __('COOCA flips this model. We believe business software should be an asset that appreciates, not a liability that bleeds. Our lifetime license model gives you permanent ownership with one investment — and our isolated infrastructure ensures your system belongs to you alone.') }}</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{{ route('customer.register') }}" class="btn-cooca btn-primary-c">{{ __('Start Free Trial') }} <i class="bi bi-arrow-right"></i></a>
+                    <a href="{{ route('solutions') }}" class="btn-cooca btn-outline-c">{{ __('View Solutions') }}</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row g-3">
+                    <div class="col-6 reveal rv1"><div class="card-c" style="text-align:center;"><div class="stat-val">{{ setting('home.stats.1.value', '10K+') }}</div><div class="stat-label">{{ __(setting('home.stats.1.label', 'Businesses Powered')) }}</div></div></div>
+                    <div class="col-6 reveal rv2"><div class="card-c" style="text-align:center;"><div class="stat-val">{{ setting('home.stats.2.value', '99.9%') }}</div><div class="stat-label">{{ __(setting('home.stats.2.label', 'Uptime SLA')) }}</div></div></div>
+                    <div class="col-6 reveal rv3"><div class="card-c" style="text-align:center;"><div class="stat-val">{{ setting('home.stats.3.value', '500M+') }}</div><div class="stat-label">{{ __(setting('home.stats.3.label', 'Transactions Processed')) }}</div></div></div>
+                    <div class="col-6 reveal rv4"><div class="card-c" style="text-align:center;"><div class="stat-val">{{ setting('home.stats.4.value', '9') }}</div><div class="stat-label">{{ __(setting('home.stats.4.label', 'Industry Verticals')) }}</div></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- VALUES section -->
+<section class="sec sec-alt">
+    <div class="container">
+        <div class="text-center mb-5">
+            <div class="section-label reveal"><i class="bi bi-gem"></i> Core Values</div>
+            <h2 style="font-size:clamp(1.8rem,3.5vw,2.8rem);" class="reveal rv1">The Principles We <span class="text-gradient">Never Compromise</span></h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6 reveal"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-shield-fill-check"></i></div><h4 class="mb-3">Ownership First</h4><p>We believe your business system should be an asset you own — not a service you rent. Every product decision is made with ownership in mind.</p></div></div>
+            <div class="col-lg-4 col-md-6 reveal rv1"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-transparency"></i></div><h4 class="mb-3">Radical Transparency</h4><p>No hidden fees, no surprise upgrades, no dark patterns. Pricing is honest, contracts are simple, and support is real humans — not bots.</p></div></div>
+            <div class="col-lg-4 col-md-6 reveal rv2"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-lock-fill"></i></div><h4 class="mb-3">Security as Architecture</h4><p>Security isn't a feature we added — it's the foundation we built on. Isolation, encryption, and domain binding are non-negotiable defaults.</p></div></div>
+            <div class="col-lg-4 col-md-6 reveal rv3"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-puzzle"></i></div><h4 class="mb-3">Modular by Design</h4><p>Start small, scale intelligently. Every module is built to work alone or in concert with the others — no forced bundles, no wasted spend.</p></div></div>
+            <div class="col-lg-4 col-md-6 reveal rv4"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-people-fill"></i></div><h4 class="mb-3">Partner, Not Vendor</h4><p>When you grow, we grow. Our affiliate program, migration support, and dedicated success team exist because your success is our business model.</p></div></div>
+            <div class="col-lg-4 col-md-6 reveal rv1"><div class="card-c h-100"><div class="value-icon"><i class="bi bi-lightning-charge-fill"></i></div><h4 class="mb-3">Speed Matters</h4><p>30-minute provisioning, 24/7 support response, automated updates. Business doesn't wait — neither do we.</p></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="sec">
+    <div class="container">
+        <div class="row g-5 align-items-start">
+            <div class="col-lg-4 reveal">
+                <div class="section-label"><i class="bi bi-clock-history"></i> Our Journey</div>
+                <h2 style="font-size:clamp(1.8rem,3.5vw,2.8rem);" class="mb-4">From a <span class="text-gradient">Frustrated Founder</span> to 10,000+ Businesses</h2>
+                <p>COOCA started as a solution to a problem we lived. As the system matured, so did our conviction: businesses deserved better than the SaaS status quo.</p>
+            </div>
+            <div class="col-lg-8">
+                <div class="timeline-v">
+                    <div class="tv-item reveal"><div class="tv-dot">20</div><div class="tv-year">2020</div><div class="tv-title">The Problem Identified</div><div class="tv-desc">Our founder's retail business was running 7 different SaaS tools costing Rp12M/month. None of them talked to each other. The idea for COOCA was born.</div></div>
+                    <div class="tv-item reveal rv1"><div class="tv-dot">21</div><div class="tv-year">2021</div><div class="tv-title">First Version Ships</div><div class="tv-desc">COOCA v1 launched with 3 modules (POS, Inventory, CRM) and 50 early access businesses. The lifetime license model was validated in week one.</div></div>
+                    <div class="tv-item reveal rv2"><div class="tv-dot">22</div><div class="tv-year">2022</div><div class="tv-title">Isolation Architecture</div><div class="tv-desc">We rebuilt the infrastructure from scratch around a "1 customer = 1 isolated system" promise after a competitor's data breach affected 50,000 businesses.</div></div>
+                    <div class="tv-item reveal rv3"><div class="tv-dot">23</div><div class="tv-year">2023</div><div class="tv-title">9 Industry Verticals</div><div class="tv-desc">Expanded from Retail to cover Restaurant, Hotel, Clinic, Education, Salon, Laundry, Workshop, and Rental with purpose-built modules for each.</div></div>
+                    <div class="tv-item reveal rv4"><div class="tv-dot">24</div><div class="tv-year">2024</div><div class="tv-title">AI &amp; Automation Layer</div><div class="tv-desc">AI Assistant, Workflow Automation, and WhatsApp Integration launched. 10,000+ businesses now running on COOCA. 500M+ transactions processed.</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TEAM section -->
+<section class="sec sec-alt">
+    <div class="container">
+        <div class="text-center mb-5">
+            <div class="section-label reveal"><i class="bi bi-person-badge-fill"></i> Leadership</div>
+            <h2 style="font-size:clamp(1.8rem,3.5vw,2.8rem);" class="reveal rv1">The Team Behind <span class="text-gradient">the System</span></h2>
+            <p class="reveal rv2" style="max-width:500px;margin:16px auto 0;">Operators, engineers, and designers who've built and run businesses — and built the tools they wished they had.</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-3 col-md-6 reveal"><div class="card-c team-card h-100"><div class="team-avatar">AR</div><div class="team-name">Arif Rahman</div><div class="team-role">Founder & CEO</div><p class="team-bio">Former retail owner who built COOCA after losing Rp200M to fragmented systems. Operator-turned-builder.</p></div></div>
+            <div class="col-lg-3 col-md-6 reveal rv1"><div class="card-c team-card h-100"><div class="team-avatar">SP</div><div class="team-name">Sari Pertiwi</div><div class="team-role">CTO</div><p class="team-bio">10 years in enterprise security architecture. Built the isolated infrastructure that protects 10K+ business systems.</p></div></div>
+            <div class="col-lg-3 col-md-6 reveal rv2"><div class="card-c team-card h-100"><div class="team-avatar">DK</div><div class="team-name">Dian Kusuma</div><div class="team-role">Head of Product</div><p class="team-bio">Previously led product at two fintech unicorns. Obsessed with making enterprise-grade tools feel simple.</p></div></div>
+            <div class="col-lg-3 col-md-6 reveal rv3"><div class="card-c team-card h-100"><div class="team-avatar">RH</div><div class="team-name">Reza Hidayat</div><div class="team-role">Head of Growth</div><p class="team-bio">Scaled the affiliate program from 0 to 2,000 active partners. Believes distribution is the real product.</p></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="sec" style="background:linear-gradient(160deg,var(--bg) 0%,#0F172A 50%,var(--bg) 100%);">
+    <div class="container text-center">
+        <h2 style="font-size:clamp(1.8rem,3.5vw,2.8rem);" class="reveal">{!! __('Ready to Own Your <span class="text-gradient">Business Infrastructure?</span>') !!}</h2>
+        <p class="reveal rv1" style="max-width:480px;margin:16px auto 36px;">{{ __('Join 10,000+ businesses that chose ownership over renting. Start your 30-day free trial — no credit card required.') }}</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap reveal rv2">
+            <a href="{{ route('customer.register') }}" class="btn-cooca btn-primary-c" style="padding:16px 40px;">{{ __('Start Free Trial') }} <i class="bi bi-arrow-right"></i></a>
+            <a href="{{ route('contact') }}" class="btn-cooca btn-outline-c" style="padding:16px 40px;">{{ __('Talk to Sales') }}</a>
+        </div>
+    </div>
+</section>
+
+<!-- ======================== UNIFIED FOOTER ======================== -->
+@endsection

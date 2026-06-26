@@ -27,11 +27,11 @@ Route::get('/pricing', [LandingController::class, 'pricing'])->name('pricing');
 Route::get('/contact', [LandingController::class, 'contact'])->name('contact');
 Route::get('/affiliate', [LandingController::class, 'affiliate'])->name('affiliate');
 Route::get('/solutions', [LandingController::class, 'solution'])->name('solutions');
-Route::get('/features', [LandingController::class, 'features'])->name('features');
 Route::get('/faq', [LandingController::class, 'faq'])->name('faq');
 Route::get('/docs', [LandingController::class, 'docs'])->name('docs');
 Route::get('/terms', [LandingController::class, 'terms'])->name('terms');
 Route::get('/privacy', [LandingController::class, 'privacy'])->name('privacy');
+Route::get('/lang/{locale}', [LandingController::class, 'switchLang'])->name('lang.switch');
 Route::post('/newsletter/subscribe', [LandingController::class, 'subscribe'])->name('newsletter.subscribe');
 // Product Catalog
 Route::prefix('products')->name('products.')->group(function () {
@@ -75,6 +75,11 @@ Route::prefix('customer')->name('customer.')->group(function () {
 
     Route::middleware('auth:customer')->group(function () {
         Route::post('logout', [LandingController::class, 'customerLogout'])->name('logout');
+        
+        // Contract Routes
+        Route::get('contracts/{licenseId}', [\App\Http\Controllers\Customer\ContractController::class, 'show'])->name('contracts.show');
+        Route::post('contracts/{licenseId}/sign', [\App\Http\Controllers\Customer\ContractController::class, 'sign'])->name('contracts.sign');
+        Route::get('contracts/{licenseId}/download', [\App\Http\Controllers\Customer\ContractController::class, 'download'])->name('contracts.download');
     });
 });
 

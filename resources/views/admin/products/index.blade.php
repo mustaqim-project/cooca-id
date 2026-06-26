@@ -1,295 +1,112 @@
 @extends('layouts.admin')
 
 @section('title', 'Manage Products')
+@section('subtitle', 'View and manage digital products')
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2 class="mb-0">
-                    <i class="fas fa-box me-2"></i>Products Management
-                </h2>
-                <button class="btn btn-primary" onclick="showAddModal()">
-                    <i class="fas fa-plus me-2"></i>Add New Product
-                </button>
+<div class="space-y-6">
+    <!-- Toolbar -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div class="relative w-full sm:w-96">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
             </div>
+            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
         </div>
-    </div>
-
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
-    <!-- Filters -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <form method="GET" action="{{ route('admin.products.index') }}">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ request('search') }}">
-                    </div>
-                    <div class="col-md-3">
-                        <select name="category" class="form-select">
-                            <option value="">All Categories</option>
-                            @foreach($categories ?? [] as $cat)
-                                <option value="{{ $cat }}" {{ request('category') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select name="status" class="form-select">
-                            <option value="">All Status</option>
-                            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
-                            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-filter me-1"></i>Filter
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="card shadow-sm">
-        <div class="card-header bg-white py-3">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h5 class="mb-0">Products List ({{ $products->total() }})</h5>
-                </div>
-                <div class="col-md-6 text-end">
-                    <span class="badge bg-success">{{ $products->where('is_active', true)->count() }} Active</span>
-                    <span class="badge bg-secondary">{{ $products->where('is_active', false)->count() }} Inactive</span>
-                </div>
+        <div class="flex items-center space-x-3 w-full sm:w-auto">
+                <a href="{{ route('admin.products.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface-900">
+                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                    Add New
+                </a>
             </div>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Product</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>License Type</th>
-                            <th>Status</th>
-                            <th>Created At</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($products as $product)
-                        <tr>
-                            <td>{{ $product->id }}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    @if($product->thumbnail)
-                                        <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" style="width: 50px; height: 50px; object-fit: cover;" class="rounded me-2">
-                                    @else
-                                        <div class="avatar bg-primary text-white rounded me-2" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fas fa-box"></i>
-                                        </div>
-                                    @endif
-                                    <div>
-                                        <strong>{{ $product->name }}</strong>
-                                        <br><small class="text-muted">{{ Str::limit($product->description, 50) }}</small>
+    </div>
+
+    <!-- Data Table -->
+    <div class="corporate-card">
+        <div class="overflow-x-auto">
+            <table class="corporate-table">
+                <thead class="table-thead">
+                    
+                    
+                    
+                <tr>
+                    <th scope="col" class="table-th">Product</th>
+                    <th scope="col" class="table-th">Category</th>
+                    <th scope="col" class="table-th">Pricing</th>
+                    <th scope="col" class="table-th">Status</th>
+                    <th scope="col" class="table-th">Actions</th>
+                </tr>
+            
+                
+                
+                </thead>
+                <tbody class="table-tbody">
+                    
+                    
+                    
+                @forelse($products as $product)
+                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            @if($product->thumbnail)
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <img class="h-10 w-10 rounded-md object-cover" src="{{ asset('storage/' . $product->thumbnail) }}" alt="">
+                                </div>
+                            @else
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-md bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-500 font-bold">
+                                        <i data-lucide="box" class="w-4 h-4"></i>
                                     </div>
                                 </div>
-                            </td>
-                            <td>
-                                @if($product->category)
-                                    <span class="badge bg-info">{{ $product->category->name ?? $product->category }}</span>
-                                @else
-                                    <span class="text-muted">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                <strong>Rp {{ number_format($product->price ?? 0, 0, ',', '.') }}</strong>
-                            </td>
-                            <td>
-                                @if($product->license_type)
-                                    <span class="badge bg-warning text-dark">{{ ucfirst($product->license_type) }}</span>
-                                @else
-                                    <span class="text-muted">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($product->is_active)
-                                    <span class="badge bg-success">Active</span>
-                                @else
-                                    <span class="badge bg-danger">Inactive</span>
-                                @endif
-                            </td>
-                            <td>{{ \Carbon\Carbon::parse($product->created_at)->format('d M Y') }}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-outline-primary" title="View Details">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <button class="btn btn-outline-warning" onclick="editProduct({{ $product->id }})" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-outline-danger" onclick="deleteProduct({{ $product->id }}, '{{ $product->name }}')" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">No products found</p>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card-footer bg-white py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <p class="text-muted mb-0">Showing {{ $products->firstItem() ?? 0 }} to {{ $products->lastItem() ?? 0 }} of {{ $products->total() }} entries</p>
-                <div class="pagination-wrapper">
-                    {{ $products->links() }}
-                </div>
-            </div>
+                            @endif
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-surface-900 dark:text-white">{{ $product->name }}</div>
+                                <div class="text-sm text-surface-500 dark:text-surface-400">SKU: {{ $product->sku ?? '-' }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-surface-900 dark:text-white">{{ $product->category->name ?? 'Uncategorized' }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-surface-900 dark:text-white">Rp {{ number_format($product->price ?? 0, 0, ',', '.') }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        @if($product->is_active)
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Active</span>
+                        @else
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">Inactive</span>
+                        @endif
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{{ route('admin.products.edit', $product->id) }}" class="inline-block text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-3">
+                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </a>
+                        <form class="form-confirm-delete" action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="inline-block form-confirm-delete" >
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-surface-500 dark:text-surface-400">
+                        <div class="flex flex-col items-center">
+                            <i data-lucide="package" class="w-4 h-4 text-4xl mb-3 text-surface-300 dark:text-surface-600 dark:text-surface-400"></i>
+                            <p>No products found.</p>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            
+                
+                
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    function showAddModal() {
-        Swal.fire({
-            title: 'Add New Product',
-            html: `
-                <div class="text-start">
-                    <div class="mb-3">
-                        <label class="form-label">Product Name</label>
-                        <input type="text" class="form-control" id="addName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" id="addDescription" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Price (Rp)</label>
-                        <input type="number" class="form-control" id="addPrice" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Category</label>
-                        <select class="form-select" id="addCategory">
-                            <option value="">Select Category</option>
-                            @foreach($categories ?? [] as $cat)
-                                <option value="{{ $cat }}">{{ $cat }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">License Type</label>
-                        <select class="form-select" id="addLicenseType">
-                            <option value="personal">Personal</option>
-                            <option value="business">Business</option>
-                            <option value="enterprise">Enterprise</option>
-                        </select>
-                    </div>
-                </div>
-            `,
-            showCancelButton: true,
-            confirmButtonText: 'Create Product',
-            cancelButtonText: 'Cancel',
-            width: '600px',
-            preConfirm: () => {
-                const name = document.getElementById('addName').value;
-                const description = document.getElementById('addDescription').value;
-                const price = document.getElementById('addPrice').value;
-                
-                if (!name || !description || !price) {
-                    Swal.showValidationMessage('Please fill all required fields');
-                    return false;
-                }
-                
-                return { name, description, price };
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Implement create logic here
-                Swal.fire('Success', 'Product created successfully', 'success');
-            }
-        });
-    }
-
-    function editProduct(id) {
-        Swal.fire({
-            title: 'Edit Product',
-            html: `
-                <div class="text-start">
-                    <div class="mb-3">
-                        <label class="form-label">Product Name</label>
-                        <input type="text" class="form-control" id="editName">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" id="editDescription" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Price (Rp)</label>
-                        <input type="number" class="form-control" id="editPrice">
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="editIsActive">
-                        <label class="form-check-label">Active</label>
-                    </div>
-                </div>
-            `,
-            showCancelButton: true,
-            confirmButtonText: 'Update',
-            cancelButtonText: 'Cancel',
-            width: '600px'
-        });
-    }
-
-    function deleteProduct(id, name) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: `You are about to delete product "${name}". This action cannot be undone!`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Implement delete logic here
-                Swal.fire('Deleted!', 'Product has been deleted.', 'success');
-            }
-        });
-    }
-
-    // Auto-hide alerts after 5 seconds
-    setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        });
-    }, 5000);
-</script>
-@endpush

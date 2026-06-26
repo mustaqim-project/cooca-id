@@ -1,196 +1,96 @@
 @extends('layouts.affiliator')
 
 @section('title', 'My Commissions')
+@section('subtitle', 'History of all your earned commissions')
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2 class="mb-0">
-                    <i class="fas fa-money-bill-wave me-2"></i>My Commissions
-                </h2>
-                <a href="{{ route('affiliator.commissions.export') }}" class="btn btn-success">
-                    <i class="fas fa-download me-2"></i>Export CSV
-                </a>
+<div class="space-y-6">
+    <!-- Toolbar -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div class="relative w-full sm:w-96">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
             </div>
+            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
+        </div>
+        <div class="flex items-center space-x-3 w-full sm:w-auto">
+            
         </div>
     </div>
 
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
-    <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-start border-4 border-primary">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted mb-1 small">Total Commission</p>
-                            <h4 class="mb-0 text-primary">Rp {{ number_format($totalCommission ?? 0, 0, ',', '.') }}</h4>
+    <!-- Data Table -->
+    <div class="corporate-card">
+        <div class="overflow-x-auto">
+            <table class="corporate-table">
+                <thead class="table-thead">
+                    
+                    
+                    
+                <tr>
+                    <th scope="col" class="table-th">Date</th>
+                    <th scope="col" class="table-th">Customer</th>
+                    <th scope="col" class="table-th">Transaction Amount</th>
+                    <th scope="col" class="table-th">Commission</th>
+                    <th scope="col" class="table-th">Status</th>
+                </tr>
+            
+                
+                
+                </thead>
+                <tbody class="table-tbody">
+                    
+                    
+                    
+                @forelse($commissions as $commission)
+                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
+                        {{ \Carbon\Carbon::parse($commission->created_at)->format('M d, Y H:i') }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white font-medium">
+                        {{ $commission->customer->name ?? 'Unknown Customer' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
+                        Rp {{ number_format($commission->gross_amount, 0, ',', '.') }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-bold text-green-600 dark:text-green-400">
+                            + Rp {{ number_format($commission->commission_amount, 0, ',', '.') }}
                         </div>
-                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-wallet fa-lg text-primary"></i>
+                        <div class="text-xs text-surface-500 dark:text-surface-400">
+                            ({{ $commission->commission_percent }}%)
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-start border-4 border-success">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted mb-1 small">Cleared Commission</p>
-                            <h4 class="mb-0 text-success">Rp {{ number_format($clearedCommission ?? 0, 0, ',', '.') }}</h4>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        @php
+                            $statusClass = match($commission->status) {
+                                'cleared', 'paid' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+                                'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+                                'void', 'cancelled' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+                                default => 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300'
+                            };
+                        @endphp
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
+                            {{ ucfirst($commission->status) }}
+                        </span>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-surface-500 dark:text-surface-400">
+                        <div class="flex flex-col items-center">
+                            <i data-lucide="coins" class="w-4 h-4 text-5xl mb-4 text-surface-300 dark:text-surface-600 dark:text-surface-400"></i>
+                            <h3 class="text-lg font-medium text-surface-900 dark:text-white">No commissions yet</h3>
+                            <p class="mt-1">When your referrals make purchases, your commissions will appear here.</p>
                         </div>
-                        <div class="bg-success bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-check-circle fa-lg text-success"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-start border-4 border-warning">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted mb-1 small">Pending Commission</p>
-                            <h4 class="mb-0 text-warning">Rp {{ number_format($pendingCommission ?? 0, 0, ',', '.') }}</h4>
-                        </div>
-                        <div class="bg-warning bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-clock fa-lg text-warning"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-start border-4 border-info">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted mb-1 small">This Month</p>
-                            <h4 class="mb-0 text-info">Rp {{ number_format($thisMonthCommission ?? 0, 0, ',', '.') }}</h4>
-                        </div>
-                        <div class="bg-info bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-calendar-alt fa-lg text-info"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Commissions Table -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-white py-3">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h5 class="mb-0">Commission History ({{ $commissions->total() }})</h5>
-                </div>
-                <div class="col-md-6">
-                    <div class="input-group float-end">
-                        <input type="text" class="form-control form-control-sm" placeholder="Search..." id="searchInput">
-                        <button class="btn btn-outline-secondary btn-sm" type="button">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Date</th>
-                            <th>Transaction ID</th>
-                            <th>Customer</th>
-                            <th>Level</th>
-                            <th>Gross Amount</th>
-                            <th>Percent</th>
-                            <th>Commission</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($commissions as $commission)
-                        <tr>
-                            <td>{{ $commission->id }}</td>
-                            <td>{{ \Carbon\Carbon::parse($commission->created_at)->format('d M Y') }}</td>
-                            <td><code>{{ $commission->transaction?->invoice_number ?? '-' }}</code></td>
-                            <td>{{ $commission->customer?->name ?? '-' }}</td>
-                            <td>
-                                <span class="badge bg-info">Level {{ $commission->level }}</span>
-                            </td>
-                            <td>Rp {{ number_format($commission->gross_amount ?? 0, 0, ',', '.') }}</td>
-                            <td>{{ $commission->commission_percent }}%</td>
-                            <td>
-                                <strong class="text-success">Rp {{ number_format($commission->commission_amount ?? 0, 0, ',', '.') }}</strong>
-                            </td>
-                            <td>
-                                @if($commission->status === 'cleared')
-                                    <span class="badge bg-success">Cleared</span>
-                                @elseif($commission->status === 'pending')
-                                    <span class="badge bg-warning text-dark">Pending</span>
-                                @else
-                                    <span class="badge bg-danger">{{ ucfirst($commission->status) }}</span>
-                                @endif
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="9" class="text-center py-5">
-                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">No commissions found</p>
-                                <p class="small text-muted">Commissions will appear here when your referrals make purchases</p>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card-footer bg-white py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <p class="text-muted mb-0">Showing {{ $commissions->firstItem() ?? 0 }} to {{ $commissions->lastItem() ?? 0 }} of {{ $commissions->total() }} entries</p>
-                <div class="pagination-wrapper">
-                    {{ $commissions->links() }}
-                </div>
-            </div>
+                    </td>
+                </tr>
+                @endforelse
+            
+                
+                
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('keyup', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('tbody tr');
-        
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchTerm) ? '' : 'none';
-        });
-    });
-
-    // Auto-hide alerts after 5 seconds
-    setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        });
-    }, 5000);
-</script>
-@endpush

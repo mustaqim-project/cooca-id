@@ -1,135 +1,88 @@
 @extends('layouts.admin')
 
 @section('title', 'Dashboard')
+@section('subtitle', 'Welcome back, ' . auth()->user()->name . '!')
 
 @section('content')
-<div class="page-header">
-    <h1 class="page-title">Dashboard</h1>
-    <p class="page-subtitle">Welcome back, {{ auth()->user()->name }}!</p>
-</div>
+<div class="space-y-6">
+    <!-- Toolbar -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div class="relative w-full sm:w-96">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
+            </div>
+            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
+        </div>
+        <div class="flex items-center space-x-3 w-full sm:w-auto">
+            
+        </div>
+    </div>
 
-<!-- Stats Cards -->
-<div class="row g-4 mb-4">
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-start justify-content-between">
-                <div>
-                    <p class="stat-label">Total Customers</p>
-                    <h3 class="stat-value">{{ $stats['totalCustomers'] ?? 0 }}</h3>
-                    <p class="stat-change positive">
-                        <i class="bi bi-arrow-up"></i> 12% from last month
-                    </p>
-                </div>
-                <div class="stat-icon indigo">
-                    <i class="bi bi-people"></i>
-                </div>
-            </div>
+    <!-- Data Table -->
+    <div class="corporate-card">
+        <div class="overflow-x-auto">
+            <table class="corporate-table">
+                <thead class="table-thead">
+                    
+                    
+                    
+                        <tr>
+                            <th scope="col" class="table-th">Invoice #</th>
+                            <th scope="col" class="table-th">Customer</th>
+                            <th scope="col" class="table-th">Amount</th>
+                            <th scope="col" class="table-th">Status</th>
+                            <th scope="col" class="table-th">Date</th>
+                        </tr>
+                    
+                
+                
+                </thead>
+                <tbody class="table-tbody">
+                    
+                    
+                    
+                        @forelse($recentTransactions ?? [] as $transaction)
+                            <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">
+                                    {{ $transaction->invoice_number }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
+                                    {{ $transaction->customer->name ?? '-' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
+                                    Rp {{ number_format($transaction->gross_amount, 0, ',', '.') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @php
+                                        $statusClass = match($transaction->status) {
+                                            'paid' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+                                            'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+                                            'failed' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+                                            'refunded' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+                                            default => 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300'
+                                        };
+                                    @endphp
+                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
+                                        {{ ucfirst($transaction->status) }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
+                                    {{ $transaction->created_at->format('d M Y') }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-8 text-center text-surface-500 dark:text-surface-400 text-sm">
+                                    No recent transactions found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    
+                
+                
+                </tbody>
+            </table>
         </div>
-    </div>
-    
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-start justify-content-between">
-                <div>
-                    <p class="stat-label">Total Affiliators</p>
-                    <h3 class="stat-value">{{ $stats['totalAffiliators'] ?? 0 }}</h3>
-                    <p class="stat-change positive">
-                        <i class="bi bi-arrow-up"></i> 8% from last month
-                    </p>
-                </div>
-                <div class="stat-icon green">
-                    <i class="bi bi-person-badge"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-start justify-content-between">
-                <div>
-                    <p class="stat-label">Active Licenses</p>
-                    <h3 class="stat-value">{{ $stats['activeLicenses'] ?? 0 }}</h3>
-                    <p class="stat-change positive">
-                        <i class="bi bi-arrow-up"></i> 15% from last month
-                    </p>
-                </div>
-                <div class="stat-icon blue">
-                    <i class="bi bi-key"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-start justify-content-between">
-                <div>
-                    <p class="stat-label">Monthly Revenue</p>
-                    <h3 class="stat-value">Rp {{ number_format($stats['monthlyRevenue'] ?? 0, 0, ',', '.') }}</h3>
-                    <p class="stat-change {{ ($stats['revenueChange'] ?? 0) >= 0 ? 'positive' : 'negative' }}">
-                        <i class="bi bi-arrow-{{ ($stats['revenueChange'] ?? 0) >= 0 ? 'up' : 'down' }}"></i> 
-                        {{ abs($stats['revenueChange'] ?? 0) }}% from last month
-                    </p>
-                </div>
-                <div class="stat-icon yellow">
-                    <i class="bi bi-currency-dollar"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Recent Transactions -->
-<div class="card">
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-semibold">Recent Transactions</h5>
-        <a href="{{ route('admin.transactions.index') }}" class="text-decoration-none">View All →</a>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>Invoice #</th>
-                    <th>Customer</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Paid At</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($recentTransactions ?? [] as $transaction)
-                <tr>
-                    <td class="fw-medium">{{ $transaction->invoice_number }}</td>
-                    <td>{{ $transaction->customer->name ?? '-' }}</td>
-                    <td>Rp {{ number_format($transaction->gross_amount, 0, ',', '.') }}</td>
-                    <td>
-                        @php
-                            $statusClass = [
-                                'pending' => 'badge-warning',
-                                'paid' => 'badge-success',
-                                'failed' => 'badge-danger',
-                                'refunded' => 'badge-info'
-                            ][$transaction->status] ?? 'badge-secondary';
-                        @endphp
-                        <span class="badge {{ $statusClass }}">{{ ucfirst($transaction->status) }}</span>
-                    </td>
-                    <td>{{ $transaction->paid_at ? \Carbon\Carbon::parse($transaction->paid_at)->format('d M Y') : '-' }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="text-center py-4 text-muted">No recent transactions</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
     </div>
 </div>
-
 @endsection
-
-@push('scripts')
-<script>
-// You can add page-specific JavaScript here
-</script>
-@endpush

@@ -73,7 +73,7 @@
             
             <p style="text-align: center;">
                 <a href="{{ $approvalUrl }}" class="btn">Proses Withdrawal</a>
-                <a href="{{ route('admin.withdrawals.index') }}" class="btn-secondary">Lihat Semua Withdrawal</a>
+                <a href="{{ route('admin.settlements.index') }}" class="btn-secondary">Lihat Semua Withdrawal</a>
             </p>
             
             <div class="footer">

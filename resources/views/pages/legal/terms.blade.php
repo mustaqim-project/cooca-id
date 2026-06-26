@@ -1,27 +1,157 @@
 @extends('layouts.guest')
+@push('styles')
+<style>
+    /* ========== LEGAL PAGE SPECIFIC ========== */
+    .legal-hero {
+        padding: 140px 0 60px;
+        position: relative;
+        overflow: hidden;
+        background: var(--hero-gradient);
+        border-bottom: 1px solid var(--border);
+        transition: background var(--transition);
+    }
 
-@section('title', 'Terms Of Service - ' . ($setting->company_name ?? config('app.name')))
+    .legal-body {
+        padding: 80px 0;
+    }
 
+    .legal-section {
+        margin-bottom: 56px;
+        scroll-margin-top: 100px;
+    }
+
+    .legal-section h2 {
+        font-size: 1.35rem;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .legal-section h3 {
+        font-size: 1.05rem;
+        margin: 20px 0 10px;
+    }
+
+    .highlight-box {
+        background: rgba(37, 99, 235, 0.06);
+        border: 1px solid rgba(37, 99, 235, 0.15);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin: 20px 0;
+    }
+
+    .highlight-box.warning {
+        background: rgba(245, 158, 11, 0.06);
+        border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    .highlight-box.success {
+        background: rgba(16, 185, 129, 0.06);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .highlight-box p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    /* ========== TOC SIDEBAR ========== */
+    .toc {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 28px;
+        position: sticky;
+        top: 100px;
+    }
+
+    .toc-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+    }
+
+    .toc-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .toc-list li {
+        margin-bottom: 8px;
+    }
+
+    .toc-list a {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        transition: color var(--transition-fast);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .toc-list a:hover {
+        color: var(--accent);
+    }
+
+    .toc-list a::before {
+        content: '';
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--border);
+        flex-shrink: 0;
+        transition: background var(--transition-fast);
+    }
+
+    .toc-list a:hover::before {
+        background: var(--accent);
+    }
+
+    .toc-list a.toc-active {
+        color: var(--accent);
+    }
+
+    .toc-list a.toc-active::before {
+        background: var(--accent);
+    }
+
+    @media (max-width: 991px) {
+        .toc {
+            display: none;
+        }
+    }
+    @media (max-width: 767px) {
+        .legal-hero {
+            padding: 110px 0 40px;
+        }
+        .legal-body {
+            padding: 50px 0;
+        }
+    }
+</style>
+@endpush
 @section('content')
-<!-- ========== NAVBAR ========== -->
-    
-
-<!-- ========== MOBILE OFFCANVAS ========== -->
-
-
-<!-- ========== HERO (dengan decorative orbs & grid) ========== -->
-<section class="legal-hero">
-    <!-- Decorative blurred orbs -->
-    <div style="position:absolute;border-radius:50%;filter:blur(80px);opacity:var(--hero-orb-opacity);pointer-events:none;width:350px;height:350px;background:var(--primary);top:-80px;right:-60px;"></div>
-    <div style="position:absolute;border-radius:50%;filter:blur(60px);opacity:var(--hero-orb-opacity);pointer-events:none;width:200px;height:200px;background:var(--accent);bottom:-40px;left:-30px;"></div>
-    <!-- Subtle grid overlay -->
-    <div style="position:absolute;inset:0;background-image:linear-gradient(var(--hero-grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--hero-grid-color) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;"></div>
-    <!-- Content -->
-    <div class="container position-relative" style="z-index:2;">
-        <div class="section-label reveal"><i class="bi bi-file-text-fill"></i> Legal</div>
-        <h1 class="reveal reveal-delay-1" style="font-size:clamp(2rem,4vw,3rem);margin-bottom:12px;">Terms of Service</h1>
-        <p class="reveal reveal-delay-2" style="max-width:580px;font-size:1rem;margin-bottom:0;">We've written these terms to be clear and honest. Please read them — they define our relationship, your rights, and our obligations to you.</p>
-        <p class="reveal reveal-delay-3" style="font-size:.85rem;margin-top:16px;margin-bottom:0;"><strong>Last updated:</strong> June 1, 2026 &nbsp;·&nbsp; <strong>Version:</strong> 2.4 &nbsp;·&nbsp; <a href="privacy.html">View Privacy Policy →</a></p>
+<section class="blog-hero">
+    <div class="blog-hero-orb blog-hero-orb-1"></div>
+    <div class="blog-hero-orb blog-hero-orb-2"></div>
+    <div class="grid-bg"></div>
+    <div class="container text-center position-relative" style="z-index:2;">
+        <div class="badge-glow reveal mb-4">
+            <i class="bi bi-file-text-fill"></i> {{ __(setting('terms.badge', 'Legal')) }}
+        </div>
+        <h1 class="hero-title reveal reveal-delay-1">
+            {{ __(setting('terms.title', 'Terms of Service')) }}
+        </h1>
+        <p class="hero-subtitle reveal reveal-delay-2" style="font-size:1.15rem;max-width:600px;margin:20px auto 0;">
+            {{ __(setting('terms.subtitle', 'We\'ve written these terms to be clear and honest. Please read them — they define our relationship, your rights, and our obligations to you.')) }}
+        </p>
+        <p class="reveal reveal-delay-3" style="font-size:.85rem;margin-top:24px;margin-bottom:0;color:var(--text-muted);">
+            <strong>{{ __('Last updated:') }}</strong> {{ __(setting('terms.updated_date', 'June 1, 2026')) }} &nbsp;·&nbsp; <strong>{{ __('Version:') }}</strong> {{ __(setting('terms.version', '2.4')) }} &nbsp;·&nbsp; <a href="{{ route('privacy') }}" style="color:var(--accent);">{{ __('View Privacy Policy') }} →</a>
+        </p>
     </div>
 </section>
 
@@ -32,23 +162,23 @@
             <!-- TOC SIDEBAR -->
             <div class="col-lg-3">
                 <div class="toc reveal">
-                    <div class="toc-title"><i class="bi bi-list-ul me-2"></i>Contents</div>
+                    <div class="toc-title"><i class="bi bi-list-ul me-2"></i>{{ __('Contents') }}</div>
                     <ul class="toc-list">
-                        <li><a href="#s1">1. Acceptance of Terms</a></li>
-                        <li><a href="#s2">2. Definitions</a></li>
-                        <li><a href="#s3">3. Account Registration</a></li>
-                        <li><a href="#s4">4. License & Ownership</a></li>
-                        <li><a href="#s5">5. Free Trial</a></li>
-                        <li><a href="#s6">6. Payments & Billing</a></li>
-                        <li><a href="#s7">7. Data & Privacy</a></li>
-                        <li><a href="#s8">8. Infrastructure & Isolation</a></li>
-                        <li><a href="#s9">9. Acceptable Use</a></li>
-                        <li><a href="#s10">10. Intellectual Property</a></li>
-                        <li><a href="#s11">11. Termination</a></li>
-                        <li><a href="#s12">12. Liability Limitation</a></li>
-                        <li><a href="#s13">13. Disputes</a></li>
-                        <li><a href="#s14">14. Changes to Terms</a></li>
-                        <li><a href="#s15">15. Contact</a></li>
+                        <li><a href="#s1">{{ __('1. Acceptance of Terms') }}</a></li>
+                        <li><a href="#s2">{{ __('2. Definitions') }}</a></li>
+                        <li><a href="#s3">{{ __('3. Account Registration') }}</a></li>
+                        <li><a href="#s4">{{ __('4. License & Ownership') }}</a></li>
+                        <li><a href="#s5">{{ __('5. Free Trial') }}</a></li>
+                        <li><a href="#s6">{{ __('6. Payments & Billing') }}</a></li>
+                        <li><a href="#s7">{{ __('7. Data & Privacy') }}</a></li>
+                        <li><a href="#s8">{{ __('8. Infrastructure & Isolation') }}</a></li>
+                        <li><a href="#s9">{{ __('9. Acceptable Use') }}</a></li>
+                        <li><a href="#s10">{{ __('10. Intellectual Property') }}</a></li>
+                        <li><a href="#s11">{{ __('11. Termination') }}</a></li>
+                        <li><a href="#s12">{{ __('12. Liability Limitation') }}</a></li>
+                        <li><a href="#s13">{{ __('13. Disputes') }}</a></li>
+                        <li><a href="#s14">{{ __('14. Changes to Terms') }}</a></li>
+                        <li><a href="#s15">{{ __('15. Contact') }}</a></li>
                     </ul>
                 </div>
             </div>
@@ -56,954 +186,193 @@
             <!-- CONTENT -->
             <div class="col-lg-9">
                 <div class="highlight-box success reveal">
-                    <p><i class="bi bi-info-circle-fill me-2" style="color:#10B981;"></i><strong>Plain English Summary:</strong> You own your data. We own the software. Your system is isolated from other customers. You can cancel anytime. We won't sell your data. Read the full terms below for the legal details.</p>
+                    <p><i class="bi bi-info-circle-fill me-2" style="color:#10B981;"></i><strong>{{ __('Plain English Summary:') }}</strong> {{ __('You own your data. We own the software. Your system is isolated from other customers. You can cancel anytime. We won\'t sell your data. Read the full terms below for the legal details.') }}</p>
                 </div>
 
                 <div class="legal-section reveal" id="s1">
-                    <h2>1. Acceptance of Terms</h2>
-                    <p>By accessing or using COOCA's software platform, website, or any associated services (collectively, "Services"), you agree to be bound by these Terms of Service ("Terms"). These Terms constitute a legally binding agreement between you ("Customer," "User," or "you") and PT COOCA Teknologi Indonesia ("COOCA," "we," "us," or "our").</p>
-                    <p>If you are entering into these Terms on behalf of a company or other legal entity, you represent that you have the authority to bind such entity to these Terms. If you do not have such authority, or if you do not agree to these Terms, you may not use the Services.</p>
-                    <p>Your continued use of the Services after any modification to these Terms constitutes acceptance of the updated Terms.</p>
+                    <h2>{{ __('1. Acceptance of Terms') }}</h2>
+                    <p>{{ __('By accessing or using COOCA\'s software platform, website, or any associated services (collectively, "Services"), you agree to be bound by these Terms of Service ("Terms"). These Terms constitute a legally binding agreement between you ("Customer," "User," or "you") and PT COOCA Teknologi Indonesia ("COOCA," "we," "us," or "our").') }}</p>
+                    <p>{{ __('If you are entering into these Terms on behalf of a company or other legal entity, you represent that you have the authority to bind such entity to these Terms. If you do not have such authority, or if you do not agree to these Terms, you may not use the Services.') }}</p>
+                    <p>{{ __('Your continued use of the Services after any modification to these Terms constitutes acceptance of the updated Terms.') }}</p>
                 </div>
 
                 <div class="legal-section reveal" id="s2">
-                    <h2>2. Definitions</h2>
+                    <h2>{{ __('2. Definitions') }}</h2>
                     <ul>
-                        <li><strong>"Services"</strong> — The COOCA software platform, dashboard, APIs, and all related tools and infrastructure.</li>
-                        <li><strong>"Customer Data"</strong> — All data submitted, uploaded, or generated through your use of the Services.</li>
-                        <li><strong>"Isolated Environment"</strong> — A dedicated infrastructure instance provisioned exclusively for a single Customer account.</li>
-                        <li><strong>"Lifetime License"</strong> — A perpetual, non-transferable license to use a specific version of the COOCA software platform.</li>
-                        <li><strong>"Subscription Plan"</strong> — A time-limited access plan (Monthly, Quarterly, or Annual) requiring recurring payment to maintain access.</li>
-                        <li><strong>"Maintenance Fee"</strong> — An annual fee paid by Lifetime License holders to receive ongoing updates and infrastructure support.</li>
-                        <li><strong>"Affiliate"</strong> — An approved partner participating in the COOCA affiliate referral program.</li>
+                        <li><strong>{{ __('"Services"') }}</strong> — {{ __('The COOCA software platform, dashboard, APIs, and all related tools and infrastructure.') }}</li>
+                        <li><strong>{{ __('"Customer Data"') }}</strong> — {{ __('All data submitted, uploaded, or generated through your use of the Services.') }}</li>
+                        <li><strong>{{ __('"Isolated Environment"') }}</strong> — {{ __('A dedicated infrastructure instance provisioned exclusively for a single Customer account.') }}</li>
+                        <li><strong>{{ __('"Lifetime License"') }}</strong> — {{ __('A perpetual, non-transferable license to use a specific version of the COOCA software platform.') }}</li>
+                        <li><strong>{{ __('"Subscription Plan"') }}</strong> — {{ __('A time-limited access plan (Monthly, Quarterly, or Annual) requiring recurring payment to maintain access.') }}</li>
+                        <li><strong>{{ __('"Maintenance Fee"') }}</strong> — {{ __('An annual fee paid by Lifetime License holders to receive ongoing updates and infrastructure support.') }}</li>
+                        <li><strong>{{ __('"Affiliate"') }}</strong> — {{ __('An approved partner participating in the COOCA affiliate referral program.') }}</li>
                     </ul>
                 </div>
 
                 <div class="legal-section reveal" id="s3">
-                    <h2>3. Account Registration</h2>
-                    <p>To use the Services, you must create an account and provide accurate, complete, and up-to-date information. You are responsible for:</p>
+                    <h2>{{ __('3. Account Registration') }}</h2>
+                    <p>{{ __('To use the Services, you must create an account and provide accurate, complete, and up-to-date information. You are responsible for:') }}</p>
                     <ul>
-                        <li>Maintaining the confidentiality of your account credentials</li>
-                        <li>All activity that occurs under your account</li>
-                        <li>Notifying COOCA immediately of any unauthorized access at <a href="mailto:security@cooca.io">security@cooca.io</a></li>
-                        <li>Ensuring your contact information remains current</li>
+                        <li>{{ __('Maintaining the confidentiality of your account credentials') }}</li>
+                        <li>{{ __('All activity that occurs under your account') }}</li>
+                        <li>{!! __('Notifying COOCA immediately of any unauthorized access at <a href="mailto:security@cooca.io">security@cooca.io</a>') !!}</li>
+                        <li>{{ __('Ensuring your contact information remains current') }}</li>
                     </ul>
-                    <p>You may not create accounts for others without their consent, share login credentials, or use another user's account without authorization.</p>
+                    <p>{{ __('You may not create accounts for others without their consent, share login credentials, or use another user\'s account without authorization.') }}</p>
                     <div class="highlight-box">
-                        <p><i class="bi bi-shield-fill me-2" style="color:var(--accent);"></i>Each COOCA account is domain-bound and protected by HMAC cryptographic validation. Unauthorized access attempts are logged and may result in immediate account suspension.</p>
+                        <p><i class="bi bi-shield-fill me-2" style="color:var(--accent);"></i>{{ __('Each COOCA account is domain-bound and protected by HMAC cryptographic validation. Unauthorized access attempts are logged and may result in immediate account suspension.') }}</p>
                     </div>
                 </div>
 
                 <div class="legal-section reveal" id="s4">
-                    <h2>4. License & Ownership</h2>
-                    <h3>4.1 Software License</h3>
-                    <p>Subject to these Terms and payment of applicable fees, COOCA grants you a limited, non-exclusive, non-transferable, non-sublicensable license to access and use the Services during your subscription period or, for Lifetime License holders, in perpetuity.</p>
-                    <h3>4.2 Lifetime License</h3>
-                    <p>Lifetime License holders receive a perpetual license to use the specific software version active at the time of purchase. This license:</p>
+                    <h2>{{ __('4. License & Ownership') }}</h2>
+                    <h3>{{ __('4.1 Software License') }}</h3>
+                    <p>{{ __('Subject to these Terms and payment of applicable fees, COOCA grants you a limited, non-exclusive, non-transferable, non-sublicensable license to access and use the Services during your subscription period or, for Lifetime License holders, in perpetuity.') }}</p>
+                    <h3>{{ __('4.2 Lifetime License') }}</h3>
+                    <p>{{ __('Lifetime License holders receive a perpetual license to use the specific software version active at the time of purchase. This license:') }}</p>
                     <ul>
-                        <li>Is tied to a single domain and business entity</li>
-                        <li>Cannot be transferred, resold, or sublicensed without written consent</li>
-                        <li>Includes ongoing feature updates contingent upon payment of the annual Maintenance Fee</li>
-                        <li>Remains valid regardless of Maintenance Fee status, but updates are suspended if the fee lapses</li>
+                        <li>{{ __('Is tied to a single domain and business entity') }}</li>
+                        <li>{{ __('Cannot be transferred, resold, or sublicensed without written consent') }}</li>
+                        <li>{{ __('Includes ongoing feature updates contingent upon payment of the annual Maintenance Fee') }}</li>
+                        <li>{{ __('Remains valid regardless of Maintenance Fee status, but updates are suspended if the fee lapses') }}</li>
                     </ul>
-                    <h3>4.3 Your Data Ownership</h3>
-                    <p>You retain full ownership of all Customer Data. COOCA does not claim any intellectual property rights over your data. We process your data solely to provide the Services as described in our <a href="privacy.html">Privacy Policy</a>.</p>
-                    <h3>4.4 COOCA Intellectual Property</h3>
-                    <p>COOCA retains all intellectual property rights in the Services, including the software, design, code, algorithms, and documentation. Nothing in these Terms transfers COOCA's intellectual property to you.</p>
+                    <h3>{{ __('4.3 Your Data Ownership') }}</h3>
+                    <p>{!! __('You retain full ownership of all Customer Data. COOCA does not claim any intellectual property rights over your data. We process your data solely to provide the Services as described in our <a href=":url">Privacy Policy</a>.', ['url' => route('privacy')]) !!}</p>
+                    <h3>{{ __('4.4 COOCA Intellectual Property') }}</h3>
+                    <p>{{ __('COOCA retains all intellectual property rights in the Services, including the software, design, code, algorithms, and documentation. Nothing in these Terms transfers COOCA\'s intellectual property to you.') }}</p>
                 </div>
 
                 <div class="legal-section reveal" id="s5">
-                    <h2>5. Free Trial</h2>
-                    <p>COOCA offers a 30-day free trial with full access to all modules and unlimited users. During the trial:</p>
+                    <h2>{{ __('5. Free Trial') }}</h2>
+                    <p>{{ __('COOCA offers a 30-day free trial with full access to all modules and unlimited users. During the trial:') }}</p>
                     <ul>
-                        <li>No payment information is required</li>
-                        <li>All features available under paid plans are accessible</li>
-                        <li>A dedicated isolated environment is provisioned</li>
-                        <li>Data entered during the trial is retained if you convert to a paid plan</li>
-                        <li>If you do not convert, your data and environment are permanently deleted 30 days after trial expiry</li>
+                        <li>{{ __('No payment information is required') }}</li>
+                        <li>{{ __('All features available under paid plans are accessible') }}</li>
+                        <li>{{ __('A dedicated isolated environment is provisioned') }}</li>
+                        <li>{{ __('Data entered during the trial is retained if you convert to a paid plan') }}</li>
+                        <li>{{ __('If you do not convert, your data and environment are permanently deleted 30 days after trial expiry') }}</li>
                     </ul>
                     <div class="highlight-box warning">
-                        <p><i class="bi bi-exclamation-triangle-fill me-2" style="color:#F59E0B;"></i>Export your data before trial expiry if you choose not to continue. COOCA is not liable for data loss after the 30-day post-expiry deletion window.</p>
+                        <p><i class="bi bi-exclamation-triangle-fill me-2" style="color:#F59E0B;"></i>{{ __('Export your data before trial expiry if you choose not to continue. COOCA is not liable for data loss after the 30-day post-expiry deletion window.') }}</p>
                     </div>
-                    <p>COOCA reserves the right to modify or discontinue the free trial offering at any time with reasonable notice.</p>
                 </div>
 
                 <div class="legal-section reveal" id="s6">
-                    <h2>6. Payments & Billing</h2>
-                    <h3>6.1 Subscription Plans</h3>
-                    <p>Subscription fees are billed in advance for the selected period (monthly, quarterly, or annually). All fees are stated in Indonesian Rupiah (IDR) unless otherwise specified.</p>
-                    <h3>6.2 Lifetime License Payment</h3>
-                    <p>Lifetime License fees are collected as a single one-time payment. The optional annual Maintenance Fee is billed annually from the anniversary of your license purchase.</p>
-                    <h3>6.3 Refund Policy</h3>
-                    <p>COOCA offers a 14-day money-back guarantee on all first payments (excluding Maintenance Fees). Refund requests must be submitted to <a href="mailto:billing@cooca.io">billing@cooca.io</a> within 14 days of the charge date. After 14 days, all fees are non-refundable.</p>
-                    <h3>6.4 Price Changes</h3>
-                    <p>COOCA may adjust pricing for Subscription Plans with 30 days' advance written notice. Lifetime License fees are fixed at the time of purchase and are not subject to increases.</p>
-                    <h3>6.5 Taxes</h3>
-                    <p>Prices displayed exclude applicable taxes (including PPN). You are responsible for all applicable taxes in your jurisdiction.</p>
+                    <h2>{{ __('6. Payments & Billing') }}</h2>
+                    <h3>{{ __('6.1 Subscription Plans') }}</h3>
+                    <p>{{ __('Subscription fees are billed in advance for the selected period (monthly, quarterly, or annually). All fees are stated in Indonesian Rupiah (IDR) unless otherwise specified.') }}</p>
+                    <h3>{{ __('6.2 Lifetime License Payment') }}</h3>
+                    <p>{{ __('Lifetime License fees are collected as a single one-time payment. The optional annual Maintenance Fee is billed annually from the anniversary of your license purchase.') }}</p>
+                    <h3>{{ __('6.3 Refund Policy') }}</h3>
+                    <p>{!! __('COOCA offers a 14-day money-back guarantee on all first payments (excluding Maintenance Fees). Refund requests must be submitted to <a href="mailto:billing@cooca.io">billing@cooca.io</a> within 14 days of the charge date. After 14 days, all fees are non-refundable.') !!}</p>
+                    <h3>{{ __('6.4 Price Changes') }}</h3>
+                    <p>{{ __('COOCA may adjust pricing for Subscription Plans with 30 days\' advance written notice. Lifetime License fees are fixed at the time of purchase and are not subject to increases.') }}</p>
+                    <h3>{{ __('6.5 Taxes') }}</h3>
+                    <p>{{ __('Prices displayed exclude applicable taxes (including PPN). You are responsible for all applicable taxes in your jurisdiction.') }}</p>
                 </div>
 
                 <div class="legal-section reveal" id="s7">
-                    <h2>7. Data & Privacy</h2>
-                    <p>Your privacy is taken seriously. Our <a href="privacy.html">Privacy Policy</a> explains in detail how we collect, use, and protect your information. Key principles:</p>
+                    <h2>{{ __('7. Data & Privacy') }}</h2>
+                    <p>{!! __('Your privacy is taken seriously. Our <a href=":url">Privacy Policy</a> explains in detail how we collect, use, and protect your information. Key principles:', ['url' => route('privacy')]) !!}</p>
                     <ul>
-                        <li>We never sell your data to third parties</li>
-                        <li>Your data is stored in your isolated environment, not commingled with other customers</li>
-                        <li>We process data only as necessary to provide the Services</li>
-                        <li>You may request a full data export at any time</li>
-                        <li>Upon account termination, data is deleted within 90 days unless you request earlier deletion</li>
+                        <li>{{ __('We never sell your data to third parties') }}</li>
+                        <li>{{ __('Your data is stored in your isolated environment, not commingled with other customers') }}</li>
+                        <li>{{ __('We process data only as necessary to provide the Services') }}</li>
+                        <li>{{ __('You may request a full data export at any time') }}</li>
+                        <li>{{ __('Upon account termination, data is deleted within 90 days unless you request earlier deletion') }}</li>
                     </ul>
                 </div>
 
                 <div class="legal-section reveal" id="s8">
-                    <h2>8. Infrastructure & Isolation</h2>
-                    <p>COOCA provisions a dedicated isolated infrastructure environment for each Customer. This means:</p>
+                    <h2>{{ __('8. Infrastructure & Isolation') }}</h2>
+                    <p>{{ __('COOCA provisions a dedicated isolated infrastructure environment for each Customer. This means:') }}</p>
                     <ul>
-                        <li>Your database, storage, and application instance are separate from all other customers</li>
-                        <li>No other customer can access your data through any COOCA interface</li>
-                        <li>Infrastructure isolation is maintained as a core security guarantee, not merely a feature</li>
+                        <li>{{ __('Your database, storage, and application instance are separate from all other customers') }}</li>
+                        <li>{{ __('No other customer can access your data through any COOCA interface') }}</li>
+                        <li>{{ __('Infrastructure isolation is maintained as a core security guarantee, not merely a feature') }}</li>
                     </ul>
-                    <h3>8.1 Uptime SLA</h3>
-                    <p>COOCA commits to 99.9% monthly uptime availability. Planned maintenance windows are communicated at least 48 hours in advance. Downtime credits are available for Subscription and Lifetime customers who experience availability below the SLA threshold.</p>
-                    <h3>8.2 Backups</h3>
-                    <p>COOCA performs automated daily backups with a 30-day retention period. Backup restoration is available upon request for all paid plan customers.</p>
+                    <h3>{{ __('8.1 Uptime SLA') }}</h3>
+                    <p>{{ __('COOCA commits to 99.9% monthly uptime availability. Planned maintenance windows are communicated at least 48 hours in advance. Downtime credits are available for Subscription and Lifetime customers who experience availability below the SLA threshold.') }}</p>
+                    <h3>{{ __('8.2 Backups') }}</h3>
+                    <p>{{ __('COOCA performs automated daily backups with a 30-day retention period. Backup restoration is available upon request for all paid plan customers.') }}</p>
                 </div>
 
                 <div class="legal-section reveal" id="s9">
-                    <h2>9. Acceptable Use</h2>
-                    <p>You agree not to use the Services to:</p>
+                    <h2>{{ __('9. Acceptable Use') }}</h2>
+                    <p>{{ __('You agree not to use the Services to:') }}</p>
                     <ul>
-                        <li>Violate any applicable laws or regulations</li>
-                        <li>Store, transmit, or process illegal content</li>
-                        <li>Attempt to gain unauthorized access to COOCA systems or other customers' environments</li>
-                        <li>Reverse engineer, decompile, or attempt to extract source code from the Services</li>
-                        <li>Resell or redistribute access to the Services without written authorization</li>
-                        <li>Conduct denial-of-service attacks, spam, or other disruptive activities</li>
-                        <li>Impersonate COOCA or misrepresent your relationship with COOCA</li>
+                        <li>{{ __('Violate any applicable laws or regulations') }}</li>
+                        <li>{{ __('Store, transmit, or process illegal content') }}</li>
+                        <li>{{ __('Attempt to gain unauthorized access to COOCA systems or other customers\' environments') }}</li>
+                        <li>{{ __('Reverse engineer, decompile, or attempt to extract source code from the Services') }}</li>
+                        <li>{{ __('Resell or redistribute access to the Services without written authorization') }}</li>
+                        <li>{{ __('Conduct denial-of-service attacks, spam, or other disruptive activities') }}</li>
+                        <li>{{ __('Impersonate COOCA or misrepresent your relationship with COOCA') }}</li>
                     </ul>
-                    <p>COOCA reserves the right to suspend accounts that violate this policy, with immediate effect for severe violations and written notice for minor violations.</p>
+                    <p>{{ __('COOCA reserves the right to suspend accounts that violate this policy, with immediate effect for severe violations and written notice for minor violations.') }}</p>
                 </div>
 
                 <div class="legal-section reveal" id="s10">
-                    <h2>10. Intellectual Property</h2>
-                    <p>The COOCA name, logo, platform design, and all related intellectual property are owned exclusively by PT COOCA Teknologi Indonesia. You may not use our brand assets without prior written permission.</p>
-                    <p>Affiliates granted permission to use COOCA brand materials must adhere to the Affiliate Brand Guidelines and may not modify, distort, or use COOCA branding in a misleading manner.</p>
+                    <h2>{{ __('10. Intellectual Property') }}</h2>
+                    <p>{{ __('The COOCA name, logo, platform design, and all related intellectual property are owned exclusively by PT COOCA Teknologi Indonesia. You may not use our brand assets without prior written permission.') }}</p>
+                    <p>{{ __('Affiliates granted permission to use COOCA brand materials must adhere to the Affiliate Brand Guidelines and may not modify, distort, or use COOCA branding in a misleading manner.') }}</p>
                 </div>
 
                 <div class="legal-section reveal" id="s11">
-                    <h2>11. Termination</h2>
-                    <h3>11.1 By You</h3>
-                    <p>You may cancel your subscription at any time through your account dashboard or by contacting support. Cancellation takes effect at the end of your current billing period. Lifetime License holders may deactivate at any time; the license itself does not expire.</p>
-                    <h3>11.2 By COOCA</h3>
-                    <p>COOCA may suspend or terminate your account with 30 days' written notice for any reason, or immediately for:</p>
+                    <h2>{{ __('11. Termination') }}</h2>
+                    <h3>{{ __('11.1 By You') }}</h3>
+                    <p>{{ __('You may cancel your subscription at any time through your account dashboard or by contacting support. Cancellation takes effect at the end of your current billing period. Lifetime License holders may deactivate at any time; the license itself does not expire.') }}</p>
+                    <h3>{{ __('11.2 By COOCA') }}</h3>
+                    <p>{{ __('COOCA may suspend or terminate your account with 30 days\' written notice for any reason, or immediately for:') }}</p>
                     <ul>
-                        <li>Serious violation of these Terms or Acceptable Use Policy</li>
-                        <li>Failure to pay applicable fees after a 15-day grace period</li>
-                        <li>Fraudulent, abusive, or illegal activity</li>
+                        <li>{{ __('Serious violation of these Terms or Acceptable Use Policy') }}</li>
+                        <li>{{ __('Failure to pay applicable fees after a 15-day grace period') }}</li>
+                        <li>{{ __('Fraudulent, abusive, or illegal activity') }}</li>
                     </ul>
-                    <h3>11.3 Effect of Termination</h3>
-                    <p>Upon termination, your access to the Services ceases. Customer Data is retained for 90 days during which you may request an export. After 90 days, data is permanently deleted.</p>
+                    <h3>{{ __('11.3 Effect of Termination') }}</h3>
+                    <p>{{ __('Upon termination, your access to the Services ceases. Customer Data is retained for 90 days during which you may request an export. After 90 days, data is permanently deleted.') }}</p>
                 </div>
 
                 <div class="legal-section reveal" id="s12">
-                    <h2>12. Liability Limitation</h2>
-                    <p>To the maximum extent permitted by applicable law, COOCA's liability to you for any claims arising from these Terms or the Services shall not exceed the total amount paid by you in the 12 months preceding the claim.</p>
-                    <p>COOCA is not liable for indirect, incidental, consequential, or punitive damages, including lost profits, data loss, or business interruption — even if COOCA has been advised of the possibility of such damages.</p>
-                    <p>Nothing in these Terms limits liability for death or personal injury caused by negligence, fraud, or any other liability that cannot be excluded by law.</p>
+                    <h2>{{ __('12. Liability Limitation') }}</h2>
+                    <p>{{ __('To the maximum extent permitted by applicable law, COOCA\'s liability to you for any claims arising from these Terms or the Services shall not exceed the total amount paid by you in the 12 months preceding the claim.') }}</p>
+                    <p>{{ __('COOCA is not liable for indirect, incidental, consequential, or punitive damages, including lost profits, data loss, or business interruption — even if COOCA has been advised of the possibility of such damages.') }}</p>
+                    <p>{{ __('Nothing in these Terms limits liability for death or personal injury caused by negligence, fraud, or any other liability that cannot be excluded by law.') }}</p>
                 </div>
 
                 <div class="legal-section reveal" id="s13">
-                    <h2>13. Disputes</h2>
-                    <p>These Terms are governed by the laws of the Republic of Indonesia. Any dispute arising from these Terms shall first be addressed through good-faith negotiation between the parties.</p>
-                    <p>If negotiation fails within 30 days, disputes shall be resolved by binding arbitration under the rules of the Indonesian National Arbitration Board (BANI), with proceedings in Jakarta in the Indonesian language.</p>
-                    <p>Notwithstanding the above, either party may seek injunctive relief in any competent court to prevent irreparable harm.</p>
+                    <h2>{{ __('13. Disputes') }}</h2>
+                    <p>{{ __('These Terms are governed by the laws of the Republic of Indonesia. Any dispute arising from these Terms shall first be addressed through good-faith negotiation between the parties.') }}</p>
+                    <p>{{ __('If negotiation fails within 30 days, disputes shall be resolved by binding arbitration under the rules of the Indonesian National Arbitration Board (BANI), with proceedings in Jakarta in the Indonesian language.') }}</p>
+                    <p>{{ __('Notwithstanding the above, either party may seek injunctive relief in any competent court to prevent irreparable harm.') }}</p>
                 </div>
 
                 <div class="legal-section reveal" id="s14">
-                    <h2>14. Changes to These Terms</h2>
-                    <p>COOCA may update these Terms periodically. Material changes will be communicated via email and in-app notification at least 30 days before taking effect. Your continued use of the Services after the effective date constitutes acceptance.</p>
-                    <p>For Lifetime License holders, material changes to terms relating to your perpetual license require your explicit written consent to apply.</p>
+                    <h2>{{ __('14. Changes to These Terms') }}</h2>
+                    <p>{{ __('COOCA may update these Terms periodically. Material changes will be communicated via email and in-app notification at least 30 days before taking effect. Your continued use of the Services after the effective date constitutes acceptance.') }}</p>
+                    <p>{{ __('For Lifetime License holders, material changes to terms relating to your perpetual license require your explicit written consent to apply.') }}</p>
                 </div>
 
                 <div class="legal-section reveal" id="s15">
-                    <h2>15. Contact</h2>
-                    <p>For legal inquiries, please contact:</p>
+                    <h2>{{ __('15. Contact') }}</h2>
+                    <p>{{ __('For legal inquiries, please contact:') }}</p>
                     <div style="background:var(--card-alt);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:16px;">
-                        <p style="margin:0;"><strong style="color:var(--text);">PT COOCA Teknologi Indonesia</strong><br>
-                            Jl. Jend. Sudirman Kav. 52–53, Jakarta Selatan 12190<br>
-                            <strong>Legal:</strong> <a href="mailto:legal@cooca.io">legal@cooca.io</a><br>
-                            <strong>Privacy:</strong> <a href="mailto:privacy@cooca.io">privacy@cooca.io</a><br>
-                        <strong>Support:</strong> <a href="mailto:support@cooca.io">support@cooca.io</a></p>
+                        <p style="margin:0;"><strong style="color:var(--text);">{{ __(setting('company.name', 'PT COOCA Teknologi Indonesia')) }}</strong><br>
+                            {{ __(setting('company.address', 'Jl. Jend. Sudirman Kav. 52–53, Jakarta Selatan 12190')) }}<br>
+                            <strong>{{ __('Legal:') }}</strong> <a href="mailto:{{ setting('company.legal_email', 'legal@cooca.io') }}">{{ setting('company.legal_email', 'legal@cooca.io') }}</a><br>
+                            <strong>{{ __('Privacy:') }}</strong> <a href="mailto:{{ setting('company.privacy_email', 'privacy@cooca.io') }}">{{ setting('company.privacy_email', 'privacy@cooca.io') }}</a><br>
+                            <strong>{{ __('Support:') }}</strong> <a href="mailto:{{ setting('company.email', 'support@cooca.io') }}">{{ setting('company.email', 'support@cooca.io') }}</a></p>
                     </div>
                 </div>
 
                 <!-- SISTER LINKS -->
                 <div class="reveal" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:48px;padding-top:32px;border-top:1px solid var(--border);">
-                    <a href="privacy.html" class="btn-cooca btn-outline-c btn-sm-c"><i class="bi bi-shield-check"></i> Privacy Policy</a>
-                    <a href="{{ route('contact') }}" class="btn-cooca btn-outline-c btn-sm-c"><i class="bi bi-chat-dots"></i> Contact Support</a>
-                    <a href="{{ route('customer.register') }}" class="btn-cooca btn-primary-c btn-sm-c"><i class="bi bi-rocket-takeoff"></i> Start Free Trial</a>
+                    <a href="{{ route('privacy') }}" class="btn-cooca btn-cooca-outline"><i class="bi bi-shield-check"></i> {{ __('Privacy Policy') }}</a>
+                    <a href="{{ route('contact') }}" class="btn-cooca btn-cooca-outline"><i class="bi bi-chat-dots"></i> {{ __('Contact Support') }}</a>
+                    <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-primary"><i class="bi bi-rocket-takeoff"></i> {{ __('Start Free Trial') }}</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-<!-- ========== FOOTER ========== -->
-
-
-<!-- ========== SCRIPTS ========== -->
 @endsection
-
-@push('styles')
-<style>
-/* ========== DESIGN SYSTEM :ROOT ========== */
-        :root {
-            --bg: #020617;
-            --card: #0F172A;
-            --card-alt: #1E293B;
-            --text: #F8FAFC;
-            --text-muted: #94A3B8;
-            --primary: #2563EB;
-            --secondary: #1E40AF;
-            --accent: #38BDF8;
-            --success: #10B981;
-            --warning: #F59E0B;
-            --danger: #EF4444;
-            --border: rgba(56, 189, 248, 0.12);
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
-            --glass: rgba(15, 23, 42, 0.65);
-            --glass-border: rgba(56, 189, 248, 0.14);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --radius-xs: 8px;
-            --radius-full: 50px;
-            --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-            --spacing-xs: 4px;
-            --spacing-sm: 8px;
-            --spacing-md: 16px;
-            --spacing-lg: 24px;
-            --spacing-xl: 32px;
-            --spacing-2xl: 48px;
-            --spacing-3xl: 64px;
-            --spacing-4xl: 80px;
-            --navbar-height: 72px;
-            --navbar-height-scrolled: 56px;
-            /* Hero – dark mode */
-            --hero-bg: linear-gradient(160deg, var(--bg) 0%, #0F172A 35%, #1a2744 65%, var(--bg) 100%);
-            --hero-grid-color: rgba(56, 189, 248, 0.025);
-            --hero-orb-opacity: 0.08;
-        }
-
-        [data-theme="light"] {
-            --bg: #F8FAFC;
-            --card: #FFFFFF;
-            --card-alt: #F1F5F9;
-            --text: #0F172A;
-            --text-muted: #475569;
-            --primary: #2563EB;
-            --secondary: #1E40AF;
-            --accent: #0284C7;
-            --success: #059669;
-            --warning: #D97706;
-            --danger: #DC2626;
-            --border: rgba(37, 99, 235, 0.12);
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.08);
-            --glass: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(37, 99, 235, 0.1);
-            /* Hero – light mode */
-            --hero-bg: linear-gradient(160deg, #ffffff 0%, #f1f5f9 30%, #e2e8f0 65%, #ffffff 100%);
-            --hero-grid-color: rgba(37, 99, 235, 0.06);
-            --hero-orb-opacity: 0.04;
-        }
-
-        /* ========== GLOBAL RESET ========== */
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-            overflow-x: hidden;
-        }
-
-        body {
-            font-family: var(--font);
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.8;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            transition: background var(--transition), color var(--transition);
-            overflow-x: hidden;
-        }
-
-        p {
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-weight: 700;
-            line-height: 1.25;
-            letter-spacing: -0.02em;
-            color: var(--text);
-        }
-
-        a {
-            color: var(--accent);
-            text-decoration: none;
-            transition: color var(--transition-fast);
-        }
-
-        a:hover {
-            color: var(--text);
-        }
-
-        ul,
-        ol {
-            padding-left: 20px;
-            color: var(--text-muted);
-        }
-
-        li {
-            margin-bottom: 8px;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        /* ========== SCROLLBAR ========== */
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 3px;
-        }
-
-        /* ========== NAVBAR ========== */
-        .navbar-cooca {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1050;
-            padding: 16px 0;
-            transition: all var(--transition);
-            background: transparent;
-        }
-
-        .navbar-cooca.scrolled {
-            padding: 10px 0;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .navbar-brand-cooca {
-            font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            color: var(--text) !important;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-
-        .navbar-brand-cooca:hover {
-            color: var(--text) !important;
-        }
-
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 1.1rem;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-
-        .nav-link-cooca {
-            color: var(--text-muted) !important;
-            font-weight: 500;
-            font-size: 0.9rem;
-            padding: 8px 16px !important;
-            transition: color var(--transition-fast);
-            text-decoration: none;
-            white-space: nowrap;
-        }
-
-        .nav-link-cooca:hover {
-            color: var(--accent) !important;
-        }
-
-        .nav-link-cooca.active {
-            color: var(--accent) !important;
-            font-weight: 600;
-        }
-
-        /* ========== THEME TOGGLE ========== */
-        .theme-toggle {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--card);
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-
-        .theme-toggle:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        /* ========== LOGIN DROPDOWN ========== */
-        .login-dropdown-toggle {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            border-radius: var(--radius-xs);
-            font-weight: 600;
-            font-size: 0.9rem;
-            background: transparent;
-            color: var(--text);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            white-space: nowrap;
-        }
-
-        .login-dropdown-toggle:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .login-dropdown-toggle::after {
-            display: none;
-        }
-
-        .login-dropdown-toggle .bi-chevron-down {
-            font-size: 0.7rem;
-            transition: transform var(--transition-fast);
-        }
-
-        .login-dropdown-toggle[aria-expanded="true"] .bi-chevron-down {
-            transform: rotate(180deg);
-        }
-
-        .dropdown-menu-cooca {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 8px 0;
-            min-width: 200px;
-            box-shadow: var(--shadow-lg);
-            margin-top: 8px !important;
-        }
-
-        .dropdown-menu-cooca .dropdown-item {
-            color: var(--text);
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 10px 20px;
-            transition: all var(--transition-fast);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .dropdown-menu-cooca .dropdown-item:hover {
-            background: var(--card-alt);
-            color: var(--accent);
-        }
-
-        .dropdown-menu-cooca .dropdown-item i {
-            font-size: 1rem;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* ========== BUTTONS ========== */
-        .btn-cooca {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 32px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            border: none;
-            cursor: pointer;
-            transition: all var(--transition);
-            text-decoration: none;
-            white-space: nowrap;
-            font-family: var(--font);
-            line-height: 1;
-        }
-
-        .btn-primary-c {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: #fff;
-        }
-
-        .btn-primary-c:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
-            color: #fff;
-        }
-
-        .btn-outline-c {
-            background: transparent;
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
-        .btn-outline-c:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .btn-sm-c {
-            padding: 10px 22px;
-            font-size: 0.85rem;
-            border-radius: 10px;
-        }
-
-        /* ========== SECTION LABEL / BADGE ========== */
-        .section-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            background: rgba(37, 99, 235, 0.1);
-            border: 1px solid rgba(37, 99, 235, 0.2);
-            color: var(--primary);
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-
-        .badge-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 14px;
-            border-radius: 50px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-        }
-
-        /* ========== CARD ========== */
-        .card-c {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 28px;
-            transition: all var(--transition);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .card-c:hover {
-            box-shadow: var(--shadow);
-            border-color: var(--glass-border);
-        }
-
-        /* ========== LEGAL PAGE SPECIFIC ========== */
-        .legal-hero {
-            padding: 140px 0 60px;
-            position: relative;
-            overflow: hidden;
-            background: var(--hero-bg);
-            border-bottom: 1px solid var(--border);
-            transition: background var(--transition);
-        }
-
-        .legal-body {
-            padding: 80px 0;
-        }
-
-        .legal-section {
-            margin-bottom: 56px;
-            scroll-margin-top: 100px;
-        }
-
-        .legal-section h2 {
-            font-size: 1.35rem;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .legal-section h3 {
-            font-size: 1.05rem;
-            margin: 20px 0 10px;
-        }
-
-        .highlight-box {
-            background: rgba(37, 99, 235, 0.06);
-            border: 1px solid rgba(37, 99, 235, 0.15);
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin: 20px 0;
-        }
-
-        .highlight-box.warning {
-            background: rgba(245, 158, 11, 0.06);
-            border-color: rgba(245, 158, 11, 0.2);
-        }
-
-        .highlight-box.success {
-            background: rgba(16, 185, 129, 0.06);
-            border-color: rgba(16, 185, 129, 0.2);
-        }
-
-        .highlight-box p {
-            margin: 0;
-            font-size: 0.9rem;
-        }
-
-        /* ========== TOC SIDEBAR ========== */
-        .toc {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 28px;
-            position: sticky;
-            top: 100px;
-        }
-
-        .toc-title {
-            font-size: 0.78rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-
-        .toc-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .toc-list li {
-            margin-bottom: 8px;
-        }
-
-        .toc-list a {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            transition: color var(--transition-fast);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-
-        .toc-list a:hover {
-            color: var(--accent);
-        }
-
-        .toc-list a::before {
-            content: '';
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: var(--border);
-            flex-shrink: 0;
-            transition: background var(--transition-fast);
-        }
-
-        .toc-list a:hover::before {
-            background: var(--accent);
-        }
-
-        .toc-list a.toc-active {
-            color: var(--accent);
-        }
-
-        .toc-list a.toc-active::before {
-            background: var(--accent);
-        }
-
-        /* ========== FOOTER ========== */
-        .footer {
-            background: var(--card);
-            border-top: 1px solid var(--border);
-            padding: 60px 0 30px;
-        }
-
-        .footer-brand {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-            color: var(--text);
-        }
-
-        .footer-desc {
-            font-size: 0.88rem;
-            color: var(--text-muted);
-            max-width: 280px;
-            line-height: 1.6;
-            margin-bottom: 0;
-        }
-
-        .footer-title {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-
-        .footer-links {
-            list-style: none;
-            padding: 0;
-        }
-
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
-            font-size: 0.88rem;
-            transition: color var(--transition-fast);
-            text-decoration: none;
-        }
-
-        .footer-links a:hover {
-            color: var(--accent);
-        }
-
-        .footer-socials {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .footer-socials a {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--card-alt);
-            color: var(--text-muted);
-            border: 1px solid var(--border);
-            transition: all var(--transition-fast);
-            text-decoration: none;
-        }
-
-        .footer-socials a:hover {
-            color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .footer-bottom {
-            margin-top: 48px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .footer-bottom p {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            margin: 0;
-        }
-
-        /* ========== MOBILE OFFCANVAS ========== */
-        .offcanvas-cooca {
-            background: var(--glass) !important;
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border-left: 1px solid var(--glass-border);
-        }
-
-        .offcanvas-cooca .btn-close {
-            filter: invert(1);
-        }
-
-        [data-theme="light"] .offcanvas-cooca .btn-close {
-            filter: none;
-        }
-
-        .offcanvas-cooca .nav-link-cooca {
-            display: block;
-            padding: 14px 0 !important;
-            font-size: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .offcanvas-cooca .theme-toggle-mobile {
-            width: 100%;
-            padding: 12px;
-            border-radius: var(--radius-xs);
-            border: 1px solid var(--border);
-            background: var(--card);
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .offcanvas-cooca .theme-toggle-mobile:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        /* ========== REVEAL ANIMATION ========== */
-        .reveal {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .reveal.revealed {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .reveal-delay-1 {
-            transition-delay: 0.1s;
-        }
-
-        .reveal-delay-2 {
-            transition-delay: 0.2s;
-        }
-
-        .reveal-delay-3 {
-            transition-delay: 0.3s;
-        }
-
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 991px) {
-            .toc {
-                display: none;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .legal-hero {
-                padding: 110px 0 40px;
-            }
-
-            .legal-body {
-                padding: 50px 0;
-            }
-
-            .footer-bottom {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .btn-cooca {
-                padding: 12px 24px;
-                font-size: 0.9rem;
-            }
-
-            .btn-sm-c {
-                padding: 8px 18px;
-                font-size: 0.8rem;
-            }
-        }
-
-        @media (max-width: 414px) {
-            .navbar-brand-cooca {
-                font-size: 1.3rem;
-            }
-
-            .logo-icon {
-                width: 30px;
-                height: 30px;
-                font-size: 0.9rem;
-                border-radius: 8px;
-            }
-
-            .legal-hero {
-                padding: 100px 0 32px;
-            }
-
-            .legal-section h2 {
-                font-size: 1.15rem;
-            }
-
-            .legal-section h3 {
-                font-size: 0.95rem;
-            }
-
-            .highlight-box {
-                padding: 12px 16px;
-            }
-
-            .highlight-box p {
-                font-size: 0.82rem;
-            }
-
-            .footer {
-                padding: 40px 0 20px;
-            }
-
-            .footer-bottom {
-                margin-top: 32px;
-                padding-top: 16px;
-            }
-        }
-</style>
-@endpush

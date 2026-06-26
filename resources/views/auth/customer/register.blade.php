@@ -1,149 +1,8 @@
 @extends('layouts.guest')
-
-@section('title', 'Customer_register - ' . ($setting->company_name ?? config('app.name')))
-
-@section('content')
-<!-- ========== NAVBAR ========== -->
-
-
-<!-- ========== REGISTRATION MAIN ========== -->
-<main class="auth-layout">
-    <!-- LEFT PANEL (value proposition) -->
-    <div class="auth-left auth-panel">
-        <div class="orb" style="width:500px;height:500px;background:#2563EB;top:-150px;right:-100px;"></div>
-        <div class="orb" style="width:300px;height:300px;background:#38BDF8;bottom:-80px;left:-60px;"></div>
-        <div class="grid-bg"></div>
-        <div class="left-content">
-            <div class="d-flex align-items-center justify-content-center gap-3 mb-5"><div class="logo-icon">C</div><span style="font-size:1.8rem;font-weight:800;">COOCA</span></div>
-            <h2>Your Business System Will Be Live in <span class="text-gradient">30 Minutes.</span></h2>
-            <p class="mt-3" style="font-size:.95rem;color:rgba(248,250,252,.7);">Sign up now. Get full access. No credit card, no commitment.</p>
-            <div class="trust-items">
-                <div class="trust-item"><div class="trust-icon"><i class="bi bi-check-circle-fill"></i></div><div><strong style="color:#F8FAFC;">30-day full access</strong><div class="trust-text">All 10 modules, unlimited users</div></div></div>
-                <div class="trust-item"><div class="trust-icon"><i class="bi bi-shield-lock-fill"></i></div><div><strong style="color:#F8FAFC;">Isolated infrastructure</strong><div class="trust-text">Provisioned in 30 min, zero risk</div></div></div>
-                <div class="trust-item"><div class="trust-icon"><i class="bi bi-graph-up-arrow"></i></div><div><strong style="color:#F8FAFC;">9 industry configs</strong><div class="trust-text">Retail, restaurant, clinic, salon, etc.</div></div></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- RIGHT PANEL: MULTI-STEP FORM -->
-    <div class="auth-right auth-panel">
-        <div class="form-panel">
-            <div class="d-md-none d-flex align-items-center gap-3 mb-4"><div class="logo-icon">C</div><span style="font-size:1.6rem;font-weight:800;">COOCA</span></div>
-            <div class="progress-bar-c"><div class="progress-fill" id="progressFill" style="width:33.3%"></div></div>
-            <div class="step-nav" id="stepNav"><div class="step-dot active" id="dot1"></div><div class="step-dot" id="dot2"></div><div class="step-dot" id="dot3"></div></div>
-
-            <!-- ERROR SUMMARY -->
-            @if ($errors->any())
-                <div class="alert alert-danger" style="border-radius: 12px; background: rgba(239,68,68,0.1); border: 1px solid var(--danger); color: #f87171; padding: 15px; margin-bottom: 20px;">
-                    <ul style="margin-bottom: 0; padding-left: 20px; font-size: 0.9rem;">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('customer.register.submit') }}" id="registerForm">
-                @csrf
-                <!-- STEP 1 -->
-                <div class="step-page active" id="step1">
-                    <div class="form-title">Create your account</div>
-                    <p class="form-subtitle">Step 1 of 3 · Start your 30-day free trial. <a href="{{ route('customer.login') }}">Already have one?</a></p>
-                    <button type="button" class="social-btn"><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Sign up with Google</button>
-                    <div class="divider"><span>or with email</span></div>
-                    
-                    <div class="input-wrap">
-                        <label class="input-label">Full Name</label>
-                        <div class="position-relative">
-                            <i class="bi bi-person input-icon"></i>
-                            <input type="text" name="name" class="input-field" placeholder="Ahmad Kurniawan" value="{{ old('name') }}" required>
-                        </div>
-                    </div>
-                    
-                    <div class="input-wrap">
-                        <label class="input-label">Work Email</label>
-                        <div class="position-relative">
-                            <i class="bi bi-envelope input-icon"></i>
-                            <input type="email" name="email" class="input-field" id="regEmail" placeholder="you@company.com" value="{{ old('email') }}" required>
-                        </div>
-                    </div>
-                    
-                    <div class="input-wrap">
-                        <label class="input-label">Password</label>
-                        <div class="position-relative">
-                            <i class="bi bi-lock input-icon"></i>
-                            <input type="password" name="password" class="input-field" id="regPassword" placeholder="Min. 8 characters" required>
-                        </div>
-                    </div>
-
-                    <div class="input-wrap">
-                        <label class="input-label">Confirm Password</label>
-                        <div class="position-relative">
-                            <i class="bi bi-lock-fill input-icon"></i>
-                            <input type="password" name="password_confirmation" class="input-field" placeholder="Confirm your password" required>
-                        </div>
-                    </div>
-
-                    <div class="check-wrap"><input type="checkbox" id="terms" required><label for="terms">I agree to COOCA's <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a></label></div>
-                    <button type="button" class="btn-submit" onclick="goStep(2)">Continue <i class="bi bi-arrow-right"></i></button>
-                </div>
-
-                <!-- STEP 2: BUSINESS INFO -->
-                <div class="step-page" id="step2">
-                    <div class="form-title">Tell us about your business</div>
-                    <p class="form-subtitle">Step 2 of 3 · Industry & business details for auto‑configuration.</p>
-                    
-                    <div class="input-wrap">
-                        <label class="input-label">Business Name (Optional)</label>
-                        <div class="position-relative">
-                            <i class="bi bi-building input-icon"></i>
-                            <input type="text" name="business_name" class="input-field" placeholder="RetailMax Indonesia" value="{{ old('business_name') }}">
-                        </div>
-                    </div>
-                    
-                    <div class="input-wrap">
-                        <label class="input-label">Referral Code (Optional)</label>
-                        <div class="position-relative">
-                            <i class="bi bi-ticket-detailed input-icon"></i>
-                            <input type="text" name="referral_code" class="input-field" placeholder="Enter referral code if you have one" value="{{ old('referral_code') }}">
-                        </div>
-                    </div>
-                    
-                    <div style="display:flex;gap:12px;margin-top:30px;">
-                        <button type="button" class="btn-cooca btn-cooca-outline" style="flex:1;" onclick="goStep(1)"><i class="bi bi-arrow-left"></i> Back</button>
-                        <button type="button" class="btn-cooca btn-cooca-primary" style="flex:1;" onclick="goStep(3)">Continue <i class="bi bi-arrow-right"></i></button>
-                    </div>
-                </div>
-
-                <!-- STEP 3: CONFIRM & LAUNCH -->
-                <div class="step-page" id="step3">
-                    <div class="form-title">You're almost there!</div>
-                    <p class="form-subtitle">Step 3 of 3 · Confirm your setup and launch your free trial.</p>
-                    <div class="glass p-4 rounded-3 mb-4"><div class="fw-bold text-uppercase small mb-3">Your Setup Summary</div><div class="d-flex flex-column gap-2"><div class="d-flex justify-content-between"><span class="text-muted">Plan</span><span class="text-success fw-bold">30-Day Free Trial</span></div><div class="d-flex justify-content-between"><span class="text-muted">Modules</span><span>All 10 included</span></div><div class="d-flex justify-content-between"><span class="text-muted">Users</span><span>Unlimited</span></div><div class="d-flex justify-content-between"><span class="text-muted">Provisioning</span><span>~30 minutes</span></div><div class="d-flex justify-content-between"><span class="text-muted">Credit Card</span><span class="text-success">Not Required</span></div></div></div>
-                    <div class="check-wrap"><input type="checkbox" id="newsletter2" checked><label for="newsletter2">Send me tips on getting the most out of COOCA</label></div>
-                    <div style="display:flex;gap:12px;">
-                        <button type="button" class="btn-cooca btn-cooca-outline" style="flex:1;" onclick="goStep(2)"><i class="bi bi-arrow-left"></i> Back</button>
-                        <button type="submit" class="btn-cooca btn-cooca-success" id="launchBtn" style="flex:1;">
-                            <span id="launchText">Launch My Free Trial</span>
-                            <i class="bi bi-rocket-takeoff-fill" id="launchIcon"></i>
-                        </button>
-                    </div>
-                    <p class="text-center small mt-3">By signing up, you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</p>
-                </div>
-            </form>
-
-            <p class="text-center mt-4">Already have an account? <a href="{{ route('customer.login') }}" class="fw-bold">Log in →</a></p>
-        </div>
-    </div>
-</main>
-
-<!-- ========== FOOTER ========== -->
-
-@endsection
-
 @push('styles')
 <style>
-:root {
+
+        :root {
             --bg: #020617;
             --card: #0F172A;
             --card-alt: #1E293B;
@@ -329,5 +188,208 @@
             .input-row{grid-template-columns:1fr;}
             .footer-bottom{justify-content:center;text-align:center;flex-direction:column;}
         }
+    
 </style>
 @endpush
+@section('content')
+<main class="auth-layout">
+    <!-- LEFT PANEL (value proposition) -->
+    <div class="auth-left auth-panel">
+        <div class="orb" style="width:500px;height:500px;background:#2563EB;top:-150px;right:-100px;"></div>
+        <div class="orb" style="width:300px;height:300px;background:#38BDF8;bottom:-80px;left:-60px;"></div>
+        <div class="grid-bg"></div>
+        <div class="left-content">
+            <div class="d-flex align-items-center justify-content-center gap-3 mb-5"><div class="logo-icon">C</div><span style="font-size:1.8rem;font-weight:800;">COOCA</span></div>
+            <h2>Your Business System Will Be Live in <span class="text-gradient">30 Minutes.</span></h2>
+            <p class="mt-3" style="font-size:.95rem;color:rgba(248,250,252,.7);">Sign up now. Get full access. No credit card, no commitment.</p>
+            <div class="trust-items">
+                <div class="trust-item"><div class="trust-icon"><i class="bi bi-check-circle-fill"></i></div><div><strong style="color:#F8FAFC;">30-day full access</strong><div class="trust-text">All 10 modules, unlimited users</div></div></div>
+                <div class="trust-item"><div class="trust-icon"><i class="bi bi-shield-lock-fill"></i></div><div><strong style="color:#F8FAFC;">Isolated infrastructure</strong><div class="trust-text">Provisioned in 30 min, zero risk</div></div></div>
+                <div class="trust-item"><div class="trust-icon"><i class="bi bi-graph-up-arrow"></i></div><div><strong style="color:#F8FAFC;">9 industry configs</strong><div class="trust-text">Retail, restaurant, clinic, salon, etc.</div></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: MULTI-STEP FORM -->
+    <div class="auth-right auth-panel">
+        <div class="form-panel">
+            <div class="d-md-none d-flex align-items-center gap-3 mb-4"><div class="logo-icon">C</div><span style="font-size:1.6rem;font-weight:800;">COOCA</span></div>
+            
+            @if ($errors->any())
+                <div class="alert alert-danger" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#FCA5A5;border-radius:12px;padding:16px;margin-bottom:24px;font-size:0.9rem;">
+                    <ul class="mb-0 pl-3" style="padding-left:20px;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="progress-bar-c"><div class="progress-fill" id="progressFill" style="width:33.3%"></div></div>
+            <div class="step-nav" id="stepNav"><div class="step-dot active" id="dot1"></div><div class="step-dot" id="dot2"></div><div class="step-dot" id="dot3"></div></div>
+
+            <form action="{{ route('customer.register.submit') }}" method="POST" id="regForm">
+                @csrf
+                <!-- STEP 1 -->
+                <div class="step-page active" id="step1">
+                    <div class="form-title">Create your account</div>
+                    <p class="form-subtitle">Step 1 of 3 · Start your 30-day free trial. <a href="{{ route('customer.login') }}">Already have one?</a></p>
+                    
+                    <div class="input-wrap">
+                        <label class="input-label">Full Name</label>
+                        <div class="position-relative">
+                            <i class="bi bi-person input-icon"></i>
+                            <input type="text" name="name" class="input-field" placeholder="Ahmad Kurniawan" value="{{ old('name') }}" required>
+                        </div>
+                    </div>
+                    <div class="input-wrap">
+                        <label class="input-label">Work Email</label>
+                        <div class="position-relative">
+                            <i class="bi bi-envelope input-icon"></i>
+                            <input type="email" name="email" class="input-field" id="regEmail" placeholder="you@company.com" value="{{ old('email') }}" required>
+                        </div>
+                    </div>
+                    <div class="input-wrap">
+                        <label class="input-label">Password</label>
+                        <div class="position-relative">
+                            <i class="bi bi-lock input-icon"></i>
+                            <input type="password" name="password" class="input-field" id="regPassword" placeholder="Min. 8 characters" required>
+                            <span class="input-toggle" id="regPwToggle"><i class="bi bi-eye" id="regPwIcon"></i></span>
+                        </div>
+                        <div class="pw-strength"><div class="pw-bars"><div class="pw-bar" id="b1"></div><div class="pw-bar" id="b2"></div><div class="pw-bar" id="b3"></div><div class="pw-bar" id="b4"></div></div><div class="pw-label" id="pwLabel">Enter a password</div></div>
+                    </div>
+                    <div class="input-wrap">
+                        <label class="input-label">Confirm Password</label>
+                        <div class="position-relative">
+                            <i class="bi bi-lock input-icon"></i>
+                            <input type="password" name="password_confirmation" class="input-field" placeholder="Repeat password" required>
+                        </div>
+                    </div>
+                    <div class="check-wrap">
+                        <input type="checkbox" id="terms" required>
+                        <label for="terms">I agree to COOCA's <a href="{{ route('terms') }}">Terms of Service</a> and <a href="{{ route('privacy') }}">Privacy Policy</a></label>
+                    </div>
+                    <button type="button" class="btn-submit" onclick="goStep(2)">Continue <i class="bi bi-arrow-right"></i></button>
+                </div>
+
+                <!-- STEP 2: BUSINESS INFO -->
+                <div class="step-page" id="step2">
+                    <div class="form-title">Tell us about your business</div>
+                    <p class="form-subtitle">Step 2 of 3 · Industry & business details for auto‑configuration.</p>
+                    <div class="input-wrap">
+                        <label class="input-label">Business Name (Optional)</label>
+                        <div class="position-relative">
+                            <i class="bi bi-building input-icon"></i>
+                            <input type="text" name="business_name" class="input-field" placeholder="RetailMax Indonesia" value="{{ old('business_name') }}">
+                        </div>
+                    </div>
+                    <div class="input-wrap">
+                        <label class="input-label">Referral Code (Optional)</label>
+                        <div class="position-relative">
+                            <i class="bi bi-person-bounding-box input-icon"></i>
+                            <input type="text" name="referral_code" class="input-field" placeholder="Affiliator Code" value="{{ old('referral_code') }}">
+                        </div>
+                    </div>
+                    <div class="input-wrap"><label class="input-label">Number of Employees</label><select class="input-field no-icon" style="padding-left:16px;"><option disabled selected>Select team size</option><option>Just me</option><option>2–5 people</option><option>6–20 people</option><option>21–50 people</option><option>51–100 people</option><option>100+ people</option></select></div>
+                    <div class="input-wrap"><label class="input-label">Number of Outlets / Locations</label><select class="input-field no-icon" style="padding-left:16px;"><option disabled selected>Select</option><option>1 location</option><option>2–5 locations</option><option>6–15 locations</option><option>16+ locations</option></select></div>
+                    <div class="input-wrap">
+                        <label class="input-label">Choose Your Industry</label>
+                        <div class="industry-grid" id="industryGrid">
+                            <div class="industry-card" onclick="selectIndustry(this,'Retail')"><span class="ic-icon">🛍️</span><span class="ic-label">Retail</span></div>
+                            <div class="industry-card" onclick="selectIndustry(this,'Restaurant')"><span class="ic-icon">🍴</span><span class="ic-label">Restaurant</span></div>
+                            <div class="industry-card" onclick="selectIndustry(this,'Hotel')"><span class="ic-icon">🏨</span><span class="ic-label">Hotel</span></div>
+                            <div class="industry-card" onclick="selectIndustry(this,'Clinic')"><span class="ic-icon">🏥</span><span class="ic-label">Clinic</span></div>
+                            <div class="industry-card" onclick="selectIndustry(this,'Education')"><span class="ic-icon">🎓</span><span class="ic-label">Education</span></div>
+                            <div class="industry-card" onclick="selectIndustry(this,'Salon')"><span class="ic-icon">✂️</span><span class="ic-label">Salon</span></div>
+                            <div class="industry-card" onclick="selectIndustry(this,'Laundry')"><span class="ic-icon">👕</span><span class="ic-label">Laundry</span></div>
+                            <div class="industry-card" onclick="selectIndustry(this,'Workshop')"><span class="ic-icon">🔧</span><span class="ic-label">Workshop</span></div>
+                            <div class="industry-card" onclick="selectIndustry(this,'Rental')"><span class="ic-icon">🔑</span><span class="ic-label">Rental</span></div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:12px;">
+                        <button type="button" class="btn-cooca btn-cooca-outline" style="flex:1;" onclick="goStep(1)"><i class="bi bi-arrow-left"></i> Back</button>
+                        <button type="button" class="btn-cooca btn-cooca-primary" style="flex:1;" onclick="goStep(3)">Continue <i class="bi bi-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: CONFIRM & LAUNCH -->
+                <div class="step-page" id="step3">
+                    <div class="form-title">You're almost there!</div>
+                    <p class="form-subtitle">Step 3 of 3 · Confirm your setup and launch your free trial.</p>
+                    <div class="glass p-4 rounded-3 mb-4"><div class="fw-bold text-uppercase small mb-3">Your Setup Summary</div><div class="d-flex flex-column gap-2"><div class="d-flex justify-content-between"><span class="text-muted">Plan</span><span class="text-success fw-bold">30-Day Free Trial</span></div><div class="d-flex justify-content-between"><span class="text-muted">Industry</span><span id="summaryIndustry" class="fw-bold">—</span></div><div class="d-flex justify-content-between"><span class="text-muted">Modules</span><span>All 10 included</span></div><div class="d-flex justify-content-between"><span class="text-muted">Users</span><span>Unlimited</span></div><div class="d-flex justify-content-between"><span class="text-muted">Provisioning</span><span>~30 minutes</span></div><div class="d-flex justify-content-between"><span class="text-muted">Credit Card</span><span class="text-success">Not Required</span></div></div></div>
+                    <div class="check-wrap"><input type="checkbox" id="newsletter2" checked><label for="newsletter2">Send me tips on getting the most out of COOCA for my industry</label></div>
+                    <div style="display:flex;gap:12px;">
+                        <button type="button" class="btn-cooca btn-cooca-outline" style="flex:1;" onclick="goStep(2)"><i class="bi bi-arrow-left"></i> Back</button>
+                        <button type="submit" class="btn-cooca btn-cooca-success" id="launchBtn" style="flex:1;"><span id="launchText">Launch My Free Trial</span><i class="bi bi-rocket-takeoff-fill" id="launchIcon"></i></button>
+                    </div>
+                    <p class="text-center small mt-3">By signing up, you agree to our <a href="{{ route('terms') }}">Terms</a> and <a href="{{ route('privacy') }}">Privacy Policy</a>.</p>
+                </div>
+            </form>
+
+            <p class="text-center mt-4">Already have an account? <a href="{{ route('customer.login') }}" class="fw-bold">Log in →</a></p>
+        </div>
+    </div>
+</main>
+
+@push('scripts')
+<script>
+    function selectIndustry(el, name) {
+        document.querySelectorAll('.industry-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        window.selectedIndustry = name;
+        const sum = document.getElementById('summaryIndustry');
+        if (sum) sum.textContent = name;
+    }
+
+    function goStep(n) {
+        document.querySelectorAll('.step-page').forEach(p => p.classList.remove('active'));
+        document.getElementById('step' + n).classList.add('active');
+        const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
+        dots.forEach((d, i) => {
+            if (d) d.className = 'step-dot' + (i + 1 < n ? ' done' : i + 1 === n ? ' active' : '');
+        });
+        const pcts = {1: '33.3%', 2: '66.6%', 3: '100%'};
+        const fill = document.getElementById('progressFill');
+        if (fill) fill.style.width = pcts[n];
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    const pwToggle = document.getElementById('regPwToggle');
+    const pwField = document.getElementById('regPassword');
+    const pwIcon = document.getElementById('regPwIcon');
+    if (pwToggle && pwField) {
+        pwToggle.addEventListener('click', () => {
+            const isPass = pwField.type === 'password';
+            pwField.type = isPass ? 'text' : 'password';
+            pwIcon.className = 'bi ' + (isPass ? 'bi-eye-slash' : 'bi-eye');
+        });
+    }
+
+    const pw = document.getElementById('regPassword');
+    if (pw) {
+        pw.addEventListener('input', function() {
+            const v = this.value;
+            const bars = [document.getElementById('b1'), document.getElementById('b2'), document.getElementById('b3'), document.getElementById('b4')];
+            const label = document.getElementById('pwLabel');
+            bars.forEach(b => b && (b.className = 'pw-bar'));
+            if (!v.length) {
+                if (label) label.textContent = 'Enter a password';
+                return;
+            }
+            let score = 0;
+            if (v.length >= 8) score++;
+            if (v.length >= 12) score++;
+            if (/[A-Z]/.test(v) && /[0-9]/.test(v)) score++;
+            if (/[^A-Za-z0-9]/.test(v)) score++;
+            const strength = Math.min(4, Math.max(1, score));
+            const classes = ['weak', 'fair', 'good', 'good'];
+            const labels = ['Weak', 'Fair', 'Good', 'Strong'];
+            for (let i = 0; i < strength; i++) {
+                if (bars[i]) bars[i].className = `pw-bar ${classes[strength - 1]}`;
+            }
+            if (label) label.textContent = labels[strength - 1] || 'Weak';
+        });
+    }
+</script>
+@endpush
+@endsection

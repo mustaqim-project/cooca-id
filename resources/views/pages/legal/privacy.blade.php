@@ -1,209 +1,213 @@
 @extends('layouts.guest')
-
-@section('title', 'Privacy Policy - ' . ($setting->company_name ?? config('app.name')))
-
+@push('styles')
+<style>
+    /* ========== LEGAL PAGE SPECIFIC ========== */
+    .legal-hero {
+        padding: 140px 0 60px;
+        position: relative;
+        overflow: hidden;
+        background: var(--hero-gradient);
+        border-bottom: 1px solid var(--border);
+        transition: background var(--transition);
+    }
+    .legal-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-size: .75rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        background: rgba(16, 185, 129, .1);
+        border: 1px solid rgba(16, 185, 129, .2);
+        color: #10B981;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+    }
+    .legal-body {
+        padding: 80px 0;
+    }
+    .legal-section {
+        margin-bottom: 56px;
+        scroll-margin-top: 100px;
+    }
+    .legal-section h2 {
+        font-size: 1.35rem;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+    }
+    .legal-section h3 {
+        font-size: 1.05rem;
+        margin: 20px 0 10px;
+    }
+    .highlight-box {
+        background: rgba(37, 99, 235, .06);
+        border: 1px solid rgba(37, 99, 235, .15);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin: 20px 0;
+    }
+    .highlight-box.success {
+        background: rgba(16, 185, 129, .06);
+        border-color: rgba(16, 185, 129, .2);
+    }
+    .highlight-box.warning {
+        background: rgba(245, 158, 11, .06);
+        border-color: rgba(245, 158, 11, .2);
+    }
+    .highlight-box p {
+        margin: 0;
+        font-size: .9rem;
+    }
+    /* ========== TOC SIDEBAR ========== */
+    .toc {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 28px;
+        position: sticky;
+        top: 100px;
+    }
+    .toc-title {
+        font-size: .78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+    }
+    .toc-list {
+        list-style: none;
+        padding: 0;
+    }
+    .toc-list li {
+        margin-bottom: 8px;
+    }
+    .toc-list a {
+        font-size: .85rem;
+        color: var(--text-muted);
+        transition: color var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+    .toc-list a:hover {
+        color: var(--accent);
+    }
+    .toc-list a::before {
+        content: '';
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--border);
+        flex-shrink: 0;
+        transition: background var(--transition);
+    }
+    .toc-list a:hover::before {
+        background: var(--accent);
+    }
+    @media (max-width: 991px) {
+        .toc {
+            display: none;
+        }
+    }
+    @media (max-width: 767px) {
+        .legal-hero {
+            padding: 110px 0 40px;
+        }
+        .legal-body {
+            padding: 50px 0;
+        }
+    }
+</style>
+@endpush
 @section('content')
-
-
-</div>
-
-<!-- HERO (dengan orbs dan grid) -->
-<section class="legal-hero" style="position:relative;overflow:hidden;background:var(--hero-bg);transition:background var(--transition);">
-    <!-- Orbs -->
-    <div style="position:absolute;border-radius:50%;filter:blur(80px);opacity:var(--hero-orb-opacity);pointer-events:none;width:400px;height:400px;background:var(--primary);top:-100px;right:-80px;"></div>
-    <div style="position:absolute;border-radius:50%;filter:blur(60px);opacity:var(--hero-orb-opacity);pointer-events:none;width:250px;height:250px;background:var(--accent);bottom:-60px;left:-40px;"></div>
-    <!-- Grid -->
-    <div style="position:absolute;inset:0;background-image:linear-gradient(var(--hero-grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--hero-grid-color) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;"></div>
-    <div class="container position-relative" style="z-index:2;">
-        <div class="legal-badge"><i class="bi bi-shield-check-fill"></i> Privacy</div>
-        <h1 style="font-size:clamp(2rem,4vw,3rem);margin-bottom:12px;">Privacy Policy</h1>
-        <p style="max-width:620px;font-size:1rem;margin-bottom:0;">We believe privacy is a right, not a checkbox. This policy explains exactly what data we collect, why we collect it, and what we'll never do with it — in plain language you can actually understand.</p>
-        <p style="font-size:.85rem;margin-top:16px;margin-bottom:0;"><strong>Last updated:</strong> June 1, 2026 &nbsp;·&nbsp; <strong>Version:</strong> 2.2 &nbsp;·&nbsp; <a href="terms.html">View Terms of Service →</a></p>
+<!-- HERO -->
+<section class="blog-hero">
+    <div class="blog-hero-orb blog-hero-orb-1"></div>
+    <div class="blog-hero-orb blog-hero-orb-2"></div>
+    <div class="grid-bg"></div>
+    <div class="container text-center position-relative" style="z-index:2;">
+        <div class="badge-glow reveal mb-4">
+            <i class="bi bi-shield-check-fill"></i> {{ __(setting('privacy.badge', 'Privacy')) }}
+        </div>
+        <h1 class="hero-title reveal reveal-delay-1">
+            {{ __(setting('privacy.title', 'Privacy Policy')) }}
+        </h1>
+        <p class="hero-subtitle reveal reveal-delay-2" style="font-size:1.15rem;max-width:620px;margin:20px auto 0;">
+            {{ __(setting('privacy.subtitle', 'We believe privacy is a right, not a checkbox. This policy explains exactly what data we collect, why we collect it, and what we\'ll never do with it — in plain language you can actually understand.')) }}
+        </p>
+        <p class="reveal reveal-delay-3" style="font-size:.85rem;margin-top:24px;margin-bottom:0;color:var(--text-muted);">
+            <strong>{{ __('Last updated:') }}</strong> {{ __(setting('privacy.updated_date', 'June 1, 2026')) }} &nbsp;·&nbsp; <strong>{{ __('Version:') }}</strong> {{ __(setting('privacy.version', '2.2')) }} &nbsp;·&nbsp; <a href="{{ route('terms') }}" style="color:var(--accent);">{{ __('View Terms of Service') }} →</a>
+        </p>
     </div>
 </section>
 
-<!-- BODY (identik dengan sebelumnya) -->
+<!-- BODY -->
 <section class="legal-body">
     <div class="container">
         <div class="row g-5">
             <div class="col-lg-3">
-                <div class="toc">
-                    <div class="toc-title"><i class="bi bi-list-ul me-2"></i>Contents</div>
+                <div class="toc reveal">
+                    <div class="toc-title"><i class="bi bi-list-ul me-2"></i>{{ __('Contents') }}</div>
                     <ul class="toc-list">
-                        <li><a href="#p1">1. Our Privacy Commitments</a></li>
-                        <li><a href="#p2">2. Who We Are</a></li>
-                        <li><a href="#p3">3. Data We Collect</a></li>
-                        <li><a href="#p4">4. How We Use Your Data</a></li>
-                        <li><a href="#p5">5. Data Isolation</a></li>
-                        <li><a href="#p6">6. Data Sharing</a></li>
-                        <li><a href="#p7">7. Data Retention</a></li>
-                        <li><a href="#p8">8. Security</a></li>
-                        <li><a href="#p9">9. Cookies</a></li>
-                        <li><a href="#p10">10. Your Rights</a></li>
-                        <li><a href="#p11">11. Children's Privacy</a></li>
-                        <li><a href="#p12">12. International Transfers</a></li>
-                        <li><a href="#p13">13. Changes to Policy</a></li>
-                        <li><a href="#p14">14. Contact Us</a></li>
+                        <li><a href="#p1">{{ __('1. Our Privacy Commitments') }}</a></li>
+                        <li><a href="#p2">{{ __('2. Who We Are') }}</a></li>
+                        <li><a href="#p3">{{ __('3. Data We Collect') }}</a></li>
+                        <li><a href="#p4">{{ __('4. How We Use Your Data') }}</a></li>
+                        <li><a href="#p5">{{ __('5. Data Isolation') }}</a></li>
+                        <li><a href="#p6">{{ __('6. Data Sharing') }}</a></li>
+                        <li><a href="#p7">{{ __('7. Data Retention') }}</a></li>
+                        <li><a href="#p8">{{ __('8. Security') }}</a></li>
+                        <li><a href="#p9">{{ __('9. Cookies') }}</a></li>
+                        <li><a href="#p10">{{ __('10. Your Rights') }}</a></li>
+                        <li><a href="#p11">{{ __('11. Children\'s Privacy') }}</a></li>
+                        <li><a href="#p12">{{ __('12. International Transfers') }}</a></li>
+                        <li><a href="#p13">{{ __('13. Changes to Policy') }}</a></li>
+                        <li><a href="#p14">{{ __('14. Contact Us') }}</a></li>
                     </ul>
                 </div>
             </div>
             <div class="col-lg-9">
                 <!-- QUICK SUMMARY -->
-                <div style="background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(37,99,235,.04));border:1px solid rgba(16,185,129,.2);border-radius:16px;padding:28px;margin-bottom:48px;">
-                    <h3 style="font-size:1.1rem;margin-bottom:16px;"><i class="bi bi-lightning-charge-fill me-2" style="color:#10B981;"></i>Privacy at a Glance</h3>
+                <div class="reveal" style="background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(37,99,235,.04));border:1px solid rgba(16,185,129,.2);border-radius:16px;padding:28px;margin-bottom:48px;">
+                    <h3 style="font-size:1.1rem;margin-bottom:16px;"><i class="bi bi-lightning-charge-fill me-2" style="color:#10B981;"></i>{{ __('Privacy at a Glance') }}</h3>
                     <div class="row g-3">
-                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>We <strong>never sell</strong> your data to third parties</span></div></div>
-                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>Your system is <strong>fully isolated</strong> — zero cross-tenant access</span></div></div>
-                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>You can <strong>export or delete</strong> your data anytime</span></div></div>
-                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>We collect <strong>only what's necessary</strong> to run the service</span></div></div>
-                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>Data encrypted <strong>in transit and at rest</strong></span></div></div>
-                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>Compliant with <strong>Indonesian UU PDP</strong> and GDPR principles</span></div></div>
+                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>{!! __('We <strong>never sell</strong> your data to third parties') !!}</span></div></div>
+                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>{!! __('Your system is <strong>fully isolated</strong> — zero cross-tenant access') !!}</span></div></div>
+                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>{!! __('You can <strong>export or delete</strong> your data anytime') !!}</span></div></div>
+                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>{!! __('We collect <strong>only what\'s necessary</strong> to run the service') !!}</span></div></div>
+                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>{!! __('Data encrypted <strong>in transit and at rest</strong>') !!}</span></div></div>
+                        <div class="col-sm-6"><div style="display:flex;align-items:center;gap:10px;font-size:.88rem;"><i class="bi bi-check-circle-fill" style="color:#10B981;flex-shrink:0;"></i><span>{!! __('Compliant with <strong>Indonesian UU PDP</strong> and GDPR principles') !!}</span></div></div>
                     </div>
                 </div>
 
-                <!-- Isi legal section tetap sama, dipersingkat agar fokus pada perubahan hero -->
-                <div class="legal-section" id="p1"><h2>1. Our Privacy Commitments</h2><p>COOCA is built on a foundation of data ownership...</p><ul><li><strong>No data selling:</strong> We have never sold customer data and will never do so.</li><li><strong>No advertising profiles:</strong> We do not build advertising profiles from your business data.</li><li><strong>No unauthorized access:</strong> COOCA staff access your data only with explicit permission or for urgent security/support purposes, with logged audit trails.</li><li><strong>Full portability:</strong> You can export your data in standard formats at any time, at no charge.</li><li><strong>Right to deletion:</strong> You can request permanent deletion of all your data at any time.</li></ul></div>
-                <div class="legal-section" id="p2"><h2>2. Who We Are</h2><p>This Privacy Policy applies to PT COOCA Teknologi Indonesia ("COOCA")...</p></div>
-                <div class="legal-section" id="p3"><h2>3. Data We Collect</h2><p>We collect the minimum data necessary to provide, improve, and support our Services...</p></div>
-                <div class="legal-section" id="p4"><h2>4. How We Use Your Data</h2><p>Your data is used exclusively for the following purposes...</p></div>
-                <div class="legal-section" id="p5"><h2>5. Data Isolation — Our Core Commitment</h2><div class="highlight-box success"><p><i class="bi bi-shield-lock-fill me-2" style="color:#10B981;"></i><strong>1 Customer = 1 Isolated System.</strong></p></div></div>
-                <div class="legal-section" id="p6"><h2>6. Data Sharing</h2><p>We do not sell, rent, or trade your personal data...</p></div>
-                <div class="legal-section" id="p7"><h2>7. Data Retention</h2><p>We retain data only for as long as necessary...</p></div>
-                <div class="legal-section" id="p8"><h2>8. Security</h2><p>We implement multiple layers of technical and organizational security measures...</p></div>
-                <div class="legal-section" id="p9"><h2>9. Cookies & Tracking</h2><p>Our website and platform use cookies and similar technologies...</p></div>
-                <div class="legal-section" id="p10"><h2>10. Your Privacy Rights</h2><p>Regardless of your location, COOCA honors the following rights for all customers...</p></div>
-                <div class="legal-section" id="p11"><h2>11. Children's Privacy</h2><p>COOCA's Services are designed for business use and are not directed at children under 18...</p></div>
-                <div class="legal-section" id="p12"><h2>12. International Data Transfers</h2><p>COOCA stores and processes data primarily within Indonesia and Singapore...</p></div>
-                <div class="legal-section" id="p13"><h2>13. Changes to This Policy</h2><p>We may update this Privacy Policy from time to time...</p></div>
-                <div class="legal-section" id="p14"><h2>14. Contact Us</h2><p>For any privacy-related questions, requests, or concerns...</p></div>
+                <div class="legal-section reveal" id="p1"><h2>{{ __('1. Our Privacy Commitments') }}</h2><p>{{ __('COOCA is built on a foundation of data ownership...') }}</p><ul><li><strong>{{ __('No data selling:') }}</strong> {{ __('We have never sold customer data and will never do so.') }}</li><li><strong>{{ __('No advertising profiles:') }}</strong> {{ __('We do not build advertising profiles from your business data.') }}</li><li><strong>{{ __('No unauthorized access:') }}</strong> {{ __('COOCA staff access your data only with explicit permission or for urgent security/support purposes, with logged audit trails.') }}</li><li><strong>{{ __('Full portability:') }}</strong> {{ __('You can export your data in standard formats at any time, at no charge.') }}</li><li><strong>{{ __('Right to deletion:') }}</strong> {{ __('You can request permanent deletion of all your data at any time.') }}</li></ul></div>
+                <div class="legal-section reveal" id="p2"><h2>{{ __('2. Who We Are') }}</h2><p>{{ __('This Privacy Policy applies to :company ("COOCA")...', ['company' => setting('company.name', 'PT COOCA Teknologi Indonesia')]) }}</p></div>
+                <div class="legal-section reveal" id="p3"><h2>{{ __('3. Data We Collect') }}</h2><p>{{ __('We collect the minimum data necessary to provide, improve, and support our Services...') }}</p></div>
+                <div class="legal-section reveal" id="p4"><h2>{{ __('4. How We Use Your Data') }}</h2><p>{{ __('Your data is used exclusively for the following purposes...') }}</p></div>
+                <div class="legal-section reveal" id="p5"><h2>{{ __('5. Data Isolation — Our Core Commitment') }}</h2><div class="highlight-box success"><p><i class="bi bi-shield-lock-fill me-2" style="color:#10B981;"></i><strong>{{ __('1 Customer = 1 Isolated System.') }}</strong></p></div></div>
+                <div class="legal-section reveal" id="p6"><h2>{{ __('6. Data Sharing') }}</h2><p>{{ __('We do not sell, rent, or trade your personal data...') }}</p></div>
+                <div class="legal-section reveal" id="p7"><h2>{{ __('7. Data Retention') }}</h2><p>{{ __('We retain data only for as long as necessary...') }}</p></div>
+                <div class="legal-section reveal" id="p8"><h2>{{ __('8. Security') }}</h2><p>{{ __('We implement multiple layers of technical and organizational security measures...') }}</p></div>
+                <div class="legal-section reveal" id="p9"><h2>{{ __('9. Cookies & Tracking') }}</h2><p>{{ __('Our website and platform use cookies and similar technologies...') }}</p></div>
+                <div class="legal-section reveal" id="p10"><h2>{{ __('10. Your Privacy Rights') }}</h2><p>{{ __('Regardless of your location, COOCA honors the following rights for all customers...') }}</p></div>
+                <div class="legal-section reveal" id="p11"><h2>{{ __('11. Children\'s Privacy') }}</h2><p>{{ __('COOCA\'s Services are designed for business use and are not directed at children under 18...') }}</p></div>
+                <div class="legal-section reveal" id="p12"><h2>{{ __('12. International Data Transfers') }}</h2><p>{{ __('COOCA stores and processes data primarily within Indonesia and Singapore...') }}</p></div>
+                <div class="legal-section reveal" id="p13"><h2>{{ __('13. Changes to This Policy') }}</h2><p>{{ __('We may update this Privacy Policy from time to time...') }}</p></div>
+                <div class="legal-section reveal" id="p14"><h2>{{ __('14. Contact Us') }}</h2><p>{!! __('For any privacy-related questions, requests, or concerns, please contact <a href="mailto::email">:email</a>.', ['email' => setting('company.email', 'support@cooca.io')]) !!}</p></div>
 
                 <!-- FOOTER LINKS -->
-                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:48px;padding-top:32px;border-top:1px solid var(--border);">
-                    <a href="terms.html" class="btn-cooca btn-outline-c btn-sm-c"><i class="bi bi-file-text"></i> Terms of Service</a>
-                    <a href="{{ route('contact') }}" class="btn-cooca btn-outline-c btn-sm-c"><i class="bi bi-envelope"></i> Privacy Questions</a>
-                    <a href="{{ route('customer.register') }}" class="btn-cooca btn-primary-c btn-sm-c"><i class="bi bi-rocket-takeoff"></i> Start Free Trial</a>
+                <div class="reveal" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:48px;padding-top:32px;border-top:1px solid var(--border);">
+                    <a href="{{ route('terms') }}" class="btn-cooca btn-cooca-outline"><i class="bi bi-file-text"></i> {{ __('Terms of Service') }}</a>
+                    <a href="{{ route('contact') }}" class="btn-cooca btn-cooca-outline"><i class="bi bi-envelope"></i> {{ __('Privacy Questions') }}</a>
+                    <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-primary"><i class="bi bi-rocket-takeoff"></i> {{ __('Start Free Trial') }}</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-
 @endsection
-
-@push('styles')
-<style>
-:root {
-            --bg: #020617;
-            --card: #0F172A;
-            --card-alt: #1E293B;
-            --text: #F8FAFC;
-            --text-muted: #94A3B8;
-            --primary: #2563EB;
-            --secondary: #1E40AF;
-            --accent: #38BDF8;
-            --success: #10B981;
-            --border: rgba(56,189,248,0.12);
-            --shadow: 0 8px 32px rgba(0,0,0,0.5);
-            --glass: rgba(15,23,42,0.65);
-            --glass-border: rgba(56,189,248,0.14);
-            --radius: 16px;
-            --transition: 0.35s cubic-bezier(0.4,0,0.2,1);
-            --font: 'Inter',-apple-system,sans-serif;
-            --hero-bg: linear-gradient(160deg, #020617 0%, #0F172A 40%, #1E3A5F 70%, #020617 100%);
-            --hero-grid-color: rgba(56, 189, 248, 0.03);
-            --hero-orb-opacity: 0.1;
-        }
-        [data-theme="light"] {
-            --bg: #F8FAFC;
-            --card: #FFFFFF;
-            --card-alt: #F1F5F9;
-            --text: #0F172A;
-            --text-muted: #475569;
-            --border: rgba(37,99,235,0.12);
-            --shadow: 0 8px 32px rgba(0,0,0,0.06);
-            --glass: rgba(255,255,255,0.7);
-            --glass-border: rgba(37,99,235,0.1);
-            --hero-bg: linear-gradient(160deg, #ffffff 0%, #f1f5f9 30%, #e2e8f0 70%, #ffffff 100%);
-            --hero-grid-color: rgba(37, 99, 235, 0.08);
-            --hero-orb-opacity: 0.04;
-        }
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        html{scroll-behavior:smooth;overflow-x:hidden;}
-        body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.8;-webkit-font-smoothing:antialiased;transition:background var(--transition),color var(--transition);}
-        p{color:var(--text-muted);margin-bottom:16px;}
-        h1,h2,h3,h4{font-weight:700;line-height:1.25;letter-spacing:-0.02em;color:var(--text);}
-        a{color:var(--accent);text-decoration:none;transition:color var(--transition);}
-        a:hover{color:var(--text);}
-        ul,ol{padding-left:20px;color:var(--text-muted);}
-        li{margin-bottom:8px;}
-        ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--primary);border-radius:3px;}
-        .navbar-cooca{position:fixed;top:0;left:0;right:0;z-index:1050;padding:16px 0;transition:all var(--transition);background:transparent;}
-        .navbar-cooca.scrolled{padding:10px 0;background:var(--glass);backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border);}
-        .navbar-brand-cooca{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--text)!important;display:flex;align-items:center;gap:10px;}
-        .logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;font-weight:800;}
-        .nav-link-cooca{color:var(--text-muted)!important;font-weight:500;font-size:.9rem;padding:8px 16px!important;transition:color var(--transition);}
-        .nav-link-cooca:hover{color:var(--accent)!important;}
-        .theme-toggle{width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--transition);font-size:1.1rem;}
-        .theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
-        .btn-cooca{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:12px;font-weight:600;font-size:.95rem;border:none;cursor:pointer;transition:all var(--transition);text-decoration:none;}
-        .btn-primary-c{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;}
-        .btn-primary-c:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,.4);color:#fff;}
-        .btn-outline-c{background:transparent;color:var(--text);border:1px solid var(--border);}
-        .btn-outline-c:hover{border-color:var(--accent);color:var(--accent);}
-        .btn-sm-c{padding:10px 22px;font-size:.85rem;border-radius:10px;}
-        .dropdown-cooca .dropdown-toggle{background:transparent;color:var(--text-muted);font-weight:500;font-size:.9rem;padding:8px 16px;border:none;display:inline-flex;align-items:center;gap:4px;}
-        .dropdown-cooca .dropdown-toggle:hover,.dropdown-cooca .dropdown-toggle.show{color:var(--accent)!important;}
-        .dropdown-cooca .dropdown-menu{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:12px;padding:8px 0;min-width:180px;}
-        .dropdown-cooca .dropdown-item{color:var(--text-muted);font-size:.88rem;font-weight:500;padding:10px 20px;transition:background var(--transition),color var(--transition);}
-        .dropdown-cooca .dropdown-item:hover{background:rgba(37,99,235,0.1);color:var(--accent);}
-        .legal-hero{padding:140px 0 60px;border-bottom:1px solid var(--border);}
-        .legal-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:50px;font-size:.75rem;font-weight:700;letter-spacing:.06em;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10B981;text-transform:uppercase;margin-bottom:16px;}
-        .legal-body{padding:80px 0;}
-        .toc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;position:sticky;top:100px;}
-        .toc-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:16px;}
-        .toc-list{list-style:none;padding:0;}
-        .toc-list li{margin-bottom:8px;}
-        .toc-list a{font-size:.85rem;color:var(--text-muted);transition:color var(--transition);display:flex;align-items:center;gap:8px;}
-        .toc-list a:hover{color:var(--accent);}
-        .toc-list a::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background var(--transition);}
-        .toc-list a:hover::before,.toc-list a.active-toc::before{background:var(--accent);}
-        .toc-list a.active-toc{color:var(--accent);}
-        .legal-section{margin-bottom:56px;scroll-margin-top:100px;}
-        .legal-section h2{font-size:1.35rem;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
-        .legal-section h3{font-size:1.05rem;margin:20px 0 10px;}
-        .highlight-box{background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.15);border-radius:12px;padding:16px 20px;margin:20px 0;}
-        .highlight-box.success{background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.2);}
-        .highlight-box.warning{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);}
-        .highlight-box p{margin:0;font-size:.9rem;}
-        .data-table{width:100%;border-collapse:collapse;margin:16px 0;}
-        .data-table th{background:var(--card-alt);padding:12px 16px;font-size:.82rem;font-weight:700;text-align:left;border-bottom:2px solid var(--border);color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;}
-        .data-table td{padding:12px 16px;font-size:.88rem;border-bottom:1px solid var(--border);color:var(--text-muted);vertical-align:top;}
-        .data-table td:first-child{font-weight:600;color:var(--text);}
-        .data-table tr:hover td{background:rgba(56,189,248,.02);}
-        .rights-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;}
-        .right-card{background:var(--card-alt);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:flex-start;gap:12px;}
-        .right-icon{width:36px;height:36px;border-radius:10px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:center;color:#10B981;flex-shrink:0;font-size:.95rem;}
-        .right-title{font-size:.88rem;font-weight:700;margin-bottom:4px;color:var(--text);}
-        .right-desc{font-size:.78rem;color:var(--text-muted);margin:0;}
-        .footer{background:var(--card);border-top:1px solid var(--border);padding:60px 0 30px;}
-        .footer-brand{font-size:1.4rem;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-        .footer-desc{font-size:.88rem;color:var(--text-muted);max-width:280px;line-height:1.6;}
-        .footer-title{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:16px;}
-        .footer-links{list-style:none;padding:0;}
-        .footer-links li{margin-bottom:10px;}
-        .footer-links a{color:var(--text-muted);font-size:.88rem;transition:color var(--transition);}
-        .footer-links a:hover{color:var(--accent);}
-        .footer-socials{display:flex;gap:10px;margin-top:20px;}
-        .footer-socials a{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--card-alt);color:var(--text-muted);border:1px solid var(--border);transition:all var(--transition);}
-        .footer-socials a:hover{color:var(--accent);border-color:var(--accent);}
-        .footer-bottom{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-        .footer-bottom p{font-size:.82rem;color:var(--text-muted);margin:0;}
-        .offcanvas-cooca{background:var(--glass)!important;backdrop-filter:blur(30px);border-left:1px solid var(--glass-border);}
-        .offcanvas-cooca .btn-close{filter:invert(1);}
-        [data-theme="light"] .offcanvas-cooca .btn-close{filter:none;}
-        .offcanvas-cooca .nav-link-cooca{display:block;padding:14px 0!important;font-size:1rem;border-bottom:1px solid var(--border);}
-        @media(max-width:991px){.toc{display:none;}.rights-grid{grid-template-columns:1fr;}}
-        @media(max-width:767px){.legal-hero{padding:110px 0 40px;}.legal-body{padding:50px 0;}}
-</style>
-@endpush

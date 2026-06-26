@@ -1,213 +1,9 @@
 @extends('layouts.guest')
-
-@section('title', 'Contact - ' . ($setting->company_name ?? config('app.name')))
-
-@section('content')
-<!-- ============================================================
-    NAVBAR — Standardized: Logo | Solutions | Pricing | Affiliate | Blog | About | Contact | Theme Toggle | Login ▼ | Start Free Trial
-    ============================================================ -->
-    
-
-
-
-<!-- ============================================================
-PAGE HERO — Strong contrast in both themes
-============================================================ -->
-<section class="page-hero">
-    <!-- Background orbs and grid remain for visual depth -->
-    <div class="page-hero-orb" style="width:500px;height:500px;background:var(--primary);top:-150px;right:-100px;"></div>
-    <div class="page-hero-orb" style="width:300px;height:300px;background:var(--accent);bottom:-80px;left:-60px;"></div>
-    <div class="grid-bg"></div>
-    <!-- Content sits above the overlay (created via ::before) -->
-    <div class="container text-center position-relative" style="z-index:2;">
-        <div class="badge-pill reveal mb-4"><i class="bi bi-chat-dots-fill"></i> {{ setting('contact.hero.badge', 'Get in Touch') }}</div>
-        <h1 style="font-size:clamp(2.4rem,5vw,4rem);" class="reveal rv1">
-            {!! setting('contact.hero.title', 'We Respond Fast <span class="text-gradient">Because Business Can\'t Wait.</span>') !!}
-        </h1>
-        <p style="font-size:1.1rem;max-width:560px;margin:20px auto 0;" class="reveal rv2">
-            {!! setting('contact.hero.subtitle', 'Sales questions, technical support, partnership inquiries, or just not sure where to start — our team is ready.') !!}
-        </p>
-    </div>
-</section>
-
-<!-- ============================================================
-CONTACT CHANNELS
-============================================================ -->
-<section class="sec">
-    <div class="container">
-        <div class="row g-4 justify-content-center mb-5">
-            <div class="col-lg-3 col-md-6 reveal">
-                <div class="channel-card">
-                    <div class="channel-icon"><i class="bi bi-whatsapp" style="color:#25D366;"></i></div>
-                    <div class="channel-title">WhatsApp</div>
-                    <p style="font-size:.85rem;margin-bottom:16px;flex-grow:1;">Fastest response. Our sales team is active during business hours.</p>
-                    <a href="https://wa.me/6281234567890" target="_blank" rel="noopener" class="btn-cooca btn-primary-c btn-sm-c" style="justify-content:center;width:100%;">Open WhatsApp</a>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 reveal rv1">
-                <div class="channel-card">
-                    <div class="channel-icon"><i class="bi bi-envelope-fill"></i></div>
-                    <div class="channel-title">Email</div>
-                    <p style="font-size:.85rem;margin-bottom:16px;flex-grow:1;">For detailed inquiries. We respond within 8 hours on business days.</p>
-                    <a href="mailto:support@cooca.io" class="btn-cooca btn-outline-c btn-sm-c" style="justify-content:center;width:100%;">support@cooca.io</a>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 reveal rv2">
-                <div class="channel-card">
-                    <div class="channel-icon"><i class="bi bi-calendar-check"></i></div>
-                    <div class="channel-title">Book a Demo</div>
-                    <p style="font-size:.85rem;margin-bottom:16px;flex-grow:1;">Schedule a 30-minute live walkthrough of your industry solution.</p>
-                    <a href="{{ route('customer.register') }}" class="btn-cooca btn-outline-c btn-sm-c" style="justify-content:center;width:100%;">Book Demo</a>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 reveal rv3">
-                <div class="channel-card">
-                    <div class="channel-icon"><i class="bi bi-headset"></i></div>
-                    <div class="channel-title">Support Center</div>
-                    <p style="font-size:.85rem;margin-bottom:16px;flex-grow:1;">Already a customer? Access our knowledge base and ticket system.</p>
-                    <a href="#" class="btn-cooca btn-outline-c btn-sm-c" style="justify-content:center;width:100%;">Go to Support</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-5 align-items-start">
-            <div class="col-lg-7 reveal">
-                <div style="background:var(--card);border:1px solid var(--border);border-radius:24px;padding:40px;transition:background var(--transition);">
-                    <h3 style="font-size:1.4rem;margin-bottom:8px;">{{ setting('contact.form.title', 'Send Us a Message') }}</h3>
-                    <p style="font-size:.9rem;margin-bottom:28px;">{{ setting('contact.form.subtitle', 'Fill out the form and we\'ll route it to the right person immediately.') }}</p>
-                    <form id="contactForm" novalidate>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label-c">Full Name *</label>
-                                    <input type="text" class="form-control-c" placeholder="Ahmad Kurniawan" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label-c">Email Address *</label>
-                                    <input type="email" class="form-control-c" placeholder="ahmad@company.com" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label-c">Phone / WhatsApp</label>
-                                    <input type="tel" class="form-control-c" placeholder="+62 812 3456 7890">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="form-label-c">Company Name</label>
-                                    <input type="text" class="form-control-c" placeholder="RetailMax Indonesia">
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label class="form-label-c">Industry *</label>
-                                    <select class="form-control-c form-select-c" required>
-                                        <option value="" disabled selected>Select your industry</option>
-                                        <option>Retail</option>
-                                        <option>Restaurant & F&B</option>
-                                        <option>Hotel & Hospitality</option>
-                                        <option>Clinic & Healthcare</option>
-                                        <option>Education</option>
-                                        <option>Salon & Beauty</option>
-                                        <option>Laundry</option>
-                                        <option>Workshop & Automotive</option>
-                                        <option>Rental</option>
-                                        <option>Other</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label class="form-label-c">How can we help? *</label>
-                                    <select class="form-control-c form-select-c" required>
-                                        <option value="" disabled selected>Select topic</option>
-                                        <option>Sales & Pricing</option>
-                                        <option>Book a Demo</option>
-                                        <option>Technical Support</option>
-                                        <option>Migration Assistance</option>
-                                        <option>Partnership / Affiliate</option>
-                                        <option>Enterprise / Custom</option>
-                                        <option>Other</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label class="form-label-c">Your Message *</label>
-                                    <textarea class="form-control-c" placeholder="Tell us about your business, current challenges, and what you're looking for..." required></textarea>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn-cooca btn-primary-c" style="width:100%;justify-content:center;padding:16px;">
-                                    Send Message <i class="bi bi-send-fill"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                    <div class="form-success" id="formSuccess">
-                        <i class="bi bi-check-circle-fill" style="font-size:2.5rem;color:#10B981;margin-bottom:12px;display:block;"></i>
-                        <h5 style="font-weight:700;margin-bottom:6px;color:var(--text);">Message Sent!</h5>
-                        <p style="margin:0;font-size:.9rem;">We've received your inquiry and will respond within 8 business hours.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-5 reveal rv2">
-                <div class="section-label mb-4"><i class="bi bi-geo-alt-fill"></i> {{ setting('contact.find.badge', 'Find Us') }}</div>
-                <div class="d-flex flex-column gap-3 mb-5">
-                    <div class="ci-card">
-                        <div class="ci-icon"><i class="bi bi-geo-alt-fill"></i></div>
-                        <div>
-                            <div class="ci-title">{{ setting('contact.address.title', 'Headquarters') }}</div>
-                            <div class="ci-detail">{!! setting('contact.address.detail', 'Jl. Jend. Sudirman Kav. 52–53<br>Jakarta Selatan 12190, Indonesia') !!}</div>
-                        </div>
-                    </div>
-                    <div class="ci-card">
-                        <div class="ci-icon"><i class="bi bi-envelope-fill"></i></div>
-                        <div>
-                            <div class="ci-title">{{ setting('contact.email.title', 'General Inquiries') }}</div>
-                            <div class="ci-detail">{!! setting('contact.email.detail', 'support@cooca.io<br>sales@cooca.io') !!}</div>
-                        </div>
-                    </div>
-                    <div class="ci-card">
-                        <div class="ci-icon"><i class="bi bi-whatsapp"></i></div>
-                        <div>
-                            <div class="ci-title">{{ setting('contact.wa.title', 'WhatsApp Sales') }}</div>
-                            <div class="ci-detail">{!! setting('contact.wa.detail', '+62 812 3456 7890<br>Mon–Fri · 08:00–18:00 WIB') !!}</div>
-                        </div>
-                    </div>
-                    <div class="ci-card">
-                        <div class="ci-icon"><i class="bi bi-clock-fill"></i></div>
-                        <div>
-                            <div class="ci-title">{{ setting('contact.response.title', 'Response Times') }}</div>
-                            <div class="ci-detail">{!! setting('contact.response.detail', 'WhatsApp: &lt; 2 hours<br>Email: &lt; 8 business hours<br>Enterprise SLA: custom') !!}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="section-label mb-3"><i class="bi bi-share-fill"></i> {{ setting('contact.follow.badge', 'Follow Us') }}</div>
-                <div class="d-flex gap-2 flex-wrap">
-                    <a href="#" class="btn-cooca btn-outline-c btn-sm-c"><i class="bi bi-twitter-x"></i> Twitter</a>
-                    <a href="#" class="btn-cooca btn-outline-c btn-sm-c"><i class="bi bi-linkedin"></i> LinkedIn</a>
-                    <a href="#" class="btn-cooca btn-outline-c btn-sm-c"><i class="bi bi-instagram"></i> Instagram</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ============================================================
-FOOTER — Standardized across all pages
-============================================================ -->
-
-@endsection
-
 @push('styles')
 <style>
-/* ============================================================
-           COOCA UNIFIED DESIGN SYSTEM — Contact Page
+
+        /* ============================================================
+           COOCA UNIFIED DESIGN SYSTEM â€” Contact Page
            Shared variables, components, and patterns across all pages
            ============================================================ */
         :root {
@@ -342,7 +138,7 @@ FOOTER — Standardized across all pages
         }
 
         /* ============================================================
-           NAVBAR — Standardized across all pages
+           NAVBAR â€” Standardized across all pages
            ============================================================ */
         .navbar-cooca {
             position: fixed;
@@ -468,7 +264,7 @@ FOOTER — Standardized across all pages
         }
 
         /* ============================================================
-           BUTTONS — Standardized
+           BUTTONS â€” Standardized
            ============================================================ */
         .btn-cooca {
             display: inline-flex;
@@ -576,7 +372,7 @@ FOOTER — Standardized across all pages
         }
 
         /* ============================================================
-           PAGE HERO — Enhanced contrast for light & dark
+           PAGE HERO â€” Enhanced contrast for light & dark
            ============================================================ */
         .page-hero {
             padding: 160px 0 80px;
@@ -586,7 +382,7 @@ FOOTER — Standardized across all pages
             transition: background var(--transition);
             isolation: isolate;
         }
-        /* Contrast overlay — ensures text always pops */
+        /* Contrast overlay â€” ensures text always pops */
         .page-hero::before {
             content: "";
             position: absolute;
@@ -634,7 +430,7 @@ FOOTER — Standardized across all pages
         }
 
         /* ============================================================
-           FORM COMPONENTS — Standardized
+           FORM COMPONENTS â€” Standardized
            ============================================================ */
         .form-control-c,
         .form-select-c {
@@ -806,7 +602,7 @@ FOOTER — Standardized across all pages
         }
 
         /* ============================================================
-           FOOTER — Standardized across all pages
+           FOOTER â€” Standardized across all pages
            ============================================================ */
         .footer {
             background: var(--card);
@@ -894,7 +690,7 @@ FOOTER — Standardized across all pages
         }
 
         /* ============================================================
-           REVEAL ANIMATIONS — Shared across all pages
+           REVEAL ANIMATIONS â€” Shared across all pages
            ============================================================ */
         .reveal {
             opacity: 0;
@@ -1041,5 +837,215 @@ FOOTER — Standardized across all pages
                 min-height: 110px;
             }
         }
+    
 </style>
+@endpush
+@section('content')
+<section class="blog-hero">
+    <div class="blog-hero-orb blog-hero-orb-1"></div>
+    <div class="blog-hero-orb blog-hero-orb-2"></div>
+    <div class="grid-bg"></div>
+    <div class="container text-center position-relative" style="z-index:2;">
+        <div class="badge-glow reveal mb-4">
+            <i class="bi bi-chat-dots-fill"></i> {{ __(setting('contact.badge', 'Get in Touch')) }}
+        </div>
+        <h1 class="hero-title reveal reveal-delay-1">
+            {!! __(setting('contact.title', 'We Respond Fast <span class="text-gradient">Because Business Can\'t Wait.</span>')) !!}
+        </h1>
+        <p class="hero-subtitle reveal reveal-delay-2" style="font-size:1.15rem;max-width:620px;margin:20px auto 0;">
+            {{ __(setting('contact.subtitle', 'Sales questions, technical support, partnership inquiries, or just not sure where to start — our team is ready.')) }}
+        </p>
+    </div>
+</section>
+
+<!-- ============================================================
+CONTACT CHANNELS
+============================================================ -->
+<section class="sec">
+    <div class="container">
+        <div class="row g-4 justify-content-center mb-5">
+            <div class="col-lg-3 col-md-6 reveal">
+                <div class="channel-card">
+                    <div class="channel-icon"><i class="bi bi-whatsapp" style="color:#25D366;"></i></div>
+                    <div class="channel-title">WhatsApp</div>
+                    <p style="font-size:.85rem;margin-bottom:16px;flex-grow:1;">{{ __('Fastest response. Our sales team is active during business hours.') }}</p>
+                    <a href="{{ setting('contact.whatsapp_link', 'https://wa.me/6281234567890') }}" target="_blank" rel="noopener" class="btn-cooca btn-primary-c btn-sm-c" style="justify-content:center;width:100%;">{{ __('Open WhatsApp') }}</a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 reveal rv1">
+                <div class="channel-card">
+                    <div class="channel-icon"><i class="bi bi-envelope-fill"></i></div>
+                    <div class="channel-title">Email</div>
+                    <p style="font-size:.85rem;margin-bottom:16px;flex-grow:1;">{{ __('For detailed inquiries. We respond within 8 hours on business days.') }}</p>
+                    <a href="mailto:{{ setting('contact.email', 'support@cooca.io') }}" class="btn-cooca btn-outline-c btn-sm-c" style="justify-content:center;width:100%;">{{ setting('contact.email', 'support@cooca.io') }}</a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 reveal rv2">
+                <div class="channel-card">
+                    <div class="channel-icon"><i class="bi bi-calendar-check"></i></div>
+                    <div class="channel-title">{{ __('Book a Demo') }}</div>
+                    <p style="font-size:.85rem;margin-bottom:16px;flex-grow:1;">{{ __('Schedule a 30-minute live walkthrough of your industry solution.') }}</p>
+                    <a href="{{ route('customer.register') }}" class="btn-cooca btn-outline-c btn-sm-c" style="justify-content:center;width:100%;">{{ __('Book Demo') }}</a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 reveal rv3">
+                <div class="channel-card">
+                    <div class="channel-icon"><i class="bi bi-headset"></i></div>
+                    <div class="channel-title">{{ __('Support Center') }}</div>
+                    <p style="font-size:.85rem;margin-bottom:16px;flex-grow:1;">{{ __('Already a customer? Access our knowledge base and ticket system.') }}</p>
+                    <a href="javascript:void(0)" class="btn-cooca btn-outline-c btn-sm-c" style="justify-content:center;width:100%;">{{ __('Go to Support') }}</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-5 align-items-start">
+            <div class="col-lg-7 reveal">
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:24px;padding:40px;transition:background var(--transition);">
+                    <h3 style="font-size:1.4rem;margin-bottom:8px;">{{ __('Send Us a Message') }}</h3>
+                    <p style="font-size:.9rem;margin-bottom:28px;">{{ __('Fill out the form and we\'ll route it to the right person immediately.') }}</p>
+                    <form id="contactForm" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label-c">{{ __('Full Name') }} *</label>
+                                    <input type="text" class="form-control-c" placeholder="Ahmad Kurniawan" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label-c">{{ __('Email Address') }} *</label>
+                                    <input type="email" class="form-control-c" placeholder="ahmad@company.com" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label-c">{{ __('Phone / WhatsApp') }}</label>
+                                    <input type="tel" class="form-control-c" placeholder="+62 812 3456 7890">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label-c">{{ __('Company Name') }}</label>
+                                    <input type="text" class="form-control-c" placeholder="RetailMax Indonesia">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-label-c">{{ __('Industry') }} *</label>
+                                    <select class="form-control-c form-select-c" required>
+                                        <option value="" disabled selected>{{ __('Select your industry') }}</option>
+                                        <option>{{ __('Retail') }}</option>
+                                        <option>{{ __('Restaurant & F&B') }}</option>
+                                        <option>{{ __('Hotel & Hospitality') }}</option>
+                                        <option>{{ __('Clinic & Healthcare') }}</option>
+                                        <option>{{ __('Education') }}</option>
+                                        <option>{{ __('Salon & Beauty') }}</option>
+                                        <option>{{ __('Laundry') }}</option>
+                                        <option>{{ __('Workshop & Automotive') }}</option>
+                                        <option>{{ __('Rental') }}</option>
+                                        <option>{{ __('Other') }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-label-c">{{ __('How can we help?') }} *</label>
+                                    <select class="form-control-c form-select-c" required>
+                                        <option value="" disabled selected>{{ __('Select topic') }}</option>
+                                        <option>{{ __('Sales & Pricing') }}</option>
+                                        <option>{{ __('Book a Demo') }}</option>
+                                        <option>{{ __('Technical Support') }}</option>
+                                        <option>{{ __('Migration Assistance') }}</option>
+                                        <option>{{ __('Partnership / Affiliate') }}</option>
+                                        <option>{{ __('Enterprise / Custom') }}</option>
+                                        <option>{{ __('Other') }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-label-c">{{ __('Your Message') }} *</label>
+                                    <textarea class="form-control-c" placeholder="{{ __('Tell us about your business, current challenges, and what you\'re looking for...') }}" required></textarea>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn-cooca btn-primary-c" style="width:100%;justify-content:center;padding:16px;">
+                                    {{ __('Send Message') }} <i class="bi bi-send-fill"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="form-success" id="formSuccess">
+                        <i class="bi bi-check-circle-fill" style="font-size:2.5rem;color:#10B981;margin-bottom:12px;display:block;"></i>
+                        <h5 style="font-weight:700;margin-bottom:6px;color:var(--text);">{{ __('Message Sent!') }}</h5>
+                        <p style="margin:0;font-size:.9rem;">{{ __('We\'ve received your inquiry and will respond within 8 business hours.') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5 reveal rv2">
+                <div class="section-label mb-4"><i class="bi bi-geo-alt-fill"></i> {{ __('Find Us') }}</div>
+                <div class="d-flex flex-column gap-3 mb-5">
+                    <div class="ci-card">
+                        <div class="ci-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                        <div>
+                            <div class="ci-title">{{ __('Headquarters') }}</div>
+                            <div class="ci-detail">{!! __(setting('contact.address', 'Jl. Jend. Sudirman Kav. 52–53<br>Jakarta Selatan 12190, Indonesia')) !!}</div>
+                        </div>
+                    </div>
+                    <div class="ci-card">
+                        <div class="ci-icon"><i class="bi bi-envelope-fill"></i></div>
+                        <div>
+                            <div class="ci-title">{{ __('General Inquiries') }}</div>
+                            <div class="ci-detail">{{ setting('contact.email', 'support@cooca.io') }}<br>sales@cooca.io</div>
+                        </div>
+                    </div>
+                    <div class="ci-card">
+                        <div class="ci-icon"><i class="bi bi-whatsapp"></i></div>
+                        <div>
+                            <div class="ci-title">{{ __('WhatsApp Sales') }}</div>
+                            <div class="ci-detail">{{ setting('contact.whatsapp', '+62 812 3456 7890') }}<br>Mon–Fri · 08:00–18:00 WIB</div>
+                        </div>
+                    </div>
+                    <div class="ci-card">
+                        <div class="ci-icon"><i class="bi bi-clock-fill"></i></div>
+                        <div>
+                            <div class="ci-title">{{ __('Response Times') }}</div>
+                            <div class="ci-detail">{{ __('WhatsApp: < 2 hours') }}<br>{{ __('Email: < 8 business hours') }}<br>{{ __('Enterprise SLA: custom') }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-label mb-3"><i class="bi bi-share-fill"></i> {{ __('Follow Us') }}</div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{{ setting('social.twitter', '#') }}" class="btn-cooca btn-outline-c btn-sm-c"><i class="bi bi-twitter-x"></i> Twitter</a>
+                    <a href="{{ setting('social.linkedin', '#') }}" class="btn-cooca btn-outline-c btn-sm-c"><i class="bi bi-linkedin"></i> LinkedIn</a>
+                    <a href="{{ setting('social.instagram', '#') }}" class="btn-cooca btn-outline-c btn-sm-c"><i class="bi bi-instagram"></i> Instagram</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+FOOTER — Standardized across all pages
+============================================================ -->
+@endsection
+@push('scripts')
+<script>
+  const contactForm = document.getElementById('contactForm');
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = this.querySelector('button[type="submit"]');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="bi bi-check-circle"></i> Message Received!';
+      btn.style.background = 'linear-gradient(135deg, #10B981, #059669)';
+      setTimeout(function() {
+        btn.innerHTML = originalText;
+        btn.style.background = '';
+        contactForm.reset();
+      }, 3000);
+    });
+  }
+</script>
 @endpush

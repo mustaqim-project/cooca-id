@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailCampaignController;
+use App\Http\Controllers\Admin\LandingCmsController;
 use App\Http\Controllers\Admin\ErpRequestController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\ProductController;
@@ -57,13 +58,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
 
     // Customers Management
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+    Route::get('/customers/create', [CustomerController::class, 'create'])->name('customers.create');
+    Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
     Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
+    Route::get('/customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
     Route::put('/customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
     Route::delete('/customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
 
     // Affiliators Management
     Route::get('/affiliators', [AffiliatorController::class, 'index'])->name('affiliators.index');
+    Route::get('/affiliators/create', [AffiliatorController::class, 'create'])->name('affiliators.create');
+    Route::post('/affiliators', [AffiliatorController::class, 'store'])->name('affiliators.store');
     Route::get('/affiliators/{affiliator}', [AffiliatorController::class, 'show'])->name('affiliators.show');
+    Route::get('/affiliators/{affiliator}/edit', [AffiliatorController::class, 'edit'])->name('affiliators.edit');
     Route::put('/affiliators/{affiliator}', [AffiliatorController::class, 'update'])->name('affiliators.update');
     Route::delete('/affiliators/{affiliator}', [AffiliatorController::class, 'destroy'])->name('affiliators.destroy');
 
@@ -92,12 +99,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::get('/vouchers/{voucher}/edit', [VoucherController::class, 'edit'])->name('vouchers.edit');
     Route::put('/vouchers/{voucher}', [VoucherController::class, 'update'])->name('vouchers.update');
     Route::delete('/vouchers/{voucher}', [VoucherController::class, 'destroy'])->name('vouchers.destroy');
+    Route::post('/vouchers/{voucher}/activate', [VoucherController::class, 'activate'])->name('vouchers.activate');
+    Route::post('/vouchers/{voucher}/deactivate', [VoucherController::class, 'deactivate'])->name('vouchers.deactivate');
 
     // Settlements (Withdrawals) Management
     Route::get('/settlements', [SettlementController::class, 'index'])->name('settlements.index');
     Route::get('/settlements/{settlement}', [SettlementController::class, 'show'])->name('settlements.show');
     Route::post('/settlements/{settlement}/approve', [SettlementController::class, 'approve'])->name('settlements.approve');
     Route::post('/settlements/{settlement}/reject', [SettlementController::class, 'reject'])->name('settlements.reject');
+
+    // CMS - Landing
+    Route::get('/cms/landing', [LandingCmsController::class, 'index'])->name('cms.landing.index');
+    Route::post('/cms/landing', [LandingCmsController::class, 'update'])->name('cms.landing.update');
 
     // CMS - Pages
     Route::get('/cms/pages', [CmsController::class, 'index'])->name('cms.pages.index');
@@ -111,6 +124,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
     Route::get('/blog/create', [BlogController::class, 'create'])->name('blog.create');
     Route::post('/blog', [BlogController::class, 'store'])->name('blog.store');
+    Route::get('/blog/{post}', [BlogController::class, 'show'])->name('blog.show');
     Route::get('/blog/{post}/edit', [BlogController::class, 'edit'])->name('blog.edit');
     Route::put('/blog/{post}', [BlogController::class, 'update'])->name('blog.update');
     Route::delete('/blog/{post}', [BlogController::class, 'destroy'])->name('blog.destroy');
@@ -131,6 +145,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
 
     // Reviews Moderation
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/{review}', [ReviewController::class, 'show'])->name('reviews.show');
     Route::post('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
     Route::post('/reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');

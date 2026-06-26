@@ -2,8 +2,12 @@
     <div class="container">
         <div class="d-flex align-items-center justify-content-between">
             <a href="{{ route('home') }}" class="navbar-brand-cooca">
-                <div class="logo-icon">C</div>
-                {{ $setting->company_name ?? 'COOCA' }}
+                @if(setting('site.logo'))
+                    <img src="{{ setting('site.logo') }}" alt="Logo" class="h-8 object-contain" />
+                @else
+                    <div class="logo-icon">C</div>
+                    {{ setting('site.preloader_text', 'COOCA') }}
+                @endif
             </a>
             <div class="d-none d-lg-flex align-items-center gap-1">
                 <a href="{{ route('solutions') }}" class="nav-link-cooca">Solutions</a>

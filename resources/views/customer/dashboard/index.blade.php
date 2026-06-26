@@ -1,204 +1,88 @@
 @extends('layouts.customer')
 
-@section('title', 'Dashboard')
+@section('title', 'Customer Dashboard')
+@section('subtitle', 'Welcome back, ' . auth()->user()->name . '!')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 fw-bold">Dashboard</h1>
-    <a href="{{ route('customer.products.index') }}" class="btn btn-primary">
-        <i class="bi bi-cart-plus me-2"></i>Beli Produk Baru
-    </a>
-</div>
-
-<!-- Stats Cards -->
-<div class="row g-4 mb-4">
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="stat-label mb-1">Subscripsi Aktif</p>
-                    <h3 class="stat-value">{{ $stats['activeSubscriptions'] ?? 0 }}</h3>
-                </div>
-                <div class="stat-icon indigo">📦</div>
+<div class="space-y-6">
+    <!-- Toolbar -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div class="relative w-full sm:w-96">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
             </div>
+            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
+        </div>
+        <div class="flex items-center space-x-3 w-full sm:w-auto">
+            
         </div>
     </div>
-    
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="stat-label mb-1">Lisensi Aktif</p>
-                    <h3 class="stat-value">{{ $stats['activeLicenses'] ?? 0 }}</h3>
-                </div>
-                <div class="stat-icon green">🔑</div>
-            </div>
+
+    <!-- Data Table -->
+    <div class="corporate-card">
+        <div class="overflow-x-auto">
+            <table class="corporate-table">
+                <thead class="table-thead">
+                    
+                    
+                    
+                        <tr>
+                            <th scope="col" class="table-th">Invoice #</th>
+                            <th scope="col" class="table-th">Product</th>
+                            <th scope="col" class="table-th">Amount</th>
+                            <th scope="col" class="table-th">Status</th>
+                            <th scope="col" class="table-th">Date</th>
+                        </tr>
+                    
+                
+                
+                </thead>
+                <tbody class="table-tbody">
+                    
+                    
+                    
+                        @forelse($recentTransactions ?? [] as $transaction)
+                            <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">
+                                    {{ $transaction->invoice_number }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
+                                    {{ $transaction->subscription->plan->product->name ?? 'Unknown Product' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
+                                    Rp {{ number_format($transaction->gross_amount, 0, ',', '.') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @php
+                                        $statusClass = match($transaction->status) {
+                                            'paid' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+                                            'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+                                            'failed' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+                                            'refunded' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+                                            default => 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300'
+                                        };
+                                    @endphp
+                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
+                                        {{ ucfirst($transaction->status) }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
+                                    {{ $transaction->created_at->format('d M Y') }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-8 text-center text-surface-500 dark:text-surface-400 text-sm">
+                                    No recent transactions found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    
+                
+                
+                </tbody>
+            </table>
         </div>
     </div>
-    
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="stat-label mb-1">Total Pengeluaran</p>
-                    <h3 class="stat-value">Rp {{ number_format($stats['totalSpent'] ?? 0, 0, ',', '.') }}</h3>
-                </div>
-                <div class="stat-icon blue">💰</div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <p class="stat-label mb-1">Invoice Pending</p>
-                    <h3 class="stat-value">{{ $stats['pendingInvoices'] ?? 0 }}</h3>
-                </div>
-                <div class="stat-icon yellow">📄</div>
-            </div>
-        </div>
-    </div>
 </div>
-
-<!-- Active Subscriptions -->
-<div class="card mb-4">
-    <div class="card-header bg-white py-3">
-        <h5 class="mb-0 fw-semibold">Subscripsi Aktif</h5>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>Produk</th>
-                    <th>Plan</th>
-                    <th>Status</th>
-                    <th>Berlaku Sampai</th>
-                    <th class="text-end">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($recentLicenses ?? [] as $license)
-                <tr>
-                    <td>{{ $license->subscription->product->name ?? '-' }}</td>
-                    <td>{{ $license->subscription->plan->name ?? '-' }}</td>
-                    <td>
-                        @php
-                            $statusClass = [
-                                'active' => 'badge-success',
-                                'trial' => 'badge-info',
-                                'expired' => 'badge-danger',
-                                'cancelled' => 'badge-secondary',
-                                'inactive' => 'badge-secondary',
-                                'revoked' => 'badge-danger'
-                            ][$license->status] ?? 'badge-secondary';
-                        @endphp
-                        <span class="badge {{ $statusClass }}">{{ ucfirst($license->status) }}</span>
-                    </td>
-                    <td>{{ $license->expires_at ? \Carbon\Carbon::parse($license->expires_at)->format('d M Y') : '-' }}</td>
-                    <td class="text-end">
-                        <a href="{{ route('customer.licenses.index') }}" class="text-decoration-none">Lihat Lisensi</a>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="text-center py-4 text-muted">
-                        Belum ada subscripsi aktif. Mulai dengan membeli produk pertama Anda.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Licenses -->
-<div class="card mb-4">
-    <div class="card-header bg-white py-3">
-        <h5 class="mb-0 fw-semibold">Lisensi Saya</h5>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>Kode Lisensi</th>
-                    <th>Domain</th>
-                    <th>Status</th>
-                    <th>Diaktifkan</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($licenses ?? [] as $license)
-                <tr>
-                    <td class="font-monospace">{{ $license->license_code }}</td>
-                    <td>{{ $license->domain ?? '-' }}</td>
-                    <td>
-                        @php
-                            $statusClass = [
-                                'active' => 'badge-success',
-                                'inactive' => 'badge-secondary',
-                                'expired' => 'badge-danger',
-                                'revoked' => 'badge-danger'
-                            ][$license->status] ?? 'badge-secondary';
-                        @endphp
-                        <span class="badge {{ $statusClass }}">{{ ucfirst($license->status) }}</span>
-                    </td>
-                    <td>{{ $license->activated_at ? \Carbon\Carbon::parse($license->activated_at)->format('d M Y') : '-' }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" class="text-center py-4 text-muted">
-                        Belum ada lisensi. Lisensi akan dibuat setelah subscripsi diaktifkan.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Recent Transactions -->
-<div class="card">
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-semibold">Transaksi Terakhir</h5>
-        <a href="{{ route('customer.invoices.index') }}" class="text-decoration-none">Lihat Semua</a>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>Invoice</th>
-                    <th>Tanggal</th>
-                    <th>Jumlah</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($recentTransactions ?? [] as $trx)
-                <tr>
-                    <td class="fw-medium">{{ $trx->invoice_number }}</td>
-                    <td>{{ \Carbon\Carbon::parse($trx->created_at)->format('d M Y') }}</td>
-                    <td>Rp {{ number_format($trx->gross_amount, 0, ',', '.') }}</td>
-                    <td>
-                        @php
-                            $statusClass = [
-                                'pending' => 'badge-warning',
-                                'paid' => 'badge-success',
-                                'failed' => 'badge-danger',
-                                'refunded' => 'badge-info'
-                            ][$trx->status] ?? 'badge-secondary';
-                        @endphp
-                        <span class="badge {{ $statusClass }}">{{ ucfirst($trx->status) }}</span>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" class="text-center py-4 text-muted">Belum ada transaksi.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
-
 @endsection
