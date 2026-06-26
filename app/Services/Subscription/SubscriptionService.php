@@ -31,10 +31,12 @@ final class SubscriptionService
     public function activateSubscription(Subscription $subscription, int $durationMonths): Subscription
     {
         $startedAt = now();
-        $expiresAt = now()->addMonths($durationMonths);
+
+        // 999 months = Lifetime license — never expires
+        $expiresAt = $durationMonths >= 999 ? null : now()->addMonths($durationMonths);
 
         $subscription = $this->subscriptionRepository->update($subscription->id, [
-            'status' => 'active',
+            'status'     => 'active',
             'started_at' => $startedAt,
             'expires_at' => $expiresAt,
         ]);

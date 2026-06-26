@@ -24,6 +24,14 @@
           const icon = theme === "dark" ? "bi-moon-fill" : "bi-sun-fill";
           if (themeIcon) themeIcon.className = "bi " + icon;
           if (themeIconMobile) themeIconMobile.className = "bi " + icon;
+
+          // Toggle light/dark logos and preloaders
+          document.querySelectorAll('.nav-logo-light, .loader-img-light').forEach(function(el) {
+            el.style.display = theme === 'light' ? 'block' : 'none';
+          });
+          document.querySelectorAll('.nav-logo-dark, .loader-img-dark').forEach(function(el) {
+            el.style.display = theme === 'dark' ? 'block' : 'none';
+          });
         }
         const savedTheme = localStorage.getItem("cooca-theme");
         setTheme(savedTheme || getSystemTheme());

@@ -3,7 +3,7 @@
 <style>
 
         /* ============================================================
-           COOCA UNIFIED DESIGN SYSTEM â€” Contact Page
+           COOCA UNIFIED DESIGN SYSTEM  Contact Page
            Shared variables, components, and patterns across all pages
            ============================================================ */
         :root {
@@ -138,7 +138,7 @@
         }
 
         /* ============================================================
-           NAVBAR â€” Standardized across all pages
+           NAVBAR  Standardized across all pages
            ============================================================ */
         .navbar-cooca {
             position: fixed;
@@ -264,7 +264,7 @@
         }
 
         /* ============================================================
-           BUTTONS â€” Standardized
+           BUTTONS  Standardized
            ============================================================ */
         .btn-cooca {
             display: inline-flex;
@@ -372,7 +372,7 @@
         }
 
         /* ============================================================
-           PAGE HERO â€” Enhanced contrast for light & dark
+           PAGE HERO  Enhanced contrast for light & dark
            ============================================================ */
         .page-hero {
             padding: 160px 0 80px;
@@ -382,7 +382,7 @@
             transition: background var(--transition);
             isolation: isolate;
         }
-        /* Contrast overlay â€” ensures text always pops */
+        /* Contrast overlay  ensures text always pops */
         .page-hero::before {
             content: "";
             position: absolute;
@@ -430,7 +430,7 @@
         }
 
         /* ============================================================
-           FORM COMPONENTS â€” Standardized
+           FORM COMPONENTS  Standardized
            ============================================================ */
         .form-control-c,
         .form-select-c {
@@ -602,7 +602,7 @@
         }
 
         /* ============================================================
-           FOOTER â€” Standardized across all pages
+           FOOTER  Standardized across all pages
            ============================================================ */
         .footer {
             background: var(--card);
@@ -690,7 +690,7 @@
         }
 
         /* ============================================================
-           REVEAL ANIMATIONS â€” Shared across all pages
+           REVEAL ANIMATIONS  Shared across all pages
            ============================================================ */
         .reveal {
             opacity: 0;

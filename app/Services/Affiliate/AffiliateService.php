@@ -37,10 +37,16 @@ final class AffiliateService
                 return ['commissions' => [], 'total' => 0];
             }
 
+            // Resolve the subscription plan from this transaction
+            // Transaction -> Subscription -> SubscriptionPlan
+            $plan = $transaction->subscription?->subscriptionPlan;
+            $planId   = $plan?->id;
+            $planName = $plan?->name;
+
             $commissions = [];
             $totalCommission = 0;
 
-            // Level 1: Direct referrer (25% of gross_amount)
+            // Level 1: Direct referrer
             $l1Affiliator = $customer->affiliator;
             if ($l1Affiliator) {
                 $l1CommissionPercent = $this->commissionPercent(1);
@@ -53,6 +59,8 @@ final class AffiliateService
                     affiliatorId: $l1Affiliator->id,
                     transactionId: $transaction->id,
                     customerId: $customer->id,
+                    subscriptionPlanId: $planId,
+                    planName: $planName,
                     level: 1,
                     grossAmount: (float) $transaction->gross_amount,
                     commissionPercent: $l1CommissionPercent,
@@ -64,7 +72,7 @@ final class AffiliateService
 
                 $this->incrementPendingBalance($l1Affiliator->id, $l1CommissionAmount);
 
-                // Level 2: Parent affiliator (5% of gross_amount)
+                // Level 2: Parent affiliator
                 if ($l1Affiliator->parent_affiliator_id) {
                     $l2Affiliator = $l1Affiliator->parent;
                     if ($l2Affiliator) {
@@ -78,6 +86,8 @@ final class AffiliateService
                             affiliatorId: $l2Affiliator->id,
                             transactionId: $transaction->id,
                             customerId: $customer->id,
+                            subscriptionPlanId: $planId,
+                            planName: $planName,
                             level: 2,
                             grossAmount: (float) $transaction->gross_amount,
                             commissionPercent: $l2CommissionPercent,
@@ -94,7 +104,7 @@ final class AffiliateService
 
             return [
                 'commissions' => $commissions,
-                'total' => $totalCommission,
+                'total'       => $totalCommission,
             ];
         });
     }
@@ -106,20 +116,24 @@ final class AffiliateService
         string $affiliatorId,
         string $transactionId,
         string $customerId,
+        ?string $subscriptionPlanId,
+        ?string $planName,
         int $level,
         float $grossAmount,
         float $commissionPercent,
         float $commissionAmount,
     ): AffiliateCommission {
         return $this->commissionRepository->create([
-            'affiliator_id' => $affiliatorId,
-            'transaction_id' => $transactionId,
-            'customer_id' => $customerId,
-            'level' => $level,
-            'gross_amount' => $grossAmount,
-            'commission_percent' => $commissionPercent,
-            'commission_amount' => $commissionAmount,
-            'status' => 'pending',
+            'affiliator_id'        => $affiliatorId,
+            'transaction_id'       => $transactionId,
+            'customer_id'          => $customerId,
+            'subscription_plan_id' => $subscriptionPlanId,
+            'plan_name'            => $planName,
+            'level'                => $level,
+            'gross_amount'         => $grossAmount,
+            'commission_percent'   => $commissionPercent,
+            'commission_amount'    => $commissionAmount,
+            'status'               => 'pending',
         ]);
     }
 

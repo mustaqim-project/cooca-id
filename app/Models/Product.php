@@ -58,6 +58,12 @@ final class Product extends Model
         return $this->hasMany(SubscriptionPlan::class, 'product_id');
     }
 
+    /** Alias for subscriptionPlans() */
+    public function plans(): HasMany
+    {
+        return $this->subscriptionPlans();
+    }
+
     public function licenses(): HasMany
     {
         return $this->hasMany(License::class, 'product_id');

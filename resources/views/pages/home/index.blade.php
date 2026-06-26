@@ -4,7 +4,7 @@
 <style>
 
       /* ==================================================================
-           UNIFIED DESIGN SYSTEM â€” COOCA
+           UNIFIED DESIGN SYSTEM  COOCA
            Blok ini HARUS persis sama di setiap halaman.
            ================================================================== */
       :root {
@@ -1809,23 +1809,23 @@
                     font-size: 0.8rem;
                     color: var(--text-muted);
                   "
-                  >COOCA Business System</span
+                  >{{ __('COOCA Business System') }}</span
                 >
               </div>
               <div class="dashboard-body">
                 <div class="dashboard-grid">
                   <div class="dash-widget">
-                    <div class="dash-widget-title">Revenue This Month</div>
-                    <div class="dash-widget-value text-accent">$284,500</div>
+                    <div class="dash-widget-title">{{ __('Revenue This Month') }}</div>
+                    <div class="dash-widget-value text-accent">{{ __('$284,500') }}</div>
                     <div class="dash-widget-change">
-                      <i class="bi bi-arrow-up-right"></i> +24.5% growth
+                      <i class="bi bi-arrow-up-right"></i> {{ __('+24.5% growth') }}
                     </div>
                   </div>
                   <div class="dash-widget">
-                    <div class="dash-widget-title">Active Licenses</div>
+                    <div class="dash-widget-title">{{ __('Active Licenses') }}</div>
                     <div class="dash-widget-value">12,847</div>
                     <div class="dash-widget-change">
-                      <i class="bi bi-arrow-up-right"></i> All protected
+                      <i class="bi bi-arrow-up-right"></i> {{ __('All protected') }}
                     </div>
                   </div>
                   <div class="dash-chart">
@@ -1849,15 +1849,15 @@
               <div class="fc-icon green">
                 <i class="bi bi-shield-check"></i>
               </div>
-              <div class="fc-label">System Status</div>
-              <div class="fc-value" style="color: #10b981">Protected âœ“</div>
+              <div class="fc-label">{{ __('System Status') }}</div>
+              <div class="fc-value" style="color: #10b981">{{ __('Protected') }} ✓</div>
             </div>
             <div class="floating-card floating-card-2 float-anim-delay">
               <div class="fc-icon blue">
                 <i class="bi bi-graph-up-arrow"></i>
               </div>
-              <div class="fc-label">Monthly Growth</div>
-              <div class="fc-value">+Rp48jt MRR</div>
+              <div class="fc-label">{{ __('Monthly Growth') }}</div>
+              <div class="fc-value">{{ __('+Rp48jt MRR') }}</div>
             </div>
           </div>
         </div>
@@ -1873,7 +1873,7 @@
               <div class="counter-value">
                 <span class="counter" data-target="10000">0</span>+
               </div>
-              <div class="counter-label">Businesses Trust COOCA</div>
+              <div class="counter-label">{{ __('Businesses Trust COOCA') }}</div>
             </div>
           </div>
           <div class="col-md-4 reveal reveal-delay-2">
@@ -1883,7 +1883,7 @@
                   >0</span
                 >%
               </div>
-              <div class="counter-label">Guaranteed Uptime SLA</div>
+              <div class="counter-label">{{ __('Guaranteed Uptime SLA') }}</div>
             </div>
           </div>
           <div class="col-md-4 reveal reveal-delay-4">
@@ -1891,7 +1891,7 @@
               <div class="counter-value">
                 <span class="counter" data-target="500">0</span>M+
               </div>
-              <div class="counter-label">Transactions Processed</div>
+              <div class="counter-label">{{ __('Transactions Processed') }}</div>
             </div>
           </div>
         </div>
@@ -1912,8 +1912,8 @@
                 <i class="bi bi-building-lock"></i>
               </div>
               <h3 style="font-size: 1.6rem; margin-bottom: 10px">
-                1 Customer =
-                <span class="text-gradient">1 Isolated System</span>
+                {{ __('1 Customer') }} =
+                <span class="text-gradient">{{ __('1 Isolated System') }}</span>
               </h3>
               <p
                 style="
@@ -1923,20 +1923,17 @@
                   color: var(--text-muted);
                 "
               >
-                Your own dedicated infrastructure. Fully separated. Independent
-                security. Not shared â€” <strong>yours alone</strong>.
+                {!! __('Your own dedicated infrastructure. Fully separated. Independent security. Not shared — <strong>yours alone</strong>.') !!}
               </p>
               <div class="trust-pills">
                 <span class="trust-pill"
-                  ><i class="bi bi-shield-fill-check"></i> Dedicated
-                  Environment</span
+                  ><i class="bi bi-shield-fill-check"></i> {{ __('Dedicated Environment') }}</span
                 >
                 <span class="trust-pill"
-                  ><i class="bi bi-lock-fill"></i> Zero Data Leakage</span
+                  ><i class="bi bi-lock-fill"></i> {{ __('Zero Data Leakage') }}</span
                 >
                 <span class="trust-pill"
-                  ><i class="bi bi-graph-up-arrow"></i> Independent
-                  Scaling</span
+                  ><i class="bi bi-graph-up-arrow"></i> {{ __('Independent Scaling') }}</span
                 >
               </div>
             </div>
@@ -1950,14 +1947,13 @@
       <div class="container">
         <div class="text-center">
           <div class="section-label reveal">
-            <i class="bi bi-grid-3x3-gap-fill"></i> Industry Solutions
+            <i class="bi bi-grid-3x3-gap-fill"></i> {{ __('Industry Solutions') }}
           </div>
           <h2 class="section-title reveal reveal-delay-1">
-            Built for <span class="text-gradient">Every Industry</span>
+            {{ __('Built for') }} <span class="text-gradient">{{ __('Every Industry') }}</span>
           </h2>
           <p class="section-subtitle reveal reveal-delay-2">
-            Nine specialized business systems — each engineered to replace
-            fragmented tools that drain your time, revenue, and peace of mind.
+            {{ __('Nine specialized business systems — each engineered to replace fragmented tools that drain your time, revenue, and peace of mind.') }}
           </p>
         </div>
 
@@ -2039,7 +2035,7 @@
       </div>
     </section>
 
-    <!-- CORE CAPABILITIES â€” 3 GROUPED TABS -->
+    <!-- CORE CAPABILITIES  3 GROUPED TABS -->
     <section
       class="section-padding"
       id="modules"
@@ -2048,16 +2044,14 @@
       <div class="container">
         <div class="text-center">
           <div class="section-label reveal">
-            <i class="bi bi-puzzle-fill"></i> Business Capabilities
+            <i class="bi bi-puzzle-fill"></i> {{ __('Business Capabilities') }}
           </div>
           <h2 class="section-title reveal reveal-delay-1">
-            Everything Your Business Needs to
-            <span class="text-gradient">Scale</span>
+            {{ __('Everything Your Business Needs to') }}
+            <span class="text-gradient">{{ __('Scale') }}</span>
           </h2>
           <p class="section-subtitle reveal reveal-delay-2">
-            Ten integrated capabilities replacing dozens of separate
-            subscriptions. Each one works with the others â€” because they were
-            built to.
+            {{ __('Ten integrated capabilities replacing dozens of separate subscriptions. Each one works with the others — because they were built to.') }}
           </p>
         </div>
 
@@ -2072,7 +2066,7 @@
               role="tab"
               aria-selected="true"
             >
-              <i class="bi bi-people me-2"></i>People &amp; Revenue
+              <i class="bi bi-people me-2"></i>{{ __('People & Revenue') }}
             </button>
           </li>
           <li class="nav-item" role="presentation">
@@ -2085,7 +2079,7 @@
               role="tab"
               aria-selected="false"
             >
-              <i class="bi bi-gear me-2"></i>Operations &amp; Finance
+              <i class="bi bi-gear me-2"></i>{{ __('Operations & Finance') }}
             </button>
           </li>
           <li class="nav-item" role="presentation">
@@ -2098,7 +2092,7 @@
               role="tab"
               aria-selected="false"
             >
-              <i class="bi bi-graph-up-arrow me-2"></i>Intelligence &amp; Growth
+              <i class="bi bi-graph-up-arrow me-2"></i>{{ __('Intelligence & Growth') }}
             </button>
           </li>
         </ul>
@@ -2119,11 +2113,9 @@
                   <div class="module-icon" style="margin: 0 auto 20px">
                     <i class="bi bi-people"></i>
                   </div>
-                  <div class="module-title">CRM</div>
+                  <div class="module-title">{{ __('CRM') }}</div>
                   <div class="module-desc" style="margin-top: 8px">
-                    Turn leads into loyal customers with automated relationship
-                    management. Full pipeline visibility from first contact to
-                    closed deal.
+                    {{ __('Turn leads into loyal customers with automated relationship management. Full pipeline visibility from first contact to closed deal.') }}
                   </div>
                   <ul
                     style="
@@ -2148,7 +2140,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent)"
                       ></i>
-                      Contact &amp; lead management
+                      {{ __('Contact & lead management') }}
                     </li>
                     <li
                       style="
@@ -2165,7 +2157,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent)"
                       ></i>
-                      Sales pipeline tracking
+                      {{ __('Sales pipeline tracking') }}
                     </li>
                     <li
                       style="
@@ -2181,7 +2173,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent)"
                       ></i>
-                      Loyalty &amp; retention programs
+                      {{ __('Loyalty & retention programs') }}
                     </li>
                   </ul>
                 </div>
@@ -2194,10 +2186,9 @@
                   <div class="module-icon" style="margin: 0 auto 20px">
                     <i class="bi bi-person-badge"></i>
                   </div>
-                  <div class="module-title">HRM</div>
+                  <div class="module-title">{{ __('HRM') }}</div>
                   <div class="module-desc" style="margin-top: 8px">
-                    Manage your entire team â€” from recruitment and onboarding to
-                    payroll and performance â€” all in one place.
+                    {{ __('Manage your entire team — from recruitment and onboarding to payroll and performance — all in one place.') }}
                   </div>
                   <ul
                     style="
@@ -2222,7 +2213,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent)"
                       ></i>
-                      Attendance &amp; shift scheduling
+                      {{ __('Attendance & shift scheduling') }}
                     </li>
                     <li
                       style="
@@ -2239,7 +2230,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent)"
                       ></i>
-                      Automated payroll calculation
+                      {{ __('Automated payroll calculation') }}
                     </li>
                     <li
                       style="
@@ -2255,7 +2246,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent)"
                       ></i>
-                      Performance &amp; leave management
+                      {{ __('Performance & leave management') }}
                     </li>
                   </ul>
                 </div>
@@ -2268,11 +2259,9 @@
                   <div class="module-icon" style="margin: 0 auto 20px">
                     <i class="bi bi-whatsapp"></i>
                   </div>
-                  <div class="module-title">WhatsApp Integration</div>
+                  <div class="module-title">{{ __('WhatsApp Integration') }}</div>
                   <div class="module-desc" style="margin-top: 8px">
-                    Reach customers where they already are â€” instantly and
-                    automatically. Blast notifications, confirmations, and
-                    campaigns without leaving the system.
+                    {{ __('Reach customers where they already are — instantly and automatically. Blast notifications, confirmations, and campaigns without leaving the system.') }}
                   </div>
                   <ul
                     style="
@@ -2297,7 +2286,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent)"
                       ></i>
-                      Broadcast &amp; bulk messaging
+                      {{ __('Broadcast & bulk messaging') }}
                     </li>
                     <li
                       style="
@@ -2314,7 +2303,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent)"
                       ></i>
-                      Automated order &amp; payment alerts
+                      {{ __('Automated order & payment alerts') }}
                     </li>
                     <li
                       style="
@@ -2330,7 +2319,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent)"
                       ></i>
-                      Two-way customer chat
+                      {{ __('Two-way customer chat') }}
                     </li>
                   </ul>
                 </div>
@@ -2349,11 +2338,9 @@
                   <div class="module-icon" style="margin: 0 auto 16px">
                     <i class="bi bi-calculator"></i>
                   </div>
-                  <div class="module-title">Accounting</div>
+                  <div class="module-title">{{ __('Accounting') }}</div>
                   <div class="module-desc" style="margin-top: 8px">
-                    Real-time financial clarity with automated bookkeeping,
-                    journal entries, and balance sheets â€” no accountant
-                    dependency.
+                    {{ __('Real-time financial clarity with automated bookkeeping, journal entries, and balance sheets — no accountant dependency.') }}
                   </div>
                   <ul
                     style="
@@ -2378,7 +2365,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent); font-size: 0.75rem"
                       ></i>
-                      Auto journal &amp; GL
+                      {{ __('Auto journal & GL') }}
                     </li>
                     <li
                       style="
@@ -2394,7 +2381,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent); font-size: 0.75rem"
                       ></i>
-                      P&amp;L &amp; balance sheets
+                      {{ __('P&L & balance sheets') }}
                     </li>
                   </ul>
                 </div>
@@ -2407,10 +2394,9 @@
                   <div class="module-icon" style="margin: 0 auto 16px">
                     <i class="bi bi-bank"></i>
                   </div>
-                  <div class="module-title">Finance</div>
+                  <div class="module-title">{{ __('Finance') }}</div>
                   <div class="module-desc" style="margin-top: 8px">
-                    Budgeting, forecasting, and cash flow management that
-                    empowers confident business decisions â€” not reactive panic.
+                    {{ __('Budgeting, forecasting, and cash flow management that empowers confident business decisions — not reactive panic.') }}
                   </div>
                   <ul
                     style="
@@ -2435,7 +2421,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent); font-size: 0.75rem"
                       ></i>
-                      Budget planning
+                      {{ __('Budget planning') }}
                     </li>
                     <li
                       style="
@@ -2451,7 +2437,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent); font-size: 0.75rem"
                       ></i>
-                      Cash flow forecasting
+                      {{ __('Cash flow forecasting') }}
                     </li>
                   </ul>
                 </div>
@@ -2464,10 +2450,9 @@
                   <div class="module-icon" style="margin: 0 auto 16px">
                     <i class="bi bi-box-seam"></i>
                   </div>
-                  <div class="module-title">Inventory</div>
+                  <div class="module-title">{{ __('Inventory') }}</div>
                   <div class="module-desc" style="margin-top: 8px">
-                    Never run out of stock â€” or over-purchase. Smart tracking
-                    across multiple warehouses with automated reorder alerts.
+                    {{ __('Never run out of stock — or over-purchase. Smart tracking across multiple warehouses with automated reorder alerts.') }}
                   </div>
                   <ul
                     style="
@@ -2492,7 +2477,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent); font-size: 0.75rem"
                       ></i>
-                      Multi-warehouse tracking
+                      {{ __('Multi-warehouse tracking') }}
                     </li>
                     <li
                       style="
@@ -2508,7 +2493,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent); font-size: 0.75rem"
                       ></i>
-                      Auto reorder points
+                      {{ __('Auto reorder points') }}
                     </li>
                   </ul>
                 </div>
@@ -2521,10 +2506,9 @@
                   <div class="module-icon" style="margin: 0 auto 16px">
                     <i class="bi bi-credit-card"></i>
                   </div>
-                  <div class="module-title">Payments</div>
+                  <div class="module-title">{{ __('Payments') }}</div>
                   <div class="module-desc" style="margin-top: 8px">
-                    Accept money from anywhere with fully integrated payment
-                    processing â€” QRIS, transfer, cards, and e-wallets.
+                    {{ __('Accept money from anywhere with fully integrated payment processing — QRIS, transfer, cards, and e-wallets.') }}
                   </div>
                   <ul
                     style="
@@ -2549,7 +2533,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent); font-size: 0.75rem"
                       ></i>
-                      QRIS &amp; multi-gateway
+                      {{ __('QRIS & multi-gateway') }}
                     </li>
                     <li
                       style="
@@ -2565,7 +2549,7 @@
                         class="bi bi-check-circle-fill"
                         style="color: var(--accent); font-size: 0.75rem"
                       ></i>
-                      Auto reconciliation
+                      {{ __('Auto reconciliation') }}
                     </li>
                   </ul>
                 </div>
@@ -2584,11 +2568,9 @@
                   <div class="module-icon" style="margin: 0 auto 20px">
                     <i class="bi bi-bar-chart-line"></i>
                   </div>
-                  <div class="module-title">Reporting &amp; Analytics</div>
+                  <div class="module-title">{{ __('Reporting & Analytics') }}</div>
                   <div class="module-desc" style="margin-top: 8px">
-                    See exactly where your money comes from and where it goes.
-                    Real-time dashboards that surface the insights that actually
-                    matter.
+                    {{ __('See exactly where your money comes from and where it goes. Real-time dashboards that surface the insights that actually matter.') }}
                   </div>
                   <ul
                     style="
@@ -2737,7 +2719,7 @@
                   <div class="module-title">AI Assistant</div>
                   <div class="module-desc" style="margin-top: 8px">
                     Get actionable insights and smart recommendations that drive
-                    better business decisions â€” before problems become
+                    better business decisions  before problems become
                     expensive.
                   </div>
                   <ul
@@ -2873,7 +2855,7 @@
                   <div>
                     <div class="feature-title">Flexible Investment</div>
                     <p class="feature-desc">
-                      Monthly, annual, or lifetime â€” choose the model that fits
+                      Monthly, annual, or lifetime  choose the model that fits
                       your current stage.
                     </p>
                   </div>
@@ -2925,12 +2907,12 @@
             <i class="bi bi-cash-coin"></i> Partner Program
           </div>
           <h2 class="section-title reveal reveal-delay-1">
-            Not Just a User â€”
+            Not Just a User 
             <span class="text-gradient">A Business Opportunity</span>
           </h2>
           <p class="section-subtitle reveal reveal-delay-2">
             You don't need to build software to earn from it. Distribute, refer,
-            and earn â€” without ever touching a line of code.
+            and earn  without ever touching a line of code.
           </p>
         </div>
         <div class="row g-4 align-items-center">
@@ -3292,7 +3274,7 @@
               <h4>Wait 30 Minutes</h4>
               <p>
                 Your isolated infrastructure is provisioned. A dedicated
-                environment â€” not a shared tenant.
+                environment  not a shared tenant.
               </p>
             </div>
           </div>
@@ -3343,7 +3325,7 @@
               <h4>Modular &amp; Scalable</h4>
               <p>
                 Start with what you need today. Add capabilities as your revenue
-                grows. The system scales alongside your ambition â€” not against
+                grows. The system scales alongside your ambition  not against
                 it.
               </p>
             </div>
@@ -3392,7 +3374,7 @@
               </div>
               <p class="testimonial-text">
                 "We saved 200 hours of manual work per month. That's equivalent
-                to Rp8 million in productivity gains â€” every single month."
+                to Rp8 million in productivity gains  every single month."
               </p>
               <div class="d-flex align-items-center gap-3">
                 <img
@@ -3496,7 +3478,7 @@
                   data-bs-parent="#faqAccordion"
                 >
                   <div class="accordion-body">
-                    Most software is rented â€” stop paying, lose access. COOCA's
+                    Most software is rented  stop paying, lose access. COOCA's
                     lifetime license is full ownership. One payment gives you
                     permanent access, free updates, and a system that keeps
                     generating value without recurring costs. It's an asset, not
@@ -3521,8 +3503,8 @@
                   data-bs-parent="#faqAccordion"
                 >
                   <div class="accordion-body">
-                    Yes. Every plan â€” Monthly, 3-Month, Annual, Lifetime, and
-                    Custom â€” includes full access to all modules with no user
+                    Yes. Every plan  Monthly, 3-Month, Annual, Lifetime, and
+                    Custom  includes full access to all modules with no user
                     limits. There are no hidden modules behind premium tiers.
                     The difference between plans is duration, support level, and
                     license ownership.
@@ -3572,7 +3554,7 @@
                   <div class="accordion-body">
                     Yes. Every COOCA customer operates in a fully isolated
                     environment. Your data never touches another customer's
-                    system. This is not shared-tenant architecture â€” it's
+                    system. This is not shared-tenant architecture  it's
                     dedicated infrastructure for every business. That's our "1
                     Customer = 1 Isolated Business System" commitment.
                   </div>

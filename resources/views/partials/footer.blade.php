@@ -3,8 +3,15 @@
     <div class="row g-4">
       <div class="col-lg-4 col-md-6">
         <div class="footer-brand">
-          @if(setting('site.logo'))
-              <img src="{{ setting('site.logo') }}" alt="{{ setting('site.name','COOCA') }}" style="height:28px;object-fit:contain;" />
+          @if(setting('site.logo_light') || setting('site.logo_dark'))
+              @if(setting('site.logo_light'))
+                  <img src="{{ asset(setting('site.logo_light')) }}" alt="{{ setting('site.name','COOCA') }}" class="nav-logo-light" style="height:28px;object-fit:contain;" />
+              @endif
+              @if(setting('site.logo_dark'))
+                  <img src="{{ asset(setting('site.logo_dark')) }}" alt="{{ setting('site.name','COOCA') }}" class="nav-logo-dark" style="height:28px;object-fit:contain; display:none;" />
+              @endif
+          @elseif(setting('site.logo'))
+              <img src="{{ asset(setting('site.logo')) }}" alt="{{ setting('site.name','COOCA') }}" class="nav-logo-default" style="height:28px;object-fit:contain;" />
           @else
               <div class="logo-icon">C</div>
               {{ setting('site.name', 'COOCA') }}

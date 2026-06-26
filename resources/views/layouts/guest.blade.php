@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     @if(setting('site.favicon'))
-        <link rel="icon" type="image/x-icon" href="{{ setting('site.favicon') }}">
+        <link rel="icon" type="image/x-icon" href="{{ asset(setting('site.favicon')) }}">
     @endif
     @include('partials.seo')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -51,6 +51,14 @@
           const icon = theme === "dark" ? "bi-moon-fill" : "bi-sun-fill";
           if (themeIcon) themeIcon.className = "bi " + icon;
           if (themeIconMobile) themeIconMobile.className = "bi " + icon;
+
+          // Toggle light/dark logos and preloaders
+          document.querySelectorAll('.nav-logo-light, .loader-img-light').forEach(function(el) {
+            el.style.display = theme === 'light' ? 'block' : 'none';
+          });
+          document.querySelectorAll('.nav-logo-dark, .loader-img-dark').forEach(function(el) {
+            el.style.display = theme === 'dark' ? 'block' : 'none';
+          });
         }
         const savedTheme = localStorage.getItem("cooca-theme");
         setTheme(savedTheme || getSystemTheme());

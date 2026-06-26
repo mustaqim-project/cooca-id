@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 /**
  * Admin Settings Controller
- * 
+ *
  * Manages system settings and configurations.
  */
 class SettingsController extends Controller
@@ -23,23 +23,27 @@ class SettingsController extends Controller
     {
         $settings = [
             // General
-            'platform_name' => Setting::get('site.name', config('app.name')),
-            'logo_url' => Setting::get('site.logo', ''),
-            'favicon_url' => Setting::get('site.favicon', ''),
+            'platform_name'  => Setting::get('site.name', config('app.name')),
+            'logo_url'       => Setting::get('site.logo', ''),       // legacy/fallback
+            'logo_light_url' => Setting::get('site.logo_light', ''), // logo for light theme
+            'logo_dark_url'  => Setting::get('site.logo_dark', ''),  // logo for dark theme
+            'preloader_image_light_url' => Setting::get('site.preloader_image_light', ''),
+            'preloader_image_dark_url'  => Setting::get('site.preloader_image_dark', ''),
+            'favicon_url'    => Setting::get('site.favicon', ''),
             'preloader_text' => Setting::get('site.preloader_text', 'COOCA'),
-            
+
             // Contact & Footer
             'email_support' => Setting::get('contact.email', 'hello@cooca.id'),
             'whatsapp_number' => Setting::get('contact.whatsapp', '6281234567890'),
             'whatsapp_link' => Setting::get('contact.whatsapp_link', 'https://wa.me/6281234567890'),
             'footer_description' => Setting::get('footer.description', ''),
-            
+
             // Social Media
             'social_twitter' => Setting::get('social.twitter', ''),
             'social_linkedin' => Setting::get('social.linkedin', ''),
             'social_github' => Setting::get('social.github', ''),
             'social_instagram' => Setting::get('social.instagram', ''),
-            
+
             // Landing Page
             'landing_hero_title' => Setting::get('landing.hero_title', ''),
             'landing_hero_subtitle' => Setting::get('landing.hero_subtitle', ''),
@@ -61,6 +65,7 @@ class SettingsController extends Controller
         foreach ($seoPages as $page) {
             $settings['seo_' . $page . '_title'] = Setting::get('seo.' . $page . '.title', '');
             $settings['seo_' . $page . '_description'] = Setting::get('seo.' . $page . '.description', '');
+            $settings['seo_' . $page . '_keywords'] = Setting::get('seo.' . $page . '.keywords', '');
         }
 
         return view('admin.settings.index', [
@@ -75,9 +80,13 @@ class SettingsController extends Controller
     {
         $validated = $request->validate([
             // General
-            'platform_name' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'logo' => ['sometimes', 'nullable', 'image', 'max:2048'],
-            'favicon' => ['sometimes', 'nullable', 'image', 'max:1024'],
+            'platform_name'  => ['sometimes', 'nullable', 'string', 'max:255'],
+            'logo'           => ['sometimes', 'nullable', 'image', 'mimes:png,jpg,jpeg,svg,webp', 'max:2048'],
+            'logo_light'     => ['sometimes', 'nullable', 'image', 'mimes:png,jpg,jpeg,svg,webp', 'max:2048'],
+            'logo_dark'      => ['sometimes', 'nullable', 'image', 'mimes:png,jpg,jpeg,svg,webp', 'max:2048'],
+            'preloader_image_light' => ['sometimes', 'nullable', 'image', 'mimes:png,jpg,jpeg,svg,webp,gif', 'max:2048'],
+            'preloader_image_dark'  => ['sometimes', 'nullable', 'image', 'mimes:png,jpg,jpeg,svg,webp,gif', 'max:2048'],
+            'favicon'        => ['sometimes', 'nullable', 'image', 'max:1024'],
             'preloader_text' => ['sometimes', 'nullable', 'string', 'max:255'],
 
             // Contact
@@ -111,18 +120,62 @@ class SettingsController extends Controller
 
         // Handle File Uploads
         if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('settings', 'public');
+            $file     = $request->file('logo');
+            $filename = time() . '_logo.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/image'), $filename);
             Setting::updateOrCreate(
                 ['key' => 'site.logo'],
-                ['value' => Storage::url($path), 'type' => 'image', 'group' => 'general']
+                ['value' => '/assets/image/' . $filename, 'type' => 'image', 'group' => 'general']
+            );
+        }
+
+        if ($request->hasFile('logo_light')) {
+            $file     = $request->file('logo_light');
+            $filename = time() . '_logo_light.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/image'), $filename);
+            Setting::updateOrCreate(
+                ['key' => 'site.logo_light'],
+                ['value' => '/assets/image/' . $filename, 'type' => 'image', 'group' => 'general']
+            );
+        }
+
+        if ($request->hasFile('logo_dark')) {
+            $file     = $request->file('logo_dark');
+            $filename = time() . '_logo_dark.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/image'), $filename);
+            Setting::updateOrCreate(
+                ['key' => 'site.logo_dark'],
+                ['value' => '/assets/image/' . $filename, 'type' => 'image', 'group' => 'general']
+            );
+        }
+
+        if ($request->hasFile('preloader_image_light')) {
+            $file     = $request->file('preloader_image_light');
+            $filename = time() . '_preloader_light.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/image'), $filename);
+            Setting::updateOrCreate(
+                ['key' => 'site.preloader_image_light'],
+                ['value' => '/assets/image/' . $filename, 'type' => 'image', 'group' => 'general']
+            );
+        }
+
+        if ($request->hasFile('preloader_image_dark')) {
+            $file     = $request->file('preloader_image_dark');
+            $filename = time() . '_preloader_dark.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/image'), $filename);
+            Setting::updateOrCreate(
+                ['key' => 'site.preloader_image_dark'],
+                ['value' => '/assets/image/' . $filename, 'type' => 'image', 'group' => 'general']
             );
         }
 
         if ($request->hasFile('favicon')) {
-            $path = $request->file('favicon')->store('settings', 'public');
+            $file     = $request->file('favicon');
+            $filename = time() . '_favicon.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/image'), $filename);
             Setting::updateOrCreate(
                 ['key' => 'site.favicon'],
-                ['value' => Storage::url($path), 'type' => 'image', 'group' => 'general']
+                ['value' => '/assets/image/' . $filename, 'type' => 'image', 'group' => 'general']
             );
         }
 
@@ -157,7 +210,7 @@ class SettingsController extends Controller
         ];
 
         foreach ($validated as $field => $value) {
-            if ($field === 'logo' || $field === 'favicon') continue;
+            if (in_array($field, ['logo', 'logo_light', 'logo_dark', 'preloader_image_light', 'preloader_image_dark', 'favicon'])) continue;
 
             if (($field === 'midtrans_server_key' || $field === 'midtrans_client_key') && blank($value)) {
                 continue;
@@ -202,9 +255,19 @@ class SettingsController extends Controller
                     ]
                 );
             }
+            if ($request->has('seo_' . $page . '_keywords')) {
+                Setting::updateOrCreate(
+                    ['key' => 'seo.' . $page . '.keywords'],
+                    [
+                        'value' => (string) $request->input('seo_' . $page . '_keywords'),
+                        'type' => 'string',
+                        'group' => 'seo',
+                        'updated_by' => $request->user('admin')?->id,
+                    ]
+                );
+            }
         }
 
         return back()->with('success', 'Settings updated successfully.');
     }
 }
-

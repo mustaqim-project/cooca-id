@@ -35,8 +35,8 @@
                             <div class="space-y-2">
                                 <label class="form-label">Main Logo</label>
                                 @if(isset($settings['site.logo']) && $settings['site.logo'])
-                                    <div class="mb-3 p-3 bg-surface-100 dark:bg-surface-800 rounded-lg inline-block">
-                                        <img src="{{ $settings['site.logo'] }}" alt="Logo" class="h-12 object-contain">
+                                    <div class="p-3 bg-surface-100 dark:bg-surface-800 rounded-md border border-surface-200 dark:border-surface-700">
+                                        <img src="{{ asset($settings['site.logo']) }}" alt="Logo" class="h-12 object-contain">
                                     </div>
                                 @endif
                                 <input type="file" name="site_logo" class="form-input" accept="image/*">
@@ -46,8 +46,8 @@
                             <div class="space-y-2">
                                 <label class="form-label">Favicon</label>
                                 @if(isset($settings['site.favicon']) && $settings['site.favicon'])
-                                    <div class="mb-3 p-3 bg-surface-100 dark:bg-surface-800 rounded-lg inline-block">
-                                        <img src="{{ $settings['site.favicon'] }}" alt="Favicon" class="h-8 object-contain">
+                                    <div class="p-3 bg-surface-100 dark:bg-surface-800 rounded-md border border-surface-200 dark:border-surface-700 inline-block">
+                                        <img src="{{ asset($settings['site.favicon']) }}" alt="Favicon" class="h-8 object-contain">
                                     </div>
                                 @endif
                                 <input type="file" name="site_favicon" class="form-input" accept=".ico,.png,.svg">

@@ -468,7 +468,7 @@
                         <p class="plan-desc">{{ __('Get complete access to all powerful capabilities of this product.') }}</p>
                         
                         <div class="plan-price-box">
-                            <span class="plan-price">Rp {{ number_format($product->base_price, 0, ',', '.') }}</span>
+                            <span class="plan-price">Rp {{ number_format($product->plans->where('is_active', true)->min('price') ?? $product->base_price, 0, ',', '.') }}</span>
                             <span class="plan-interval">/ {{ __('package') }}</span>
                         </div>
 

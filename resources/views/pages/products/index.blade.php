@@ -364,7 +364,7 @@
                                                         <div class="product-card-footer">
                                                             <div>
                                                                 <div class="product-price-label">{{ __('Starting from') }}</div>
-                                                                <div class="product-price">Rp {{ number_format($product->base_price, 0, ',', '.') }}</div>
+                                                                <div class="product-price">Rp {{ number_format($product->plans->where('is_active', true)->min('price') ?? $product->base_price, 0, ',', '.') }}</div>
                                                             </div>
                                                             <a href="{{ route('products.show', $product->slug) }}" class="product-cta-icon" aria-label="{{ __('View Product') }}">
                                                                 <i class="bi bi-arrow-right"></i>

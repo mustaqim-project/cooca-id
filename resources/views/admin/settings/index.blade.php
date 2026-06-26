@@ -49,11 +49,32 @@
                         <input type="text" name="preloader_text" id="preloader_text" value="{{ old('preloader_text', $settings['preloader_text'] ?? '') }}" class="mt-1 block w-full border border-surface-300 dark:border-surface-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800">
                     </div>
                     <div>
-                        <label for="logo" class="block text-sm font-medium text-surface-700 dark:text-surface-300">Site Logo</label>
-                        @if(!empty($settings['logo_url']))
-                            <img src="{{ asset($settings['logo_url']) }}" alt="Logo" class="h-12 mt-2 mb-2 object-contain bg-surface-100 dark:bg-surface-800 rounded p-1">
+                        <label for="preloader_image_light" class="block text-sm font-medium text-surface-700 dark:text-surface-300">Preloader Image (Light Theme)</label>
+                        @if(!empty($settings['preloader_image_light_url']))
+                            <img src="{{ asset($settings['preloader_image_light_url']) }}" alt="Preloader Light" class="h-12 mt-2 mb-2 object-contain bg-surface-100 dark:bg-surface-800 rounded p-1">
                         @endif
-                        <input type="file" name="logo" id="logo" accept="image/*" class="mt-1 block w-full text-sm text-surface-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+                        <input type="file" name="preloader_image_light" id="preloader_image_light" accept="image/*" class="mt-1 block w-full text-sm text-surface-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+                    </div>
+                    <div>
+                        <label for="preloader_image_dark" class="block text-sm font-medium text-surface-700 dark:text-surface-300">Preloader Image (Dark Theme)</label>
+                        @if(!empty($settings['preloader_image_dark_url']))
+                            <img src="{{ asset($settings['preloader_image_dark_url']) }}" alt="Preloader Dark" class="h-12 mt-2 mb-2 object-contain bg-surface-100 dark:bg-surface-800 rounded p-1">
+                        @endif
+                        <input type="file" name="preloader_image_dark" id="preloader_image_dark" accept="image/*" class="mt-1 block w-full text-sm text-surface-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+                    </div>
+                    <div>
+                        <label for="logo_light" class="block text-sm font-medium text-surface-700 dark:text-surface-300">Site Logo (Light Theme)</label>
+                        @if(!empty($settings['logo_light_url']))
+                            <img src="{{ asset($settings['logo_light_url']) }}" alt="Logo Light" class="h-12 mt-2 mb-2 object-contain bg-surface-100 dark:bg-surface-800 rounded p-1">
+                        @endif
+                        <input type="file" name="logo_light" id="logo_light" accept="image/*" class="mt-1 block w-full text-sm text-surface-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+                    </div>
+                    <div>
+                        <label for="logo_dark" class="block text-sm font-medium text-surface-700 dark:text-surface-300">Site Logo (Dark Theme)</label>
+                        @if(!empty($settings['logo_dark_url']))
+                            <img src="{{ asset($settings['logo_dark_url']) }}" alt="Logo Dark" class="h-12 mt-2 mb-2 object-contain bg-surface-100 dark:bg-surface-800 rounded p-1">
+                        @endif
+                        <input type="file" name="logo_dark" id="logo_dark" accept="image/*" class="mt-1 block w-full text-sm text-surface-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
                     </div>
                     <div>
                         <label for="favicon" class="block text-sm font-medium text-surface-700 dark:text-surface-300">Site Favicon</label>
@@ -181,6 +202,10 @@
                                 <div>
                                     <label class="block text-xs text-surface-500 dark:text-surface-400">Meta Description</label>
                                     <textarea name="seo_{{ $page['id'] }}_description" rows="2" class="mt-1 block w-full border border-surface-300 dark:border-surface-600 rounded-md shadow-sm py-1.5 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-sm bg-white dark:bg-surface-800">{{ old('seo_'.$page['id'].'_description', $settings['seo_'.$page['id'].'_description'] ?? '') }}</textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-surface-500 dark:text-surface-400">Meta Keywords</label>
+                                    <input type="text" name="seo_{{ $page['id'] }}_keywords" value="{{ old('seo_'.$page['id'].'_keywords', $settings['seo_'.$page['id'].'_keywords'] ?? '') }}" placeholder="comma, separated, keywords" class="mt-1 block w-full border border-surface-300 dark:border-surface-600 rounded-md shadow-sm py-1.5 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-sm bg-white dark:bg-surface-800">
                                 </div>
                             </div>
                         </div>

@@ -3,7 +3,7 @@
         <div class="d-flex align-items-center justify-content-between">
             <a href="{{ route('home') }}" class="navbar-brand-cooca">
                 @if(setting('site.logo'))
-                    <img src="{{ setting('site.logo') }}" alt="Logo" class="h-8 object-contain" />
+                    <img src="{{ asset(setting('site.logo')) }}" alt="Logo" class="h-8 object-contain" />
                 @else
                     <div class="logo-icon">C</div>
                     {{ setting('site.preloader_text', 'COOCA') }}

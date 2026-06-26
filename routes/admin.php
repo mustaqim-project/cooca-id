@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SettlementController;
 use App\Http\Controllers\Admin\SubscriptionController;
+use App\Http\Controllers\Admin\SubscriptionPlanController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\VoucherController;
@@ -55,6 +56,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+    // Product Pricing Plans Management
+    Route::get('/products/{product}/plans', [SubscriptionPlanController::class, 'index'])->name('products.plans.index');
+    Route::post('/products/{product}/plans', [SubscriptionPlanController::class, 'store'])->name('products.plans.store');
+    Route::put('/products/{product}/plans/{plan}', [SubscriptionPlanController::class, 'update'])->name('products.plans.update');
+    Route::delete('/products/{product}/plans/{plan}', [SubscriptionPlanController::class, 'destroy'])->name('products.plans.destroy');
+    Route::post('/products/{product}/plans/{plan}/toggle', [SubscriptionPlanController::class, 'toggle'])->name('products.plans.toggle');
+
 
     // Customers Management
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');

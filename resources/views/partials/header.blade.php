@@ -1,8 +1,15 @@
 <!-- PAGE LOADER -->
 <div class="page-loader" id="pageLoader">
   <div class="loader-logo">
-    @if(setting('site.logo'))
-        <img src="{{ setting('site.logo') }}" alt="{{ setting('site.name','COOCA') }}" class="h-12 object-contain" style="max-height:56px;" />
+    @if(setting('site.preloader_image_light') || setting('site.preloader_image_dark'))
+        @if(setting('site.preloader_image_light'))
+            <img src="{{ asset(setting('site.preloader_image_light')) }}" alt="{{ setting('site.name','COOCA') }}" class="h-12 object-contain loader-img-light" style="max-height:200px;" />
+        @endif
+        @if(setting('site.preloader_image_dark'))
+            <img src="{{ asset(setting('site.preloader_image_dark')) }}" alt="{{ setting('site.name','COOCA') }}" class="h-12 object-contain loader-img-dark" style="max-height:200px; display:none;" />
+        @endif
+    @elseif(setting('site.logo'))
+        <img src="{{ asset(setting('site.logo')) }}" alt="{{ setting('site.name','COOCA') }}" class="h-12 object-contain loader-img-default" style="max-height:56px;" />
     @else
         <div class="logo-icon-large">C</div>
         <div class="logo-text">{{ setting('site.preloader_text', 'COOCA') }}</div>
@@ -26,8 +33,15 @@
   <div class="container">
     <div class="d-flex align-items-center justify-content-between">
       <a href="{{ route('home') }}" class="navbar-brand-cooca">
-        @if(setting('site.logo'))
-            <img src="{{ setting('site.logo') }}" alt="{{ setting('site.name','COOCA') }}" style="height:32px;object-fit:contain;" />
+        @if(setting('site.logo_light') || setting('site.logo_dark'))
+            @if(setting('site.logo_light'))
+                <img src="{{ asset(setting('site.logo_light')) }}" alt="{{ setting('site.name','COOCA') }}" class="nav-logo-light" style="height:32px;object-fit:contain;" />
+            @endif
+            @if(setting('site.logo_dark'))
+                <img src="{{ asset(setting('site.logo_dark')) }}" alt="{{ setting('site.name','COOCA') }}" class="nav-logo-dark" style="height:32px;object-fit:contain; display:none;" />
+            @endif
+        @elseif(setting('site.logo'))
+            <img src="{{ asset(setting('site.logo')) }}" alt="{{ setting('site.name','COOCA') }}" class="nav-logo-default" style="height:32px;object-fit:contain;" />
         @else
             <div class="logo-icon">C</div>
             {{ setting('site.name', 'COOCA') }}
@@ -74,17 +88,24 @@
 </nav>
 
 <!-- MOBILE OFFCANVAS -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" style="background:var(--bg);color:var(--text);max-width:300px;">
+<div class="offcanvas offcanvas-end offcanvas-cooca" tabindex="-1" id="mobileMenu" style="max-width:300px;">
   <div class="offcanvas-header" style="border-bottom:1px solid var(--border);">
     <span class="navbar-brand-cooca mb-0">
-      @if(setting('site.logo'))
-          <img src="{{ setting('site.logo') }}" alt="{{ setting('site.name','COOCA') }}" style="height:28px;" />
+      @if(setting('site.logo_light') || setting('site.logo_dark'))
+          @if(setting('site.logo_light'))
+              <img src="{{ asset(setting('site.logo_light')) }}" alt="{{ setting('site.name','COOCA') }}" class="nav-logo-light" style="height:28px;" />
+          @endif
+          @if(setting('site.logo_dark'))
+              <img src="{{ asset(setting('site.logo_dark')) }}" alt="{{ setting('site.name','COOCA') }}" class="nav-logo-dark" style="height:28px; display:none;" />
+          @endif
+      @elseif(setting('site.logo'))
+          <img src="{{ asset(setting('site.logo')) }}" alt="{{ setting('site.name','COOCA') }}" class="nav-logo-default" style="height:28px;" />
       @else
           <div class="logo-icon" style="width:28px;height:28px;font-size:0.8rem;">C</div>
           {{ setting('site.name','COOCA') }}
       @endif
     </span>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" style="filter:invert(1);"></button>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
   </div>
   <div class="offcanvas-body d-flex flex-column gap-2 pt-3">
     <a href="{{ route('solutions') }}" class="nav-link-cooca">{{ __('Solutions') }}</a>

@@ -6,12 +6,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProductRequest;
-use App\Http\Resources\Admin\ProductResource;
 use App\Models\Product;
+use App\Models\SubscriptionPlan;
 use App\Repositories\Contracts\ProductRepositoryInterface;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 
 final class ProductController extends Controller
 {
@@ -68,21 +67,51 @@ final class ProductController extends Controller
             abort(404, 'Product not found');
         }
 
+        $plans = $product->subscriptionPlans()->orderBy('sort_order')->orderBy('duration_months')->get();
+
         return view('admin.products.edit', [
             'product' => $product,
+            'plans'   => $plans,
         ]);
     }
 
     /**
      * Store a newly created product.
      */
-    public function store(StoreProductRequest $request)
+    public function store(StoreProductRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $product = $this->productRepository->create($data);
+        $plansData = $data['plans'] ?? [];
 
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product created successfully.');
+        // Map 'price' field to 'base_price' if needed
+        if (!isset($data['base_price']) && isset($data['price'])) {
+            $data['base_price'] = $data['price'];
+        }
+
+        unset($data['plans'], $data['price']);
+
+        $product = DB::transaction(function () use ($data, $plansData) {
+            $product = $this->productRepository->create($data);
+
+            // Save pricing plans if submitted
+            foreach ($plansData as $i => $plan) {
+                SubscriptionPlan::create([
+                    'product_id'       => $product->id,
+                    'name'             => $plan['name'],
+                    'duration_months'  => (int) $plan['duration_months'],
+                    'price'            => (float) $plan['price'],
+                    'discount_percent' => (float) ($plan['discount_percent'] ?? 0),
+                    'sort_order'       => (int) ($plan['sort_order'] ?? $i),
+                    'is_active'        => isset($plan['is_active']) ? (bool) $plan['is_active'] : true,
+                ]);
+            }
+
+            return $product;
+        });
+
+        return redirect()
+            ->route('admin.products.edit', $product->id)
+            ->with('success', 'Product created successfully. You can now manage pricing plans below.');
     }
 
     /**

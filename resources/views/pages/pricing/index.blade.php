@@ -447,7 +447,7 @@
 
                                                         <div class="plan-pricing">
                                                             <span class="curr">Rp</span>
-                                                            <span class="amount">{{ number_format($product->base_price, 0, ',', '.') }}</span>
+                                                            <span class="amount">{{ number_format($product->plans->where('is_active', true)->min('price') ?? $product->base_price, 0, ',', '.') }}</span>
                                                             <span class="freq">/ {{ __('Base License') }}</span>
                                                         </div>
 
@@ -569,7 +569,7 @@
                                 @foreach($products as $product)
                                     <th style="min-width: 200px;">
                                         <div style="font-size: 1.2rem; font-weight: 800; color: var(--text);">{{ $product->name }}</div>
-                                        <div style="font-size: 0.85rem; color: var(--accent); margin-top: 4px;">Rp {{ number_format($product->base_price, 0, ',', '.') }}</div>
+                                        <div style="font-size: 0.85rem; color: var(--accent); margin-top: 4px;">Rp {{ number_format($product->plans->where('is_active', true)->min('price') ?? $product->base_price, 0, ',', '.') }}</div>
                                     </th>
                                 @endforeach
                             @else

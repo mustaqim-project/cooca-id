@@ -19,6 +19,8 @@ final class AffiliateCommission extends Model
         'affiliator_id',
         'transaction_id',
         'customer_id',
+        'subscription_plan_id',
+        'plan_name',
         'level',
         'gross_amount',
         'commission_percent',
@@ -60,6 +62,11 @@ final class AffiliateCommission extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function subscriptionPlan(): BelongsTo
+    {
+        return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
     }
 
     public function isPending(): bool

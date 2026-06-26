@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Facades\Cache;
 
 class Setting extends Model
 {
@@ -27,6 +28,27 @@ class Setting extends Model
         'is_public' => 'boolean',
         'metadata' => 'array',
     ];
+
+    protected static function booted(): void
+    {
+        $clearCache = function (Setting $setting): void {
+            Cache::forget('settings_all');
+            Cache::forget('settings_' . $setting->key);
+
+            if ($setting->group) {
+                Cache::forget('settings_group_' . $setting->group);
+            }
+
+            $originalGroup = $setting->getOriginal('group');
+            if ($originalGroup && $originalGroup !== $setting->group) {
+                Cache::forget('settings_group_' . $originalGroup);
+            }
+        };
+
+        static::saved($clearCache);
+        static::deleted($clearCache);
+        static::restored($clearCache);
+    }
 
     /**
      * Get the setting value in the correct type
