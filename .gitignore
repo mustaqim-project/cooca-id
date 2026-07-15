@@ -1,36 +1,19 @@
 ```
 # Laravel-specific ignores
-bootstrap/cache/
+vendor/
+composer.lock
+.env
+.env.*
+!.env.example
+
+# Build and distribution
+public/build/
 storage/framework/cache/
 storage/framework/sessions/
 storage/framework/views/
-vendor/
+bootstrap/cache/
 
-# Environment
-.env
-.env.local
-.env.*
-
-# Logs
-*.log
-
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-dist/
-build/
-target/
-
-# Dependencies
-node_modules/
-.npm/
-.yarn/
-.pnpm-store/
-composer.lock
-
-# Editors
+# IDE
 .vscode/
 .idea/
 *.swp
@@ -40,32 +23,10 @@ composer.lock
 .DS_Store
 Thumbs.db
 
-# Testing
-.coverage
-coverage/
-htmlcov/
+# Logs
+*.log
+storage/logs/
 
-# Archives
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+# Testing
+.phpunit.result.cache
 ```

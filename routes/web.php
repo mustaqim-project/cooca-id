@@ -112,3 +112,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('logout', [AuthController::class, 'adminLogout'])->name('logout');
     });
 });
+
+// Admin API Integrations Management
+Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {
+    Route::resource('api-integrations', \App\Http\Controllers\Admin\ApiIntegrationController::class);
+    Route::post('api-integrations/{apiIntegration}/test', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'test'])->name('api-integrations.test');
+    Route::post('api-integrations/seed', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'seedDefaults'])->name('api-integrations.seed');
+});
