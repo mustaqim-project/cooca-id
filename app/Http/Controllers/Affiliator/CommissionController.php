@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Affiliator;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Admin\CommissionResource;
+use App\Models\AffiliateCommission;
 use App\Services\Affiliate\AffiliateService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 final class CommissionController extends Controller
 {
@@ -17,50 +16,62 @@ final class CommissionController extends Controller
     ) {}
 
     /**
-     * Display listing of commissions.
+     * Display listing of all commissions (paginated).
      */
     public function index()
     {
-        $affiliator = Auth::guard('affiliator')->user();
-        $commissions = \App\Models\AffiliateCommission::where('affiliator_id', $affiliator->getKey())->paginate(15);
+        $affiliator  = Auth::guard('affiliator')->user();
+        $commissions = AffiliateCommission::where('affiliator_id', $affiliator->getKey())
+            ->with(['transaction', 'customer'])
+            ->latest()
+            ->paginate(20);
 
         return view('affiliator.commissions.index', [
-            'commissions' => \Illuminate\Http\Resources\Json\JsonResource::collection($commissions),
+            'commissions' => $commissions,
         ]);
     }
 
+    /**
+     * Commission statistics page.
+     */
     public function stats()
     {
         $affiliator = Auth::guard('affiliator')->user();
-        
+
         return view('affiliator.commissions.stats', [
-            'total_commission' => $this->affiliateService->getTotalCommission($affiliator),
+            'total_commission'   => $this->affiliateService->getTotalCommission($affiliator),
             'cleared_commission' => $this->affiliateService->getTotalCommission($affiliator, 'cleared'),
             'pending_commission' => $this->affiliateService->getTotalCommission($affiliator, 'pending'),
-            'breakdown' => $this->affiliateService->getCommissionBreakdown($affiliator),
+            'breakdown'          => $this->affiliateService->getCommissionBreakdown($affiliator),
+            'level1_total'       => AffiliateCommission::where('affiliator_id', $affiliator->getKey())
+                                        ->where('level', 1)->sum('commission_amount'),
+            'level2_total'       => AffiliateCommission::where('affiliator_id', $affiliator->getKey())
+                                        ->where('level', 2)->sum('commission_amount'),
         ]);
     }
 
+    /**
+     * Export commissions to CSV.
+     */
     public function export()
     {
-        $affiliator = Auth::guard('affiliator')->user();
-        $commissions = \App\Models\AffiliateCommission::where('affiliator_id', $affiliator->getKey())
+        $affiliator  = Auth::guard('affiliator')->user();
+        $commissions = AffiliateCommission::where('affiliator_id', $affiliator->getKey())
             ->with(['transaction', 'customer'])
             ->get();
 
         $csvFileName = 'commissions_' . date('Y-m-d') . '.csv';
-        $headers = [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$csvFileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
+        $headers     = [
+            'Content-type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename=$csvFileName",
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
         ];
 
-        $handle = fopen('php://output', 'w');
-        
-        return response()->stream(function() use ($handle, $commissions) {
-            fputcsv($handle, ['ID', 'Date', 'Transaction ID', 'Customer', 'Level', 'Gross Amount', 'Percent', 'Amount', 'Status']);
+        return response()->stream(function () use ($commissions) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['ID', 'Date', 'Transaction ID', 'Customer', 'Level', 'Gross Amount', 'Percent (%)', 'Commission Amount', 'Status']);
             foreach ($commissions as $commission) {
                 fputcsv($handle, [
                     $commission->id,
@@ -71,11 +82,23 @@ final class CommissionController extends Controller
                     $commission->gross_amount,
                     $commission->commission_percent,
                     $commission->commission_amount,
-                    $commission->status
+                    $commission->status,
                 ]);
             }
             fclose($handle);
         }, 200, $headers);
     }
 
+    /**
+     * Show detail for one commission.
+     */
+    public function show(string $commission)
+    {
+        $affiliator   = Auth::guard('affiliator')->user();
+        $commission   = AffiliateCommission::where('affiliator_id', $affiliator->getKey())
+            ->with(['transaction', 'customer'])
+            ->findOrFail($commission);
+
+        return view('affiliator.commissions.show', compact('commission'));
+    }
 }

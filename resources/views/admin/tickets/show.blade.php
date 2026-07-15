@@ -1,60 +1,190 @@
 @extends('layouts.admin')
 
-@section('title', 'Tickets Details')
-@section('subtitle', 'View specific tickets data.')
+@section('title', 'Ticket Details')
+@section('subtitle', '#{{ $ticket->id }} – {{ $ticket->subject }}')
 
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <!-- Header Actions -->
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
+    <div class="mb-4">
+        <a href="{{ route('admin.tickets.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Tickets
         </a>
     </div>
 
-    <!-- Details Card -->
-    <div class="corporate-card">
-        <div class="card-header">
-            <h3 class="card-title">Information Details</h3>
-        </div>
-        <div class="card-body">
-            <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-300">
-        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back
-    </a>
-    
-    <a href="javascript:void(0)" class="inline-flex items-center px-4 py-2 border border-surface-300 dark:border-surface-600 rounded-md font-medium text-xs text-surface-700 dark:text-surface-200 bg-white dark:bg-surface-800 hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700 shadow-sm transition">
-        <i data-lucide="edit" class="w-4 h-4 mr-2"></i> Edit
-    </a>
-</div>
+    <div class="row g-4">
+        {{-- Left: ticket info + replies --}}
+        <div class="col-lg-8">
 
-<div class="corporate-card overflow-hidden">
-    <div class="px-6 py-5 border-b border-surface-200 dark:border-surface-700">
-        <h3 class="text-lg leading-6 font-medium text-surface-900 dark:text-white">Information Overview</h3>
-        <p class="mt-1 max-w-2xl text-sm text-surface-500 dark:text-surface-400">Detailed breakdown of the record.</p>
-    </div>
-    <div class="px-6 py-5 sm:p-0">
-        <dl class="sm:divide-y sm:divide-surface-200 dark:divide-surface-700 dark:sm:divide-surface-700">
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">ID</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">#0001</dd>
+            {{-- Info card --}}
+            <div class="card-saas mb-4">
+                <div class="card-saas-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <h5 class="card-saas-title mb-0">{{ $ticket->subject }}</h5>
+                    <div class="d-flex gap-2">
+                        @php
+                            $priorityMap = [
+                                'urgent' => 'danger',
+                                'high' => 'warning',
+                                'medium' => 'info',
+                                'low' => 'neutral',
+                            ];
+                            $statusMap = [
+                                'open' => 'danger',
+                                'in_progress' => 'warning',
+                                'resolved' => 'success',
+                                'closed' => 'neutral',
+                            ];
+                            $statusLabel = match ($ticket->status) {
+                                'in_progress' => 'In Progress',
+                                default => ucfirst($ticket->status),
+                            };
+                        @endphp
+                        <span
+                            class="badge-saas badge-saas-{{ $priorityMap[$ticket->priority] ?? 'neutral' }}">{{ ucfirst($ticket->priority) }}</span>
+                        <span
+                            class="badge-saas badge-saas-{{ $statusMap[$ticket->status] ?? 'neutral' }}">{{ $statusLabel }}</span>
+                    </div>
+                </div>
+                <div class="card-saas-body p-0">
+                    <table class="table mb-0" style="font-size:.9rem">
+                        <tbody>
+                            <tr>
+                                <th class="ps-4 py-3 text-muted fw-normal" style="width:30%">Ticket ID</th>
+                                <td class="pe-4 py-3">#{{ $ticket->id }}</td>
+                            </tr>
+                            <tr>
+                                <th class="ps-4 py-3 text-muted fw-normal">Customer</th>
+                                <td class="pe-4 py-3">
+                                    <a href="{{ route('admin.customers.show', $ticket->customer_id ?? 0) }}"
+                                        class="fw-semibold text-decoration-none">
+                                        {{ $ticket->customer->name ?? 'N/A' }}
+                                    </a>
+                                    <div class="small text-muted">{{ $ticket->customer->email ?? '' }}</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-4 py-3 text-muted fw-normal">Assigned To</th>
+                                <td class="pe-4 py-3">
+                                    @if ($ticket->assignedTo)
+                                        <span class="badge-saas badge-saas-primary">{{ $ticket->assignedTo->name }}</span>
+                                    @else
+                                        <span class="text-muted">Unassigned</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-4 py-3 text-muted fw-normal">Created</th>
+                                <td class="pe-4 py-3">
+                                    {{ \Carbon\Carbon::parse($ticket->created_at)->format('d M Y, H:i') }}</td>
+                            </tr>
+                            <tr>
+                                <th class="ps-4 py-3 text-muted fw-normal align-top">Message</th>
+                                <td class="pe-4 py-3" style="white-space:pre-line">{{ $ticket->message }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Title</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">Sample Record</dd>
+
+            {{-- Replies --}}
+            @if ($ticket->replies && $ticket->replies->count() > 0)
+                <div class="card-saas mb-4">
+                    <div class="card-saas-header">
+                        <h5 class="card-saas-title mb-0"><i class="bi bi-chat-left-text me-2"></i>Replies
+                            ({{ $ticket->replies->count() }})</h5>
+                    </div>
+                    <div class="card-saas-body">
+                        @foreach ($ticket->replies as $reply)
+                            <div class="mb-4 pb-4 @if (!$loop->last) border-bottom @endif">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <div class="stat-card-icon {{ $reply->is_admin ? 'blue' : 'purple' }}"
+                                        style="width:32px;height:32px;min-width:32px;font-size:.75rem">
+                                        {{ strtoupper(substr($reply->user->name ?? 'U', 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold small">{{ $reply->user->name ?? 'Unknown' }}
+                                            @if ($reply->is_admin)
+                                                <span class="badge-saas badge-saas-info ms-1"
+                                                    style="font-size:.65rem">Admin</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-muted" style="font-size:.75rem">
+                                            {{ \Carbon\Carbon::parse($reply->created_at)->format('d M Y, H:i') }}</div>
+                                    </div>
+                                </div>
+                                <div class="ps-5" style="white-space:pre-line;font-size:.9rem">{{ $reply->message }}
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            {{-- Reply form --}}
+            @if (!in_array($ticket->status, ['resolved', 'closed']))
+                <div class="card-saas mb-4">
+                    <div class="card-saas-header">
+                        <h5 class="card-saas-title mb-0"><i class="bi bi-reply me-2"></i>Reply</h5>
+                    </div>
+                    <div class="card-saas-body">
+                        <form action="{{ route('admin.tickets.reply', $ticket) }}" method="POST">
+                            @csrf
+                            <div class="form-saas-group">
+                                <label class="form-saas-label" for="replyMessage">Message</label>
+                                <textarea class="form-saas-textarea @error('message') is-invalid @enderror" id="replyMessage" name="message"
+                                    rows="5" placeholder="Type your reply...">{{ old('message') }}</textarea>
+                                @error('message')
+                                    <div class="form-saas-error">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="d-flex gap-2 mt-3">
+                                <button type="submit" class="btn-saas btn-saas-primary">
+                                    <i class="bi bi-send me-1"></i> Send Reply
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
+        </div>
+
+        {{-- Right: actions sidebar --}}
+        <div class="col-lg-4">
+            <div class="card-saas">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title mb-0"><i class="bi bi-gear me-2"></i>Actions</h5>
+                </div>
+                <div class="card-saas-body d-flex flex-column gap-3">
+
+                    @if ($ticket->status !== 'resolved')
+                        <form action="{{ route('admin.tickets.resolve', $ticket) }}" method="POST"
+                            class="form-confirm-submit">
+                            @csrf
+                            <button type="submit" class="btn-saas btn-saas-primary w-100">
+                                <i class="bi bi-check-circle me-2"></i>Mark as Resolved
+                            </button>
+                        </form>
+                    @endif
+
+                    @if ($ticket->status !== 'closed')
+                        <form action="{{ route('admin.tickets.close', $ticket) }}" method="POST"
+                            class="form-confirm-submit">
+                            @csrf
+                            <button type="submit" class="btn-saas btn-saas-secondary w-100">
+                                <i class="bi bi-lock me-2"></i>Close Ticket
+                            </button>
+                        </form>
+                    @endif
+
+                    @if (in_array($ticket->status, ['resolved', 'closed']))
+                        <div class="text-center text-muted small py-2">
+                            <i class="bi bi-check-circle-fill text-success me-1"></i>
+                            Ticket is {{ $ticket->status }}
+                        </div>
+                    @endif
+                </div>
             </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Status</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Active</span>
-                </dd>
-            </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Description</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">This is a generated placeholder description for the record details view. It represents standard data output.</dd>
-            </div>
-        </dl>
-    </div>
         </div>
     </div>
-</div>
+
+    @include('components.swal-alert')
 @endsection

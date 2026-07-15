@@ -48,6 +48,12 @@ final class CustomerController extends Controller
             abort(404, 'Customer not found');
         }
 
+        // Load relationships for the view
+        $customer->load([
+            'subscriptions' => fn($q) => $q->with('product', 'subscriptionPlan')->latest(),
+            'licenses' => fn($q) => $q->with('product')->latest()
+        ]);
+
         return view('admin.customers.show', [
             'customer' => $customer,
         ]);

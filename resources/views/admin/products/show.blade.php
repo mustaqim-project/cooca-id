@@ -1,175 +1,221 @@
 @extends('layouts.admin')
 
-@section('title', 'Product Details')
-@section('subtitle', 'View and manage ' . $product->name)
+@section('title', 'Product: ' . $product->name)
 
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <!-- Header Actions -->
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
-        </a>
+    <div class="page-toolbar mb-4">
+        <div class="page-toolbar-left">
+            <a href="{{ route('admin.products.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
+                <i class="bi bi-arrow-left me-1"></i> Products
+            </a>
+            <span class="text-muted mx-2">/</span>
+            <span class="fw-semibold">{{ $product->name }}</span>
+        </div>
+        <div class="page-toolbar-right">
+            <a href="{{ route('admin.products.edit', $product) }}" class="btn-saas btn-saas-secondary btn-saas-sm">
+                <i class="bi bi-pencil me-1"></i> Edit
+            </a>
+            <form action="{{ route('admin.products.destroy', $product) }}" method="POST"
+                class="form-confirm-delete d-inline">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn-saas btn-saas-danger btn-saas-sm">
+                    <i class="bi bi-trash me-1"></i> Delete
+                </button>
+            </form>
+        </div>
     </div>
 
-    <!-- Details Card -->
-    <div class="corporate-card">
-        <div class="card-header">
-            <h3 class="card-title">Information Details</h3>
-        </div>
-        <div class="card-body">
-            <a href="{{ route('admin.products.index') }}" class="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Products
-    </a>
-    
-    <div class="flex gap-2">
-        <a href="{{ route('admin.products.edit', $product->id) }}" class="inline-flex items-center px-4 py-2 border border-surface-300 dark:border-surface-600 rounded-md shadow-sm text-sm font-medium text-surface-700 dark:text-surface-300 bg-white dark:bg-surface-800 hover:bg-surface-50 dark:bg-surface-900 focus:outline-none">
-            <i data-lucide="pencil" class="w-4 h-4"></i> Edit Product
-        </a>
-        
-        <form class="form-confirm-delete" action="{{ route('admin.products.destroy', $product->id) }}" method="POST" >
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none">
-                <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
-            </button>
-        </form>
-    </div>
-</div>
+    <div class="row g-4">
+        {{-- Left Column --}}
+        <div class="col-lg-8">
+            {{-- General Info --}}
+            <div class="card-saas mb-4">
+                <div class="card-saas-header">
+                    <h6 class="card-saas-title mb-0">
+                        <i class="bi bi-info-circle me-2 text-primary"></i>General Information
+                    </h6>
+                </div>
+                <div class="card-saas-body">
+                    <div class="mb-4">
+                        <div class="form-saas-label">Product Name</div>
+                        <div class="fw-semibold fs-5">{{ $product->name }}</div>
+                    </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Left Column: Product Info -->
-    <div class="lg:col-span-2 space-y-6">
-        <!-- Main Details -->
-        <div class="bg-white dark:bg-surface-800 animate-fade-in-up shadow-sm rounded-lg border border-surface-200 dark:border-surface-700 overflow-hidden">
-            <div class="px-6 py-5 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 flex justify-between items-center">
-                <h3 class="text-lg leading-6 font-medium text-surface-900 dark:text-white">
-                    General Information
-                </h3>
-                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $product->is_active ? 'bg-green-100 text-green-800' : 'bg-surface-100 dark:bg-surface-800 text-surface-800 dark:text-surface-200' }}">
-                    {{ $product->is_active ? 'Active' : 'Inactive / Draft' }}
-                </span>
+                    <div class="mb-4">
+                        <div class="form-saas-label">Category</div>
+                        @if ($product->category)
+                            <span class="badge-saas badge-saas-info">
+                                <i class="bi bi-tag me-1"></i>{{ $product->category->name }}
+                            </span>
+                        @else
+                            <span class="text-muted">—</span>
+                        @endif
+                    </div>
+
+                    <div>
+                        <div class="form-saas-label">Description</div>
+                        @if ($product->description)
+                            <p class="mb-0" style="white-space: pre-wrap; line-height: 1.7;">{{ $product->description }}
+                            </p>
+                        @else
+                            <span class="text-muted fst-italic">No description provided.</span>
+                        @endif
+                    </div>
+                </div>
             </div>
-            
-            <div class="px-6 py-5 sm:p-0">
-                <dl class="sm:divide-y sm:divide-surface-200 dark:divide-surface-700">
-                    <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Product Name</dt>
-                        <dd class="mt-1 text-sm text-surface-900 dark:text-white font-bold sm:mt-0 sm:col-span-2">
-                            {{ $product->name }}
-                        </dd>
+
+            {{-- Technical Integration --}}
+            <div class="card-saas">
+                <div class="card-saas-header">
+                    <h6 class="card-saas-title mb-0">
+                        <i class="bi bi-code-slash me-2 text-primary"></i>Technical Integration
+                    </h6>
+                </div>
+                <div class="card-saas-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="form-saas-label">Product ID (UUID)</div>
+                            <code class="d-block p-2 rounded"
+                                style="background:var(--surface-alt,#f5f5f5); font-size:.85rem; word-break:break-all;">{{ $product->id }}</code>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-saas-label">Webhook URL</div>
+                            @if ($product->webhook_url)
+                                <code class="d-block p-2 rounded"
+                                    style="background:var(--surface-alt,#f5f5f5); font-size:.85rem; word-break:break-all;">{{ $product->webhook_url }}</code>
+                            @else
+                                <span class="text-muted fst-italic">Not configured</span>
+                            @endif
+                        </div>
+                        <div class="col-12">
+                            <div class="form-saas-label">Demo URL</div>
+                            @if ($product->demo_url)
+                                <a href="{{ $product->demo_url }}" target="_blank" rel="noopener"
+                                    class="d-inline-flex align-items-center gap-1" style="word-break:break-all;">
+                                    {{ $product->demo_url }}
+                                    <i class="bi bi-box-arrow-up-right" style="font-size:.75rem;"></i>
+                                </a>
+                            @else
+                                <span class="text-muted fst-italic">Not configured</span>
+                            @endif
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-saas-label">Created</div>
+                            <span>{{ $product->created_at->format('d M Y, H:i') }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-saas-label">Last Updated</div>
+                            <span>{{ $product->updated_at->format('d M Y, H:i') }}</span>
+                        </div>
                     </div>
-                    
-                    <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-surface-50 dark:bg-surface-900">
-                        <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Description</dt>
-                        <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{ $product->description }}</dd>
-                    </div>
-                    
-                    <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Category</dt>
-                        <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                            {{ $product->category->name ?? 'Uncategorized' }}
-                        </dd>
-                    </div>
-                </dl>
+                </div>
             </div>
         </div>
-        
-        <!-- Integration Details -->
-        <div class="bg-white dark:bg-surface-800 animate-fade-in-up shadow-sm rounded-lg border border-surface-200 dark:border-surface-700 overflow-hidden">
-            <div class="px-6 py-5 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900">
-                <h3 class="text-lg leading-6 font-medium text-surface-900 dark:text-white">
-                    Technical Integration
-                </h3>
+
+        {{-- Right Column --}}
+        <div class="col-lg-4">
+            {{-- Pricing Card --}}
+            <div class="card-saas mb-4"
+                style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color:#fff; border:none;">
+                <div class="card-saas-header" style="border-color:rgba(255,255,255,.15);">
+                    <h6 class="card-saas-title mb-0" style="color:#fff;">
+                        <i class="bi bi-currency-dollar me-2"></i>Pricing
+                    </h6>
+                </div>
+                <div class="card-saas-body">
+                    <div class="mb-3">
+                        <div
+                            style="font-size:.75rem; opacity:.8; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.25rem;">
+                            Base Price</div>
+                        <div style="font-size:2rem; font-weight:700; line-height:1.1;">
+                            Rp {{ number_format($product->price, 0, ',', '.') }}
+                        </div>
+                    </div>
+                    <div>
+                        <div
+                            style="font-size:.75rem; opacity:.8; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.4rem;">
+                            Type</div>
+                        @if ($product->type === 'subscription')
+                            <span class="badge-saas badge-saas-info"
+                                style="background:rgba(255,255,255,.2); color:#fff; border:1px solid rgba(255,255,255,.3);">
+                                <i class="bi bi-arrow-repeat me-1"></i> Subscription
+                            </span>
+                        @elseif($product->type === 'one_time')
+                            <span class="badge-saas badge-saas-success"
+                                style="background:rgba(255,255,255,.2); color:#fff; border:1px solid rgba(255,255,255,.3);">
+                                <i class="bi bi-check-circle me-1"></i> One Time
+                            </span>
+                        @else
+                            <span class="badge-saas badge-saas-neutral"
+                                style="background:rgba(255,255,255,.2); color:#fff; border:1px solid rgba(255,255,255,.3);">
+                                {{ ucfirst($product->type ?? '—') }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
             </div>
-            
-            <div class="px-6 py-5 sm:p-0">
-                <dl class="sm:divide-y sm:divide-surface-200 dark:divide-surface-700">
-                    <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Product ID (UUID)</dt>
-                        <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2 font-mono">
-                            {{ $product->id }}
-                        </dd>
+
+            {{-- Product Performance --}}
+            <div class="card-saas">
+                <div class="card-saas-header">
+                    <h6 class="card-saas-title mb-0">
+                        <i class="bi bi-bar-chart-line me-2 text-primary"></i>Performance
+                    </h6>
+                </div>
+                <div class="card-saas-body p-0">
+                    <div style="border-bottom:1px solid var(--border); padding:1rem 1.25rem;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stat-card-icon green"
+                                style="width:2.5rem; height:2.5rem; font-size:1rem; flex-shrink:0;">
+                                <i class="bi bi-bag-check"></i>
+                            </div>
+                            <div>
+                                <div class="stat-card-label" style="font-size:.7rem;">Total Sales</div>
+                                <div class="stat-card-value" style="font-size:1.25rem;">
+                                    {{ $product->transactions ? $product->transactions->count() : 0 }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-surface-50 dark:bg-surface-900">
-                        <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Webhook URL</dt>
-                        <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2 break-all">
-                            {{ $product->webhook_url ?? 'Not configured' }}
-                        </dd>
+                    <div style="border-bottom:1px solid var(--border); padding:1rem 1.25rem;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stat-card-icon blue"
+                                style="width:2.5rem; height:2.5rem; font-size:1rem; flex-shrink:0;">
+                                <i class="bi bi-key"></i>
+                            </div>
+                            <div>
+                                <div class="stat-card-label" style="font-size:.7rem;">Active Licenses</div>
+                                <div class="stat-card-value" style="font-size:1.25rem;">
+                                    {{ $product->licenses ? $product->licenses->where('status', 'active')->count() : 0 }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Created At</dt>
-                        <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                            {{ $product->created_at->format('F d, Y H:i') }}
-                        </dd>
+                    <div style="padding:1rem 1.25rem;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="stat-card-icon purple"
+                                style="width:2.5rem; height:2.5rem; font-size:1rem; flex-shrink:0;">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                            <div>
+                                <div class="stat-card-label" style="font-size:.7rem;">Total Revenue</div>
+                                <div class="stat-card-value" style="font-size:1.25rem;">
+                                    Rp
+                                    {{ number_format(
+                                        $product->transactions ? $product->transactions->where('status', 'paid')->sum('amount') : 0,
+                                        0,
+                                        ',',
+                                        '.',
+                                    ) }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-surface-50 dark:bg-surface-900">
-                        <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Last Updated</dt>
-                        <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                            {{ $product->updated_at->format('F d, Y H:i') }}
-                        </dd>
-                    </div>
-                </dl>
+                </div>
             </div>
         </div>
     </div>
-    
-    <!-- Right Column: Stats & Pricing -->
-    <div class="lg:col-span-1 space-y-6">
-        <!-- Pricing Info -->
-        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow text-white overflow-hidden">
-            <div class="p-6">
-                <p class="text-primary-100 text-sm font-medium uppercase tracking-wide">Pricing</p>
-                <div class="mt-2 flex items-baseline text-4xl font-extrabold">
-                    Rp {{ number_format($product->price, 0, ',', '.') }}
-                </div>
-                <p class="mt-1 text-primary-100 text-sm">
-                    {{ ucfirst($product->type ?? 'One-time') }} 
-                    @if(($product->type ?? '') == 'subscription') 
-                        / billing cycle
-                    @endif
-                </p>
-            </div>
-        </div>
-        
-        <!-- Quick Stats -->
-        <div class="bg-white dark:bg-surface-800 animate-fade-in-up shadow-sm rounded-lg border border-surface-200 dark:border-surface-700 overflow-hidden">
-            <div class="px-6 py-4 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900">
-                <h3 class="text-base font-medium text-surface-900 dark:text-white">
-                    Product Performance
-                </h3>
-            </div>
-            
-            <div class="divide-y divide-surface-200 dark:divide-surface-700">
-                <div class="p-4 flex justify-between items-center">
-                    <span class="text-sm text-surface-500 dark:text-surface-400">Total Sales</span>
-                    <span class="text-base font-semibold text-surface-900 dark:text-white">{{ $product->transactions()->where('status', 'paid')->count() ?? 0 }}</span>
-                </div>
-                
-                <div class="p-4 flex justify-between items-center">
-                    <span class="text-sm text-surface-500 dark:text-surface-400">Active Licenses</span>
-                    <span class="text-base font-semibold text-surface-900 dark:text-white">{{ $product->licenses()->where('status', 'active')->count() ?? 0 }}</span>
-                </div>
-                
-                <div class="p-4 flex justify-between items-center">
-                    <span class="text-sm text-surface-500 dark:text-surface-400">Total Revenue</span>
-                    <span class="text-base font-semibold text-green-600">
-                        Rp {{ number_format($product->transactions()->where('status', 'paid')->sum('gross_amount') ?? 0, 0, ',', '.') }}
-                    </span>
-                </div>
-            </div>
-            
-            <div class="p-4 bg-surface-50 dark:bg-surface-900 border-t border-surface-200 dark:border-surface-700">
-                <a href="{{ route('admin.transactions.index', ['product_id' => $product->id]) }}" class="text-sm text-primary-600 hover:text-primary-800 font-medium block text-center">
-                    View all transactions &rarr;
-                </a>
-            </div>
-        </div>
-    </div>
-        </div>
-    </div>
-</div>
+
+    @include('components.swal-alert')
 @endsection

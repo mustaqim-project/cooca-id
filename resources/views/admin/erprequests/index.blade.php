@@ -1,72 +1,99 @@
 @extends('layouts.admin')
-
 @section('title', 'ERP Requests')
-@section('subtitle', 'Manage your erp requests data.')
+@section('subtitle', 'Manage customer ERP setup requests')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
+    <div class="page-toolbar mb-4">
+        <div class="page-toolbar-left">
+            <div class="input-group" style="width:300px">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search requests...">
             </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
-        </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-            
         </div>
     </div>
 
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
-                <tr>
-                    <th class="table-th">ID</th>
-                    <th class="table-th">Name / Title</th>
-                    <th class="table-th">Status</th>
-                    <th class="table-th">Date</th>
-                    <th class="table-th">Actions</th>
-                </tr>
-            
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
-                @forelse($requests ?? [] as $erp)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">{{ $erp->id }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white">{{ $erp->customer->name ?? 'Unknown Customer' }}</div>
-                        <div class="text-sm text-surface-500 dark:text-surface-400">{{ $erp->company_name ?? '-' }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                            {{ ucfirst($erp->status ?? 'pending') }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">{{ $erp->created_at ? $erp->created_at->format('M d, Y') : '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{{ route('admin.erp-requests.show', $erp->id) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-3">View</a>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="5" class="px-6 py-4 text-center text-sm text-surface-500">No ERP requests found.</td></tr>
-                @endforelse
-            
-                
-                
-                </tbody>
-            </table>
+    <div class="card-saas">
+        <div class="card-saas-body p-0">
+            <div class="table-responsive">
+                <table class="table-saas" id="requestsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Company</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($requests as $erp)
+                            <tr>
+                                <td class="text-muted" style="font-size:.8rem">{{ $erp->id }}</td>
+                                <td>
+                                    <div style="font-weight:600">{{ $erp->customer->name ?? '-' }}</div>
+                                    <div style="font-size:.8rem;color:var(--text-muted)">{{ $erp->customer->email ?? '' }}
+                                    </div>
+                                </td>
+                                <td>{{ $erp->company_name ?? '-' }}</td>
+                                <td>
+                                    @php
+                                        $statusMap = [
+                                            'pending' => ['label' => 'Pending', 'class' => 'badge-saas-warning'],
+                                            'approved' => ['label' => 'Approved', 'class' => 'badge-saas-info'],
+                                            'rejected' => ['label' => 'Rejected', 'class' => 'badge-saas-danger'],
+                                            'waiting_setup' => [
+                                                'label' => 'Waiting Setup',
+                                                'class' => 'badge-saas-neutral',
+                                            ],
+                                            'in_setup' => ['label' => 'In Setup', 'class' => 'badge-saas-primary'],
+                                            'domain_setup' => [
+                                                'label' => 'Domain Setup',
+                                                'class' => 'badge-saas-primary',
+                                            ],
+                                            'testing' => ['label' => 'Testing', 'class' => 'badge-saas-warning'],
+                                            'ready' => ['label' => 'Ready', 'class' => 'badge-saas-success'],
+                                        ];
+                                        $s = $statusMap[$erp->status] ?? [
+                                            'label' => ucfirst($erp->status),
+                                            'class' => 'badge-saas-neutral',
+                                        ];
+                                    @endphp
+                                    <span class="badge-saas {{ $s['class'] }}">{{ $s['label'] }}</span>
+                                </td>
+                                <td class="text-muted" style="font-size:.85rem">{{ $erp->created_at->format('d M Y') }}</td>
+                                <td>
+                                    <a href="{{ route('admin.erp-requests.show', $erp) }}"
+                                        class="btn-saas btn-saas-ghost btn-saas-sm">
+                                        <i class="bi bi-eye me-1"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon"><i class="bi bi-pc-display-horizontal"></i></div>
+                                        <div class="empty-state-title">No ERP requests</div>
+                                        <div class="empty-state-description">Customer ERP requests will appear here.</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('#requestsTable tbody tr').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    </script>
+@endpush

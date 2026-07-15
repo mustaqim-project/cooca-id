@@ -21,11 +21,11 @@
                 </p>
                 <div class="hero-cta mt-4">
                     @if($product->demo_url)
-                    <a href="{{ $product->demo_url }}" target="_blank" class="btn-cooca btn-cooca-primary">
+                    <a href="{{ $product->demo_url }}" target="_blank" class="btn btn-primary">
                         Live Demo <i class="bi bi-box-arrow-up-right"></i>
                     </a>
                     @endif
-                    <a href="{{ route('customer.register') }}" class="btn-cooca btn-cooca-outline">
+                    <a href="{{ route('customer.register') }}" class="btn btn-outline">
                         Start Free Trial
                     </a>
                 </div>
@@ -45,7 +45,7 @@
         <h2 class="section-title">Ready to transform your business?</h2>
         <p class="section-subtitle">Get full access to all capabilities with unlimited users.</p>
         <div class="mt-4">
-            <a href="{{ route('pricing') }}" class="btn-cooca btn-cooca-primary">View Pricing Plans</a>
+            <a href="{{ route('pricing') }}" class="btn btn-primary">View Pricing Plans</a>
         </div>
     </div>
 </section>

@@ -1,112 +1,124 @@
 @extends('layouts.admin')
-
-@section('title', 'Manage Products')
-@section('subtitle', 'View and manage digital products')
-
+@section('title', 'Products')
+@section('subtitle', 'Manage your SaaS products')
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
+    <div class="page-toolbar mb-4">
+        <div class="page-toolbar-left">
+            <div class="input-group" style="width:300px">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search products...">
             </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
         </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-                <a href="{{ route('admin.products.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface-900">
-                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
-                    Add New
-                </a>
-            </div>
+        <div class="page-toolbar-right">
+            <a href="{{ route('admin.products.create') }}" class="btn-saas btn-saas-primary">
+                <i class="bi bi-plus-lg me-1"></i> Add Product
+            </a>
+        </div>
     </div>
-
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
-                <tr>
-                    <th scope="col" class="table-th">Product</th>
-                    <th scope="col" class="table-th">Category</th>
-                    <th scope="col" class="table-th">Pricing</th>
-                    <th scope="col" class="table-th">Status</th>
-                    <th scope="col" class="table-th">Actions</th>
-                </tr>
-            
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
-                @forelse($products as $product)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            @if($product->thumbnail)
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    <img class="h-10 w-10 rounded-md object-cover" src="{{ asset('storage/' . $product->thumbnail) }}" alt="">
-                                </div>
-                            @else
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    <div class="h-10 w-10 rounded-md bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-500 font-bold">
-                                        <i data-lucide="box" class="w-4 h-4"></i>
+    <div class="card-saas">
+        <div class="card-saas-body p-0">
+            <div class="table-responsive">
+                <table class="table-saas" id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Price From</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($products as $product)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        @if ($product->thumbnail)
+                                            <img src="{{ Storage::url($product->thumbnail) }}" alt="{{ $product->name }}"
+                                                style="width:40px;height:40px;object-fit:cover;border-radius:8px;flex-shrink:0">
+                                        @else
+                                            <div
+                                                style="width:40px;height:40px;border-radius:8px;background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                                <i class="bi bi-box" style="color:var(--text-muted)"></i>
+                                            </div>
+                                        @endif
+                                        <div>
+                                            <a href="{{ route('admin.products.show', $product) }}"
+                                                style="font-weight:500;color:var(--text-primary);text-decoration:none">{{ $product->name }}</a>
+                                            @if ($product->slug)
+                                                <div style="font-size:.75rem;color:var(--text-muted)">{{ $product->slug }}
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
-                            @endif
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-surface-900 dark:text-white">{{ $product->name }}</div>
-                                <div class="text-sm text-surface-500 dark:text-surface-400">SKU: {{ $product->sku ?? '-' }}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-surface-900 dark:text-white">{{ $product->category->name ?? 'Uncategorized' }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white">Rp {{ number_format($product->price ?? 0, 0, ',', '.') }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @if($product->is_active)
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Active</span>
-                        @else
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">Inactive</span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{{ route('admin.products.edit', $product->id) }}" class="inline-block text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-3">
-                            <i data-lucide="pencil" class="w-4 h-4"></i>
-                        </a>
-                        <form class="form-confirm-delete" action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="inline-block form-confirm-delete" >
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-surface-500 dark:text-surface-400">
-                        <div class="flex flex-col items-center">
-                            <i data-lucide="package" class="w-4 h-4 text-4xl mb-3 text-surface-300 dark:text-surface-600 dark:text-surface-400"></i>
-                            <p>No products found.</p>
-                        </div>
-                    </td>
-                </tr>
-                @endforelse
-            
-                
-                
-                </tbody>
-            </table>
+                                </td>
+                                <td>{{ $product->category->name ?? '-' }}</td>
+                                <td>
+                                    @php $minPrice = $product->pricingPlans()->min('price'); @endphp
+                                    {{ $minPrice ? 'Rp ' . number_format($minPrice, 0, ',', '.') : 'Free' }}
+                                </td>
+                                <td>
+                                    @if ($product->is_active)
+                                        <span class="badge-saas badge-saas-success">Active</span>
+                                    @else
+                                        <span class="badge-saas badge-saas-neutral">Inactive</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{{ route('admin.products.show', $product) }}"
+                                            class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.products.edit', $product) }}"
+                                            class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form action="{{ route('admin.products.destroy', $product) }}" method="POST"
+                                            class="form-confirm-delete">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon"
+                                                title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon"><i class="bi bi-box"></i></div>
+                                        <div class="empty-state-title">No products found</div>
+                                        <div class="empty-state-description">Create your first product to start selling
+                                        </div>
+                                        <a href="{{ route('admin.products.create') }}"
+                                            class="btn-saas btn-saas-primary mt-3">
+                                            <i class="bi bi-plus-lg me-1"></i> Add Product
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
+        @if (isset($products) && method_exists($products, 'links'))
+            <div class="card-saas-footer">{{ $products->links() }}</div>
+        @endif
     </div>
-</div>
 @endsection
+@push('scripts')
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('#productsTable tbody tr').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    </script>
+@endpush

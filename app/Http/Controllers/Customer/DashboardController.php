@@ -11,38 +11,61 @@ use App\Models\Invoice;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Carbon\Carbon;
 
 /**
  * Customer Dashboard Controller
  *
- * Handles customer dashboard with subscription, license, and invoice statistics.
+ * Handles customer dashboard with subscription, license, invoice, and spending statistics.
  */
 final class DashboardController extends Controller
 {
     /**
      * Display customer dashboard with comprehensive statistics.
      */
-    public function index()
+    public function index(): View
     {
         $customer = Auth::guard('customer')->user();
+        $now      = Carbon::now();
 
-        // License Statistics
+        // ─────────────────────────────────────────────
+        // LICENSE KPIs
+        // ─────────────────────────────────────────────
         $activeLicenses = License::where('customer_id', $customer->id)
             ->where('status', 'active')
             ->count();
 
         $expiringLicenses = License::where('customer_id', $customer->id)
             ->where('status', 'active')
-            ->where('expires_at', '<=', now()->addDays(30))
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<=', $now->copy()->addDays(30))
             ->count();
 
-        // Subscription Statistics
-        $totalSubscriptions = Subscription::where('customer_id', $customer->id)->count();
+        $totalLicenses = License::where('customer_id', $customer->id)->count();
+
+        // ─────────────────────────────────────────────
+        // SUBSCRIPTION KPIs
+        // ─────────────────────────────────────────────
+        $totalSubscriptions  = Subscription::where('customer_id', $customer->id)->count();
         $activeSubscriptions = Subscription::where('customer_id', $customer->id)
             ->where('status', 'active')
             ->count();
+        $expiredSubscriptions = Subscription::where('customer_id', $customer->id)
+            ->where('status', 'expired')
+            ->count();
 
-        // Invoice Statistics
+        // Upcoming renewals in next 14 days
+        $upcomingRenewals = Subscription::where('customer_id', $customer->id)
+            ->where('status', Subscription::STATUS_ACTIVE)
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<=', $now->copy()->addDays(14))
+            ->orderBy('expires_at')
+            ->with(['subscriptionPlan'])
+            ->get();
+
+        // ─────────────────────────────────────────────
+        // INVOICE KPIs
+        // ─────────────────────────────────────────────
         $pendingInvoices = Invoice::where('customer_id', $customer->id)
             ->where('status', 'pending')
             ->count();
@@ -51,52 +74,86 @@ final class DashboardController extends Controller
             ->where('status', 'pending')
             ->sum('amount');
 
-        // Transaction Statistics
+        // ─────────────────────────────────────────────
+        // SPENDING KPIs
+        // ─────────────────────────────────────────────
         $totalSpent = Transaction::where('customer_id', $customer->id)
             ->where('status', 'paid')
             ->sum('gross_amount');
 
+        $thisMonthSpent = Transaction::where('customer_id', $customer->id)
+            ->where('status', 'paid')
+            ->whereYear('paid_at', $now->year)
+            ->whereMonth('paid_at', $now->month)
+            ->sum('gross_amount');
+
+        $totalTransactions = Transaction::where('customer_id', $customer->id)
+            ->where('status', 'paid')
+            ->count();
+
+        // ─────────────────────────────────────────────
+        // SPENDING CHART — Last 6 Months
+        // ─────────────────────────────────────────────
+        $spendingChart = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = $now->copy()->subMonths($i);
+            $spendingChart[] = [
+                'month'  => $month->format('M Y'),
+                'amount' => (float) Transaction::where('customer_id', $customer->id)
+                    ->where('status', 'paid')
+                    ->whereYear('paid_at', $month->year)
+                    ->whereMonth('paid_at', $month->month)
+                    ->sum('gross_amount'),
+            ];
+        }
+
+        // ─────────────────────────────────────────────
+        // RECENT DATA
+        // ─────────────────────────────────────────────
         $recentTransactions = Transaction::where('customer_id', $customer->id)
-            ->with(['subscription'])
+            ->with(['subscription.subscriptionPlan'])
             ->latest()
-            ->limit(5)
+            ->limit(6)
             ->get();
 
-        // Recent Licenses
         $recentLicenses = License::where('customer_id', $customer->id)
-            ->with(['subscription.product'])
-            ->latest()
+            ->with(['subscription.subscriptionPlan'])
+            ->orderBy('expires_at')
             ->limit(5)
             ->get();
 
-        // Upcoming Renewals
-        $upcomingRenewals = Subscription::where('customer_id', $customer->id)
-            ->where('status', Subscription::STATUS_ACTIVE)
-            ->whereNotNull('expires_at')
-            ->where('expires_at', '<=', now()->addDays(14))
-            ->get();
-
-        // Notifications
-        $notifications = $customer->notifications()
-            ->unread()
-            ->latest()
-            ->limit(5)
-            ->get();
+        // ─────────────────────────────────────────────
+        // NOTIFICATIONS
+        // ─────────────────────────────────────────────
+        try {
+            $notifications = $customer->notifications()
+                ->unread()
+                ->latest()
+                ->limit(5)
+                ->get();
+        } catch (\Throwable $e) {
+            $notifications = collect();
+        }
 
         return view('customer.dashboard.index', [
             'stats' => [
-                'activeLicenses' => $activeLicenses,
-                'expiringLicenses' => $expiringLicenses,
-                'totalSubscriptions' => $totalSubscriptions,
+                'activeLicenses'      => $activeLicenses,
+                'totalLicenses'       => $totalLicenses,
+                'expiringLicenses'    => $expiringLicenses,
+                'totalSubscriptions'  => $totalSubscriptions,
                 'activeSubscriptions' => $activeSubscriptions,
-                'pendingInvoices' => $pendingInvoices,
-                'unpaidInvoicesAmount' => $unpaidInvoicesAmount,
-                'totalSpent' => $totalSpent,
+                'expiredSubscriptions'=> $expiredSubscriptions,
+                'pendingInvoices'     => $pendingInvoices,
+                'unpaidInvoicesAmount'=> $unpaidInvoicesAmount,
+                'totalSpent'          => $totalSpent,
+                'thisMonthSpent'      => $thisMonthSpent,
+                'totalTransactions'   => $totalTransactions,
             ],
             'recentTransactions' => $recentTransactions,
-            'recentLicenses' => $recentLicenses,
-            'upcomingRenewals' => $upcomingRenewals,
-            'notifications' => $notifications,
+            'recentLicenses'     => $recentLicenses,
+            'upcomingRenewals'   => $upcomingRenewals,
+            'notifications'      => $notifications,
+            'spendingChart'      => $spendingChart,
         ]);
     }
 }

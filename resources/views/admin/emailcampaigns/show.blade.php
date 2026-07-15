@@ -1,60 +1,86 @@
 @extends('layouts.admin')
-
-@section('title', 'Email Campaigns Details')
-@section('subtitle', 'View specific email campaigns data.')
+@section('title', 'Campaign: ' . $campaign->name)
+@section('subtitle', 'View campaign details')
 
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <!-- Header Actions -->
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
+    <div class="mb-4">
+        <a href="{{ route('admin.email-campaigns.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Campaigns
         </a>
     </div>
 
-    <!-- Details Card -->
-    <div class="corporate-card">
-        <div class="card-header">
-            <h3 class="card-title">Information Details</h3>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card-saas">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title"><i class="bi bi-envelope-open me-2"></i>{{ $campaign->name }}</h5>
+                </div>
+                <div class="card-saas-body">
+                    <div class="mb-3">
+                        <div class="form-saas-label mb-1">Subject</div>
+                        <div style="font-size:1rem;font-weight:600">{{ $campaign->subject }}</div>
+                    </div>
+                    <div>
+                        <div class="form-saas-label mb-2">Body</div>
+                        <div class="card-saas" style="background:var(--surface-raised)">
+                            <div class="card-saas-body" style="font-size:.9rem;line-height:1.8">
+                                {!! nl2br(e($campaign->body ?? $campaign->content)) !!}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-300">
-        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back
-    </a>
-    
-    <a href="javascript:void(0)" class="inline-flex items-center px-4 py-2 border border-surface-300 dark:border-surface-600 rounded-md font-medium text-xs text-surface-700 dark:text-surface-200 bg-white dark:bg-surface-800 hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700 shadow-sm transition">
-        <i data-lucide="edit" class="w-4 h-4 mr-2"></i> Edit
-    </a>
-</div>
 
-<div class="corporate-card overflow-hidden">
-    <div class="px-6 py-5 border-b border-surface-200 dark:border-surface-700">
-        <h3 class="text-lg leading-6 font-medium text-surface-900 dark:text-white">Information Overview</h3>
-        <p class="mt-1 max-w-2xl text-sm text-surface-500 dark:text-surface-400">Detailed breakdown of the record.</p>
-    </div>
-    <div class="px-6 py-5 sm:p-0">
-        <dl class="sm:divide-y sm:divide-surface-200 dark:divide-surface-700 dark:sm:divide-surface-700">
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">ID</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">#0001</dd>
+        <div class="col-lg-4">
+            <div class="card-saas mb-4">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title"><i class="bi bi-info-circle me-2"></i>Details</h5>
+                </div>
+                <div class="card-saas-body">
+                    <table class="w-100" style="font-size:.9rem;border-collapse:collapse">
+                        <tr>
+                            <td style="padding:.5rem 0;color:var(--text-muted);width:40%">Status</td>
+                            <td style="padding:.5rem 0">
+                                @if ($campaign->status === 'sent')
+                                    <span class="badge-saas badge-saas-success">Sent</span>
+                                @else
+                                    <span class="badge-saas badge-saas-neutral">Draft</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:.5rem 0;color:var(--text-muted)">Created</td>
+                            <td style="padding:.5rem 0">{{ $campaign->created_at->format('d M Y, H:i') }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:.5rem 0;color:var(--text-muted)">Updated</td>
+                            <td style="padding:.5rem 0">{{ $campaign->updated_at->format('d M Y, H:i') }}</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Title</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">Sample Record</dd>
-            </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Status</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Active</span>
-                </dd>
-            </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Description</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">This is a generated placeholder description for the record details view. It represents standard data output.</dd>
-            </div>
-        </dl>
-    </div>
+
+            @if ($campaign->status !== 'sent')
+                <div class="card-saas">
+                    <div class="card-saas-header">
+                        <h5 class="card-saas-title"><i class="bi bi-send me-2"></i>Actions</h5>
+                    </div>
+                    <div class="card-saas-body">
+                        <p style="font-size:.88rem;color:var(--text-muted)">Send this campaign to all subscribers. This
+                            action cannot be undone.</p>
+                        <form action="{{ route('admin.email-campaigns.send', $campaign) }}" method="POST"
+                            class="form-confirm-submit">
+                            @csrf
+                            <button type="submit" class="btn-saas btn-saas-primary w-100">
+                                <i class="bi bi-send-fill me-1"></i> Send Campaign
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
-</div>
+
+    @include('components.swal-alert')
 @endsection

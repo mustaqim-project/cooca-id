@@ -425,7 +425,7 @@ final class PaymentService
      */
     public function getTransactionsPaginated(int $perPage = 15): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        return Transaction::with(['customer', 'subscription', 'product'])
+        return Transaction::with(['customer', 'subscription.subscriptionPlan.product'])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
     }
@@ -435,7 +435,7 @@ final class PaymentService
      */
     public function findTransactionById(string $id): ?Transaction
     {
-        return Transaction::with(['customer', 'subscription', 'product', 'invoice'])->find($id);
+        return Transaction::with(['customer', 'subscription.subscriptionPlan.product', 'invoice'])->find($id);
     }
 
     /**

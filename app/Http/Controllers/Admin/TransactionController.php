@@ -24,7 +24,7 @@ final class TransactionController extends Controller
         $transactions = $this->paymentService->getTransactionsPaginated(15);
 
         return view('admin.transactions.index', [
-            'transactions' => TransactionResource::collection($transactions),
+            'transactions' => $transactions,
         ]);
     }
 
@@ -40,7 +40,7 @@ final class TransactionController extends Controller
         }
 
         return view('admin.transactions.show', [
-            'transaction' => new TransactionResource($transaction),
+            'transaction' => $transaction,
         ]);
     }
 

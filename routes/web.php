@@ -76,6 +76,11 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::middleware('auth:customer')->group(function () {
         Route::post('logout', [LandingController::class, 'customerLogout'])->name('logout');
         
+        // Email Verification
+        Route::get('email/verify', [LandingController::class, 'showCustomerVerificationNotice'])->name('verification.notice');
+        Route::get('email/verify/{id}/{hash}', [LandingController::class, 'verifyCustomerEmail'])->middleware('signed')->name('verification.verify');
+        Route::post('email/verification-notification', [LandingController::class, 'resendCustomerVerificationEmail'])->middleware('throttle:6,1')->name('verification.send');
+        
         // Contract Routes
         Route::get('contracts/{licenseId}', [\App\Http\Controllers\Customer\ContractController::class, 'show'])->name('contracts.show');
         Route::post('contracts/{licenseId}/sign', [\App\Http\Controllers\Customer\ContractController::class, 'sign'])->name('contracts.sign');

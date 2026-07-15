@@ -45,32 +45,33 @@ class ActivateSubscriptionJob implements ShouldQueue
                 return;
             }
 
-            // Cek apakah sudah ada subscription aktif untuk order ini
-            $existingSubscription = Subscription::where('transaction_id', $this->transaction->id)
-                ->first();
+            // Get the subscription associated with this transaction
+            $subscription = $this->transaction->subscription;
 
-            if ($existingSubscription) {
-                if ($existingSubscription->status === 'active') {
-                    Log::channel('payment')->info('Subscription already active', [
-                        'subscription_id' => $existingSubscription->id,
-                    ]);
-                    return;
-                }
-                
-                // Update status jika sebelumnya failed/pending
-                $existingSubscription->update([
-                    'status' => 'active',
-                    'activated_at' => now(),
+            if (!$subscription) {
+                Log::channel('payment')->error('No subscription found for transaction', [
+                    'transaction_id' => $this->transaction->id,
                 ]);
-            } else {
-                // Buat subscription baru
-                $subscriptionService->createSubscriptionFromTransaction($this->transaction);
+                return;
             }
 
-            // Update ERP Request status jika terkait
-            if ($this->transaction->erpRequest) {
-                $this->transaction->erpRequest->update([
-                    'status' => 'active', // atau status akhir yang sesuai
+            if ($subscription->status === 'active') {
+                Log::channel('payment')->info('Subscription already active', [
+                    'subscription_id' => $subscription->id,
+                ]);
+                return;
+            }
+
+            // Get plan duration (assuming 1 month if not specified)
+            $durationMonths = $subscription->subscriptionPlan?->duration_months ?? 1;
+
+            // Activate subscription (ini juga akan memperbarui license via SubscriptionService)
+            $subscriptionService->activateSubscription($subscription, $durationMonths);
+
+            // Update ERP Request status jika terkait via License
+            if ($subscription->license && $subscription->license->erpRequest) {
+                $subscription->license->erpRequest->update([
+                    'status' => 'active', 
                     'approved_at' => now(),
                 ]);
             }

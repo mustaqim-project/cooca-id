@@ -23,7 +23,7 @@ class SubscriptionController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Subscription::with(['customer', 'product', 'license'])
+        $query = Subscription::with(['customer', 'subscriptionPlan.product', 'license'])
             ->latest('created_at');
 
         // Filters
@@ -36,7 +36,9 @@ class SubscriptionController extends Controller
         }
 
         if ($product = $request->get('product_id')) {
-            $query->where('product_id', $product);
+            $query->whereHas('subscriptionPlan', function ($q) use ($product) {
+                $q->where('product_id', $product);
+            });
         }
 
         $subscriptions = $query->paginate(20)->withQueryString();
@@ -65,7 +67,7 @@ class SubscriptionController extends Controller
      */
     public function show(Subscription $subscription)
     {
-        $subscription->load(['customer', 'product', 'license', 'transactions']);
+        $subscription->load(['customer', 'subscriptionPlan.product', 'license', 'transactions']);
 
         $timeline = [];
         

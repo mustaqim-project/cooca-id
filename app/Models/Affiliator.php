@@ -31,6 +31,12 @@ final class Affiliator extends Authenticatable
         'parent_affiliator_id',
         'referral_code',
         'google_id',
+        'status',
+        'suspension_reason_type',
+        'suspension_reason_notes',
+        'appeal_reason',
+        'appeal_proof_path',
+        'appealed_at',
     ];
 
     protected $hidden = [
@@ -43,6 +49,7 @@ final class Affiliator extends Authenticatable
         return [
             ...parent::casts(),
             'balance' => 'decimal:2',
+            'appealed_at' => 'datetime',
         ];
     }
 

@@ -29,27 +29,35 @@ class ReviewController extends Controller
             ->pluck('id');
 
         // Get reviews from referred customers
-        $query = Review::whereIn('customer_id', $customerIds)
-            ->with(['customer', 'product'])
+        $query = Review::where('reviewer_type', 'customer')
+            ->whereIn('reviewer_id', $customerIds)
+            ->with(['reviewer', 'reviewable'])
             ->latest('created_at');
 
         // Filters
-        if ($status = $request->get('status')) {
-            $query->where('status', $status);
+        if ($request->has('status')) {
+            $status = $request->get('status');
+            if ($status === 'approved') {
+                $query->where('is_approved', true);
+            } elseif ($status === 'pending') {
+                $query->where('is_approved', false);
+            }
         }
 
         if ($product = $request->get('product_id')) {
-            $query->where('product_id', $product);
+            $query->where('reviewable_type', \App\Models\Product::class)
+                  ->where('reviewable_id', $product);
         }
 
         $reviews = $query->paginate(20)->withQueryString();
 
         $stats = [
-            'total' => Review::whereIn('customer_id', $customerIds)->count(),
-            'approved' => Review::whereIn('customer_id', $customerIds)->where('status', 'approved')->count(),
-            'average_rating' => round(Review::whereIn('customer_id', $customerIds)
-                ->where('status', 'approved')
-                ->avg('rating') ?? 0, 2),
+            'total' => Review::where('reviewer_type', 'customer')->whereIn('reviewer_id', $customerIds)->count(),
+            'approved' => Review::where('reviewer_type', 'customer')->whereIn('reviewer_id', $customerIds)->where('is_approved', true)->count(),
+            'average_rating' => round((float) (Review::where('reviewer_type', 'customer')
+                ->whereIn('reviewer_id', $customerIds)
+                ->where('is_approved', true)
+                ->avg('rating') ?? 0), 2),
         ];
 
         return view('affiliator.reviews.index', [
@@ -84,17 +92,18 @@ class ReviewController extends Controller
             ]);
         }
 
-        $query = Review::where('customer_id', $customer->id)
-            ->with(['product'])
+        $query = Review::where('reviewer_type', 'customer')
+            ->where('reviewer_id', $customer->id)
+            ->with(['reviewable'])
             ->latest('created_at');
 
         $reviews = $query->paginate(20);
 
         $stats = [
-            'total' => Review::where('customer_id', $customer->id)->count(),
-            'pending' => Review::where('customer_id', $customer->id)->where('status', 'pending')->count(),
-            'approved' => Review::where('customer_id', $customer->id)->where('status', 'approved')->count(),
-            'rejected' => Review::where('customer_id', $customer->id)->where('status', 'rejected')->count(),
+            'total' => Review::where('reviewer_type', 'customer')->where('reviewer_id', $customer->id)->count(),
+            'pending' => Review::where('reviewer_type', 'customer')->where('reviewer_id', $customer->id)->where('is_approved', false)->count(),
+            'approved' => Review::where('reviewer_type', 'customer')->where('reviewer_id', $customer->id)->where('is_approved', true)->count(),
+            'rejected' => 0,
         ];
 
         return view('affiliator.reviews.my_reviews', [
@@ -125,8 +134,10 @@ class ReviewController extends Controller
         ]);
 
         // Check if already reviewed
-        $existingReview = Review::where('customer_id', $customer->id)
-            ->where('product_id', $validated['product_id'])
+        $existingReview = Review::where('reviewer_type', 'customer')
+            ->where('reviewer_id', $customer->id)
+            ->where('reviewable_type', \App\Models\Product::class)
+            ->where('reviewable_id', $validated['product_id'])
             ->first();
 
         if ($existingReview) {
@@ -134,12 +145,14 @@ class ReviewController extends Controller
         }
 
         Review::create([
-            'customer_id' => $customer->id,
-            'product_id' => $validated['product_id'],
+            'reviewer_type' => 'customer',
+            'reviewer_id' => $customer->id,
+            'reviewable_type' => \App\Models\Product::class,
+            'reviewable_id' => $validated['product_id'],
             'rating' => $validated['rating'],
             'title' => $validated['title'],
             'comment' => $validated['comment'],
-            'status' => 'pending',
+            'is_approved' => false,
         ]);
 
         return redirect()->route('affiliator.reviews.my_reviews')

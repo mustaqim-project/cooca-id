@@ -60,13 +60,17 @@ class LandingCmsController extends Controller
 
         // Handle File Uploads
         if ($request->hasFile('site_logo')) {
-            $path = $request->file('site_logo')->storePublicly('settings', 'public');
-            Setting::set('site.logo', '/storage/' . $path, 'string');
+            $file = $request->file('site_logo');
+            $filename = time() . '_logo.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/settings'), $filename);
+            Setting::set('site.logo', '/uploads/settings/' . $filename, 'string');
         }
 
         if ($request->hasFile('site_favicon')) {
-            $path = $request->file('site_favicon')->storePublicly('settings', 'public');
-            Setting::set('site.favicon', '/storage/' . $path, 'string');
+            $file = $request->file('site_favicon');
+            $filename = time() . '_favicon.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/settings'), $filename);
+            Setting::set('site.favicon', '/uploads/settings/' . $filename, 'string');
         }
 
         // Handle Text Fields

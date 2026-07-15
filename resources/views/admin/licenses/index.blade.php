@@ -4,109 +4,122 @@
 @section('subtitle', 'Manage software licenses and domain authorizations')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
+    <div class="page-toolbar mb-4">
+        <div class="page-toolbar-left">
+            <div class="input-group" style="width:320px">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search license, domain, customer...">
             </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
         </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-            
+        <div class="page-toolbar-right">
+            {{-- No create button: licenses are generated automatically --}}
         </div>
     </div>
 
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
-                <tr>
-                    <th scope="col" class="table-th">License Key / Domain</th>
-                    <th scope="col" class="table-th">Customer</th>
-                    <th scope="col" class="table-th">Product</th>
-                    <th scope="col" class="table-th">Status</th>
-                    <th scope="col" class="table-th">Actions</th>
-                </tr>
-            
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
-                @forelse($licenses as $license)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white font-mono" title="{{ $license->key }}">
-                            {{ substr($license->key, 0, 16) }}...
-                        </div>
-                        <div class="text-sm text-surface-500 dark:text-surface-400">
-                            {{ $license->domain ?? 'Unconfigured' }}
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <a href="{{ route('admin.customers.show', $license->customer_id ?? 0) }}" class="text-sm font-medium text-primary-600 hover:underline">
-                            {{ $license->customer->name ?? 'Unknown Customer' }}
-                        </a>
-                        <div class="text-xs text-surface-500 dark:text-surface-400">{{ $license->customer->email ?? '' }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-surface-900 dark:text-white">{{ $license->product->name ?? 'Unknown Product' }}</div>
-                        @if($license->subscription_id)
-                            <a href="{{ route('admin.subscriptions.show', $license->subscription_id) }}" class="text-xs text-primary-600 hover:underline">
-                                Sub: #{{ substr($license->subscription_id, 0, 8) }}
-                            </a>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @php
-                            $statusClass = match($license->status) {
-                                'active' => 'bg-green-100 text-green-800',
-                                'inactive' => 'bg-yellow-100 text-yellow-800',
-                                'revoked' => 'bg-red-100 text-red-800',
-                                'expired' => 'bg-surface-100 text-surface-800',
-                                default => 'bg-surface-100 text-surface-800'
-                            };
-                        @endphp
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
-                            {{ ucfirst($license->status) }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div class="flex justify-end gap-2">
-                            @if($license->status == 'active')
-                                <button type="button" class="text-red-600 hover:text-red-900" title="Revoke License" onclick="revokeLicense('{{ $license->id }}')">
-                                    <i data-lucide="x" class="w-4 h-4"></i> Revoke
-                                </button>
-                            @else
-                                <button type="button" class="text-green-600 hover:text-green-900" title="Activate License" onclick="activateLicense('{{ $license->id }}')">
-                                    <i data-lucide="check" class="w-4 h-4"></i> Activate
-                                </button>
-                            @endif
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="px-6 py-12 text-center text-surface-500 dark:text-surface-400">
-                        <i data-lucide="key" class="w-4 h-4"></i>
-                        <p>No licenses found.</p>
-                    </td>
-                </tr>
-                @endforelse
-            
-                
-                
-                </tbody>
-            </table>
+    <div class="card-saas">
+        <div class="card-saas-body p-0">
+            <div class="table-responsive">
+                <table class="table-saas" id="licensesTable">
+                    <thead>
+                        <tr>
+                            <th>License Key / Domain</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($licenses as $license)
+                            <tr>
+                                <td>
+                                    <code class="text-sm"
+                                        title="{{ $license->key }}">{{ substr($license->key, 0, 16) }}…</code>
+                                    <div class="small text-muted mt-1">
+                                        <i class="bi bi-globe2 me-1"></i>{{ $license->domain ?? 'Unconfigured' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="{{ route('admin.customers.show', $license->customer_id ?? 0) }}"
+                                        class="fw-semibold text-decoration-none">
+                                        {{ $license->customer->name ?? 'Unknown' }}
+                                    </a>
+                                    <div class="small text-muted">{{ $license->customer->email ?? '' }}</div>
+                                </td>
+                                <td>
+                                    <span class="fw-medium">{{ $license->product->name ?? 'Unknown Product' }}</span>
+                                    @if ($license->subscription_id)
+                                        <div class="small">
+                                            <a href="{{ route('admin.subscriptions.show', $license->subscription_id) }}"
+                                                class="text-decoration-none">
+                                                Sub #{{ substr($license->subscription_id, 0, 8) }}
+                                            </a>
+                                        </div>
+                                    @endif
+                                </td>
+                                <td>
+                                    @php
+                                        $badgeMap = [
+                                            'active' => 'success',
+                                            'inactive' => 'warning',
+                                            'revoked' => 'danger',
+                                            'expired' => 'neutral',
+                                        ];
+                                        $badge = $badgeMap[$license->status] ?? 'neutral';
+                                    @endphp
+                                    <span
+                                        class="badge-saas badge-saas-{{ $badge }}">{{ ucfirst($license->status) }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        @if ($license->status === 'active')
+                                            <form action="{{ route('admin.licenses.revoke', $license) }}" method="POST"
+                                                class="form-confirm-submit">
+                                                @csrf
+                                                <button type="submit" class="btn-saas btn-saas-danger btn-saas-sm">
+                                                    <i class="bi bi-x-lg me-1"></i>Revoke
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('admin.licenses.activate', $license) }}" method="POST"
+                                                class="form-confirm-submit">
+                                                @csrf
+                                                <button type="submit" class="btn-saas btn-saas-primary btn-saas-sm">
+                                                    <i class="bi bi-check-lg me-1"></i>Activate
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon"><i class="bi bi-key"></i></div>
+                                        <div class="empty-state-title">No licenses found</div>
+                                        <div class="empty-state-description">Licenses are generated automatically when
+                                            subscriptions are activated.</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
+
+    @include('components.swal-alert')
 @endsection
+
+@push('scripts')
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('#licensesTable tbody tr').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    </script>
+@endpush

@@ -26,9 +26,11 @@ class CustomerLoginTest extends TestCase
             'name' => 'Test Customer',
             'email' => 'test@cooca.id',
             'password' => Hash::make('password123'),
+        ]);
+        $customer->forceFill([
             'email_verified_at' => now(),
             'status' => 'active',
-        ]);
+        ])->save();
 
         $response = $this->post(route('customer.login.submit'), [
             'email' => 'test@cooca.id',
@@ -42,8 +44,6 @@ class CustomerLoginTest extends TestCase
         $dashboardResponse = $this->actingAs($customer, 'customer')->get(route('customer.dashboard'));
         
         $dashboardResponse->assertStatus(200);
-        $dashboardResponse->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Customer/Dashboard/Index')
-        );
+        $dashboardResponse->assertViewIs('customer.dashboard.index');
     }
 }

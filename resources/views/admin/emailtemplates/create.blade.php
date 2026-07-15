@@ -1,68 +1,75 @@
 @extends('layouts.admin')
-
-@section('title', 'Create Email Templates')
-@section('subtitle', 'Add a new email templates record.')
+@section('title', 'New Template')
+@section('subtitle', 'Create a reusable email template')
 
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
+    <div class="mb-4">
+        <a href="{{ route('admin.email-templates.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Templates
         </a>
     </div>
 
-    <form action="#" method="POST"  class="form-confirm-submit">
-        @csrf
-        
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column: Main Form -->
-            <div class="lg:col-span-2 space-y-6">
-                <div class="corporate-card">
-                    <div class="p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-50/50 dark:bg-surface-900/50">
-                        <h3 class="text-lg font-medium text-surface-900 dark:text-white">Form Details</h3>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <form action="{{ route('admin.email-templates.store') }}" method="POST">
+                @csrf
+                <div class="card-saas">
+                    <div class="card-saas-header">
+                        <h5 class="card-saas-title"><i class="bi bi-file-earmark-plus me-2"></i>Template Details</h5>
                     </div>
-                    <div class="p-6 space-y-5">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="col-span-2">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Title / Name</label>
-                <input type="text" name="name" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white" placeholder="Enter title">
-            </div>
-            
-            <div class="col-span-2">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Description</label>
-                <textarea name="description" rows="4" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white" placeholder="Enter description"></textarea>
-            </div>
-            
-            <div class="col-span-2 md:col-span-1">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Status</label>
-                <select name="status" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white">
-                    <option value="1">Active</option>
-                    <option value="0">Inactive</option>
-                </select>
-            </div>
-        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Right Column: Actions -->
-            <div class="space-y-6">
-                <div class="corporate-card">
-                    <div class="p-6">
-                        <h3 class="text-lg font-medium text-surface-900 dark:text-white mb-2">Actions</h3>
-                        <p class="text-sm text-surface-500 dark:text-surface-400 mb-6">Review your changes before submitting.</p>
-                        
-                        <div class="flex flex-col space-y-3">
-                            
-                            <a href="javascript:history.back()" class="btn btn-secondary w-full">
-                                Cancel
-                            </a>
+                    <div class="card-saas-body">
+                        <div class="form-saas-group">
+                            <label class="form-saas-label" for="name">Template Name <span class="text-danger">*</span></label>
+                            <input class="form-saas-input @error('name') is-invalid @enderror" type="text" name="name" id="name" value="{{ old('name') }}" placeholder="e.g. Welcome Email" autofocus>
+                            @error('name')<div class="form-saas-error">{{ $message }}</div>@enderror
+                        </div>
+
+                        <div class="form-saas-group">
+                            <label class="form-saas-label" for="subject">Email Subject <span class="text-danger">*</span></label>
+                            <input class="form-saas-input @error('subject') is-invalid @enderror" type="text" name="subject" id="subject" value="{{ old('subject') }}" placeholder="e.g. Welcome to Cooca!">
+                            @error('subject')<div class="form-saas-error">{{ $message }}</div>@enderror
+                        </div>
+
+                        <div class="form-saas-group">
+                            <label class="form-saas-label" for="body">Email Body <span class="text-danger">*</span></label>
+                            <textarea class="form-saas-textarea @error('body') is-invalid @enderror" name="body" id="body" rows="12" placeholder="Write your template content here...">{{ old('body') }}</textarea>
+                            @error('body')<div class="form-saas-error">{{ $message }}</div>@enderror
+                            <div class="form-saas-hint">HTML supported. Use placeholders like <code>{{{{ name }}}}</code> for dynamic content.</div>
+                        </div>
+
+                        <div class="form-saas-group mb-0">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', '1') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_active">Active</label>
+                            </div>
+                            <div class="form-saas-hint">Inactive templates cannot be used in campaigns.</div>
                         </div>
                     </div>
+                    <div class="card-saas-footer d-flex gap-2 justify-content-end">
+                        <a href="{{ route('admin.email-templates.index') }}" class="btn-saas btn-saas-secondary">Cancel</a>
+                        <button type="submit" class="btn-saas btn-saas-primary">
+                            <i class="bi bi-check-lg me-1"></i> Save Template
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card-saas">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title"><i class="bi bi-info-circle me-2"></i>Available Placeholders</h5>
+                </div>
+                <div class="card-saas-body">
+                    <ul class="mb-0" style="padding-left:1.2rem;color:var(--text-muted);font-size:.88rem;line-height:2">
+                        <li><code>{{{{ name }}}}</code> — Customer name</li>
+                        <li><code>{{{{ email }}}}</code> — Customer email</li>
+                        <li><code>{{{{ platform_name }}}}</code> — Platform name</li>
+                        <li><code>{{{{ subscription_plan }}}}</code> — Plan name</li>
+                        <li><code>{{{{ expiry_date }}}}</code> — Expiry date</li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </form>
-</div>
+    </div>
 @endsection

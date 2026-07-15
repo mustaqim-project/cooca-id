@@ -258,6 +258,44 @@ class LandingController extends Controller
 
     /* ==================== CUSTOMER AUTH ==================== */
 
+    public function showCustomerVerificationNotice(Request $request)
+    {
+        return $request->user('customer')->hasVerifiedEmail()
+            ? redirect()->intended(route('customer.dashboard'))
+            : view('auth.customer.verify-email');
+    }
+
+    public function verifyCustomerEmail(Request $request, $id, $hash)
+    {
+        $customer = Customer::findOrFail($id);
+
+        if (! hash_equals((string) $hash, sha1($customer->getEmailForVerification()))) {
+            abort(403);
+        }
+
+        if ($customer->hasVerifiedEmail()) {
+            return redirect()->route('customer.dashboard');
+        }
+
+        if ($customer->markEmailAsVerified()) {
+            event(new \Illuminate\Auth\Events\Verified($customer));
+        }
+
+        return redirect()->intended(route('customer.dashboard'))
+            ->with('success', 'Email berhasil diverifikasi.');
+    }
+
+    public function resendCustomerVerificationEmail(Request $request)
+    {
+        if ($request->user('customer')->hasVerifiedEmail()) {
+            return redirect()->intended(route('customer.dashboard'));
+        }
+
+        $request->user('customer')->sendEmailVerificationNotification();
+
+        return back()->with('success', 'Link verifikasi telah dikirim ulang ke email Anda.');
+    }
+
     public function customerRegister(RegisterCustomerRequest $request)
     {
         $customer = $this->authService->registerCustomer($request->validated());

@@ -12,8 +12,8 @@ use App\Http\Resources\Admin\LicenseResource;
 use App\Services\License\LicenseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
-
-
+use App\Models\LicenseAppeal;
+use Illuminate\Http\Request;
 
 final class LicenseController extends Controller
 {
@@ -31,6 +31,22 @@ final class LicenseController extends Controller
 
         return view('admin.licenses.index', [
             'licenses' => LicenseResource::collection($licenses),
+        ]);
+    }
+
+    /**
+     * Display the specified license.
+     */
+    public function show(string $id)
+    {
+        $license = $this->licenseService->findById($id);
+
+        if (!$license) {
+            abort(404, 'License not found');
+        }
+
+        return view('admin.licenses.show', [
+            'license' => $license,
         ]);
     }
 
@@ -60,7 +76,7 @@ final class LicenseController extends Controller
     /**
      * Revoke the specified license.
      */
-    public function revoke(string $id, array $data)
+    public function revoke(\Illuminate\Http\Request $request, string $id)
     {
         $license = $this->licenseService->findById($id);
 
@@ -68,12 +84,21 @@ final class LicenseController extends Controller
             return response()->json(['message' => 'License not found'], 404);
         }
 
-        $this->licenseService->revoke($id, $data['revoked_by'], $data['reason'] ?? null);
-
-        return response()->json([
-            'message' => 'License revoked successfully',
-            'data' => new LicenseResource($license->fresh()),
+        $data = $request->validate([
+            'category' => 'required|string',
+            'reason' => 'nullable|string',
         ]);
+
+        $this->licenseService->revoke($id, auth('admin')->id(), $data['reason'] ?? null, $data['category']);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'License revoked successfully',
+                'data' => new LicenseResource($license->fresh()),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'License revoked successfully');
     }
 
     /**
@@ -93,5 +118,39 @@ final class LicenseController extends Controller
             'message' => 'License activated successfully',
             'data' => new LicenseResource($license->fresh()),
         ]);
+    }
+
+    public function approveAppeal(Request $request, string $licenseId, string $appealId)
+    {
+        $license = $this->licenseService->findById($licenseId);
+        if (!$license) abort(404);
+
+        $appeal = LicenseAppeal::findOrFail($appealId);
+        
+        $appeal->update([
+            'status' => 'approved',
+            'reviewed_by' => auth('admin')->id(),
+            'reviewed_at' => now(),
+        ]);
+
+        $this->licenseService->activate($licenseId);
+
+        return redirect()->back()->with('success', 'Appeal approved and license reactivated successfully.');
+    }
+
+    public function rejectAppeal(Request $request, string $licenseId, string $appealId)
+    {
+        $license = $this->licenseService->findById($licenseId);
+        if (!$license) abort(404);
+
+        $appeal = LicenseAppeal::findOrFail($appealId);
+        
+        $appeal->update([
+            'status' => 'rejected',
+            'reviewed_by' => auth('admin')->id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Appeal rejected.');
     }
 }

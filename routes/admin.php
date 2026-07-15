@@ -23,10 +23,11 @@ use App\Http\Controllers\Admin\SubscriptionPlanController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\VoucherController;
-
+use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\ErrorLogController;
 // Rate limiter for admin routes
 RateLimiter::for('admin', function ($request) {
-    return Limit::perMinute(100)->by($request->user()?->id ?? $request->ip());
+    return Limit::perMinute(120)->by($request->user()?->id ?? $request->ip()); // increased limit
 });
 
 RateLimiter::for('admin-login', function ($request) {
@@ -79,9 +80,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::get('/affiliators/create', [AffiliatorController::class, 'create'])->name('affiliators.create');
     Route::post('/affiliators', [AffiliatorController::class, 'store'])->name('affiliators.store');
     Route::get('/affiliators/{affiliator}', [AffiliatorController::class, 'show'])->name('affiliators.show');
-    Route::get('/affiliators/{affiliator}/edit', [AffiliatorController::class, 'edit'])->name('affiliators.edit');
-    Route::put('/affiliators/{affiliator}', [AffiliatorController::class, 'update'])->name('affiliators.update');
-    Route::delete('/affiliators/{affiliator}', [AffiliatorController::class, 'destroy'])->name('affiliators.destroy');
+    Route::post('/affiliators/{affiliator}/suspend', [AffiliatorController::class, 'suspend'])->name('affiliators.suspend');
+    Route::post('/affiliators/{affiliator}/reactivate', [AffiliatorController::class, 'reactivate'])->name('affiliators.reactivate');
 
     // Licenses Management
     Route::get('/licenses', [LicenseController::class, 'index'])->name('licenses.index');
@@ -89,11 +89,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::get('/licenses/{license}', [LicenseController::class, 'show'])->name('licenses.show');
     Route::post('/licenses/{license}/revoke', [LicenseController::class, 'revoke'])->name('licenses.revoke');
     Route::post('/licenses/{license}/activate', [LicenseController::class, 'activate'])->name('licenses.activate');
+    Route::post('/licenses/{license}/appeals/{appeal}/approve', [LicenseController::class, 'approveAppeal'])->name('licenses.appeals.approve');
+    Route::post('/licenses/{license}/appeals/{appeal}/reject', [LicenseController::class, 'rejectAppeal'])->name('licenses.appeals.reject');
 
     // Subscriptions Management
     Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
     Route::post('/subscriptions/{subscription}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+    Route::post('subscriptions/validate-domain', [SubscriptionController::class, 'validateDomain'])->name('subscriptions.validate-domain');
 
     // Transactions Management
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
@@ -116,6 +119,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::get('/settlements/{settlement}', [SettlementController::class, 'show'])->name('settlements.show');
     Route::post('/settlements/{settlement}/approve', [SettlementController::class, 'approve'])->name('settlements.approve');
     Route::post('/settlements/{settlement}/reject', [SettlementController::class, 'reject'])->name('settlements.reject');
+    Route::post('/settlements/{settlement}/mark-as-paid', [SettlementController::class, 'markAsPaid'])->name('settlements.markAsPaid');
 
     // CMS - Landing
     Route::get('/cms/landing', [LandingCmsController::class, 'index'])->name('cms.landing.index');
@@ -158,6 +162,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::post('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
     Route::post('/reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // System & Security Logs
+    Route::resource('audit-logs', AuditLogController::class)->only(['index', 'show']);
+    Route::get('error-logs', [ErrorLogController::class, 'index'])->name('error-logs.index');
+    Route::delete('error-logs/clear', [ErrorLogController::class, 'clear'])->name('error-logs.clear');
 
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
@@ -203,4 +212,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::delete('/testimonials/{testimonial}', [App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->name('testimonials.destroy');
     Route::post('/testimonials/reorder', [App\Http\Controllers\Admin\TestimonialController::class, 'reorder'])->name('testimonials.reorder');
     Route::post('/testimonials/{testimonial}/toggle-featured', [App\Http\Controllers\Admin\TestimonialController::class, 'toggleFeatured'])->name('testimonials.toggle-featured');
+    // API Integrations Management
+    Route::get('/api-integrations', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'index'])->name('api-integrations.index');
+    Route::get('/api-integrations/{provider}/edit', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'edit'])->name('api-integrations.edit');
+    Route::put('/api-integrations/{provider}', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'update'])->name('api-integrations.update');
+    Route::post('/api-integrations/{provider}/toggle', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'toggle'])->name('api-integrations.toggle');
+    Route::post('/api-integrations/{provider}/test', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'test'])->name('api-integrations.test');
 });

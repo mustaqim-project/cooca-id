@@ -22,7 +22,7 @@ class TicketController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Ticket::with(['customer', 'assignedTo'])->latest('created_at');
+        $query = Ticket::with(['customer', 'admin'])->latest('created_at');
 
         // Filters
         if ($status = $request->get('status')) {
@@ -73,7 +73,7 @@ class TicketController extends Controller
      */
     public function show(Ticket $ticket)
     {
-        $ticket->load(['customer', 'assignedTo', 'replies.user']);
+        $ticket->load(['customer', 'admin', 'replies.user']);
 
         return view('admin.tickets.show', [
             'ticket' => $ticket,

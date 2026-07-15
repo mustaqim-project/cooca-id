@@ -28,7 +28,7 @@ final class SettlementController extends Controller
         $withdrawals = $this->affiliateService->getWithdrawalsPaginated(15);
 
         return view('admin.settlements.index', [
-            'settlements' => AffiliateWithdrawalResource::collection($withdrawals),
+            'settlements' => $withdrawals,
         ]);
     }
 
@@ -41,7 +41,7 @@ final class SettlementController extends Controller
         }
 
         return view('admin.settlements.show', [
-            'settlement' => (new AffiliateWithdrawalResource($withdrawal))->resolve(),
+            'settlement' => $withdrawal,
         ]);
     }
 
@@ -95,7 +95,7 @@ final class SettlementController extends Controller
     /**
      * Mark withdrawal as paid.
      */
-    public function markAsPaid(string $id)
+    public function markAsPaid(Request $request, string $id)
     {
         $withdrawal = $this->affiliateService->findWithdrawalById($id);
 
@@ -103,7 +103,23 @@ final class SettlementController extends Controller
             return response()->json(['message' => 'Withdrawal not found'], 404);
         }
 
-        $this->affiliateService->markWithdrawalAsPaid($id);
+        $request->validate([
+            'proof_of_payment' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        ]);
+
+        $proofPath = null;
+        if ($request->hasFile('proof_of_payment')) {
+            $file = $request->file('proof_of_payment');
+            $filename = time() . '_proof.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/proofs'), $filename);
+            $proofPath = '/uploads/proofs/' . $filename;
+        }
+
+        $this->affiliateService->markWithdrawalAsPaid($id, $proofPath);
+
+        if (!$request->expectsJson()) {
+            return back()->with('success', 'Withdrawal marked as paid successfully');
+        }
 
         return response()->json([
             'message' => 'Withdrawal marked as paid',

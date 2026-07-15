@@ -41,8 +41,6 @@ class AffiliatorLoginTest extends TestCase
         $dashboardResponse = $this->actingAs($affiliator, 'affiliator')->get(route('affiliator.dashboard'));
         
         $dashboardResponse->assertStatus(200);
-        $dashboardResponse->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Affiliator/Dashboard/Index')
-        );
+        $dashboardResponse->assertViewIs('affiliator.dashboard.index');
     }
 }

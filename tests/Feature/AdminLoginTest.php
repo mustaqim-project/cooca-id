@@ -40,8 +40,6 @@ class AdminLoginTest extends TestCase
         $dashboardResponse = $this->actingAs($admin, 'admin')->get(route('admin.dashboard'));
         
         $dashboardResponse->assertStatus(200);
-        $dashboardResponse->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('Admin/Dashboard/Index')
-        );
+        $dashboardResponse->assertViewIs('admin.dashboard.index');
     }
 }

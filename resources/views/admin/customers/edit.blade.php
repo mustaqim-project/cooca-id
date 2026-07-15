@@ -1,82 +1,121 @@
 ﻿@extends('layouts.admin')
-
 @section('title', 'Edit Customer')
-@section('subtitle', 'Update customer information')
-
+@section('subtitle', 'Update customer account details')
 @section('content')
-<div class="space-y-6 max-w-4xl mx-auto">
-    <div class="flex items-center justify-between">
-        <a href="{{ route('admin.customers.index') }}" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back to Customers
+    <div class="mb-4">
+        <a href="{{ route('admin.customers.show', $customer) }}" class="btn-saas btn-saas-ghost btn-saas-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Customer
         </a>
     </div>
-
-    <div class="corporate-card">
-        <div class="p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-50/50 dark:bg-surface-900/50">
-            <h3 class="text-lg font-medium text-surface-900 dark:text-white">Customer Information</h3>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card-saas">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title"><i class="bi bi-pencil-square me-2"></i>Edit: {{ $customer->name }}</h5>
+                </div>
+                <div class="card-saas-body">
+                    <form action="{{ route('admin.customers.update', $customer) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-saas-group">
+                                    <label class="form-saas-label" for="name">Full Name <span
+                                            class="text-danger">*</span></label>
+                                    <input class="form-saas-input @error('name') is-invalid @enderror" type="text"
+                                        name="name" id="name" value="{{ old('name', $customer->name) }}" required>
+                                    @error('name')
+                                        <div class="form-saas-error">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-saas-group">
+                                    <label class="form-saas-label" for="email">Email Address <span
+                                            class="text-danger">*</span></label>
+                                    <input class="form-saas-input @error('email') is-invalid @enderror" type="email"
+                                        name="email" id="email" value="{{ old('email', $customer->email) }}" required>
+                                    @error('email')
+                                        <div class="form-saas-error">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-saas-group">
+                                    <label class="form-saas-label" for="phone">Phone Number</label>
+                                    <input class="form-saas-input @error('phone') is-invalid @enderror" type="text"
+                                        name="phone" id="phone" value="{{ old('phone', $customer->phone) }}">
+                                    @error('phone')
+                                        <div class="form-saas-error">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-saas-group">
+                                    <label class="form-saas-label" for="business_name">Business Name</label>
+                                    <input class="form-saas-input @error('business_name') is-invalid @enderror"
+                                        type="text" name="business_name" id="business_name"
+                                        value="{{ old('business_name', $customer->business_name) }}">
+                                    @error('business_name')
+                                        <div class="form-saas-error">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <hr style="border-color:var(--border-color)">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-saas-group">
+                                    <label class="form-saas-label" for="password">New Password</label>
+                                    <input class="form-saas-input @error('password') is-invalid @enderror" type="password"
+                                        name="password" id="password" placeholder="Leave blank to keep current">
+                                    @error('password')
+                                        <div class="form-saas-error">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-saas-group">
+                                    <label class="form-saas-label" for="password_confirmation">Confirm Password</label>
+                                    <input class="form-saas-input" type="password" name="password_confirmation"
+                                        id="password_confirmation" placeholder="Leave blank to keep current">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn-saas btn-saas-primary">
+                                <i class="bi bi-floppy me-1"></i> Update Customer
+                            </button>
+                            <a href="{{ route('admin.customers.show', $customer) }}"
+                                class="btn-saas btn-saas-ghost">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        
-        <form action="{{ route('admin.customers.update', $customer->id) }}" method="POST" class="p-6 space-y-6">
-            @csrf
-            @method('PUT')
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Full Name <span class="text-red-500">*</span></label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $customer->name) }}" required 
-                        class="block w-full py-2 px-3 border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-surface-900 dark:text-white">
-                    @error('name')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+        <div class="col-lg-4">
+            <div class="card-saas">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title"><i class="bi bi-person-circle me-2"></i>Account Info</h5>
                 </div>
-                
-                <div>
-                    <label for="email" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Email Address <span class="text-red-500">*</span></label>
-                    <input type="email" name="email" id="email" value="{{ old('email', $customer->email) }}" required 
-                        class="block w-full py-2 px-3 border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-surface-900 dark:text-white">
-                    @error('email')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                
-                <div>
-                    <label for="phone" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Phone Number</label>
-                    <input type="text" name="phone" id="phone" value="{{ old('phone', $customer->phone) }}" 
-                        class="block w-full py-2 px-3 border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-surface-900 dark:text-white">
-                    @error('phone')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                
-                <div>
-                    <label for="business_name" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Business Name</label>
-                    <input type="text" name="business_name" id="business_name" value="{{ old('business_name', $customer->business_name) }}" 
-                        class="block w-full py-2 px-3 border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-surface-900 dark:text-white">
-                    @error('business_name')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                
-                <div class="md:col-span-2">
-                    <label for="password" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Password</label>
-                    <input type="password" name="password" id="password" 
-                        class="block w-full py-2 px-3 border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm text-surface-900 dark:text-white">
-                    <p class="mt-1 text-xs text-surface-500">Leave blank to keep current password.</p>
-                    @error('password')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                <div class="card-saas-body">
+                    <dl style="font-size:.875rem;margin:0">
+                        <dt style="color:var(--text-muted);font-weight:500">Registered</dt>
+                        <dd class="mb-2">{{ $customer->created_at->format('d M Y') }}</dd>
+                        <dt style="color:var(--text-muted);font-weight:500">Last Login</dt>
+                        <dd class="mb-2">
+                            {{ $customer->last_login_at ? $customer->last_login_at->diffForHumans() : 'Never' }}</dd>
+                        <dt style="color:var(--text-muted);font-weight:500">Status</dt>
+                        <dd class="mb-0">
+                            @if ($customer->email_verified_at)
+                                <span class="badge-saas badge-saas-success">Verified</span>
+                            @else
+                                <span class="badge-saas badge-saas-warning">Unverified</span>
+                            @endif
+                        </dd>
+                    </dl>
                 </div>
             </div>
-            
-            <div class="pt-4 border-t border-surface-200 dark:border-surface-700 flex justify-end space-x-3">
-                <a href="{{ route('admin.customers.index') }}" class="px-4 py-2 border border-surface-300 dark:border-surface-600 rounded-lg shadow-sm text-sm font-medium text-surface-700 dark:text-surface-300 bg-white dark:bg-surface-800 hover:bg-surface-50 dark:hover:bg-surface-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-surface-900">
-                    Cancel
-                </a>
-                <button type="submit" class="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-surface-900">
-                    Update Customer
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
 @endsection

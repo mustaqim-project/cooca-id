@@ -22,7 +22,7 @@ use App\Http\Controllers\Customer\ProfileController;
 |
 */
 
-Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'verified', 'throttle:customer'])->group(function () {
+Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'verified:customer.verification.notice', 'throttle:customer'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -53,6 +53,7 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'veri
     Route::get('/licenses/{license}', [LicenseController::class, 'show'])->name('licenses.show');
     Route::post('/licenses/{license}/activate', [LicenseController::class, 'activate'])->name('licenses.activate');
     Route::get('/licenses/{license}/credentials', [LicenseController::class, 'credentials'])->name('licenses.credentials');
+    Route::post('/licenses/{license}/appeals', [\App\Http\Controllers\Customer\LicenseAppealController::class, 'store'])->name('licenses.appeals.store');
 
     // Reviews - Using policy-based authorization
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');

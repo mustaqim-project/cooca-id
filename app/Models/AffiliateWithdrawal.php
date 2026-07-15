@@ -29,6 +29,7 @@ final class AffiliateWithdrawal extends Model
         'rejected_at',
         'rejection_reason',
         'paid_at',
+        'proof_of_payment',
     ];
 
     protected $casts = [

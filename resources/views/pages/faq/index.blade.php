@@ -1,179 +1,71 @@
 @extends('layouts.guest')
-@push('styles')
-<style>
-    .hero-section {
-        min-height: 55vh;
-        display: flex;
-        align-items: center;
-        padding-top: 120px;
-        padding-bottom: 60px;
-        position: relative;
-        overflow: hidden;
-        background: var(--hero-gradient);
-    }
-    .hero-bg-orb {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(80px);
-        opacity: 0.12;
-        pointer-events: none;
-    }
-    .hero-bg-orb-1 {
-        width: 500px;
-        height: 500px;
-        background: var(--primary);
-        top: -200px;
-        right: -100px;
-    }
-    .hero-bg-orb-2 {
-        width: 400px;
-        height: 400px;
-        background: var(--accent);
-        bottom: -100px;
-        left: -100px;
-    }
-    .hero-content {
-        position: relative;
-        z-index: 2;
-    }
-    .accordion-cooca .accordion-item {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: var(--radius) !important;
-        margin-bottom: 16px;
-        overflow: hidden;
-        box-shadow: var(--shadow);
-    }
-    .accordion-cooca .accordion-button {
-        background: transparent;
-        color: var(--text);
-        font-weight: 700;
-        font-size: 1.1rem;
-        padding: 22px 28px;
-        box-shadow: none;
-    }
-    .accordion-cooca .accordion-button:not(.collapsed) {
-        background: transparent;
-        color: var(--accent);
-    }
-    .accordion-cooca .accordion-button::after {
-        filter: invert(1);
-    }
-    [data-theme="dark"] .accordion-cooca .accordion-button::after {
-        filter: invert(1);
-    }
-    [data-theme="light"] .accordion-cooca .accordion-button::after {
-        filter: none;
-    }
-    .accordion-cooca .accordion-body {
-        color: var(--text-muted);
-        font-size: 0.95rem;
-        padding: 0 28px 24px;
-        line-height: 1.8;
-    }
-</style>
-@endpush
 @section('content')
-<section class="blog-hero">
-    <div class="blog-hero-orb blog-hero-orb-1"></div>
-    <div class="blog-hero-orb blog-hero-orb-2"></div>
-    <div class="grid-bg"></div>
-    <div class="container text-center position-relative" style="z-index:2;">
-        <div class="badge-glow reveal mb-4">
-            <i class="bi bi-question-circle-fill"></i> {{ __(setting('faq.hero.badge', 'Help Center')) }}
-        </div>
-        <h1 class="hero-title reveal reveal-delay-1">
-            {!! __(setting('faq.hero.title', 'Frequently Asked <span class="text-gradient">Questions.</span>')) !!}
-        </h1>
-        <p class="hero-subtitle reveal reveal-delay-2" style="font-size:1.15rem;max-width:600px;margin:20px auto 0;">
-            {{ __(setting('faq.hero.subtitle', 'Everything you need to know about the product, billing, and technical support.')) }}
-        </p>
+
+<section class="page-hero">
+  <div class="page-hero-orb page-hero-orb-1"></div>
+  <div class="page-hero-orb page-hero-orb-2"></div>
+  <div class="grid-bg"></div>
+  <div class="container text-center position-relative" style="z-index:2;">
+    <div class="badge-glow reveal mb-4">
+      <i class="bi bi-star-fill"></i> {{ __('FAQ') }}
     </div>
+    <h1 class="hero-title reveal rv-delay-1">{!! __('Frequently Asked <span class="text-gradient">Questions.</span>') !!}</h1>
+    <p class="hero-subtitle reveal rv-delay-2" style="font-size:1.1rem;max-width:640px;margin:16px auto 0;">
+      {{ __('Everything you need to know about COOCA, our licensing model, infrastructure, and how we serve your business.') }}
+    </p>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 reveal">
+        <div class="accordion accordion-c" id="faqMain">
+          <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#f1">{{ __('What is COOCA?') }}</button></h2>
+            <div id="f1" class="accordion-collapse collapse show" data-bs-parent="#faqMain"><div class="accordion-body">{{ __('COOCA is an enterprise business infrastructure platform that provides lifetime-licensed ERP, CRM, POS, HRIS, and other business management modules on isolated container infrastructure.') }}</div></div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f2">{{ __('What does lifetime license mean?') }}</button></h2>
+            <div id="f2" class="accordion-collapse collapse" data-bs-parent="#faqMain"><div class="accordion-body">{{ __('You pay once and own the software forever. No annual renewal fees. No forced upgrades. Your license does not expire. This is fundamental to our business model.') }}</div></div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f3">{{ __('How is my data secured?') }}</button></h2>
+            <div id="f3" class="accordion-collapse collapse" data-bs-parent="#faqMain"><div class="accordion-body">{{ __('Each customer gets isolated infrastructure: separate container, separate database. Your data never touches another customer. All data is encrypted at rest (AES-256) and in transit (TLS 1.3). We perform daily automated backups.') }}</div></div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f4">{{ __('How long does setup take?') }}</button></h2>
+            <div id="f4" class="accordion-collapse collapse" data-bs-parent="#faqMain"><div class="accordion-body">{{ __('Your isolated instance is provisioned in approximately 30 minutes. Pre-configured industry templates mean you can start using the system immediately.') }}</div></div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f5">{{ __('Can I migrate my existing data?') }}</button></h2>
+            <div id="f5" class="accordion-collapse collapse" data-bs-parent="#faqMain"><div class="accordion-body">{{ __('Yes. We provide migration tools and dedicated support to move your data from legacy systems, spreadsheets, or other platforms. Most migrations are completed within 24 hours.') }}</div></div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f6">{{ __('Is there a free trial?') }}</button></h2>
+            <div id="f6" class="accordion-collapse collapse" data-bs-parent="#faqMain"><div class="accordion-body">{{ __('Absolutely. Start a 30-day full-access trial with all 10 modules. No credit card required. Your isolated instance is provisioned in 30 minutes, and you get full access to evaluate the system.') }}</div></div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f7">{{ __('Do you offer support?') }}</button></h2>
+            <div id="f7" class="accordion-collapse collapse" data-bs-parent="#faqMain"><div class="accordion-body">{{ __('Yes. We provide 30-day setup support included with every license, with extended support plans available. Our support team operates during Indonesian business hours (Mon–Fri, 9AM–6PM WIB) via WhatsApp, email, and ticketing.') }}</div></div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#f8">{{ __('Can I cancel my license?') }}</button></h2>
+            <div id="f8" class="accordion-collapse collapse" data-bs-parent="#faqMain"><div class="accordion-body">{{ __('Our refund policy covers the first 30 days after purchase. After that, since you own the license, there is no cancellation — the software is yours. We recommend thoroughly evaluating during the free trial period.') }}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- FAQ Section -->
-<section class="section-padding" style="background:var(--card-alt);">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="accordion accordion-cooca" id="mainFaqAccordion">
-                    <!-- FAQ 1 -->
-                    <div class="accordion-item reveal">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqItem1">
-                                {{ __(setting('faq.item1.question', 'What is COOCA?')) }}
-                            </button>
-                        </h2>
-                        <div id="faqItem1" class="accordion-collapse collapse show" data-bs-parent="#mainFaqAccordion">
-                            <div class="accordion-body">
-                                {{ __(setting('faq.item1.answer', 'COOCA is an all-in-one business operating system designed for retail, F&B, and service businesses. It combines point-of-sale, inventory, CRM, accounting, and HR into a single, unified platform.')) }}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 2 -->
-                    <div class="accordion-item reveal reveal-delay-1">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqItem2">
-                                {{ __(setting('faq.item2.question', 'Can I switch plans later?')) }}
-                            </button>
-                        </h2>
-                        <div id="faqItem2" class="accordion-collapse collapse" data-bs-parent="#mainFaqAccordion">
-                            <div class="accordion-body">
-                                {{ __(setting('faq.item2.answer', 'Absolutely. You can upgrade to a higher tier or a lifetime license at any time. We will prorate the remaining balance on your current subscription.')) }}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 3 -->
-                    <div class="accordion-item reveal reveal-delay-2">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqItem3">
-                                {{ __(setting('faq.item3.question', 'Do you provide onboarding support?')) }}
-                            </button>
-                        </h2>
-                        <div id="faqItem3" class="accordion-collapse collapse" data-bs-parent="#mainFaqAccordion">
-                            <div class="accordion-body">
-                                {{ __(setting('faq.item3.answer', 'Yes, our annual and lifetime plans include dedicated onboarding sessions. We will help you migrate your data from your existing systems and train your staff.')) }}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 4 -->
-                    <div class="accordion-item reveal reveal-delay-3">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqItem4">
-                                {{ __(setting('faq.item4.question', 'What hardware do I need?')) }}
-                            </button>
-                        </h2>
-                        <div id="faqItem4" class="accordion-collapse collapse" data-bs-parent="#mainFaqAccordion">
-                            <div class="accordion-body">
-                                {{ __(setting('faq.item4.answer', 'COOCA runs in any modern web browser. For the POS, you can use any iPad, Android tablet, PC, or Mac. We integrate with most standard receipt printers and barcode scanners via USB or Bluetooth.')) }}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- FAQ 5 -->
-                    <div class="accordion-item reveal reveal-delay-4">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqItem5">
-                                {{ __(setting('faq.item5.question', 'Is my data secure?')) }}
-                            </button>
-                        </h2>
-                        <div id="faqItem5" class="accordion-collapse collapse" data-bs-parent="#mainFaqAccordion">
-                            <div class="accordion-body">
-                                {{ __(setting('faq.item5.answer', 'Security is our top priority. Your data is encrypted at rest and in transit, and hosted on enterprise-grade cloud infrastructure with automatic daily backups.')) }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-5 text-center reveal reveal-delay-5">
-                    <p class="mb-4" style="font-size:1.1rem;color:var(--text-muted);">{{ __('Still have questions?') }}</p>
-                    <a href="{{ route('contact') }}" class="btn-cooca btn-cooca-primary">{{ __('Contact Support') }} <i class="bi bi-chat-dots"></i></a>
-                </div>
-            </div>
-        </div>
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <div class="container cta-content text-center">
+    <div class="reveal">
+      <h2 class="section-title">{{ __('Still Have <span class="text-gradient">Questions?</span>') }}</h2>
+      <p class="section-subtitle">{{ __('Our team is ready to answer any specific questions about your industry and requirements.') }}</p>
+      <a href="{{ route('contact') }}" class="btn btn-primary btn-lg">{{ __('Contact Us') }} <i class="bi bi-chat-dots"></i></a>
     </div>
+  </div>
 </section>
 @endsection

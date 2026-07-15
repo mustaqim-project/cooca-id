@@ -12,10 +12,17 @@ use Illuminate\Support\Facades\Schedule;
 |
 */
 
+// Process queue for shared hosting (since there is no Supervisor)
+Schedule::command('queue:work --stop-when-empty --max-time=50')->everyMinute()->withoutOverlapping();
+
+
 // Subscription expiry commands
 Schedule::command('subscriptions:expire')->dailyAt('00:05');
 Schedule::command('subscriptions:remind --days=7')->dailyAt('09:00');
 Schedule::command('subscriptions:remind --days=3')->dailyAt('09:00');
+
+// Affiliate
+Schedule::command('affiliate:clear-commissions')->dailyAt('00:00');
 
 // Daily Tasks
 Schedule::command('licenses:expire')->dailyAt('01:00')->name('Expire expired licenses');

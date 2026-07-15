@@ -16,9 +16,11 @@ class CustomerMenuTest extends TestCase
             'name' => 'Test Customer',
             'email' => 'customer@cooca.id',
             'password' => bcrypt('password123'),
+        ]);
+        $customer->forceFill([
             'email_verified_at' => now(),
             'status' => 'active',
-        ]);
+        ])->save();
 
         $menus = [
             'customer.dashboard',

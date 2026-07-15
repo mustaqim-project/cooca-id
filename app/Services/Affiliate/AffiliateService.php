@@ -16,11 +16,14 @@ use App\Repositories\Contracts\AffiliatorRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
+use App\Services\Security\FraudDetectionService;
+
 final class AffiliateService
 {
     public function __construct(
         private readonly AffiliateCommissionRepositoryInterface $commissionRepository,
         private readonly AffiliatorRepositoryInterface $affiliatorRepository,
+        private readonly FraudDetectionService $fraudDetectionService,
     ) {}
 
     /**
@@ -42,6 +45,11 @@ final class AffiliateService
             $plan = $transaction->subscription?->subscriptionPlan;
             $planId   = $plan?->id;
             $planName = $plan?->name;
+
+            // Check for Fraud
+            if ($this->fraudDetectionService->detectAffiliateFraud($transaction)) {
+                return ['commissions' => [], 'total' => 0];
+            }
 
             $commissions = [];
             $totalCommission = 0;
@@ -229,21 +237,15 @@ final class AffiliateService
         return (float) $query->sum('commission_amount');
     }
 
-    /**
-     * Get commission breakdown by level
-     */
-    public function getCommissionBreakdown(Affiliator $affiliator): array
+    public function getCommissionBreakdown(Affiliator $affiliator)
     {
-        return [
-            'level_1' => (float) AffiliateCommission::query()
-                ->where('affiliator_id', $affiliator->id)
-                ->where('level', 1)
-                ->sum('commission_amount'),
-            'level_2' => (float) AffiliateCommission::query()
-                ->where('affiliator_id', $affiliator->id)
-                ->where('level', 2)
-                ->sum('commission_amount'),
-        ];
+        return AffiliateCommission::query()
+            ->selectRaw('plan_name as product_name, SUM(commission_amount) as total')
+            ->where('affiliator_id', $affiliator->id)
+            ->whereNotNull('plan_name')
+            ->groupBy('plan_name')
+            ->orderByDesc('total')
+            ->get();
     }
 
     public function getAvailableBalance(string $affiliatorId): float
@@ -364,15 +366,21 @@ final class AffiliateService
         });
     }
 
-    public function markWithdrawalAsPaid(string $id): void
+    public function markWithdrawalAsPaid(string $id, ?string $proofPath = null): void
     {
+        $updateData = [
+            'status' => AffiliateWithdrawal::STATUS_PAID,
+            'paid_at' => now(),
+        ];
+
+        if ($proofPath) {
+            $updateData['proof_of_payment'] = $proofPath;
+        }
+
         AffiliateWithdrawal::query()
             ->where('id', $id)
             ->where('status', AffiliateWithdrawal::STATUS_APPROVED)
-            ->update([
-                'status' => AffiliateWithdrawal::STATUS_PAID,
-                'paid_at' => now(),
-            ]);
+            ->update($updateData);
     }
 
     private function withdrawalFee(string $withdrawalMethod): float

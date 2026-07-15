@@ -57,9 +57,54 @@ final class SubscriptionController extends Controller
         $customer = Auth::guard('customer')->user();
         $data = $request->validated();
 
+        $product = \App\Models\Product::where('slug', $data['product_slug'])->firstOrFail();
+        
+        // Ensure proper domain format
+        $domainStr = $data['domain'];
+        if (!str_contains($domainStr, '.')) {
+            $domainStr .= '.cooca.id';
+        }
+
+        $domain = \App\Models\Domain::firstOrCreate(
+            ['domain' => $domainStr],
+            [
+                'customer_id' => $customer->getKey(),
+                'type' => str_contains($domainStr, 'cooca.id') ? \App\Models\Domain::TYPE_SUBDOMAIN : \App\Models\Domain::TYPE_CUSTOM_DOMAIN,
+                'status' => \App\Models\Domain::STATUS_PENDING,
+            ]
+        );
+
+        // Find existing license or create (License is generated only 1 time forever)
+        $license = \App\Models\License::where('customer_id', $customer->getKey())
+            ->where('domain_id', $domain->id)
+            ->where('product_id', $product->id)
+            ->first();
+
+        if (!$license) {
+            do {
+                $licenseCode = strtoupper(\Illuminate\Support\Str::random(16));
+            } while (\App\Models\License::where('license_code', $licenseCode)->exists());
+
+            do {
+                $tokenCode = strtoupper(\Illuminate\Support\Str::random(16));
+            } while (\App\Models\License::where('token_code', $tokenCode)->exists());
+
+            $license = \App\Models\License::create([
+                'customer_id' => $customer->getKey(),
+                'product_id' => $product->id,
+                'subscription_plan_id' => $data['subscription_plan_id'],
+                'domain_id' => $domain->id,
+                'license_code' => $licenseCode,
+                'token_code' => $tokenCode,
+                'domain' => $domain->domain,
+                'status' => \App\Models\License::STATUS_INACTIVE,
+                'is_trial' => false,
+            ]);
+        }
+
         $subscriptionData = SubscriptionData::from([
             'customer_id' => $customer->getKey(),
-            'license_id' => $data['license_id'] ?? null,
+            'license_id' => $license->id,
             'subscription_plan_id' => $data['subscription_plan_id'],
             'started_at' => $data['started_at'] ?? now(),
             'expires_at' => $data['expires_at'] ?? null,

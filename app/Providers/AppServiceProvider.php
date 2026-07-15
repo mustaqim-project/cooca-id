@@ -104,6 +104,11 @@ final class AppServiceProvider extends ServiceProvider
         $this->bootPolicies();
         $this->bootObservers();
         $this->bootRateLimiters();
+
+        \Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+            'customer' => \App\Models\Customer::class,
+            'affiliator' => \App\Models\Affiliator::class,
+        ]);
     }
 
     private function bootPolicies(): void
@@ -137,6 +142,16 @@ final class AppServiceProvider extends ServiceProvider
      */
     private function bootRateLimiters(): void
     {
+        // Admin routes rate limiter: 120 requests per minute
+        RateLimiter::for('admin', function (Request $request) {
+            return Limit::perMinute(120)->by($request->user()?->id ?? $request->ip());
+        });
+
+        // Admin login rate limiter: 5 requests per minute (brute force protection)
+        RateLimiter::for('admin-login', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
+        });
+
         // General API rate limiter: 60 requests per minute
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->ip())

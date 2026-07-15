@@ -27,26 +27,33 @@ class ReviewController extends Controller
     {
         $customer = Auth::guard('customer')->user();
 
-        $query = Review::where('customer_id', $customer->id)
-            ->with(['product'])
+        $query = Review::where('reviewer_type', 'customer')
+            ->where('reviewer_id', $customer->id)
+            ->with(['reviewable'])
             ->latest('created_at');
 
         // Filters
-        if ($status = $request->get('status')) {
-            $query->where('status', $status);
+        if ($request->has('status')) {
+            $status = $request->get('status');
+            if ($status === 'approved') {
+                $query->where('is_approved', true);
+            } elseif ($status === 'pending') {
+                $query->where('is_approved', false);
+            }
         }
 
         if ($product = $request->get('product_id')) {
-            $query->where('product_id', $product);
+            $query->where('reviewable_type', \App\Models\Product::class)
+                  ->where('reviewable_id', $product);
         }
 
         $reviews = $query->paginate(20)->withQueryString();
 
         $stats = [
-            'total' => Review::where('customer_id', $customer->id)->count(),
-            'pending' => Review::where('customer_id', $customer->id)->where('status', 'pending')->count(),
-            'approved' => Review::where('customer_id', $customer->id)->where('status', 'approved')->count(),
-            'rejected' => Review::where('customer_id', $customer->id)->where('status', 'rejected')->count(),
+            'total' => Review::where('reviewer_type', 'customer')->where('reviewer_id', $customer->id)->count(),
+            'pending' => Review::where('reviewer_type', 'customer')->where('reviewer_id', $customer->id)->where('is_approved', false)->count(),
+            'approved' => Review::where('reviewer_type', 'customer')->where('reviewer_id', $customer->id)->where('is_approved', true)->count(),
+            'rejected' => 0,
         ];
 
         return view('customer.reviews.index', [
@@ -85,8 +92,10 @@ class ReviewController extends Controller
         }
 
         // Check if already reviewed
-        $existingReview = Review::where('customer_id', $customer->id)
-            ->where('product_id', $validated['product_id'])
+        $existingReview = Review::where('reviewer_type', 'customer')
+            ->where('reviewer_id', $customer->id)
+            ->where('reviewable_type', \App\Models\Product::class)
+            ->where('reviewable_id', $validated['product_id'])
             ->first();
 
         if ($existingReview) {
@@ -94,13 +103,15 @@ class ReviewController extends Controller
         }
 
         $review = Review::create([
-            'customer_id' => $customer->id,
-            'product_id' => $validated['product_id'],
-            'subscription_id' => $validated['subscription_id'] ?? null,
+            'reviewer_type' => 'customer',
+            'reviewer_id' => $customer->id,
+            'reviewable_type' => \App\Models\Product::class,
+            'reviewable_id' => $validated['product_id'],
+            // subscription_id is not in Review model/schema, ignoring it
             'rating' => $validated['rating'],
             'title' => $validated['title'],
             'comment' => $validated['comment'],
-            'status' => 'pending',
+            'is_approved' => false,
         ]);
 
         return redirect()->route('customer.reviews.index')
@@ -118,7 +129,7 @@ class ReviewController extends Controller
         Gate::authorize('update', $review);
 
         // Can only edit pending or rejected reviews
-        if ($review->status === 'approved') {
+        if ($review->is_approved) {
             return back()->withErrors(['error' => 'Approved reviews cannot be edited.']);
         }
 
@@ -132,7 +143,7 @@ class ReviewController extends Controller
             'rating' => $validated['rating'],
             'title' => $validated['title'],
             'comment' => $validated['comment'],
-            'status' => 'pending', // Reset to pending for re-moderation
+            'is_approved' => false,
         ]);
 
         return redirect()->route('customer.reviews.index')

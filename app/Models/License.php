@@ -50,6 +50,7 @@ final class License extends Model
         'revoked_at',
         'revoked_by',
         'revocation_reason',
+        'revocation_category',
     ];
 
     protected $casts = [
@@ -112,6 +113,16 @@ final class License extends Model
     public function revokedBy(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Admin::class, 'revoked_by');
+    }
+
+    public function appeals(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(LicenseAppeal::class);
+    }
+
+    public function latestAppeal(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(LicenseAppeal::class)->latestOfMany();
     }
 
     public function subscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany

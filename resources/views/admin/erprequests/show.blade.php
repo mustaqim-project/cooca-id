@@ -1,60 +1,211 @@
 @extends('layouts.admin')
-
-@section('title', 'ERP Requests Details')
-@section('subtitle', 'View specific erp requests data.')
+@section('title', 'ERP Request #' . $erp->id)
+@section('subtitle', 'View and manage ERP setup request')
 
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <!-- Header Actions -->
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
+    <div class="mb-4">
+        <a href="{{ route('admin.erp-requests.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Requests
         </a>
     </div>
 
-    <!-- Details Card -->
-    <div class="corporate-card">
-        <div class="card-header">
-            <h3 class="card-title">Information Details</h3>
-        </div>
-        <div class="card-body">
-            <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-300">
-        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back
-    </a>
-    
-    <a href="javascript:void(0)" class="inline-flex items-center px-4 py-2 border border-surface-300 dark:border-surface-600 rounded-md font-medium text-xs text-surface-700 dark:text-surface-200 bg-white dark:bg-surface-800 hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700 shadow-sm transition">
-        <i data-lucide="edit" class="w-4 h-4 mr-2"></i> Edit
-    </a>
-</div>
+    @php
+        $statusMap = [
+            'pending' => ['label' => 'Pending', 'class' => 'badge-saas-warning'],
+            'approved' => ['label' => 'Approved', 'class' => 'badge-saas-info'],
+            'rejected' => ['label' => 'Rejected', 'class' => 'badge-saas-danger'],
+            'waiting_setup' => ['label' => 'Waiting Setup', 'class' => 'badge-saas-neutral'],
+            'in_setup' => ['label' => 'In Setup', 'class' => 'badge-saas-primary'],
+            'domain_setup' => ['label' => 'Domain Setup', 'class' => 'badge-saas-primary'],
+            'testing' => ['label' => 'Testing', 'class' => 'badge-saas-warning'],
+            'ready' => ['label' => 'Ready', 'class' => 'badge-saas-success'],
+        ];
+        $s = $statusMap[$erp->status] ?? ['label' => ucfirst($erp->status), 'class' => 'badge-saas-neutral'];
+    @endphp
 
-<div class="corporate-card overflow-hidden">
-    <div class="px-6 py-5 border-b border-surface-200 dark:border-surface-700">
-        <h3 class="text-lg leading-6 font-medium text-surface-900 dark:text-white">Information Overview</h3>
-        <p class="mt-1 max-w-2xl text-sm text-surface-500 dark:text-surface-400">Detailed breakdown of the record.</p>
-    </div>
-    <div class="px-6 py-5 sm:p-0">
-        <dl class="sm:divide-y sm:divide-surface-200 dark:divide-surface-700 dark:sm:divide-surface-700">
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">ID</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">#0001</dd>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card-saas mb-4">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title"><i class="bi bi-person-vcard me-2"></i>Customer Information</h5>
+                </div>
+                <div class="card-saas-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="form-saas-label mb-1">Customer Name</div>
+                            <div style="font-weight:600">{{ $erp->customer->name ?? '-' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-saas-label mb-1">Email</div>
+                            <div>{{ $erp->customer->email ?? '-' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-saas-label mb-1">Company Name</div>
+                            <div style="font-weight:600">{{ $erp->company_name ?? '-' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-saas-label mb-1">Phone</div>
+                            <div>{{ $erp->phone ?? '-' }}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Title</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">Sample Record</dd>
+
+            <div class="card-saas">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title"><i class="bi bi-pc-display-horizontal me-2"></i>Request Details</h5>
+                </div>
+                <div class="card-saas-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="form-saas-label mb-1">Product</div>
+                            <div style="font-weight:600">{{ $erp->product->name ?? '-' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-saas-label mb-1">Status</div>
+                            <div><span class="badge-saas {{ $s['class'] }}">{{ $s['label'] }}</span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-saas-label mb-1">Submitted</div>
+                            <div>{{ $erp->created_at->format('d M Y, H:i') }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-saas-label mb-1">Last Updated</div>
+                            <div>{{ $erp->updated_at->format('d M Y, H:i') }}</div>
+                        </div>
+                        @if ($erp->notes)
+                            <div class="col-12">
+                                <div class="form-saas-label mb-1">Notes</div>
+                                <div class="card-saas" style="background:var(--surface-raised)">
+                                    <div class="card-saas-body" style="font-size:.9rem;line-height:1.8">{{ $erp->notes }}
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Status</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Active</span>
-                </dd>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card-saas">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title"><i class="bi bi-diagram-3 me-2"></i>Workflow Actions</h5>
+                </div>
+                <div class="card-saas-body d-flex flex-column gap-2">
+                    @if ($erp->status === 'pending')
+                        <form action="{{ route('admin.erp-requests.approve', $erp) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn-saas btn-saas-primary w-100">
+                                <i class="bi bi-check-circle me-1"></i> Approve
+                            </button>
+                        </form>
+                        <form action="{{ route('admin.erp-requests.reject', $erp) }}" method="POST"
+                            class="form-confirm-submit">
+                            @csrf
+                            <button type="submit" class="btn-saas btn-saas-danger w-100">
+                                <i class="bi bi-x-circle me-1"></i> Reject
+                            </button>
+                        </form>
+                    @endif
+
+                    @if ($erp->status === 'approved')
+                        <form action="{{ route('admin.erp-requests.mark-waiting-setup', $erp) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn-saas btn-saas-secondary w-100">
+                                <i class="bi bi-hourglass-split me-1"></i> Mark: Waiting Setup
+                            </button>
+                        </form>
+                    @endif
+
+                    @if ($erp->status === 'waiting_setup')
+                        <form action="{{ route('admin.erp-requests.mark-in-setup', $erp) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn-saas btn-saas-secondary w-100">
+                                <i class="bi bi-gear-wide-connected me-1"></i> Mark: In Setup
+                            </button>
+                        </form>
+                    @endif
+
+                    @if ($erp->status === 'in_setup')
+                        <form action="{{ route('admin.erp-requests.mark-domain-setup', $erp) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn-saas btn-saas-secondary w-100">
+                                <i class="bi bi-globe me-1"></i> Mark: Domain Setup
+                            </button>
+                        </form>
+                    @endif
+
+                    @if ($erp->status === 'domain_setup')
+                        <form action="{{ route('admin.erp-requests.mark-testing', $erp) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn-saas btn-saas-secondary w-100">
+                                <i class="bi bi-bug me-1"></i> Mark: Testing
+                            </button>
+                        </form>
+                    @endif
+
+                    @if ($erp->status === 'testing')
+                        <form action="{{ route('admin.erp-requests.confirm-ready', $erp) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn-saas btn-saas-primary w-100">
+                                <i class="bi bi-check2-all me-1"></i> Confirm Ready
+                            </button>
+                        </form>
+                    @endif
+
+                    @if ($erp->status === 'ready')
+                        <div class="text-center py-2" style="color:var(--success);font-weight:600;font-size:.9rem">
+                            <i class="bi bi-check-circle-fill me-1"></i> Setup Complete
+                        </div>
+                    @endif
+
+                    @if ($erp->status === 'rejected')
+                        <div class="text-center py-2" style="color:var(--danger);font-weight:600;font-size:.9rem">
+                            <i class="bi bi-x-circle-fill me-1"></i> Request Rejected
+                        </div>
+                    @endif
+                </div>
             </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Description</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">This is a generated placeholder description for the record details view. It represents standard data output.</dd>
+
+            <div class="card-saas mt-4">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title"><i class="bi bi-list-check me-2"></i>Status Timeline</h5>
+                </div>
+                <div class="card-saas-body">
+                    @php
+                        $steps = [
+                            'pending',
+                            'approved',
+                            'waiting_setup',
+                            'in_setup',
+                            'domain_setup',
+                            'testing',
+                            'ready',
+                        ];
+                        $currentIdx = array_search($erp->status, $steps);
+                    @endphp
+                    <div style="font-size:.85rem">
+                        @foreach ($steps as $i => $step)
+                            @php
+                                $done = $currentIdx !== false && $i <= $currentIdx && $erp->status !== 'rejected';
+                            @endphp
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div
+                                    style="width:20px;height:20px;border-radius:50%;flex-shrink:0;background:{{ $done ? 'var(--success)' : 'var(--border)' }};display:flex;align-items:center;justify-content:center">
+                                    @if ($done)
+                                        <i class="bi bi-check" style="color:#fff;font-size:.7rem"></i>
+                                    @endif
+                                </div>
+                                <span
+                                    style="color:{{ $done ? 'var(--text)' : 'var(--text-muted)' }}">{{ ucwords(str_replace('_', ' ', $step)) }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
-        </dl>
-    </div>
         </div>
     </div>
-</div>
+
+    @include('components.swal-alert')
 @endsection

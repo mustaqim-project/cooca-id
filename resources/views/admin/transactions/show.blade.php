@@ -1,140 +1,163 @@
 @extends('layouts.admin')
-
-@section('title', 'Transaction Details')
-@section('subtitle', 'View complete details for transaction ' . $transaction->id)
-
+@section('title', 'Transaction #' . $transaction->invoice_number)
+@section('subtitle', 'Transaction Details')
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <!-- Header Actions -->
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
+    <div class="mb-4">
+        <a href="{{ route('admin.transactions.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Transactions
         </a>
     </div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card-saas mb-4">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title"><i class="bi bi-receipt me-2"></i>Invoice Details</h5>
+                </div>
+                <div class="card-saas-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div
+                                style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">
+                                Invoice Number</div>
+                            <div style="font-weight:600"><code>{{ $transaction->invoice_number }}</code></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div
+                                style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">
+                                Status</div>
+                            @php
+                                $s = $transaction->status;
+                                $cls = match ($s) {
+                                    'paid' => 'badge-saas-success',
+                                    'pending' => 'badge-saas-warning',
+                                    'failed' => 'badge-saas-danger',
+                                    'refunded' => 'badge-saas-info',
+                                    default => 'badge-saas-neutral',
+                                };
+                            @endphp
+                            <span class="badge-saas {{ $cls }}">{{ ucfirst($s) }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <div
+                                style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">
+                                Customer</div>
+                            <div style="font-weight:500">{{ $transaction->customer->name ?? '-' }}</div>
+                            <div style="font-size:.8rem;color:var(--text-muted)">{{ $transaction->customer->email ?? '' }}
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div
+                                style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">
+                                Product</div>
+                            <div style="font-weight:500">{{ $transaction->product->name ?? '-' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div
+                                style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">
+                                Amount</div>
+                            <div style="font-size:1.25rem;font-weight:700;color:var(--primary)">Rp
+                                {{ number_format($transaction->amount, 0, ',', '.') }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div
+                                style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">
+                                Payment Method</div>
+                            <div style="font-weight:500">{{ $transaction->payment_method ?? '-' }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div
+                                style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">
+                                Transaction Date</div>
+                            <div>{{ $transaction->created_at->format('d M Y H:i') }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div
+                                style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">
+                                Paid At</div>
+                            <div>{{ $transaction->paid_at ? $transaction->paid_at->format('d M Y H:i') : '-' }}</div>
+                        </div>
+                        @if ($transaction->notes)
+                            <div class="col-12">
+                                <div
+                                    style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">
+                                    Notes</div>
+                                <div>{{ $transaction->notes }}</div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
 
-    <!-- Details Card -->
-    <div class="corporate-card">
-        <div class="card-header">
-            <h3 class="card-title">Information Details</h3>
-        </div>
-        <div class="card-body">
-            <a href="{{ route('admin.transactions.index') }}" class="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Transactions
-    </a>
-</div>
-
-<div class="bg-white dark:bg-surface-800 animate-fade-in-up shadow-sm rounded-lg border border-surface-200 dark:border-surface-700 overflow-hidden mb-8">
-    <div class="px-6 py-5 border-b border-surface-200 dark:border-surface-700 flex justify-between items-center bg-surface-50 dark:bg-surface-900">
-        <h3 class="text-lg leading-6 font-medium text-surface-900 dark:text-white">
-            Transaction #{{ $transaction->id }}
-        </h3>
-        <div>
-            @php
-                $statusClass = match($transaction->status) {
-                    'paid', 'settlement', 'capture' => 'bg-green-100 text-green-800',
-                    'pending' => 'bg-yellow-100 text-yellow-800',
-                    'failed', 'deny', 'cancel', 'expire' => 'bg-red-100 text-red-800',
-                    'refunded' => 'bg-blue-100 text-blue-800',
-                    default => 'bg-surface-100 text-surface-800'
-                };
-            @endphp
-            <span class="px-3 py-1 inline-flex text-sm leading-5 font-bold rounded-full {{ $statusClass }}">
-                {{ strtoupper($transaction->status) }}
-            </span>
-        </div>
-    </div>
-    
-    <div class="px-6 py-5 sm:p-0">
-        <dl class="sm:divide-y sm:divide-surface-200 dark:divide-surface-700">
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Customer</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    <a href="{{ route('admin.customers.show', $transaction->customer_id ?? 0) }}" class="text-primary-600 hover:underline">
-                        {{ $transaction->customer->name ?? 'Unknown Customer' }}
-                    </a>
-                    <span class="text-surface-500 dark:text-surface-400 ml-2">({{ $transaction->customer->email ?? '' }})</span>
-                </dd>
-            </div>
-            
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-surface-50 dark:bg-surface-900">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Order ID / Invoice Number</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2 font-mono">
-                    {{ $transaction->invoice_number ?? '-' }}
-                </dd>
-            </div>
-            
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Gross Amount</dt>
-                <dd class="mt-1 text-lg font-bold text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    Rp {{ number_format($transaction->gross_amount, 0, ',', '.') }}
-                </dd>
-            </div>
-            
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-surface-50 dark:bg-surface-900">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Payment Method</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    {{ strtoupper($transaction->payment_type ?? 'WAITING') }}
-                    @if($transaction->bank)
-                        <span class="text-surface-500 dark:text-surface-400">({{ $transaction->bank }})</span>
-                    @endif
-                </dd>
-            </div>
-            
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Subscription Link</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    @if($transaction->subscription_id)
-                        <a href="{{ route('admin.subscriptions.show', $transaction->subscription_id) }}" class="text-primary-600 hover:underline">
-                            View Subscription #{{ $transaction->subscription_id }}
-                        </a>
-                    @else
-                        <span class="text-surface-500 dark:text-surface-400">No linked subscription</span>
-                    @endif
-                </dd>
-            </div>
-            
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-surface-50 dark:bg-surface-900">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Created At</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    {{ \Carbon\Carbon::parse($transaction->created_at)->format('F d, Y - H:i:s') }}
-                </dd>
-            </div>
-            
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Last Updated</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    {{ \Carbon\Carbon::parse($transaction->updated_at)->format('F d, Y - H:i:s') }}
-                </dd>
-            </div>
-            
-            @if($transaction->payment_url)
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-surface-50 dark:bg-surface-900">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Payment Link</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    <a href="{{ $transaction->payment_url }}" target="_blank" class="text-primary-600 hover:underline break-all">
-                        {{ $transaction->payment_url }}
-                    </a>
-                </dd>
-            </div>
+            @if ($transaction->voucher)
+                <div class="card-saas">
+                    <div class="card-saas-header">
+                        <h5 class="card-saas-title"><i class="bi bi-ticket-perforated me-2"></i>Voucher Applied</h5>
+                    </div>
+                    <div class="card-saas-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <code class="fs-5">{{ $transaction->voucher->code }}</code>
+                                <div style="font-size:.875rem;color:var(--text-muted)">
+                                    {{ $transaction->voucher->description }}</div>
+                            </div>
+                            <div style="font-size:1.25rem;font-weight:700;color:var(--success)">
+                                -Rp {{ number_format($transaction->discount_amount ?? 0, 0, ',', '.') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endif
-        </dl>
-    </div>
-    
-    <div class="px-6 py-4 bg-surface-50 dark:bg-surface-900 border-t border-surface-200 dark:border-surface-700 flex justify-end gap-3">
-        <!-- Actions based on status -->
-        @if($transaction->status == 'pending')
-            <button type="button" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none" onclick="markAsPaid({{ $transaction->id }})">
-                <i data-lucide="check" class="w-4 h-4"></i> Mark as Paid
-            </button>
-        @endif
-        
-        @if(in_array($transaction->status, ['paid', 'settlement']))
-            <button type="button" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none" onclick="refund({{ $transaction->id }})">
-                <i data-lucide="arrow-counterclockwise" class="w-4 h-4 mr-2"></i> Refund
-            </button>
-        @endif
-    </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card-saas">
+                <div class="card-saas-header">
+                    <h5 class="card-saas-title"><i class="bi bi-gear me-2"></i>Actions</h5>
+                </div>
+                <div class="card-saas-body d-flex flex-column gap-2">
+                    @if ($transaction->status === 'pending')
+                        <button type="button" class="btn-saas btn-saas-primary w-100"
+                            onclick="markAsPaid({{ $transaction->id }})">
+                            <i class="bi bi-check-circle me-1"></i> Mark as Paid
+                        </button>
+                    @endif
+                    @if ($transaction->status === 'paid')
+                        <button type="button" class="btn-saas btn-saas-outline w-100"
+                            onclick="processRefund({{ $transaction->id }})">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Process Refund
+                        </button>
+                    @endif
+                    <a href="{{ route('admin.customers.show', $transaction->customer_id) }}"
+                        class="btn-saas btn-saas-ghost w-100">
+                        <i class="bi bi-person me-1"></i> View Customer
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 @endsection
+@push('scripts')
+    <script>
+        function markAsPaid(id) {
+            if (!confirm('Mark this transaction as paid?')) return;
+            fetch(`/admin/transactions/${id}/mark-paid`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json'
+                }
+            }).then(r => r.ok ? location.reload() : alert('Failed'));
+        }
+
+        function processRefund(id) {
+            if (!confirm('Process refund for this transaction?')) return;
+            fetch(`/admin/transactions/${id}/refund`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json'
+                }
+            }).then(r => r.ok ? location.reload() : alert('Failed'));
+        }
+    </script>
+@endpush

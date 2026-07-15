@@ -1,75 +1,86 @@
 @extends('layouts.admin')
-
 @section('title', 'Email Campaigns')
-@section('subtitle', 'Manage your email campaigns data.')
+@section('subtitle', 'Manage email marketing campaigns')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
+    <div class="page-toolbar mb-4">
+        <div class="page-toolbar-left">
+            <div class="input-group" style="width:300px">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search campaigns...">
             </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
         </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-                <a href="{{ route('admin.email-campaigns.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface-900">
-                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
-                    Add New
-                </a>
-            </div>
+        <div class="page-toolbar-right">
+            <a href="{{ route('admin.email-campaigns.create') }}" class="btn-saas btn-saas-primary">
+                <i class="bi bi-plus-lg me-1"></i> New Campaign
+            </a>
+        </div>
     </div>
 
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
-                <tr>
-                    <th class="table-th">ID</th>
-                    <th class="table-th">Name / Title</th>
-                    <th class="table-th">Status</th>
-                    <th class="table-th">Date</th>
-                    <th class="table-th">Actions</th>
-                </tr>
-            
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
-                @forelse($campaigns ?? [] as $campaign)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">{{ $campaign->id }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white">{{ $campaign->name }}</div>
-                        <div class="text-sm text-surface-500 dark:text-surface-400">{{ Str::limit($campaign->subject, 30) }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ ($campaign->status ?? 'draft') == 'sent' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300' }}">
-                            {{ ucfirst($campaign->status ?? 'draft') }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">{{ $campaign->created_at ? $campaign->created_at->format('M d, Y') : '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{{ route('admin.email-campaigns.show', $campaign->id) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-3">View</a>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="5" class="px-6 py-4 text-center text-sm text-surface-500">No email campaigns found.</td></tr>
-                @endforelse
-            
-                
-                
-                </tbody>
-            </table>
+    <div class="card-saas">
+        <div class="card-saas-body p-0">
+            <div class="table-responsive">
+                <table class="table-saas" id="campaignsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($campaigns as $campaign)
+                            <tr>
+                                <td class="text-muted" style="font-size:.8rem">{{ $campaign->id }}</td>
+                                <td>
+                                    <div style="font-weight:600">{{ $campaign->name }}</div>
+                                </td>
+                                <td>{{ $campaign->subject }}</td>
+                                <td>
+                                    @if ($campaign->status === 'sent')
+                                        <span class="badge-saas badge-saas-success">Sent</span>
+                                    @else
+                                        <span class="badge-saas badge-saas-neutral">Draft</span>
+                                    @endif
+                                </td>
+                                <td class="text-muted" style="font-size:.85rem">{{ $campaign->created_at->format('d M Y') }}
+                                </td>
+                                <td>
+                                    <a href="{{ route('admin.email-campaigns.show', $campaign) }}"
+                                        class="btn-saas btn-saas-ghost btn-saas-sm">
+                                        <i class="bi bi-eye me-1"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon"><i class="bi bi-envelope-paper"></i></div>
+                                        <div class="empty-state-title">No campaigns yet</div>
+                                        <div class="empty-state-description">Create your first email campaign to get
+                                            started.</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('#campaignsTable tbody tr').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    </script>
+@endpush

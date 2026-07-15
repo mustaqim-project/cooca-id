@@ -4,220 +4,214 @@
 @section('subtitle', 'Moderate customer review')
 
 @section('content')
-<div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-    <a href="{{ route('admin.reviews.index') }}" class="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Reviews
-    </a>
-    
-    <div class="flex gap-2">
-        @if($review->status == 'pending' || $review->status == 'rejected')
-            <form class="form-confirm-submit" action="{{ route('admin.reviews.approve', $review->id) }}" method="POST" class="inline">
-                @csrf
-                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none">
-                    <i data-lucide="check" class="w-4 h-4"></i> Approve Review
-                </button>
-            </form>
-        @endif
-        
-        @if($review->status == 'pending' || $review->status == 'approved')
-            <button type="button" onclick="rejectReview()" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none">
-                <i data-lucide="x" class="w-4 h-4"></i> Reject Review
-            </button>
-        @endif
-        
-        <form class="form-confirm-delete" action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" class="inline" >
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none">
-                <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
-            </button>
-        </form>
+    <div class="mb-4 d-flex align-items-center gap-2">
+        <a href="{{ route('admin.reviews.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Reviews
+        </a>
     </div>
-</div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Main Content -->
-    <div class="lg:col-span-2 space-y-6">
-        
-        <!-- The Review -->
-        <div class="bg-white dark:bg-surface-800 animate-fade-in-up shadow-sm rounded-lg border border-surface-200 dark:border-surface-700 overflow-hidden">
-            <div class="px-6 py-4 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 flex justify-between items-center">
-                <h3 class="text-lg font-medium text-surface-900 dark:text-white">Review Content</h3>
-                @php
-                    $statusClass = match($review->status) {
-                        'approved' => 'bg-green-100 text-green-800 border-green-200',
-                        'pending' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
-                        'rejected' => 'bg-red-100 text-red-800 border-red-200',
-                        default => 'bg-surface-100 text-surface-800 border-surface-200'
-                    };
-                @endphp
-                <span class="px-3 py-1 inline-flex text-xs font-bold uppercase tracking-wider rounded-full border {{ $statusClass }}">
-                    {{ $review->status }}
-                </span>
-            </div>
-            
-            <div class="p-6">
-                <!-- Rating -->
-                <div class="flex items-center mb-4">
-                    <div class="flex text-yellow-400 text-2xl">
-                        @for($i = 1; $i <= 5; $i++)
-                            @if($i <= $review->rating)
-                                <i data-lucide="star" class="w-4 h-4"></i>
-                            @else
-                                <i data-lucide="star" class="w-4 h-4"></i>
-                            @endif
-                        @endfor
+    <div class="row g-4">
+        {{-- Main --}}
+        <div class="col-lg-8">
+            <div class="card-saas">
+                <div class="card-saas-header">
+                    <span class="card-saas-title">Review Content</span>
+                    @php
+                        $badge = match ($review->status) {
+                            'approved' => 'success',
+                            'pending' => 'warning',
+                            'rejected' => 'danger',
+                            default => 'neutral',
+                        };
+                    @endphp
+                    <span class="badge-saas badge-saas-{{ $badge }}">{{ ucfirst($review->status) }}</span>
+                </div>
+                <div class="card-saas-body">
+                    {{-- Rating --}}
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="d-flex gap-1" style="color:#f59e0b;font-size:1.2rem">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <i class="bi bi-star{{ $i <= $review->rating ? '-fill' : '' }}"></i>
+                            @endfor
+                        </div>
+                        <span class="fw-semibold">{{ $review->rating }} / 5</span>
                     </div>
-                    <span class="ml-3 text-lg font-medium text-surface-900 dark:text-white">{{ $review->rating }} out of 5</span>
-                </div>
-                
-                <!-- Title -->
-                <h4 class="text-xl font-bold text-surface-900 dark:text-white mb-2">{{ $review->title ?? 'No Title' }}</h4>
-                
-                <!-- Content -->
-                <div class="prose prose-sm max-w-none text-surface-700 dark:text-surface-300 bg-surface-50 dark:bg-surface-900 p-4 rounded-md border border-surface-100">
-                    {!! nl2br(e($review->comment)) !!}
-                </div>
-                
-                <!-- Images if any -->
-                @if($review->images && count($review->images) > 0)
-                <div class="mt-6">
-                    <h5 class="text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">Attached Images</h5>
-                    <div class="flex flex-wrap gap-4">
-                        @foreach($review->images as $image)
-                            <div class="relative h-24 w-24 rounded-lg overflow-hidden border border-surface-200 dark:border-surface-700">
-                                <img src="{{ $image }}" alt="Review image" class="object-cover w-full h-full">
+
+                    {{-- Title --}}
+                    <h5 class="fw-bold mb-2">{{ $review->title ?? 'No Title' }}</h5>
+
+                    {{-- Body --}}
+                    <div class="p-3 rounded-3 mb-4"
+                        style="background:var(--surface-raised);border:1px solid var(--border);font-size:0.9rem;line-height:1.7">
+                        {!! nl2br(e($review->comment)) !!}
+                    </div>
+
+                    {{-- Images --}}
+                    @if (!empty($review->images) && count($review->images) > 0)
+                        <div class="mb-4">
+                            <div class="text-muted fw-medium mb-2" style="font-size:0.85rem">Attached Images</div>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach ($review->images as $image)
+                                    <img src="{{ $image }}" alt="Review image" class="rounded-3"
+                                        style="width:96px;height:96px;object-fit:cover;border:1px solid var(--border)">
+                                @endforeach
                             </div>
-                        @endforeach
-                    </div>
-                </div>
-                @endif
-                
-                @if($review->status == 'rejected' && $review->rejection_reason)
-                <div class="mt-6 bg-red-50 p-4 rounded-md border border-red-100">
-                    <h5 class="text-sm font-bold text-red-800 mb-1"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Rejection Reason</h5>
-                    <p class="text-sm text-red-700">{{ $review->rejection_reason }}</p>
-                    <p class="text-xs text-red-500 mt-2">Rejected at: {{ $review->rejected_at ? $review->rejected_at->format('M d, Y H:i') : 'Unknown' }}</p>
-                </div>
-                @endif
-            </div>
-        </div>
-        
-    </div>
-    
-    <!-- Sidebar -->
-    <div class="lg:col-span-1 space-y-6">
-        
-        <!-- Author Info -->
-        <div class="bg-white dark:bg-surface-800 animate-fade-in-up shadow-sm rounded-lg border border-surface-200 dark:border-surface-700 overflow-hidden">
-            <div class="px-6 py-4 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900">
-                <h3 class="text-base font-medium text-surface-900 dark:text-white">Author</h3>
-            </div>
-            <div class="p-6">
-                <div class="flex items-center mb-4">
-                    <div class="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xl">
-                        {{ strtoupper(substr($review->customer->name ?? '?', 0, 1)) }}
-                    </div>
-                    <div class="ml-4">
-                        <h4 class="text-lg font-bold text-surface-900 dark:text-white">{{ $review->customer->name ?? 'Unknown Customer' }}</h4>
-                        <p class="text-sm text-surface-500 dark:text-surface-400">{{ $review->customer->email ?? '' }}</p>
-                    </div>
-                </div>
-                
-                @if($review->customer)
-                <div class="mt-4 pt-4 border-t border-surface-100">
-                    <a href="{{ route('admin.customers.show', $review->customer->id) }}" class="text-sm text-primary-600 hover:text-primary-800 font-medium flex items-center">
-                        View Customer Profile <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </a>
-                </div>
-                @endif
-            </div>
-        </div>
-        
-        <!-- Product Info -->
-        <div class="bg-white dark:bg-surface-800 animate-fade-in-up shadow-sm rounded-lg border border-surface-200 dark:border-surface-700 overflow-hidden">
-            <div class="px-6 py-4 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900">
-                <h3 class="text-base font-medium text-surface-900 dark:text-white">Reviewed Product</h3>
-            </div>
-            <div class="p-6">
-                @if($review->product)
-                    <h4 class="text-md font-medium text-surface-900 dark:text-white">{{ $review->product->name }}</h4>
-                    <p class="text-sm text-surface-500 dark:text-surface-400 mt-1 line-clamp-2">{{ Str::limit($review->product->description, 100) }}</p>
-                    
-                    <div class="mt-4 pt-4 border-t border-surface-100">
-                        <a href="{{ route('admin.products.show', $review->product->id) }}" class="text-sm text-primary-600 hover:text-primary-800 font-medium flex items-center">
-                            View Product Details <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                        </a>
-                    </div>
-                @else
-                    <p class="text-sm text-surface-500 dark:text-surface-400 italic">Product information unavailable or product has been deleted.</p>
-                @endif
-            </div>
-        </div>
-        
-        <!-- Metadata -->
-        <div class="bg-white dark:bg-surface-800 animate-fade-in-up shadow-sm rounded-lg border border-surface-200 dark:border-surface-700 overflow-hidden">
-            <div class="px-6 py-4 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900">
-                <h3 class="text-base font-medium text-surface-900 dark:text-white">Metadata</h3>
-            </div>
-            <div class="p-6">
-                <dl class="space-y-3 text-sm">
-                    <div class="flex justify-between">
-                        <dt class="text-surface-500 dark:text-surface-400">Submitted</dt>
-                        <dd class="text-surface-900 dark:text-white font-medium">{{ $review->created_at->format('M d, Y H:i') }}</dd>
-                    </div>
-                    @if($review->approved_at)
-                    <div class="flex justify-between border-t border-surface-100 pt-3">
-                        <dt class="text-surface-500 dark:text-surface-400">Approved On</dt>
-                        <dd class="text-surface-900 dark:text-white font-medium">{{ $review->approved_at->format('M d, Y H:i') }}</dd>
-                    </div>
+                        </div>
                     @endif
-                    <div class="flex justify-between border-t border-surface-100 pt-3">
-                        <dt class="text-surface-500 dark:text-surface-400">Verified Purchase</dt>
-                        <dd class="font-medium {{ $review->is_verified_purchase ? 'text-green-600' : 'text-surface-500 dark:text-surface-400' }}">
-                            {{ $review->is_verified_purchase ? 'Yes' : 'No' }}
-                        </dd>
-                    </div>
-                </dl>
+
+                    {{-- Rejection reason --}}
+                    @if ($review->status === 'rejected' && $review->rejection_reason)
+                        <div class="p-3 rounded-3" style="background:#fef2f2;border:1px solid #fecaca">
+                            <div class="fw-semibold mb-1" style="color:#b91c1c;font-size:0.85rem">
+                                <i class="bi bi-exclamation-triangle me-1"></i> Rejection Reason
+                            </div>
+                            <div style="color:#7f1d1d;font-size:0.85rem">{{ $review->rejection_reason }}</div>
+                            @if ($review->rejected_at)
+                                <div class="text-muted mt-1" style="font-size:0.78rem">Rejected:
+                                    {{ $review->rejected_at->format('d M Y H:i') }}</div>
+                            @endif
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
-        
+
+        {{-- Sidebar --}}
+        <div class="col-lg-4">
+            {{-- Actions --}}
+            <div class="card-saas mb-4">
+                <div class="card-saas-header"><span class="card-saas-title">Actions</span></div>
+                <div class="card-saas-body d-flex flex-column gap-2">
+                    @if (in_array($review->status, ['pending', 'rejected']))
+                        <form class="form-confirm-submit" action="{{ route('admin.reviews.approve', $review->id) }}"
+                            method="POST">
+                            @csrf
+                            <button type="submit" class="btn-saas btn-saas-primary w-100">
+                                <i class="bi bi-check-lg me-1"></i> Approve Review
+                            </button>
+                        </form>
+                    @endif
+
+                    @if (in_array($review->status, ['pending', 'approved']))
+                        <button type="button" onclick="rejectReview()" class="btn-saas btn-saas-outline w-100"
+                            style="color:var(--warning);border-color:var(--warning)">
+                            <i class="bi bi-x-lg me-1"></i> Reject Review
+                        </button>
+                    @endif
+
+                    <form class="form-confirm-delete" action="{{ route('admin.reviews.destroy', $review->id) }}"
+                        method="POST">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn-saas btn-saas-danger w-100">
+                            <i class="bi bi-trash3 me-1"></i> Delete Review
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {{-- Author --}}
+            <div class="card-saas mb-4">
+                <div class="card-saas-header"><span class="card-saas-title">Author</span></div>
+                <div class="card-saas-body">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="stat-card-icon blue" style="width:44px;height:44px;font-size:1rem;flex-shrink:0">
+                            {{ strtoupper(substr($review->customer->name ?? '?', 0, 1)) }}
+                        </div>
+                        <div>
+                            <div class="fw-semibold">{{ $review->customer->name ?? 'Unknown' }}</div>
+                            <div class="text-muted" style="font-size:0.82rem">{{ $review->customer->email ?? '' }}</div>
+                        </div>
+                    </div>
+                    @if ($review->customer)
+                        <a href="{{ route('admin.customers.show', $review->customer->id) }}"
+                            class="btn-saas btn-saas-ghost btn-saas-sm">
+                            View Profile <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Product --}}
+            <div class="card-saas mb-4">
+                <div class="card-saas-header"><span class="card-saas-title">Reviewed Product</span></div>
+                <div class="card-saas-body">
+                    @if ($review->product)
+                        <div class="fw-medium mb-1">{{ $review->product->name }}</div>
+                        <div class="text-muted" style="font-size:0.82rem">
+                            {{ Str::limit($review->product->description, 100) }}</div>
+                        <div class="mt-3">
+                            <a href="{{ route('admin.products.show', $review->product->id) }}"
+                                class="btn-saas btn-saas-ghost btn-saas-sm">
+                                View Product <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    @else
+                        <span class="text-muted" style="font-size:0.85rem">Product deleted or unavailable.</span>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Metadata --}}
+            <div class="card-saas">
+                <div class="card-saas-header"><span class="card-saas-title">Metadata</span></div>
+                <div class="card-saas-body">
+                    <table class="table table-sm table-borderless mb-0" style="font-size:0.85rem">
+                        <tbody>
+                            <tr>
+                                <td class="text-muted">Submitted</td>
+                                <td class="fw-medium">{{ $review->created_at->format('d M Y H:i') }}</td>
+                            </tr>
+                            @if ($review->approved_at)
+                                <tr>
+                                    <td class="text-muted">Approved</td>
+                                    <td class="fw-medium">{{ $review->approved_at->format('d M Y H:i') }}</td>
+                                </tr>
+                            @endif
+                            <tr>
+                                <td class="text-muted">Verified Purchase</td>
+                                <td class="fw-medium"
+                                    style="color:{{ $review->is_verified_purchase ? 'var(--success)' : 'inherit' }}">
+                                    {{ $review->is_verified_purchase ? 'Yes' : 'No' }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- Rejection Form -->
-<form class="form-confirm-submit" id="reject-form" action="{{ route('admin.reviews.reject', $review->id) }}" method="POST" class="hidden">
-    @csrf
-    <input type="hidden" name="rejection_reason" id="rejection_reason">
-</form>
-
+    {{-- Hidden reject form --}}
+    <form class="form-confirm-submit" id="reject-form" action="{{ route('admin.reviews.reject', $review->id) }}"
+        method="POST" style="display:none">
+        @csrf
+        <input type="hidden" name="rejection_reason" id="rejection_reason">
+    </form>
 @endsection
 
 @push('scripts')
-<script>
-    function rejectReview() {
-        Swal.fire({
-            title: 'Reject Review',
-            text: "Please provide a reason for rejecting this review.",
-            icon: 'warning',
-            input: 'textarea',
-            inputLabel: 'Rejection Reason (Internal use)',
-            inputPlaceholder: 'Contains inappropriate language, spam, etc.',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'You need to write a reason!'
+    <script>
+        function rejectReview() {
+            Swal.fire({
+                title: 'Reject Review',
+                text: 'Please provide a reason for rejecting this review.',
+                icon: 'warning',
+                input: 'textarea',
+                inputLabel: 'Rejection Reason (internal)',
+                inputPlaceholder: 'Inappropriate language, spam, etc.',
+                inputValidator: (v) => {
+                    if (!v) return 'Reason is required.';
+                },
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, reject it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('rejection_reason').value = result.value;
+                    document.getElementById('reject-form').submit();
                 }
-            },
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, reject it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('rejection_reason').value = result.value;
-                document.getElementById('reject-form').submit();
-            }
-        })
-    }
-</script>
+            });
+        }
+    </script>
 @endpush

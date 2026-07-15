@@ -4,130 +4,140 @@
 @section('subtitle', 'Moderate and manage product feedback')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
+    <div class="page-toolbar mb-4">
+        <div class="page-toolbar-left">
+            <div class="input-group" style="width:300px">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search reviewer, product...">
             </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
         </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-            
+        <div class="page-toolbar-right">
+            {{-- no create; reviews come from customers --}}
         </div>
     </div>
 
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
-                <tr>
-                    <th scope="col" class="table-th">Reviewer / Product</th>
-                    <th scope="col" class="table-th">Rating</th>
-                    <th scope="col" class="table-th">Comment</th>
-                    <th scope="col" class="table-th">Status</th>
-                    <th scope="col" class="table-th">Actions</th>
-                </tr>
-            
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
-                @forelse($reviews as $review)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 {{ $review->status == 'pending' ? 'bg-yellow-50' : '' }}">
-                    <td class="px-6 py-4">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10 bg-surface-200 rounded-full flex items-center justify-center text-surface-600 dark:text-surface-400 font-bold">
-                                {{ strtoupper(substr($review->customer->name ?? '?', 0, 1)) }}
-                            </div>
-                            <div class="ml-4">
-                                <a href="{{ route('admin.customers.show', $review->customer_id ?? 0) }}" class="text-sm font-medium text-primary-600 hover:underline">
-                                    {{ $review->customer->name ?? 'Unknown Customer' }}
-                                </a>
-                                <div class="text-xs text-surface-500 dark:text-surface-400 mt-1">
-                                    on <a href="{{ route('admin.products.show', $review->product_id ?? 0) }}" class="text-surface-900 dark:text-white hover:underline">{{ Str::limit($review->product->name ?? 'Unknown', 25) }}</a>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex text-yellow-400">
-                            @for($i = 1; $i <= 5; $i++)
-                                @if($i <= $review->rating)
-                                    <i data-lucide="star" class="w-4 h-4"></i>
-                                @else
-                                    <i data-lucide="star" class="w-4 h-4"></i>
-                                @endif
-                            @endfor
-                        </div>
-                        <div class="text-xs text-surface-500 dark:text-surface-400 mt-1">{{ $review->created_at->format('M d, Y') }}</div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white mb-1">{{ $review->title ?? 'No Title' }}</div>
-                        <div class="text-sm text-surface-600 dark:text-surface-400 line-clamp-2" title="{{ $review->comment }}">
-                            {{ $review->comment }}
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @php
-                            $statusClass = match($review->status) {
-                                'approved' => 'bg-green-100 text-green-800',
-                                'pending' => 'bg-yellow-100 text-yellow-800',
-                                'rejected' => 'bg-red-100 text-red-800',
-                                default => 'bg-surface-100 text-surface-800'
-                            };
-                        @endphp
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
-                            {{ ucfirst($review->status) }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div class="flex justify-end gap-2">
-                            <a href="{{ route('admin.reviews.show', $review->id) }}" class="text-primary-600 hover:text-primary-900" title="View & Moderate">
-                                <i data-lucide="eye" class="w-4 h-4"></i>
-                            </a>
-                            
-                            @if($review->status == 'pending')
-                            <form class="form-confirm-submit" action="{{ route('admin.reviews.approve', $review->id) }}" method="POST" class="inline form-confirm-delete">
-                                @csrf
-                                <button type="submit" class="text-green-600 hover:text-green-900" title="Approve">
-                                    <i data-lucide="check" class="w-4 h-4"></i>
-                                </button>
-                            </form>
-                            @endif
-                            
-                            <form class="form-confirm-delete" action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" class="inline form-confirm-delete" >
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900" title="Delete">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="px-6 py-12 text-center text-surface-500 dark:text-surface-400">
-                        <i data-lucide="star" class="w-4 h-4"></i>
-                        <p>No reviews found.</p>
-                    </td>
-                </tr>
-                @endforelse
-            
-                
-                
-                </tbody>
-            </table>
+    <div class="card-saas">
+        <div class="card-saas-body p-0">
+            <div class="table-responsive">
+                <table class="table-saas" id="reviewsTable">
+                    <thead>
+                        <tr>
+                            <th>Reviewer / Product</th>
+                            <th>Rating</th>
+                            <th>Comment</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($reviews as $review)
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="stat-card-icon blue"
+                                            style="width:36px;height:36px;font-size:0.85rem;flex-shrink:0">
+                                            {{ strtoupper(substr($review->customer->name ?? '?', 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <a href="{{ route('admin.customers.show', $review->customer_id ?? 0) }}"
+                                                class="fw-medium text-decoration-none"
+                                                style="color:var(--primary);font-size:0.9rem">
+                                                {{ $review->customer->name ?? 'Unknown' }}
+                                            </a>
+                                            <div class="text-muted" style="font-size:0.8rem">
+                                                on <a href="{{ route('admin.products.show', $review->product_id ?? 0) }}"
+                                                    class="text-decoration-none text-dark">
+                                                    {{ Str::limit($review->product->name ?? 'Unknown', 25) }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1" style="color:#f59e0b">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            <i class="bi bi-star{{ $i <= $review->rating ? '-fill' : '' }}"
+                                                style="font-size:0.85rem"></i>
+                                        @endfor
+                                    </div>
+                                    <div class="text-muted" style="font-size:0.78rem">{{ $review->rating }}/5</div>
+                                </td>
+                                <td style="max-width:240px">
+                                    <div class="fw-medium" style="font-size:0.85rem">{{ $review->title ?? 'No Title' }}
+                                    </div>
+                                    <div class="text-muted text-truncate" style="font-size:0.8rem"
+                                        title="{{ $review->comment }}">{{ $review->comment }}</div>
+                                </td>
+                                <td>
+                                    @php
+                                        $badge = match ($review->status) {
+                                            'approved' => 'success',
+                                            'pending' => 'warning',
+                                            'rejected' => 'danger',
+                                            default => 'neutral',
+                                        };
+                                    @endphp
+                                    <span
+                                        class="badge-saas badge-saas-{{ $badge }}">{{ ucfirst($review->status) }}</span>
+                                </td>
+                                <td class="text-muted" style="font-size:0.85rem">{{ $review->created_at->format('d M Y') }}
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="{{ route('admin.reviews.show', $review->id) }}"
+                                            class="btn-saas btn-saas-ghost btn-saas-sm" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+
+                                        @if ($review->status === 'pending')
+                                            <form class="form-confirm-submit"
+                                                action="{{ route('admin.reviews.approve', $review->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn-saas btn-saas-ghost btn-saas-sm"
+                                                    style="color:var(--success)" title="Approve">
+                                                    <i class="bi bi-check-lg"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        <form class="form-confirm-delete"
+                                            action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn-saas btn-saas-ghost btn-saas-sm"
+                                                style="color:var(--danger)" title="Delete">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon"><i class="bi bi-star"></i></div>
+                                        <div class="empty-state-title">No reviews found</div>
+                                        <div class="empty-state-description">Customer product reviews will appear here.
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('#reviewsTable tbody tr').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    </script>
+@endpush

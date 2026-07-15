@@ -105,4 +105,25 @@ final class Review extends Model
             'approved_at' => now(),
         ]);
     }
+
+    // Compatibility Accessors for views
+    public function getProductAttribute()
+    {
+        return $this->reviewable_type === Product::class ? $this->reviewable : null;
+    }
+
+    public function getCustomerAttribute()
+    {
+        return $this->reviewer_type === 'customer' ? $this->reviewer : null;
+    }
+
+    public function getAffiliatorAttribute()
+    {
+        return $this->reviewer_type === 'affiliator' ? $this->reviewer : null;
+    }
+
+    public function getStatusAttribute()
+    {
+        return $this->is_approved ? 'approved' : 'pending';
+    }
 }

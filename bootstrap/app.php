@@ -32,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\Admin\AdminAuth::class,
             'customer' => \App\Http\Middleware\Customer\CustomerAuth::class,
             'affiliator' => \App\Http\Middleware\Affiliator\AffiliatorAuth::class,
+            'check.affiliator.suspension' => \App\Http\Middleware\CheckAffiliatorSuspension::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

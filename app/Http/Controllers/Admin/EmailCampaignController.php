@@ -23,7 +23,7 @@ class EmailCampaignController extends Controller
      */
     public function index(Request $request)
     {
-        $query = EmailCampaign::with(['createdBy'])->latest('created_at');
+        $query = EmailCampaign::with(['creator'])->latest('created_at');
 
         if ($status = $request->get('status')) {
             $query->where('status', $status);
@@ -91,7 +91,7 @@ class EmailCampaignController extends Controller
      */
     public function show(EmailCampaign $campaign)
     {
-        $campaign->load(['createdBy']);
+        $campaign->load(['creator']);
 
         return view('admin.emailcampaigns.show', [
             'campaign' => $campaign,

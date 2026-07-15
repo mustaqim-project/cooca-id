@@ -1,106 +1,105 @@
 @extends('layouts.admin')
-
-@section('title', 'Transactions Management')
-@section('subtitle', 'View and manage all financial transactions')
-
+@section('title', 'Transactions')
+@section('subtitle', 'View all payment transactions')
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
+    <div class="page-toolbar mb-4">
+        <div class="page-toolbar-left">
+            <div class="input-group" style="width:300px">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search by invoice, customer...">
             </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
         </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-            
-        </div>
-    </div>
-
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
-                <tr>
-                    <th scope="col" class="table-th">Invoice #</th>
-                    <th scope="col" class="table-th">Customer</th>
-                    <th scope="col" class="table-th">Amount</th>
-                    <th scope="col" class="table-th">Payment Method</th>
-                    <th scope="col" class="table-th">Status</th>
-                    <th scope="col" class="table-th">Date</th>
-                    <th scope="col" class="table-th">Actions</th>
-                </tr>
-            
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
-                @forelse($transactions as $transaction)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">
-                        {{ $transaction->invoice_number }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white">{{ $transaction->customer->name ?? 'Unknown Customer' }}</div>
-                        <div class="text-sm text-surface-500 dark:text-surface-400">{{ $transaction->customer->email ?? '' }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white">Rp {{ number_format($transaction->gross_amount, 0, ',', '.') }}</div>
-                        @if($transaction->net_amount != $transaction->gross_amount)
-                            <div class="text-xs text-surface-500 dark:text-surface-400">Net: Rp {{ number_format($transaction->net_amount, 0, ',', '.') }}</div>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-surface-900 dark:text-white">{{ strtoupper($transaction->payment_type ?? '-') }}</div>
-                        <div class="text-xs text-surface-500 dark:text-surface-400">{{ $transaction->bank ?? '' }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @php
-                            $statusClass = match($transaction->status) {
-                                'paid' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                                'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                                'failed' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-                                'refunded' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-                                default => 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300'
-                            };
-                        @endphp
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
-                            {{ ucfirst($transaction->status) }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
-                        {{ $transaction->created_at->format('d M Y H:i') }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button onclick="viewTransaction({{ $transaction->id }})" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
-                            <i data-lucide="eye" class="w-4 h-4"></i> Details
-                        </button>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="7" class="px-6 py-8 text-center text-surface-500 dark:text-surface-400">
-                        <div class="flex flex-col items-center">
-                            <i data-lucide="receipt" class="w-4 h-4 text-4xl mb-3 text-surface-300 dark:text-surface-600 dark:text-surface-400"></i>
-                            <p>No transactions found.</p>
-                        </div>
-                    </td>
-                </tr>
-                @endforelse
-            
-                
-                
-                </tbody>
-            </table>
+        <div class="page-toolbar-right">
+            <select class="form-saas-select" id="statusFilter" style="width:150px">
+                <option value="">All Status</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+                <option value="failed">Failed</option>
+                <option value="refunded">Refunded</option>
+            </select>
         </div>
     </div>
-</div>
+    <div class="card-saas">
+        <div class="card-saas-body p-0">
+            <div class="table-responsive">
+                <table class="table-saas" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Invoice</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($transactions as $transaction)
+                            <tr>
+                                <td><code style="font-size:.8rem">{{ $transaction->invoice_number }}</code></td>
+                                <td>
+                                    <div style="font-weight:500">{{ $transaction->customer->name ?? '-' }}</div>
+                                    <div style="font-size:.75rem;color:var(--text-muted)">
+                                        {{ $transaction->customer->email ?? '' }}</div>
+                                </td>
+                                <td>{{ $transaction->product->name ?? '-' }}</td>
+                                <td style="font-weight:600">Rp {{ number_format($transaction->amount, 0, ',', '.') }}</td>
+                                <td>{{ $transaction->payment_method ?? '-' }}</td>
+                                <td>
+                                    @php
+                                        $s = $transaction->status;
+                                        $cls = match ($s) {
+                                            'paid' => 'badge-saas-success',
+                                            'pending' => 'badge-saas-warning',
+                                            'failed' => 'badge-saas-danger',
+                                            'refunded' => 'badge-saas-info',
+                                            default => 'badge-saas-neutral',
+                                        };
+                                    @endphp
+                                    <span class="badge-saas {{ $cls }}">{{ ucfirst($s) }}</span>
+                                </td>
+                                <td style="color:var(--text-muted);white-space:nowrap">
+                                    {{ $transaction->created_at->format('d M Y') }}</td>
+                                <td>
+                                    <a href="{{ route('admin.transactions.show', $transaction) }}"
+                                        class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon"><i class="bi bi-receipt"></i></div>
+                                        <div class="empty-state-title">No transactions found</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @if (isset($transactions) && method_exists($transactions, 'links'))
+            <div class="card-saas-footer">{{ $transactions->links() }}</div>
+        @endif
+    </div>
 @endsection
+@push('scripts')
+    <script>
+        document.getElementById('searchInput').addEventListener('input', filter);
+        document.getElementById('statusFilter').addEventListener('change', filter);
+
+        function filter() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const s = document.getElementById('statusFilter').value.toLowerCase();
+            document.querySelectorAll('#transactionsTable tbody tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = (text.includes(q) && (s === '' || text.includes(s))) ? '' : 'none';
+            });
+        }
+    </script>
+@endpush

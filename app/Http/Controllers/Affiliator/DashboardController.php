@@ -8,12 +8,10 @@ use App\Http\Controllers\Controller;
 use App\Models\AffiliateCommission;
 use App\Models\AffiliateWithdrawal;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
 
 /**
  * Affiliator Dashboard Controller
- * 
+ *
  * Handles affiliator dashboard with referral, commission, and withdrawal statistics.
  */
 final class DashboardController extends Controller
@@ -24,118 +22,137 @@ final class DashboardController extends Controller
     public function index()
     {
         $affiliator = Auth::guard('affiliator')->user();
-        
-        // Referral Statistics
-        $totalReferrals = $affiliator->referrals()->count();
-        $activeReferrals = $affiliator->referrals()
-            ->whereHas('subscriptions', function ($query) {
-                $query->where('status', 'active');
-            })
+
+        // === Referral Statistics ===
+        $totalReferrals       = $affiliator->referrals()->count();
+        $activeReferrals      = $affiliator->referrals()
+            ->whereHas('subscriptions', fn($q) => $q->where('status', 'active'))
             ->count();
-        
         $newReferralsThisMonth = $affiliator->referrals()
             ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
             ->count();
-        
-        // Commission Statistics
-        $totalCommissions = AffiliateCommission::where('affiliator_id', $affiliator->id)
-            ->where('status', 'paid')
-            ->sum('amount');
-        
+
+        // === Commission Statistics (use correct column names) ===
+        $totalEarned = AffiliateCommission::where('affiliator_id', $affiliator->id)
+            ->whereIn('status', ['cleared', 'paid'])
+            ->sum('commission_amount');
+
         $pendingCommissions = AffiliateCommission::where('affiliator_id', $affiliator->id)
             ->where('status', 'pending')
-            ->sum('amount');
-        
+            ->sum('commission_amount');
+
         $thisMonthCommissions = AffiliateCommission::where('affiliator_id', $affiliator->id)
-            ->where('status', 'paid')
+            ->whereIn('status', ['cleared', 'paid'])
             ->whereMonth('created_at', now()->month)
-            ->sum('amount');
-        
-        // Level 2 Commissions (Downline)
+            ->whereYear('created_at', now()->year)
+            ->sum('commission_amount');
+
+        // Level breakdown
+        $level1Commissions = AffiliateCommission::where('affiliator_id', $affiliator->id)
+            ->where('level', 1)
+            ->sum('commission_amount');
+
         $level2Commissions = AffiliateCommission::where('affiliator_id', $affiliator->id)
             ->where('level', 2)
-            ->where('status', 'paid')
-            ->sum('amount');
-        
-        // Withdrawal Statistics
+            ->sum('commission_amount');
+
+        // === Withdrawal Statistics ===
         $totalWithdrawals = AffiliateWithdrawal::where('affiliator_id', $affiliator->id)
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'paid'])
             ->sum('amount');
-        
+
         $pendingWithdrawals = AffiliateWithdrawal::where('affiliator_id', $affiliator->id)
             ->where('status', 'pending')
             ->sum('amount');
-        
+
         $recentWithdrawals = AffiliateWithdrawal::where('affiliator_id', $affiliator->id)
             ->latest()
             ->limit(5)
             ->get();
-        
-        // Recent Commissions
+
+        // === Recent Commissions ===
         $recentCommissions = AffiliateCommission::where('affiliator_id', $affiliator->id)
-            ->with(['referral', 'subscription.product'])
+            ->with(['transaction', 'customer'])
             ->latest()
             ->limit(10)
             ->get();
-        
-        // Top Referrers (for downline tracking)
-        $topReferrers = $affiliator->downlines()
+
+        // === Downlines ===
+        $topDownlines = $affiliator->downlines()
             ->withCount('referrals')
             ->orderByDesc('referrals_count')
             ->limit(5)
             ->get();
-        
-        // Commission Trend (Last 6 months)
+
+        // === Commission Trend (Last 6 months) ===
         $commissionTrend = [];
         for ($i = 5; $i >= 0; $i--) {
-            $month = now()->subMonths($i);
+            $month             = now()->subMonths($i);
             $commissionTrend[] = [
-                'month' => $month->format('M Y'),
+                'month'  => $month->format('M Y'),
                 'amount' => AffiliateCommission::where('affiliator_id', $affiliator->id)
-                    ->where('status', 'paid')
+                    ->whereIn('status', ['cleared', 'paid'])
                     ->whereYear('created_at', $month->year)
                     ->whereMonth('created_at', $month->month)
-                    ->sum('amount'),
+                    ->sum('commission_amount'),
             ];
         }
-        
-        // Performance Metrics
+
+        // === Performance Metrics ===
         $conversionRate = 0;
-        $totalClicks = $affiliator->referral_clicks ?? 0;
-        if ($totalClicks > 0 && $totalReferrals > 0) {
-            $conversionRate = round(($totalReferrals / $totalClicks) * 100, 2);
+        if ($totalReferrals > 0) {
+            $conversionRate = round(($activeReferrals / $totalReferrals) * 100, 2);
         }
-        
+
         $averageCommission = AffiliateCommission::where('affiliator_id', $affiliator->id)
-            ->where('status', 'paid')
-            ->avg('amount') ?? 0;
+            ->whereIn('status', ['cleared', 'paid'])
+            ->avg('commission_amount') ?? 0;
+
+        // Available balance from wallet or affiliator.balance
+        $availableBalance = (float) ($affiliator->balance ?? 0);
+
+        // === Referral Monthly (Last 6 months) ===
+        $referralMonthly = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $referralMonthly[] = [
+                'month' => $month->format('M Y'),
+                'count' => $affiliator->referrals()
+                    ->whereYear('created_at', $month->year)
+                    ->whereMonth('created_at', $month->month)
+                    ->count(),
+            ];
+        }
 
         return view('affiliator.dashboard.index', [
             'stats' => [
-                'totalReferrals' => $totalReferrals,
-                'activeReferrals' => $activeReferrals,
+                'totalReferrals'       => $totalReferrals,
+                'activeReferrals'      => $activeReferrals,
                 'newReferralsThisMonth' => $newReferralsThisMonth,
-                'totalCommissions' => $totalCommissions,
-                'pendingCommissions' => $pendingCommissions,
+                'totalEarned'          => $totalEarned,
+                'pendingCommissions'   => $pendingCommissions,
                 'thisMonthCommissions' => $thisMonthCommissions,
-                'level2Commissions' => $level2Commissions,
-                'balance' => $affiliator->balance ?? 0,
-                'totalWithdrawals' => $totalWithdrawals,
-                'pendingWithdrawals' => $pendingWithdrawals,
-                'conversionRate' => $conversionRate,
-                'averageCommission' => $averageCommission,
-                'totalBalance' => $affiliator->balance ?? 0,
-                'totalEarned' => $totalCommissions,
-                'pendingCommission' => $pendingCommissions,
-                'level1Count' => $activeReferrals,
-                'level2Count' => 0,
+                'level1Commissions'    => $level1Commissions,
+                'level2Commissions'    => $level2Commissions,
+                'availableBalance'     => $availableBalance,
+                'totalWithdrawals'     => $totalWithdrawals,
+                'pendingWithdrawals'   => $pendingWithdrawals,
+                'conversionRate'       => $conversionRate,
+                'averageCommission'    => $averageCommission,
+                // Legacy keys for backward compatibility
+                'totalBalance'         => $availableBalance,
+                'totalCommissions'     => $totalEarned,
+                'balance'              => $availableBalance,
+                'pendingCommission'    => $pendingCommissions,
+                'level1Count'          => $activeReferrals,
+                'level2Count'          => $affiliator->downlines()->count(),
             ],
-            'commissions' => $recentCommissions,
-            'referrals' => [],
-            'downlines' => $topReferrers,
             'recentCommissions' => $recentCommissions,
             'recentWithdrawals' => $recentWithdrawals,
-            'commissionTrend' => $commissionTrend,
+            'commissionTrend'   => $commissionTrend,
+            'downlines'         => $topDownlines,
+            'referralMonthly'   => $referralMonthly,
         ]);
     }
 }

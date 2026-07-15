@@ -1,68 +1,92 @@
 @extends('layouts.admin')
 
-@section('title', 'Create Faqs')
-@section('subtitle', 'Add a new faqs record.')
+@section('title', 'Add FAQ')
+@section('subtitle', 'Create a new frequently asked question')
 
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
+    <div class="mb-4">
+        <a href="{{ route('admin.faqs.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to FAQs
         </a>
     </div>
 
-    <form action="#" method="POST"  class="form-confirm-submit">
+    <form action="{{ route('admin.faqs.store') }}" method="POST">
         @csrf
-        
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column: Main Form -->
-            <div class="lg:col-span-2 space-y-6">
-                <div class="corporate-card">
-                    <div class="p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-50/50 dark:bg-surface-900/50">
-                        <h3 class="text-lg font-medium text-surface-900 dark:text-white">Form Details</h3>
-                    </div>
-                    <div class="p-6 space-y-5">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="col-span-2">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Title / Name</label>
-                <input type="text" name="name" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white" placeholder="Enter title">
-            </div>
-            
-            <div class="col-span-2">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Description</label>
-                <textarea name="description" rows="4" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white" placeholder="Enter description"></textarea>
-            </div>
-            
-            <div class="col-span-2 md:col-span-1">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Status</label>
-                <select name="status" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white">
-                    <option value="1">Active</option>
-                    <option value="0">Inactive</option>
-                </select>
-            </div>
-        </div>
+        <div class="row g-4">
+            {{-- Main --}}
+            <div class="col-lg-8">
+                <div class="card-saas">
+                    <div class="card-saas-header"><span class="card-saas-title">FAQ Content</span></div>
+                    <div class="card-saas-body">
+
+                        <div class="form-saas-group">
+                            <label class="form-saas-label" for="question">Question <span
+                                    class="text-danger">*</span></label>
+                            <input class="form-saas-input @error('question') is-invalid @enderror" type="text"
+                                name="question" id="question" value="{{ old('question') }}"
+                                placeholder="e.g. How do I reset my password?" required>
+                            @error('question')
+                                <div class="form-saas-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-saas-group">
+                            <label class="form-saas-label" for="answer">Answer <span class="text-danger">*</span></label>
+                            <textarea class="form-saas-textarea @error('answer') is-invalid @enderror" name="answer" id="answer" rows="6"
+                                placeholder="Provide a clear, helpful answer..." required>{{ old('answer') }}</textarea>
+                            @error('answer')
+                                <div class="form-saas-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-saas-group">
+                            <label class="form-saas-label" for="category">Category (Optional)</label>
+                            <input class="form-saas-input @error('category') is-invalid @enderror" type="text"
+                                name="category" id="category" value="{{ old('category') }}"
+                                placeholder="e.g. Billing, Technical, General">
+                            @error('category')
+                                <div class="form-saas-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                     </div>
                 </div>
             </div>
-            
-            <!-- Right Column: Actions -->
-            <div class="space-y-6">
-                <div class="corporate-card">
-                    <div class="p-6">
-                        <h3 class="text-lg font-medium text-surface-900 dark:text-white mb-2">Actions</h3>
-                        <p class="text-sm text-surface-500 dark:text-surface-400 mb-6">Review your changes before submitting.</p>
-                        
-                        <div class="flex flex-col space-y-3">
-                            
-                            <a href="javascript:history.back()" class="btn btn-secondary w-full">
-                                Cancel
-                            </a>
+
+            {{-- Sidebar --}}
+            <div class="col-lg-4">
+                <div class="card-saas">
+                    <div class="card-saas-header"><span class="card-saas-title">Settings</span></div>
+                    <div class="card-saas-body">
+
+                        <div class="form-saas-group">
+                            <label class="form-saas-label" for="sort_order">Sort Order</label>
+                            <input class="form-saas-input @error('sort_order') is-invalid @enderror" type="number"
+                                name="sort_order" id="sort_order" value="{{ old('sort_order', 0) }}" min="0">
+                            <div class="form-saas-hint">Lower numbers appear first.</div>
+                            @error('sort_order')
+                                <div class="form-saas-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1"
+                                {{ old('is_active', true) ? 'checked' : '' }}>
+                            <label class="form-check-label fw-medium" for="is_active">Active</label>
+                            <div class="text-muted" style="font-size:0.82rem">Visible on the public FAQ page.</div>
+                        </div>
+
+                        <hr style="border-color:var(--border)">
+
+                        <div class="d-flex flex-column gap-2">
+                            <button type="submit" class="btn-saas btn-saas-primary w-100">
+                                <i class="bi bi-check-lg me-1"></i> Save FAQ
+                            </button>
+                            <a href="{{ route('admin.faqs.index') }}" class="btn-saas btn-saas-ghost w-100">Cancel</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </form>
-</div>
 @endsection

@@ -4,123 +4,131 @@
 @section('subtitle', 'Update product category details')
 
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
+    <div class="mb-4">
+        <a href="{{ route('admin.product-categories.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Categories
         </a>
     </div>
 
-    <form class="form-confirm-submit" action="{{ route('admin.product-categories.update', $category->id) }}" method="POST"  class="form-confirm-submit">
+    <form class="form-confirm-submit" action="{{ route('admin.product-categories.update', $category->id) }}" method="POST">
         @csrf
         @method('PUT')
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column: Main Form -->
-            <div class="lg:col-span-2 space-y-6">
-                <div class="corporate-card">
-                    <div class="p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-50/50 dark:bg-surface-900/50">
-                        <h3 class="text-lg font-medium text-surface-900 dark:text-white">Form Details</h3>
-                    </div>
-                    <div class="p-6 space-y-5">
-                        <div class="p-6 sm:p-8 space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Name -->
-                <div class="col-span-1 md:col-span-2">
-                    <label for="name" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Category Name <span class="text-red-500">*</span></label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $category->name) }}" required 
-                        class="block w-full py-2 px-3 border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
-                    @error('name')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                
-                <!-- Slug -->
-                <div class="col-span-1 md:col-span-2">
-                    <label for="slug" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Slug</label>
-                    <input type="text" name="slug" id="slug" value="{{ old('slug', $category->slug) }}" 
-                        class="block w-full py-2 px-3 border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
-                    <p class="mt-1 text-xs text-surface-500 dark:text-surface-400">The URL-friendly version of the name. Must be unique.</p>
-                    @error('slug')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                
-                <!-- Description -->
-                <div class="col-span-1 md:col-span-2">
-                    <label for="description" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Description</label>
-                    <textarea name="description" id="description" rows="3" 
-                        class="block w-full py-2 px-3 border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">{{ old('description', $category->description) }}</textarea>
-                    @error('description')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                
-                <!-- Icon -->
-                <div>
-                    <label for="icon" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Icon Class (Optional)</label>
-                    <input type="text" name="icon" id="icon" value="{{ old('icon', $category->icon) }}" placeholder="e.g. bi bi-star" 
-                        class="block w-full py-2 px-3 border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
-                    <p class="mt-1 text-xs text-surface-500 dark:text-surface-400">Bootstrap Icon class name.</p>
-                    @error('icon')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                
-                <!-- Sort Order -->
-                <div>
-                    <label for="sort_order" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Sort Order</label>
-                    <input type="number" name="sort_order" id="sort_order" value="{{ old('sort_order', $category->sort_order) }}" min="0" 
-                        class="block w-full py-2 px-3 border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
-                    <p class="mt-1 text-xs text-surface-500 dark:text-surface-400">Lower numbers appear first.</p>
-                    @error('sort_order')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                
-                <!-- Status -->
-                <div class="col-span-1 md:col-span-2 pt-2">
-                    <div class="flex items-start">
-                        <div class="flex items-center h-5">
-                            <input id="is_active" name="is_active" type="checkbox" value="1" {{ old('is_active', $category->is_active) ? 'checked' : '' }}
-                                class="focus:ring-primary-500 h-4 w-4 text-primary-600 border-surface-300 dark:border-surface-600 rounded">
+        <div class="row g-4">
+            {{-- Main --}}
+            <div class="col-lg-8">
+                <div class="card-saas">
+                    <div class="card-saas-header"><span class="card-saas-title">Category Details</span></div>
+                    <div class="card-saas-body">
+
+                        <div class="form-saas-group">
+                            <label class="form-saas-label" for="name">Category Name <span
+                                    class="text-danger">*</span></label>
+                            <input class="form-saas-input @error('name') is-invalid @enderror" type="text" name="name"
+                                id="name" value="{{ old('name', $category->name) }}" required>
+                            @error('name')
+                                <div class="form-saas-error">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="ml-3 text-sm">
-                            <label for="is_active" class="font-medium text-surface-700 dark:text-surface-300">Active</label>
-                            <p class="text-surface-500 dark:text-surface-400">Make this category visible on the store.</p>
+
+                        <div class="form-saas-group">
+                            <label class="form-saas-label" for="slug">Slug</label>
+                            <input class="form-saas-input @error('slug') is-invalid @enderror" type="text" name="slug"
+                                id="slug" value="{{ old('slug', $category->slug) }}">
+                            <div class="form-saas-hint">URL-friendly version of the name. Must be unique.</div>
+                            @error('slug')
+                                <div class="form-saas-error">{{ $message }}</div>
+                            @enderror
                         </div>
+
+                        <div class="form-saas-group">
+                            <label class="form-saas-label" for="description">Description</label>
+                            <textarea class="form-saas-textarea @error('description') is-invalid @enderror" name="description" id="description"
+                                rows="3">{{ old('description', $category->description) }}</textarea>
+                            @error('description')
+                                <div class="form-saas-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-saas-group">
+                                    <label class="form-saas-label" for="icon">Icon Class</label>
+                                    <input class="form-saas-input @error('icon') is-invalid @enderror" type="text"
+                                        name="icon" id="icon" value="{{ old('icon', $category->icon) }}"
+                                        placeholder="e.g. bi bi-star">
+                                    <div class="form-saas-hint">Bootstrap Icon class name.</div>
+                                    @error('icon')
+                                        <div class="form-saas-error">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-saas-group">
+                                    <label class="form-saas-label" for="sort_order">Sort Order</label>
+                                    <input class="form-saas-input @error('sort_order') is-invalid @enderror" type="number"
+                                        name="sort_order" id="sort_order"
+                                        value="{{ old('sort_order', $category->sort_order) }}" min="0">
+                                    <div class="form-saas-hint">Lower numbers appear first.</div>
+                                    @error('sort_order')
+                                        <div class="form-saas-error">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="px-6 py-4 bg-surface-50 dark:bg-surface-900 border-t border-surface-200 dark:border-surface-700 flex justify-end gap-3">
-            <a href="{{ route('admin.product-categories.index') }}" class="inline-flex justify-center py-2 px-4 border border-surface-300 dark:border-surface-600 shadow-sm text-sm font-medium rounded-md text-surface-700 dark:text-surface-300 bg-white dark:bg-surface-800 hover:bg-surface-50 dark:bg-surface-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                Cancel
-            </a>
-            
-        </div>
+
+            {{-- Sidebar --}}
+            <div class="col-lg-4">
+                <div class="card-saas">
+                    <div class="card-saas-header"><span class="card-saas-title">Settings</span></div>
+                    <div class="card-saas-body">
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1"
+                                {{ old('is_active', $category->is_active) ? 'checked' : '' }}>
+                            <label class="form-check-label fw-medium" for="is_active">Active</label>
+                            <div class="text-muted" style="font-size:0.82rem">Visible on the store.</div>
+                        </div>
+
+                        <hr style="border-color:var(--border)">
+
+                        <div class="d-flex flex-column gap-2">
+                            <button type="submit" class="btn-saas btn-saas-primary w-100">
+                                <i class="bi bi-check-lg me-1"></i> Save Changes
+                            </button>
+                            <a href="{{ route('admin.product-categories.show', $category->id) }}"
+                                class="btn-saas btn-saas-ghost w-100">Cancel</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Right Column: Actions -->
-            <div class="space-y-6">
-                <div class="corporate-card">
-                    <div class="p-6">
-                        <h3 class="text-lg font-medium text-surface-900 dark:text-white mb-2">Actions</h3>
-                        <p class="text-sm text-surface-500 dark:text-surface-400 mb-6">Review your changes before submitting.</p>
-                        
-                        <div class="flex flex-col space-y-3">
-                            
-                            <a href="javascript:history.back()" class="btn btn-secondary w-full">
-                                Cancel
-                            </a>
-                        </div>
+
+                {{-- Danger Zone --}}
+                <div class="card-saas mt-4" style="border-color:#fecaca">
+                    <div class="card-saas-header" style="background:#fef2f2">
+                        <span class="card-saas-title" style="color:#b91c1c">Danger Zone</span>
+                    </div>
+                    <div class="card-saas-body">
+                        @if (($category->products_count ?? ($category->products->count() ?? 0)) === 0)
+                            <form class="form-confirm-delete"
+                                action="{{ route('admin.product-categories.destroy', $category->id) }}" method="POST">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn-saas btn-saas-danger w-100">
+                                    <i class="bi bi-trash3 me-1"></i> Delete Category
+                                </button>
+                            </form>
+                        @else
+                            <button type="button" class="btn-saas btn-saas-danger w-100" disabled
+                                title="Cannot delete: has products">
+                                <i class="bi bi-trash3 me-1"></i> Delete Category
+                            </button>
+                            <div class="text-muted mt-2" style="font-size:0.8rem">Remove all products from this category
+                                first.</div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     </form>
-</div>
 @endsection

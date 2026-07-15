@@ -1,88 +1,47 @@
 @extends('layouts.guest')
 @section('content')
-<main class="auth-layout" style="margin-top: var(--navbar-height); display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - var(--navbar-height));">
-    <!-- LEFT VISUAL PANEL -->
-    <div class="auth-left auth-panel" style="background: linear-gradient(160deg, #020617 0%, #0F172A 40%, #1E3A5F 80%, #020617 100%); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 48px 40px;">
-        <div class="orb" style="width:500px;height:500px;background:#2563EB;top:-150px;right:-100px;position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;pointer-events:none;"></div>
-        <div class="orb" style="width:300px;height:300px;background:#38BDF8;bottom:-80px;left:-60px;position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;pointer-events:none;"></div>
-        <div class="grid-bg" style="position:absolute;inset:0;background-image:linear-gradient(rgba(56,189,248,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.04) 1px,transparent 1px);background-size:60px 60px;"></div>
-        <div class="left-content" style="position:relative;z-index:2;max-width:420px;text-align:center;">
-            <div class="d-flex align-items-center justify-content-center gap-3 mb-5">
-                <div class="logo-icon" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;font-weight:800;">C</div>
-                <span class="brand-name" style="font-size:1.8rem;font-weight:800;">{{ setting('site_name', 'COOCA') }}</span>
-            </div>
-            <h2 style="font-size:2rem;font-weight:800;line-height:1.2;margin-bottom:16px;letter-spacing:-0.02em;">Grow With Us as a <span class="text-gradient">COOCA Affiliator.</span></h2>
-            <p style="font-size:.95rem;color:rgba(248,250,252,.6);margin-top:12px;">Welcome back to the Affiliator Portal. Track your referrals and commissions in real-time.</p>
-            <div class="trust-items" style="display:flex;flex-direction:column;gap:12px;margin-top:36px;text-align:left;">
-                <div class="trust-item" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(56,189,248,.1);border-radius:12px;">
-                    <div class="trust-icon" style="width:36px;height:36px;border-radius:10px;background:rgba(56,189,248,.1);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:1rem;flex-shrink:0;"><i class="bi bi-graph-up-arrow"></i></div>
-                    <div class="trust-text" style="font-size:.85rem;color:rgba(248,250,252,.7);"><strong style="color:#F8FAFC;">High Commissions</strong> — Earn recurring commissions for every active business you refer.</div>
-                </div>
-                <div class="trust-item" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(56,189,248,.1);border-radius:12px;">
-                    <div class="trust-icon" style="width:36px;height:36px;border-radius:10px;background:rgba(56,189,248,.1);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:1rem;flex-shrink:0;"><i class="bi bi-lightning-charge-fill"></i></div>
-                    <div class="trust-text" style="font-size:.85rem;color:rgba(248,250,252,.7);"><strong style="color:#F8FAFC;">Fast Payouts</strong> — Automated monthly disbursements directly to your registered bank account.</div>
-                </div>
-            </div>
-        </div>
+<div class="auth-layout">
+  <div class="auth-left auth-panel">
+    <div class="hero-orb hero-orb-1" style="width:500px;height:500px;top:-150px;right:-100px;"></div>
+    <div class="hero-orb hero-orb-2" style="width:300px;height:300px;bottom:-80px;left:-60px;"></div>
+    <div class="grid-bg"></div>
+    <div class="auth-left-content">
+      <div class="d-flex align-items-center justify-content-center gap-3 mb-5"><div class="brand-icon">C</div><span style="font-size:1.8rem;font-weight:800;">{{ setting('site.name','COOCA') }}</span></div>
+      <h2>{{ __('Affiliator') }} <span class="text-gradient">{{ __('Portal') }}</span></h2>
+      <p style="font-size:.95rem;color:var(--text-muted);">{{ __('Secure access to your affiliator dashboard.') }}</p>
     </div>
+  </div>
+  <div class="auth-right auth-panel">
+    <div class="auth-form-panel">
+      <div class="form-title" style="font-size:1.7rem;font-weight:800;margin-bottom:4px;">{{ __('Affiliator Login') }}</div>
+      <p class="mb-4" style="font-size:.9rem;">{{ __('Sign in to manage your affiliator account.') }}</p>
 
-    <!-- RIGHT FORM PANEL -->
-    <div class="auth-right auth-panel" style="background:var(--bg); display:flex; align-items:center; justify-content:center; padding:48px 40px;">
-        <div class="form-panel" style="width:100%; max-width:420px;">
-            <!-- Mobile only brand -->
-            <div class="d-flex align-items-center gap-3 d-md-none mb-4">
-                <div class="logo-icon" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;font-weight:800;">C</div>
-                <span class="brand-name" style="font-size:1.8rem;font-weight:800;">{{ setting('site_name', 'COOCA') }}</span>
-            </div>
+      @if ($errors->any())
+      <div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill"></i> {{ $errors->first() }}</div>
+      @endif
 
-            <div class="form-title" style="font-size:1.8rem;font-weight:800;margin-bottom:6px;letter-spacing:-0.02em;">Affiliator Portal</div>
-            <p class="form-subtitle" style="font-size:.92rem;margin-bottom:32px;">Log in to your COOCA affiliator dashboard. <a href="{{ route('affiliator.register') }}">No account? Join now →</a></p>
-
-            <!-- ERROR -->
-            @if ($errors->any())
-            <div class="error-msg" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:12px 16px;font-size:.85rem;color:#EF4444;margin-bottom:16px;display:block;">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                {{ $errors->first() }}
-            </div>
-            @endif
-
-            <!-- FORM -->
-            <form action="{{ route('affiliator.login.submit') }}" method="POST" id="loginForm">
-                @csrf
-                <div class="input-wrap" style="position:relative;margin-bottom:16px;">
-                    <label class="input-label" style="font-size:.82rem;font-weight:600;margin-bottom:8px;display:block;color:var(--text);">Email Address</label>
-                    <div style="position:relative;">
-                        <i class="bi bi-envelope input-icon" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:1rem;pointer-events:none;"></i>
-                        <input type="email" name="email" value="{{ old('email') }}" class="input-field" style="width:100%;padding:14px 16px 14px 46px;border-radius:12px;border:1px solid var(--border);background:var(--card-alt);color:var(--text);font-family:var(--font);font-size:.95rem;outline:none;transition:all var(--transition);" placeholder="you@company.com" required autocomplete="email">
-                    </div>
-                </div>
-                <div class="input-wrap" style="position:relative;margin-bottom:16px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <label class="input-label" style="font-size:.82rem;font-weight:600;margin-bottom:8px;display:block;color:var(--text);">Password</label>
-                        <a href="{{ route('affiliator.password.request') }}" style="font-size:.82rem;">Forgot password?</a>
-                    </div>
-                    <div style="position:relative;">
-                        <i class="bi bi-lock input-icon" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:1rem;pointer-events:none;"></i>
-                        <input type="password" name="password" class="input-field" style="width:100%;padding:14px 16px 14px 46px;border-radius:12px;border:1px solid var(--border);background:var(--card-alt);color:var(--text);font-family:var(--font);font-size:.95rem;outline:none;transition:all var(--transition);" placeholder="Your password" required autocomplete="current-password">
-                    </div>
-                </div>
-                <div class="check-wrap" style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-                    <input type="checkbox" name="remember" id="rememberMe" style="width:18px;height:18px;accent-color:var(--primary);border-radius:4px;cursor:pointer;flex-shrink:0;">
-                    <label for="rememberMe" style="font-size:.85rem;color:var(--text-muted);cursor:pointer;">Keep me logged in</label>
-                </div>
-                <button type="submit" class="btn-cooca btn-cooca-primary" style="width:100%;padding:15px;font-size:1rem;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-weight:600;">
-                    <span>Log In to Portal</span>
-                    <i class="bi bi-arrow-right"></i>
-                </button>
-            </form>
-
-            <p style="text-align:center;font-size:.82rem;margin-top:28px;color:var(--text-muted);">
-                By logging in, you agree to our <a href="{{ route('terms') }}">Terms of Service</a> and <a href="{{ route('privacy') }}">Privacy Policy</a>.
-            </p>
-            <p style="text-align:center;font-size:.9rem;margin-top:16px;">
-                Don't have an affiliator account? <a href="{{ route('affiliator.register') }}" style="font-weight:700;">Join as Affiliator →</a>
-            </p>
+      <form action="{{ route('affiliator.login.submit') }}" method="POST">
+        @csrf
+        <div class="form-group">
+          <label class="form-label">{{ __('Email Address') }}</label>
+          <div class="input-icon-wrap">
+            <i class="bi bi-envelope input-icon"></i>
+            <input type="email" name="email" value="{{ old('email') }}" class="form-control" placeholder="you@company.com" required autocomplete="email">
+          </div>
         </div>
+        <div class="form-group">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label class="form-label">{{ __('Password') }}</label>
+            <a href="{{ route('affiliator.password.request') }}" style="font-size:.82rem;">{{ __('Forgot password?') }}</a>
+          </div>
+          <div class="input-icon-wrap">
+            <i class="bi bi-lock input-icon"></i>
+            <input type="password" name="password" class="form-control" placeholder="Your password" required autocomplete="current-password">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">{{ __('Log In') }} <i class="bi bi-arrow-right"></i></button>
+      </form>
     </div>
-</main>
+  </div>
+</div>
 @endsection

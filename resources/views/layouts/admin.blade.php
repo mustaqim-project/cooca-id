@@ -1,185 +1,209 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))" :class="{ 'dark': darkMode }">
+<html lang="en" data-bs-theme="light">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>@yield('title', 'Admin Panel') - Cooca.id</title>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Scripts -->
+
+    <!-- App CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-surface-50 text-surface-900 dark:bg-surface-900 dark:text-surface-100 font-sans antialiased flex h-screen overflow-hidden transition-colors duration-200">
-    
+
+<body>
+
     <!-- Mobile sidebar backdrop -->
-    <div x-show="sidebarOpen" style="display: none;" class="fixed inset-0 z-40 bg-surface-900/80 backdrop-blur-sm lg:hidden" @click="sidebarOpen = false" x-transition></div>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     <!-- Sidebar -->
-    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" 
-           class="fixed inset-y-0 left-0 z-50 w-72 corporate-sidebar transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static lg:inset-auto flex flex-col shadow-xl lg:shadow-none h-screen shrink-0">
-        
+    <aside class="app-sidebar" id="appSidebar">
         <!-- Brand -->
-        <div class="h-16 flex items-center justify-center border-b border-surface-200 dark:border-surface-700 shrink-0">
-            <a href="{{ route('admin.dashboard') }}" class="text-xl font-bold tracking-tight text-surface-900 dark:text-white">
-                Cooca<span class="text-primary-600 dark:text-primary-400">.id</span>
+        <div class="sidebar-brand">
+            <a href="{{ route('admin.dashboard') }}" class="sidebar-brand-link">
+                Cooca<span class="sidebar-brand-accent">.id</span>
             </a>
         </div>
-        
+
         <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto p-4 space-y-6">
-            @php
-                $navigationGroups = [
-                    [
-                        'title' => 'Main',
-                        'items' => [
-                            ['name' => 'Dashboard', 'href' => route('admin.dashboard'), 'icon' => 'bi-house-door', 'route_name' => 'admin.dashboard'],
-                        ]
-                    ],
-                    [
-                        'title' => 'Users',
-                        'items' => [
-                            ['name' => 'Customers', 'href' => route('admin.customers.index'), 'icon' => 'bi-people', 'route_name' => 'admin.customers.*'],
-                            ['name' => 'Affiliators', 'href' => route('admin.affiliators.index'), 'icon' => 'bi-person-badge', 'route_name' => 'admin.affiliators.*'],
-                        ]
-                    ],
-                    [
-                        'title' => 'Catalog',
-                        'items' => [
-                            ['name' => 'Products', 'href' => route('admin.products.index'), 'icon' => 'bi-box', 'route_name' => 'admin.products.*'],
-                            ['name' => 'Categories', 'href' => route('admin.product-categories.index'), 'icon' => 'bi-tag', 'route_name' => 'admin.product-categories.*'],
-                            ['name' => 'Subscriptions', 'href' => route('admin.subscriptions.index'), 'icon' => 'bi-calendar', 'route_name' => 'admin.subscriptions.*'],
-                            ['name' => 'Licenses', 'href' => route('admin.licenses.index'), 'icon' => 'bi-key', 'route_name' => 'admin.licenses.*'],
-                        ]
-                    ],
-                    [
-                        'title' => 'Sales & Finance',
-                        'items' => [
-                            ['name' => 'Transactions', 'href' => route('admin.transactions.index'), 'icon' => 'bi-currency-dollar', 'route_name' => 'admin.transactions.*'],
-                            ['name' => 'Settlements', 'href' => route('admin.settlements.index'), 'icon' => 'bi-cash-stack', 'route_name' => 'admin.settlements.*'],
-                            ['name' => 'Vouchers', 'href' => route('admin.vouchers.index'), 'icon' => 'bi-ticket', 'route_name' => 'admin.vouchers.*'],
-                            ['name' => 'ERP Requests', 'href' => route('admin.erp-requests.index'), 'icon' => 'bi-server', 'route_name' => 'admin.erp-requests.*'],
-                        ]
-                    ],
-                    [
-                        'title' => 'Content Management',
-                        'items' => [
-                            ['name' => 'Landing Page', 'href' => route('admin.cms.landing.index'), 'icon' => 'bi-layout-text-window', 'route_name' => 'admin.cms.landing.*'],
-                            ['name' => 'CMS Pages', 'href' => route('admin.cms.pages.index'), 'icon' => 'bi-file-text', 'route_name' => 'admin.cms.pages.*'],
-                            ['name' => 'Blog', 'href' => route('admin.blog.index'), 'icon' => 'bi-newspaper', 'route_name' => 'admin.blog.*'],
-                            ['name' => 'FAQs', 'href' => route('admin.faqs.index'), 'icon' => 'bi-question-circle', 'route_name' => 'admin.faqs.*'],
-                            ['name' => 'Testimonials', 'href' => route('admin.testimonials.index'), 'icon' => 'bi-chat-quote', 'route_name' => 'admin.testimonials.*'],
-                            ['name' => 'Reviews', 'href' => route('admin.reviews.index'), 'icon' => 'bi-star', 'route_name' => 'admin.reviews.*'],
-                        ]
-                    ],
-                    [
-                        'title' => 'Communication',
-                        'items' => [
-                            ['name' => 'Email Campaigns', 'href' => route('admin.email-campaigns.index'), 'icon' => 'bi-envelope', 'route_name' => 'admin.email-campaigns.*'],
-                            ['name' => 'Email Templates', 'href' => route('admin.email-templates.index'), 'icon' => 'bi-files', 'route_name' => 'admin.email-templates.*'],
-                            ['name' => 'Tickets', 'href' => route('admin.tickets.index'), 'icon' => 'bi-inbox', 'route_name' => 'admin.tickets.*'],
-                        ]
-                    ],
-                    [
-                        'title' => 'System',
-                        'items' => [
-                            ['name' => 'Settings', 'href' => route('admin.settings.index'), 'icon' => 'bi-gear', 'route_name' => 'admin.settings.*'],
-                        ]
-                    ],
-                ];
-            @endphp
-            
-            @foreach($navigationGroups as $group)
-                <div>
-                    <h3 class="px-3 text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider mb-2">
-                        {{ $group['title'] }}
-                    </h3>
-                    <ul class="space-y-1">
-                        @foreach($group['items'] as $item)
-                            <li>
-                                <a href="{{ $item['href'] }}" 
-                                   class="{{ request()->routeIs($item['route_name']) ? 'corporate-nav-item-active' : 'corporate-nav-item' }}">
-                                    <i class="bi {{ $item['icon'] }} text-lg mr-3 {{ request()->routeIs($item['route_name']) ? 'text-white' : 'text-surface-400 dark:text-surface-500' }}"></i>
-                                    {{ $item['name'] }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endforeach
-        </nav>
-        
-        <!-- Bottom Action -->
-        <div class="p-4 border-t border-surface-200 dark:border-surface-700">
+        <div class="sidebar-nav-wrap">
+            @include('layouts.partials.admin-nav')
+        </div>
+
+        <!-- Logout -->
+        <div class="sidebar-footer">
             <form class="form-confirm-submit" method="POST" action="{{ route('admin.logout') }}">
                 @csrf
-                <button type="submit" class="flex w-full items-center px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                    <i data-lucide="log-out" class="w-5 h-5 icon-3d"></i>
-                    Logout
+                <button type="submit" class="sidebar-logout-btn">
+                    <i class="bi bi-box-arrow-right sidebar-logout-icon"></i>
+                    <span>Sign out</span>
                 </button>
             </form>
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col min-h-screen overflow-hidden min-w-0">
-        
+    <!-- Main -->
+    <div class="app-main" id="appMain">
+
         <!-- Top Header -->
-        <header class="h-16 corporate-header sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center">
-                <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 rounded-md text-surface-400 hover:text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
-                    <i data-lucide="menu" class="w-5 h-5 icon-3d"></i>
+        <header class="app-header">
+            <div class="header-left">
+                <!-- Hamburger -->
+                <button class="header-hamburger" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <i class="bi bi-list"></i>
                 </button>
+
+                <!-- Breadcrumb / page title -->
+                <div class="header-breadcrumb">
+                    <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                    <span class="separator">/</span>
+                    <span class="current">@yield('title', 'Dashboard')</span>
+                </div>
             </div>
-            
-            <div class="flex items-center space-x-4">
-                <!-- Dark Mode Toggle -->
-                <button @click="darkMode = !darkMode" class="p-2 text-surface-400 hover:text-surface-500 dark:hover:text-surface-300 transition-colors">
-                    <i class="bi" :class="darkMode ? 'bi-sun' : 'bi-moon'"></i>
+
+            <div class="header-right">
+                <!-- Dark mode toggle -->
+                <button class="header-icon-btn" id="darkModeToggle" title="Toggle dark mode">
+                    <i class="bi bi-moon-stars" id="darkModeIcon"></i>
                 </button>
-                
-                <!-- Profile Dropdown -->
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-3 focus:outline-none">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-sm">
-                            {{ substr(auth('admin')->user()->name ?? 'A', 0, 1) }}
+
+                <!-- Notifications -->
+                <button class="header-icon-btn" title="Notifications">
+                    <i class="bi bi-bell"></i>
+                    <span class="badge-dot"></span>
+                </button>
+
+                <!-- Divider -->
+                <div class="vr opacity-25" style="height:24px; margin:0 4px;"></div>
+
+                <!-- Profile dropdown -->
+                <div class="dropdown">
+                    <button class="header-user-btn" data-bs-toggle="dropdown" id="profileDropdown">
+                        <div class="header-user-avatar">
+                            {{ strtoupper(substr(auth('admin')->user()->name ?? 'A', 0, 1)) }}
                         </div>
-                        <div class="hidden md:block text-left">
-                            <p class="text-sm font-medium text-surface-700 dark:text-surface-200">{{ auth('admin')->user()->name ?? 'Admin' }}</p>
-                        </div>
-                        <i data-lucide="chevron-down" class="w-5 h-5 text-xs text-surface-500 icon-3d"></i>
+                        <span class="header-user-name">
+                            {{ auth('admin')->user()->name ?? 'Admin' }}
+                        </span>
+                        <i class="bi bi-chevron-down header-user-chevron"></i>
                     </button>
-                    
-                    <div x-show="open" x-transition class="absolute right-0 mt-2 w-48 bg-white dark:bg-surface-800 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none" style="display: none;">
-                        <a href="{{ route('admin.settings.index') }}" class="block px-4 py-2 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-700">Profile</a>
-                        <a href="{{ route('admin.settings.index') }}" class="block px-4 py-2 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-700">Settings</a>
-                        <div class="border-t border-surface-100 dark:border-surface-700"></div>
-                        <form class="form-confirm-submit" method="POST" action="{{ route('admin.logout') }}">
-                            @csrf
-                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">Sign out</button>
-                        </form>
-                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-1">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2"
+                                href="{{ route('admin.settings.index') }}">
+                                <i class="bi bi-person text-secondary"></i> Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2"
+                                href="{{ route('admin.settings.index') }}">
+                                <i class="bi bi-gear text-secondary"></i> Settings
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <form class="form-confirm-submit" method="POST" action="{{ route('admin.logout') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="dropdown-item d-flex align-items-center gap-2 text-danger">
+                                    <i class="bi bi-box-arrow-right"></i> Sign out
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </header>
 
         <!-- Page Content -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-surface-50 dark:bg-surface-900 p-4 sm:p-6 lg:p-8">
-            <!-- Header section -->
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold text-surface-900 dark:text-white">@yield('title')</h1>
-                <p class="mt-1 text-sm text-surface-500 dark:text-surface-400">@yield('subtitle')</p>
-            </div>
-            
+        <main class="app-content">
             @yield('content')
         </main>
     </div>
-    
-    @include('components.swal-alert')
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // ── Dark Mode ──────────────────────────────────────────
+        (function() {
+            if (localStorage.getItem('adminDarkMode') === 'true') {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                document.getElementById('darkModeIcon')?.classList.replace('bi-moon-stars', 'bi-sun');
+            }
+        })();
+
+        document.getElementById('darkModeToggle')?.addEventListener('click', function() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-bs-theme') === 'dark';
+            html.setAttribute('data-bs-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('adminDarkMode', String(!isDark));
+            const icon = document.getElementById('darkModeIcon');
+            icon?.classList.replace(isDark ? 'bi-sun' : 'bi-moon-stars', isDark ? 'bi-moon-stars' : 'bi-sun');
+        });
+
+        // ── Sidebar Toggle ─────────────────────────────────────
+        const sidebar = document.getElementById('appSidebar');
+        const main = document.getElementById('appMain');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const toggle = document.getElementById('sidebarToggle');
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            backdrop.classList.add('show');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            backdrop.classList.remove('show');
+        }
+
+        function toggleCollapse() {
+            // Desktop: collapse/expand
+            if (window.innerWidth >= 992) {
+                sidebar.classList.toggle('collapsed');
+                main.classList.toggle('sidebar-collapsed');
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            } else {
+                sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+            }
+        }
+
+        toggle?.addEventListener('click', toggleCollapse);
+        backdrop?.addEventListener('click', closeSidebar);
+
+        // Restore collapsed state on desktop
+        if (window.innerWidth >= 992 && localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            main.classList.add('sidebar-collapsed');
+        }
+
+        // ── Confirm Delete ─────────────────────────────────────
+        document.addEventListener('submit', function(e) {
+            if (e.target.classList.contains('form-confirm-delete')) {
+                e.preventDefault();
+                if (confirm('Yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.')) {
+                    e.target.submit();
+                }
+            }
+            if (e.target.classList.contains('form-confirm-submit')) {
+                e.preventDefault();
+                if (confirm('Yakin ingin melanjutkan tindakan ini?')) {
+                    e.target.submit();
+                }
+            }
+        });
+    </script>
+
     @stack('scripts')
 </body>
+
 </html>

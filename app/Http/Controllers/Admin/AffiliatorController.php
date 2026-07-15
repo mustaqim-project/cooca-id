@@ -75,25 +75,9 @@ final class AffiliatorController extends Controller
     }
 
     /**
-     * Show the form for editing the specified affiliator.
+     * Suspend the specified affiliator.
      */
-    public function edit(string $id)
-    {
-        $affiliator = $this->affiliatorRepository->find($id);
-
-        if (!$affiliator) {
-            abort(404, 'Affiliator not found');
-        }
-
-        return view('admin.affiliators.edit', [
-            'affiliator' => $affiliator,
-        ]);
-    }
-
-    /**
-     * Update the specified affiliator.
-     */
-    public function update(Request $request, string $id)
+    public function suspend(Request $request, string $id)
     {
         $affiliator = $this->affiliatorRepository->find($id);
 
@@ -102,20 +86,23 @@ final class AffiliatorController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:affiliators,email,' . $id,
-            'is_active' => 'boolean',
+            'suspension_reason_type' => 'required|string',
+            'suspension_reason_notes' => 'nullable|string',
         ]);
 
-        $this->affiliatorRepository->update($id, $validated);
+        $this->affiliatorRepository->update($id, [
+            'status' => 'suspended',
+            'suspension_reason_type' => $validated['suspension_reason_type'],
+            'suspension_reason_notes' => $validated['suspension_reason_notes'] ?? null,
+        ]);
 
-        return redirect()->route('admin.affiliators.index')->with('success', 'Affiliator updated successfully');
+        return redirect()->route('admin.affiliators.show', $id)->with('success', 'Affiliator suspended successfully');
     }
 
     /**
-     * Remove the specified affiliator.
+     * Reactivate the specified affiliator.
      */
-    public function destroy(string $id)
+    public function reactivate(string $id)
     {
         $affiliator = $this->affiliatorRepository->find($id);
 
@@ -123,8 +110,15 @@ final class AffiliatorController extends Controller
             return redirect()->route('admin.affiliators.index')->with('error', 'Affiliator not found');
         }
 
-        $this->affiliatorRepository->delete($id);
+        $this->affiliatorRepository->update($id, [
+            'status' => 'active',
+            'suspension_reason_type' => null,
+            'suspension_reason_notes' => null,
+            'appeal_reason' => null,
+            'appeal_proof_path' => null,
+            'appealed_at' => null,
+        ]);
 
-        return redirect()->route('admin.affiliators.index')->with('success', 'Affiliator deleted successfully');
+        return redirect()->route('admin.affiliators.show', $id)->with('success', 'Affiliator reactivated successfully');
     }
 }

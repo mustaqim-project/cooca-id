@@ -1,63 +1,136 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Services\Notification;
 
-use App\Models\Setting;
+use App\Models\ApiIntegration;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
+/**
+ * WhatsApp Service
+ *
+ * Mengirim pesan WhatsApp melalui microservice whatsapp-web.js lokal.
+ * Konfigurasi diambil dari tabel api_integrations (provider: whatsapp).
+ */
 final class WhatsAppService
 {
-    private readonly string $token;
-    private const API_URL = 'https://api.fonnte.com/send';
+    private ?string $serverUrl = null;
+    private ?string $apiToken = null;
+    private bool $configured = false;
 
     public function __construct()
     {
-        $this->token = (string) Setting::get('notification.fonnte_token', config('services.fonnte.token', ''));
+        $this->loadConfig();
     }
 
     /**
-     * Send WhatsApp message to single phone number
+     * Load konfigurasi dari api_integrations.
      */
-    public function send(string $phone, string $message): bool
+    private function loadConfig(): void
     {
-        if (empty($this->token)) {
-            report(new \RuntimeException('FONNTE_TOKEN not configured'));
-            return false;
-        }
+        try {
+            $integration = Cache::remember('api_integration.whatsapp', 3600, function () {
+                return ApiIntegration::where('provider', 'whatsapp')
+                    ->where('is_active', true)
+                    ->first();
+            });
 
-        $normalizedPhone = $this->normalizePhone($phone);
-        
-        if (empty($normalizedPhone)) {
-            return false;
+            if ($integration && is_array($integration->config)) {
+                $this->serverUrl = rtrim($integration->config['server_url'] ?? 'http://localhost:3000', '/');
+                $this->apiToken = $integration->config['api_token'] ?? null;
+                $this->configured = true;
+            }
+        } catch (\Exception $e) {
+            Log::warning('WhatsAppService: Failed to load config', ['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Check apakah WhatsApp service sudah dikonfigurasi.
+     */
+    public function isConfigured(): bool
+    {
+        return $this->configured;
+    }
+
+    /**
+     * Get status WhatsApp client (ready/pending/loading).
+     */
+    public function getStatus(): array
+    {
+        if (!$this->configured) {
+            return ['status' => 'unconfigured', 'message' => 'WhatsApp belum dikonfigurasi.'];
         }
 
         try {
-            $response = Http::withHeaders([
-                'Authorization' => $this->token,
-                'Content-Type' => 'application/json',
-            ])->post(self::API_URL, [
-                'target' => $normalizedPhone,
-                'message' => $message,
-                'countryCode' => '62',
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                return isset($data['success']) && $data['success'] === true;
-            }
-
-            return false;
-        } catch (\Throwable $e) {
-            report($e);
-            return false;
+            $response = Http::timeout(5)->get("{$this->serverUrl}/qr");
+            return $response->json() ?? ['status' => 'error', 'message' => 'Empty response'];
+        } catch (\Exception $e) {
+            Log::error('WhatsAppService: Failed to get status', ['error' => $e->getMessage()]);
+            return ['status' => 'error', 'message' => 'Server tidak dapat dihubungi: ' . $e->getMessage()];
         }
     }
 
     /**
-     * Send WhatsApp message to multiple phone numbers
-     * 
+     * Send WhatsApp message to single phone number via whatsapp-web.js.
+     *
+     * @param string $phone Nomor tujuan (format: 08xx atau 62xx)
+     * @param string $message Isi pesan
+     */
+    public function send(string $phone, string $message): bool
+    {
+        $result = $this->sendMessage($phone, $message);
+        return $result['success'];
+    }
+
+    /**
+     * Kirim pesan WhatsApp (detailed response).
+     *
+     * @param string $number Nomor tujuan (format: 08xx atau 62xx)
+     * @param string $message Isi pesan
+     * @return array{success: bool, message: string}
+     */
+    public function sendMessage(string $number, string $message): array
+    {
+        if (!$this->configured) {
+            Log::warning('WhatsAppService: Attempted to send message but service is not configured.');
+            return ['success' => false, 'message' => 'WhatsApp service belum dikonfigurasi.'];
+        }
+
+        $normalizedPhone = $this->normalizePhone($number);
+        if (empty($normalizedPhone)) {
+            return ['success' => false, 'message' => 'Nomor telepon tidak valid.'];
+        }
+
+        try {
+            $response = Http::timeout(15)
+                ->post("{$this->serverUrl}/send", [
+                    'number'  => $normalizedPhone,
+                    'message' => $message,
+                ]);
+
+            if ($response->successful()) {
+                Log::info('WhatsAppService: Message sent', [
+                    'number' => substr($normalizedPhone, 0, 6) . '***',
+                ]);
+                return ['success' => true, 'message' => 'Pesan berhasil dikirim.'];
+            }
+
+            $error = $response->json('error') ?? 'Unknown error';
+            Log::error('WhatsAppService: Send failed', ['error' => $error]);
+            return ['success' => false, 'message' => "Gagal mengirim pesan: {$error}"];
+        } catch (\Exception $e) {
+            Log::error('WhatsAppService: Exception', ['error' => $e->getMessage()]);
+            return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Send WhatsApp message to multiple phone numbers.
+     *
      * @param array<string> $phones
      * @return array{success: int, failed: int}
      */
@@ -81,25 +154,40 @@ final class WhatsAppService
     }
 
     /**
-     * Normalize phone number to international format (628xxx)
+     * Kirim pesan notifikasi transaksional.
+     */
+    public function sendTransactionalMessage(string $number, string $template, array $data = []): array
+    {
+        $message = $this->renderTemplate($template, $data);
+        return $this->sendMessage($number, $message);
+    }
+
+    /**
+     * Render template pesan sederhana (placeholder replacement).
+     */
+    private function renderTemplate(string $template, array $data): string
+    {
+        foreach ($data as $key => $value) {
+            $template = str_replace("{{$key}}", (string) $value, $template);
+        }
+        return $template;
+    }
+
+    /**
+     * Normalize phone number to international format (628xxx).
      */
     private function normalizePhone(string $phone): ?string
     {
         // Remove all non-numeric characters except +
         $cleaned = preg_replace('/[^\d+]/', '', $phone);
-        
+
         // Remove leading +
         $cleaned = ltrim($cleaned, '+');
 
         // Handle Indonesian phone numbers
         if (str_starts_with($cleaned, '0')) {
-            // Replace leading 0 with 62
             $cleaned = '62' . substr($cleaned, 1);
-        } elseif (str_starts_with($cleaned, '62')) {
-            // Already in correct format
-            $cleaned = $cleaned;
-        } elseif (strlen($cleaned) >= 9 && strlen($cleaned) <= 13) {
-            // Assume it's a local number without country code
+        } elseif (!str_starts_with($cleaned, '62') && strlen($cleaned) >= 9 && strlen($cleaned) <= 13) {
             $cleaned = '62' . $cleaned;
         }
 

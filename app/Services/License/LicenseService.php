@@ -102,7 +102,7 @@ final class LicenseService
     /**
      * Activate a license
      */
-    public function activateLicense(License $license, \DateTimeInterface $activatedAt, \DateTimeInterface $expiresAt): License
+    public function activateLicense(License $license, \DateTimeInterface $activatedAt, ?\DateTimeInterface $expiresAt): License
     {
         return $this->licenseRepository->update($license->id, [
             'status' => 'active',
@@ -114,13 +114,14 @@ final class LicenseService
     /**
      * Revoke a license
      */
-    public function revokeLicense(License $license, string $reason, ?\Ramsey\Uuid\UuidInterface $adminId): License
+    public function revokeLicense(License $license, string $reason, ?\Ramsey\Uuid\UuidInterface $adminId, ?string $category = null): License
     {
         $license = $this->licenseRepository->update($license->id, [
             'status' => 'revoked',
             'revoked_at' => now(),
             'revoked_by' => $adminId,
             'revocation_reason' => $reason,
+            'revocation_category' => $category,
         ]);
 
         $this->clearLicenseCache($license);
@@ -217,18 +218,18 @@ final class LicenseService
      */
     public function findById(string $id): ?License
     {
-        return $this->licenseRepository->findById($id);
+        return $this->licenseRepository->find($id);
     }
 
     /**
      * Revoke license wrapper
      */
-    public function revoke(string $id, ?string $revokedBy, ?string $reason): void
+    public function revoke(string $id, ?string $revokedBy, ?string $reason, ?string $category = null): void
     {
         $license = $this->findById($id);
         if ($license) {
             $adminId = $revokedBy ? \Ramsey\Uuid\Uuid::fromString($revokedBy) : null;
-            $this->revokeLicense($license, $reason ?? 'No reason provided', $adminId);
+            $this->revokeLicense($license, $reason ?? 'No reason provided', $adminId, $category);
         }
     }
 
