@@ -39,11 +39,23 @@ class FullDatabaseSeeder extends Seeder
 
         // Seed Customers
         $this->command->info('Seeding Customers...');
-        $customers = Customer::factory()->count(25)->create();
+        $customers = Customer::factory()
+            ->count(25)
+            ->sequence(fn($sequence) => [
+                'domain' => 'customer-' . ($sequence->index + 1) . '-' . Str::random(6) . '.cooca.id',
+                'email' => 'customer.' . ($sequence->index + 1) . '.' . Str::random(4) . '@example.com',
+            ])
+            ->create();
 
         // Seed Affiliators
         $this->command->info('Seeding Affiliators...');
-        $affiliators = Affiliator::factory()->count(15)->create();
+        $affiliators = Affiliator::factory()
+            ->count(15)
+            ->sequence(fn($sequence) => [
+                'referral_code' => 'AFF-' . strtoupper(Str::random(6)) . '-' . ($sequence->index + 1),
+                'email' => 'affiliator.' . ($sequence->index + 1) . '.' . Str::random(4) . '@example.com',
+            ])
+            ->create();
 
         // Use existing categories or create new ones
         $categories = ProductCategory::all();
