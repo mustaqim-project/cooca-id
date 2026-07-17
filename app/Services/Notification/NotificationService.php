@@ -22,6 +22,14 @@ final class NotificationService
     public const WITHDRAWAL_APPROVED = 'withdrawal_approved';
     public const WITHDRAWAL_REJECTED = 'withdrawal_rejected';
     public const WITHDRAWAL_PAID = 'withdrawal_paid';
+    public const TRIAL_SUBMITTED = 'trial_submitted';
+    public const TRIAL_APPROVED = 'trial_approved';
+    public const TRIAL_REJECTED = 'trial_rejected';
+    public const TRIAL_STARTED = 'trial_started';
+    public const TRIAL_EXPIRING_SOON = 'trial_expiring_soon';
+    public const TRIAL_EXPIRED = 'trial_expired';
+    public const TRIAL_CONVERTED = 'trial_converted';
+    public const COMMISSION_HOLDING_RELEASED = 'commission_holding_released';
 
     /**
      * Render notification template with variables
@@ -114,6 +122,14 @@ final class NotificationService
             self::COMMISSION_RECEIVED => $this->getCommissionMessage($channel, $data),
             self::WITHDRAWAL_APPROVED => $this->getWithdrawalApprovedMessage($channel, $data),
             self::WITHDRAWAL_REJECTED => $this->getWithdrawalRejectedMessage($channel, $data),
+            self::TRIAL_SUBMITTED => $this->getTrialSubmittedMessage($channel, $data),
+            self::TRIAL_APPROVED => $this->getTrialApprovedMessage($channel, $data),
+            self::TRIAL_REJECTED => $this->getTrialRejectedMessage($channel, $data),
+            self::TRIAL_STARTED => $this->getTrialStartedMessage($channel, $data),
+            self::TRIAL_EXPIRING_SOON => $this->getTrialExpiringSoonMessage($channel, $data),
+            self::TRIAL_EXPIRED => $this->getTrialExpiredMessage($channel, $data),
+            self::TRIAL_CONVERTED => $this->getTrialConvertedMessage($channel, $data),
+            self::COMMISSION_HOLDING_RELEASED => $this->getCommissionHoldingReleasedMessage($channel, $data),
             default => null,
         };
     }
@@ -279,6 +295,134 @@ final class NotificationService
                 "Alasan: %s\n\n" .
                 "Silakan hubungi support untuk informasi lebih lanjut.",
                 $data['rejection_reason'] ?? 'Tidak diketahui'
+            ),
+            default => null,
+        };
+    }
+
+    private function getTrialSubmittedMessage(string $channel, array $data): ?string
+    {
+        return match ($channel) {
+            'whatsapp' => sprintf(
+                "Permintaan Trial Disubmit\n\n" .
+                "Produk: %s\n" .
+                "ID Trial: %s\n" .
+                "Status: Menunggu persetujuan admin",
+                $data['product_name'] ?? '-',
+                $data['trial_id'] ?? '-'
+            ),
+            default => null,
+        };
+    }
+
+    private function getTrialApprovedMessage(string $channel, array $data): ?string
+    {
+        return match ($channel) {
+            'whatsapp' => sprintf(
+                "Trial Disetujui!\n\n" .
+                "Produk: %s\n" .
+                "Domain: %s\n" .
+                "Periode trial: %d hari\n\n" .
+                "Silakan akses panel customer Anda untuk memulai testing.",
+                $data['product_name'] ?? '-',
+                $data['domain'] ?? '-',
+                $data['trial_days'] ?? 14
+            ),
+            default => null,
+        };
+    }
+
+    private function getTrialRejectedMessage(string $channel, array $data): ?string
+    {
+        return match ($channel) {
+            'whatsapp' => sprintf(
+                "Trial Ditolak\n\n" .
+                "Produk: %s\n" .
+                "Alasan: %s\n\n" .
+                "Silakan hubungi support untuk informasi lebih lanjut.",
+                $data['product_name'] ?? '-',
+                $data['rejection_reason'] ?? 'Tidak diketahui'
+            ),
+            default => null,
+        };
+    }
+
+    private function getTrialStartedMessage(string $channel, array $data): ?string
+    {
+        return match ($channel) {
+            'whatsapp' => sprintf(
+                "Trial Dimulai!\n\n" .
+                "Produk: %s\n" .
+                "Domain: %s\n" .
+                "Berakhir pada: %s\n\n" .
+                "Selamat melakukan testing!",
+                $data['product_name'] ?? '-',
+                $data['domain'] ?? '-',
+                $data['expires_at'] ?? '-'
+            ),
+            default => null,
+        };
+    }
+
+    private function getTrialExpiringSoonMessage(string $channel, array $data): ?string
+    {
+        return match ($channel) {
+            'whatsapp' => sprintf(
+                "Trial Segera Berakhir!\n\n" .
+                "Produk: %s\n" .
+                "Sisa waktu: %d hari\n" .
+                "Tanggal berakhir: %s\n\n" .
+                "Konversi ke subscription sekarang untuk melanjutkan penggunaan.",
+                $data['product_name'] ?? '-',
+                $data['days_until_expiry'] ?? 0,
+                $data['expires_at'] ?? '-'
+            ),
+            default => null,
+        };
+    }
+
+    private function getTrialExpiredMessage(string $channel, array $data): ?string
+    {
+        return match ($channel) {
+            'whatsapp' => sprintf(
+                "Trial Telah Berakhir\n\n" .
+                "Produk: %s\n" .
+                "Tanggal berakhir: %s\n\n" .
+                "Subscribe sekarang untuk terus menikmati layanan kami.",
+                $data['product_name'] ?? '-',
+                $data['expired_at'] ?? '-'
+            ),
+            default => null,
+        };
+    }
+
+    private function getTrialConvertedMessage(string $channel, array $data): ?string
+    {
+        return match ($channel) {
+            'whatsapp' => sprintf(
+                "Trial Berhasil Dikonversi!\n\n" .
+                "Produk: %s\n" .
+                "Subscription ID: %s\n" .
+                "Invoice: %s\n\n" .
+                "Terima kasih telah berlangganan!",
+                $data['product_name'] ?? '-',
+                $data['subscription_id'] ?? '-',
+                $data['invoice_number'] ?? '-'
+            ),
+            default => null,
+        };
+    }
+
+    private function getCommissionHoldingReleasedMessage(string $channel, array $data): ?string
+    {
+        return match ($channel) {
+            'whatsapp' => sprintf(
+                "Komisi Tersedia untuk Withdrawal!\n\n" .
+                "Jumlah: Rp %s\n" .
+                "Saldo tersedia: Rp %s\n\n" .
+                "Silakan ajukan withdrawal dari panel affiliator Anda.",
+                number_format($data['commission_amount'] ?? 0, 0, ',', '.'),
+                number_format($data['available_balance'] ?? 0, 0, ',', '.')
             ),
             default => null,
         };

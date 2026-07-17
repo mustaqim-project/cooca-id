@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\ErrorLogController;
+use App\Http\Controllers\Admin\TrialManagementController;
 // Rate limiter for admin routes
 RateLimiter::for('admin', function ($request) {
     return Limit::perMinute(120)->by($request->user()?->id ?? $request->ip()); // increased limit
@@ -218,6 +219,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::delete('/testimonials/{testimonial}', [App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->name('testimonials.destroy');
     Route::post('/testimonials/reorder', [App\Http\Controllers\Admin\TestimonialController::class, 'reorder'])->name('testimonials.reorder');
     Route::post('/testimonials/{testimonial}/toggle-featured', [App\Http\Controllers\Admin\TestimonialController::class, 'toggleFeatured'])->name('testimonials.toggle-featured');
+
+    // Trial Management
+    Route::get('/trials', [TrialManagementController::class, 'index'])->name('trials.index');
+    Route::get('/trials/{trial}', [TrialManagementController::class, 'show'])->name('trials.show');
+    Route::post('/trials/{trial}/approve', [TrialManagementController::class, 'approve'])->name('trials.approve');
+    Route::post('/trials/{trial}/reject', [TrialManagementController::class, 'reject'])->name('trials.reject');
+    Route::post('/trials/{trial}/mark-domain-setup', [TrialManagementController::class, 'markDomainSetup'])->name('trials.mark-domain-setup');
+    Route::post('/trials/{trial}/mark-testing', [TrialManagementController::class, 'markTesting'])->name('trials.mark-testing');
+    Route::post('/trials/{trial}/start-trial', [TrialManagementController::class, 'startTrial'])->name('trials.start-trial');
+    Route::get('/trials/stats', [TrialManagementController::class, 'stats'])->name('trials.stats');
+
     // API Integrations Management
     Route::get('/api-integrations', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'index'])->name('api-integrations.index');
     Route::get('/api-integrations/{provider}/edit', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'edit'])->name('api-integrations.edit');

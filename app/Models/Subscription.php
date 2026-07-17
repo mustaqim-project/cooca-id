@@ -47,6 +47,7 @@ final class Subscription extends Model
     public const STATUS_ACTIVE = 'active';
     public const STATUS_EXPIRED = 'expired';
     public const STATUS_CANCELLED = 'cancelled';
+    public const STATUS_SUSPENDED = 'suspended';
 
     public static function getStatuses(): array
     {
@@ -55,6 +56,7 @@ final class Subscription extends Model
             self::STATUS_ACTIVE,
             self::STATUS_EXPIRED,
             self::STATUS_CANCELLED,
+            self::STATUS_SUSPENDED,
         ];
     }
 
