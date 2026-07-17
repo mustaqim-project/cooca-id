@@ -23,9 +23,19 @@ class Kernel extends ConsoleKernel
             ->hourly()
             ->timezone('Asia/Jakarta');
 
+        // Process trial expiration daily at 7 AM
+        $schedule->command('trials:process-expiration')
+            ->dailyAt('07:00')
+            ->timezone('Asia/Jakarta');
+
         // Process recurring affiliate commissions daily at 9 AM
         $schedule->command('affiliate:recurring-commissions')
             ->dailyAt('09:00')
+            ->timezone('Asia/Jakarta');
+
+        // Process commission holding period (14 days) daily at 6 AM
+        $schedule->command('commissions:process-holding')
+            ->dailyAt('06:00')
             ->timezone('Asia/Jakarta');
 
         // Send subscription expiry reminders daily at 10 AM
