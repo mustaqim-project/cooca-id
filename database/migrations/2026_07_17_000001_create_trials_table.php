@@ -19,7 +19,7 @@ return new class extends Migration
             $table->uuid('erp_product_id');
             $table->uuid('subscription_plan_id');
             $table->string('subdomain', 63)->unique();
-            $table->uuid('affiliate_code_id')->nullable();
+            $table->uuid('affiliator_id')->nullable()->comment('Affiliator who referred this trial');
             $table->enum('status', [
                 'draft',
                 'submitted',
@@ -60,9 +60,9 @@ return new class extends Migration
                 ->on('subscription_plans')
                 ->onDelete('cascade');
 
-            $table->foreign('affiliate_code_id')
+            $table->foreign('affiliator_id')
                 ->references('id')
-                ->on('affiliate_codes')
+                ->on('affiliators')
                 ->onDelete('set null');
 
             $table->foreign('subscription_id')
@@ -76,6 +76,7 @@ return new class extends Migration
             $table->index(['customer_id', 'status']);
             $table->index('expires_at');
             $table->index('submitted_at');
+            $table->index('affiliator_id');
         });
     }
 

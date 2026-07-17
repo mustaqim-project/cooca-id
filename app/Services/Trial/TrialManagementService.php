@@ -9,7 +9,7 @@ use App\Models\TrialStatusHistory;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\SubscriptionPlan;
-use App\Models\AffiliateCode;
+use App\Models\Affiliator;
 use App\Services\Provisioning\ProvisioningService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -33,9 +33,9 @@ final class TrialManagementService
         string $erpProductId,
         string $subscriptionPlanId,
         string $subdomain,
-        ?string $affiliateCodeId = null
+        ?string $affiliatorId = null
     ): Trial {
-        return DB::transaction(function () use ($customerId, $erpProductId, $subscriptionPlanId, $subdomain, $affiliateCodeId) {
+        return DB::transaction(function () use ($customerId, $erpProductId, $subscriptionPlanId, $subdomain, $affiliatorId) {
             // Cek eligibility - hanya 1 trial per customer per produk
             $existingTrial = Trial::where('customer_id', $customerId)
                 ->where('erp_product_id', $erpProductId)
@@ -73,7 +73,7 @@ final class TrialManagementService
                 'erp_product_id' => $erpProductId,
                 'subscription_plan_id' => $subscriptionPlanId,
                 'subdomain' => $subdomain,
-                'affiliate_code_id' => $affiliateCodeId,
+                'affiliator_id' => $affiliatorId,
                 'status' => Trial::STATUS_WAITING_APPROVAL,
                 'submitted_at' => now(),
             ]);

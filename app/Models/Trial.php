@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $erp_product_id
  * @property string $subscription_plan_id
  * @property string $subdomain
- * @property string|null $affiliate_code_id
+ * @property string|null $affiliator_id
  * @property string $status
  * @property string|null $rejection_reason
  * @property \Carbon\Carbon|null $submitted_at
@@ -41,7 +41,7 @@ final class Trial extends Model
         'erp_product_id',
         'subscription_plan_id',
         'subdomain',
-        'affiliate_code_id',
+        'affiliator_id',
         'status',
         'rejection_reason',
         'submitted_at',
@@ -128,9 +128,9 @@ final class Trial extends Model
         return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
     }
 
-    public function affiliateCode(): BelongsTo
+    public function affiliator(): BelongsTo
     {
-        return $this->belongsTo(AffiliateCode::class, 'affiliate_code_id');
+        return $this->belongsTo(Affiliator::class, 'affiliator_id');
     }
 
     public function subscription(): BelongsTo
