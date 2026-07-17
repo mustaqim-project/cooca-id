@@ -11,16 +11,18 @@
                 <h2 class="mb-1 fw-bold">Global Settings</h2>
                 <p class="text-secondary mb-0">Configure your application settings, integrations, and preferences.</p>
             </div>
-            <div>
-                <button type="submit" form="settings-form" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
-                    <i class="bi bi-check2-circle me-2"></i> Save Changes
-                </button>
-            </div>
         </div>
 
         <form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-end mb-4">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
+                    <i class="bi bi-check2-circle me-2"></i> Save Changes
+                </button>
+            </div>
 
             <div class="row g-4">
 
@@ -275,6 +277,13 @@
                     </div>
                 </div>
 
+            </div>
+
+            <!-- Form Actions Footer -->
+            <div class="d-flex justify-content-end mt-4 pt-4 border-top">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
+                    <i class="bi bi-check2-circle me-2"></i> Save Changes
+                </button>
             </div>
         </form>
     </div>
