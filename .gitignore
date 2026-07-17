@@ -1,4 +1,4 @@
-```gitignore
+```
 # Compiled and build artifacts
 *.pyc
 __pycache__/
@@ -6,10 +6,13 @@ __pycache__/
 *.obj
 dist/
 build/
+target/
 
 # Dependencies
+node_modules/
 vendor/
 composer.lock
+*.lock
 
 # Logs and temp files
 *.log
@@ -24,18 +27,14 @@ composer.lock
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # OS generated files
 .DS_Store
 Thumbs.db
 
-# Laravel specific
-bootstrap/cache/
-storage/logs/
-storage/framework/
-public/storage/
-
-# Coverage reports
+# Coverage
 coverage/
 htmlcov/
 .coverage
