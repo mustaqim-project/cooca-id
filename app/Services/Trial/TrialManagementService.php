@@ -127,15 +127,15 @@ final class TrialManagementService
 
             // Trigger provisioning
             try {
-                $this->provisioningService->setupTrialEnvironment($trial);
+                $provisioningJob = $this->provisioningService->provisionTrial($trial);
                 
-                $trial->update(['status' => Trial::STATUS_PROVISIONING]);
-                $trial->recordStatusChange(
-                    Trial::STATUS_PROVISIONING,
-                    'Provisioning started',
-                    $adminId,
-                    'App\\Models\\Admin'
-                );
+                // Run provisioning asynchronously via queue or synchronously based on config
+                if (config('app.sync_provisioning', false)) {
+                    $this->provisioningService->runProvisioning($provisioningJob);
+                } else {
+                    // Dispatch to queue - will be processed by queue worker
+                    \App\Jobs\Provisioning\RunProvisioningJob::dispatch($provisioningJob);
+                }
             } catch (\Exception $e) {
                 Log::error("Provisioning failed for trial {$trialId}", [
                     'error' => $e->getMessage(),
