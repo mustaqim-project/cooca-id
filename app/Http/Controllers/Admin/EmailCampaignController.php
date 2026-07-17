@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * Admin Email Campaign Controller
- * 
+ *
  * Manages email marketing campaigns.
  */
 class EmailCampaignController extends Controller
@@ -38,7 +38,7 @@ class EmailCampaignController extends Controller
             'scheduled' => EmailCampaign::where('status', 'scheduled')->count(),
         ];
 
-        return view('admin.emailcampaigns.index', [
+        return view('admin.email-campaigns.index', [
             'campaigns' => $campaigns,
             'stats' => $stats,
             'filters' => [
@@ -54,7 +54,7 @@ class EmailCampaignController extends Controller
     {
         $customerCount = Customer::where('is_active', true)->count();
 
-        return view('admin.emailcampaigns.create', [
+        return view('admin.email-campaigns.create', [
             'campaign' => null,
             'customerCount' => $customerCount,
         ]);
@@ -87,13 +87,61 @@ class EmailCampaignController extends Controller
     }
 
     /**
+     * Show the form for editing the specified campaign.
+     */
+    public function edit(EmailCampaign $campaign)
+    {
+        $customerCount = Customer::where('is_active', true)->count();
+
+        return view('admin.email-campaigns.create', [
+            'campaign' => $campaign,
+            'customerCount' => $customerCount,
+        ]);
+    }
+
+    /**
+     * Update the specified campaign.
+     */
+    public function update(Request $request, EmailCampaign $campaign)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'subject' => 'required|string|max:255',
+            'content' => 'required|string',
+            'recipient_type' => 'required|in:all,segment,specific',
+            'segment_filters' => 'nullable|array',
+            'recipient_ids' => 'nullable|array',
+            'recipient_ids.*' => 'exists:customers,id',
+            'scheduled_at' => 'nullable|date',
+        ]);
+
+        $validated['status'] = $request->filled('scheduled_at') ? 'scheduled' : 'draft';
+
+        $campaign->update($validated);
+
+        return redirect()->route('admin.email-campaigns.index')
+            ->with('success', 'Email campaign updated successfully.');
+    }
+
+    /**
+     * Remove the specified campaign from storage.
+     */
+    public function destroy(EmailCampaign $campaign)
+    {
+        $campaign->delete();
+
+        return redirect()->route('admin.email-campaigns.index')
+            ->with('success', 'Email campaign deleted successfully.');
+    }
+
+    /**
      * Display the specified campaign.
      */
     public function show(EmailCampaign $campaign)
     {
         $campaign->load(['creator']);
 
-        return view('admin.emailcampaigns.show', [
+        return view('admin.email-campaigns.show', [
             'campaign' => $campaign,
         ]);
     }
@@ -117,13 +165,13 @@ class EmailCampaignController extends Controller
         } elseif ($campaign->recipient_type === 'segment' && $campaign->segment_filters) {
             // Apply segment filters
             $query = Customer::where('is_active', true)->whereNotNull('email');
-            
+
             foreach ($campaign->segment_filters as $filter) {
                 if (isset($filter['field']) && isset($filter['operator']) && isset($filter['value'])) {
                     $query->where($filter['field'], $filter['operator'], $filter['value']);
                 }
             }
-            
+
             $recipients = $query->pluck('email');
         } elseif ($campaign->recipient_type === 'specific' && $campaign->recipient_ids) {
             $recipients = Customer::whereIn('id', $campaign->recipient_ids)

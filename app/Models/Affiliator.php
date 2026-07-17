@@ -12,12 +12,13 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 final class Affiliator extends Authenticatable
 {
-    use HasFactory, Notifiable, HasUuids;
+    use HasFactory, HasRoles, Notifiable, HasUuids;
 
     protected $table = 'affiliators';
 
@@ -130,11 +131,11 @@ final class Affiliator extends Authenticatable
 
         return $query->where(function ($q) use ($root) {
             $q->where('parent_affiliator_id', $root->id)
-              ->orWhereIn('id', function ($subQ) use ($root) {
-                  $subQ->select('id')
-                       ->from('affiliators')
-                       ->where('parent_affiliator_id', $root->id);
-              });
+                ->orWhereIn('id', function ($subQ) use ($root) {
+                    $subQ->select('id')
+                        ->from('affiliators')
+                        ->where('parent_affiliator_id', $root->id);
+                });
         });
     }
 

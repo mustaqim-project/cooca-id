@@ -1,134 +1,107 @@
-@extends('layouts.admin')
+@extends('admin.layouts.app')
 
 @section('title', 'Add Testimonial')
-@section('subtitle', 'Create a new customer testimonial')
 
 @section('content')
-    <div class="mb-4">
-        <a href="{{ route('admin.testimonials.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
-            <i class="bi bi-arrow-left me-1"></i> Back to Testimonials
-        </a>
-    </div>
+    <div class="d-flex flex-column gap-4" style="max-width: 800px; margin: 0 auto;">
 
-    <form action="{{ route('admin.testimonials.store') }}" method="POST">
-        @csrf
-        <div class="row g-4">
-            {{-- Main --}}
-            <div class="col-lg-8">
-                <div class="card-saas">
-                    <div class="card-saas-header"><span class="card-saas-title">Testimonial Details</span></div>
-                    <div class="card-saas-body">
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="name">Name <span
-                                            class="text-danger">*</span></label>
-                                    <input class="form-saas-input @error('name') is-invalid @enderror" type="text"
-                                        name="name" id="name" value="{{ old('name') }}"
-                                        placeholder="Customer name" required>
-                                    @error('name')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="role">Role / Title</label>
-                                    <input class="form-saas-input @error('role') is-invalid @enderror" type="text"
-                                        name="role" id="role" value="{{ old('role') }}"
-                                        placeholder="e.g. CEO, Marketing Manager">
-                                    @error('role')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="company">Company</label>
-                                    <input class="form-saas-input @error('company') is-invalid @enderror" type="text"
-                                        name="company" id="company" value="{{ old('company') }}"
-                                        placeholder="Company name">
-                                    @error('company')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="rating">Rating (1-5)</label>
-                                    <input class="form-saas-input @error('rating') is-invalid @enderror" type="number"
-                                        name="rating" id="rating" value="{{ old('rating', 5) }}" min="1"
-                                        max="5">
-                                    @error('rating')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="content">Testimonial Content <span
-                                            class="text-danger">*</span></label>
-                                    <textarea class="form-saas-textarea @error('content') is-invalid @enderror" name="content" id="content" rows="5"
-                                        placeholder="What the customer said..." required>{{ old('content') }}</textarea>
-                                    @error('content')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="avatar_url">Avatar URL</label>
-                                    <input class="form-saas-input @error('avatar_url') is-invalid @enderror" type="url"
-                                        name="avatar_url" id="avatar_url" value="{{ old('avatar_url') }}"
-                                        placeholder="https://...">
-                                    @error('avatar_url')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="sort_order">Sort Order</label>
-                                    <input class="form-saas-input @error('sort_order') is-invalid @enderror" type="number"
-                                        name="sort_order" id="sort_order" value="{{ old('sort_order', 0) }}"
-                                        min="0">
-                                    <div class="form-saas-hint">Lower numbers appear first.</div>
-                                    @error('sort_order')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            {{-- Sidebar --}}
-            <div class="col-lg-4">
-                <div class="card-saas">
-                    <div class="card-saas-header"><span class="card-saas-title">Settings</span></div>
-                    <div class="card-saas-body">
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" name="is_featured" id="is_featured"
-                                value="1" {{ old('is_featured') ? 'checked' : '' }}>
-                            <label class="form-check-label fw-medium" for="is_featured">Featured Testimonial</label>
-                            <div class="text-muted" style="font-size:0.82rem">Show prominently on the homepage.</div>
-                        </div>
-
-                        <hr style="border-color:var(--border)">
-
-                        <div class="d-flex flex-column gap-2">
-                            <button type="submit" class="btn-saas btn-saas-primary w-100">
-                                <i class="bi bi-check-lg me-1"></i> Save Testimonial
-                            </button>
-                            <a href="{{ route('admin.testimonials.index') }}"
-                                class="btn-saas btn-saas-ghost w-100">Cancel</a>
-                        </div>
-                    </div>
-                </div>
+        <!-- Header -->
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ route('admin.testimonials.index') }}"
+                class="btn btn-light border-0 rounded-circle p-2 shadow-sm hover-lift"><i class="bi bi-arrow-left"></i></a>
+            <div>
+                <h2 class="mb-1 fw-bold">Add Testimonial</h2>
+                <p class="text-secondary mb-0">Add a new client review or feedback.</p>
             </div>
         </div>
-    </form>
+
+        <!-- Form Card -->
+        <div class="card border-0 shadow-sm rounded-4 glass p-4 p-md-5">
+            <form action="{{ route('admin.testimonials.store') }}" method="POST" enctype="multipart/form-data"
+                class="d-flex flex-column gap-4">
+                @csrf
+
+                <!-- Image Upload -->
+                <div class="d-flex flex-column align-items-center justify-content-center text-center p-4 border rounded-4 border-dashed bg-light-subtle position-relative overflow-hidden hover-lift cursor-pointer"
+                    style="transition: all 0.3s ease; border-color: var(--color-border) !important;">
+                    <input type="file" name="avatar" id="avatar"
+                        class="position-absolute w-100 h-100 opacity-0 cursor-pointer" accept="image/*">
+                    <div class="mb-2">
+                        <i class="bi bi-person-bounding-box fs-1 text-secondary"></i>
+                    </div>
+                    <h6 class="fw-medium mb-1">Upload Avatar</h6>
+                    <p class="fs-7 text-secondary mb-0">Recommended size: 256x256px (JPG, PNG)</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control rounded-3 shadow-none border bg-transparent"
+                                id="name" name="name" placeholder="Name" required>
+                            <label for="name">Client Name <span class="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control rounded-3 shadow-none border bg-transparent"
+                                id="role" name="role" placeholder="Role (e.g. CEO)">
+                            <label for="role">Role / Job Title</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control rounded-3 shadow-none border bg-transparent"
+                                id="company" name="company" placeholder="Company Name">
+                            <label for="company">Company Name</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <select class="form-select rounded-3 shadow-none border bg-transparent" id="rating"
+                                name="rating" required>
+                                <option value="5">5 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="2">2 Stars</option>
+                                <option value="1">1 Star</option>
+                            </select>
+                            <label for="rating">Rating <span class="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <select class="form-select rounded-3 shadow-none border bg-transparent" id="is_active"
+                                name="is_active" required>
+                                <option value="1">Active (Featured on Landing Page)</option>
+                                <option value="0">Hidden</option>
+                            </select>
+                            <label for="is_active">Status <span class="text-danger">*</span></label>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <textarea class="form-control rounded-3 shadow-none border bg-transparent" id="quote" name="quote"
+                                placeholder="Quote / Feedback" style="height: 120px" required></textarea>
+                            <label for="quote">Quote / Feedback <span class="text-danger">*</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-light my-2">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ route('admin.testimonials.index') }}"
+                        class="btn btn-light border rounded-pill px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift">
+                        <i class="bi bi-check2 me-2"></i> Save Testimonial
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection

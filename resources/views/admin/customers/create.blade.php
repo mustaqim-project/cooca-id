@@ -1,112 +1,95 @@
-﻿@extends('layouts.admin')
-@section('title', 'Add Customer')
-@section('subtitle', 'Create a new customer account')
+@extends('admin.layouts.app')
+
+@section('title', 'Create Customers')
+
 @section('content')
-    <div class="mb-4">
-        <a href="{{ route('admin.customers.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
-            <i class="bi bi-arrow-left me-1"></i> Back to Customers
-        </a>
-    </div>
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card-saas">
-                <div class="card-saas-header">
-                    <h5 class="card-saas-title"><i class="bi bi-person-plus me-2"></i>Customer Information</h5>
-                </div>
-                <div class="card-saas-body">
-                    <form action="{{ route('admin.customers.store') }}" method="POST">
-                        @csrf
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="name">Full Name <span
-                                            class="text-danger">*</span></label>
-                                    <input class="form-saas-input @error('name') is-invalid @enderror" type="text"
-                                        name="name" id="name" value="{{ old('name') }}" placeholder="John Doe"
-                                        required>
-                                    @error('name')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="email">Email Address <span
-                                            class="text-danger">*</span></label>
-                                    <input class="form-saas-input @error('email') is-invalid @enderror" type="email"
-                                        name="email" id="email" value="{{ old('email') }}"
-                                        placeholder="john@example.com" required>
-                                    @error('email')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="phone">Phone Number</label>
-                                    <input class="form-saas-input @error('phone') is-invalid @enderror" type="text"
-                                        name="phone" id="phone" value="{{ old('phone') }}"
-                                        placeholder="+62 812 3456 7890">
-                                    @error('phone')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="business_name">Business Name</label>
-                                    <input class="form-saas-input @error('business_name') is-invalid @enderror"
-                                        type="text" name="business_name" id="business_name"
-                                        value="{{ old('business_name') }}" placeholder="PT. Example">
-                                    @error('business_name')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="password">Password <span
-                                            class="text-danger">*</span></label>
-                                    <input class="form-saas-input @error('password') is-invalid @enderror" type="password"
-                                        name="password" id="password" placeholder="Min. 8 characters" required>
-                                    @error('password')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="password_confirmation">Confirm Password <span
-                                            class="text-danger">*</span></label>
-                                    <input class="form-saas-input" type="password" name="password_confirmation"
-                                        id="password_confirmation" placeholder="Repeat password" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn-saas btn-saas-primary">
-                                <i class="bi bi-floppy me-1"></i> Save Customer
-                            </button>
-                            <a href="{{ route('admin.customers.index') }}" class="btn-saas btn-saas-ghost">Cancel</a>
-                        </div>
-                    </form>
-                </div>
+    <div class="d-flex flex-column gap-4" style="max-width: 800px; margin: 0 auto;">
+
+        <!-- Header -->
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ route('admin.customers.index') }}"
+                class="btn btn-light border-0 rounded-circle p-2 shadow-sm hover-lift"><i class="bi bi-arrow-left"></i></a>
+            <div>
+                <h2 class="mb-1 fw-bold text-capitalize">Create Customer</h2>
+                <p class="text-secondary mb-0">Fill in the details to create a new customer.</p>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="card-saas">
-                <div class="card-saas-header">
-                    <h5 class="card-saas-title"><i class="bi bi-info-circle me-2"></i>Tips</h5>
+
+        <!-- Form Card -->
+        <div class="card border-0 shadow-sm rounded-4 glass p-4 p-md-5">
+            <form action="{{ route('admin.customers.store') }}" method="POST" class="d-flex flex-column gap-4">
+                @csrf
+
+                <div class="row g-4">
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="text"
+                                class="form-control rounded-3 shadow-none border bg-transparent @error('name') is-invalid @enderror"
+                                id="name" name="name" value="{{ old('name') }}" placeholder="Full Name" required>
+                            <label for="name">Full Name *</label>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="email"
+                                class="form-control rounded-3 shadow-none border bg-transparent @error('email') is-invalid @enderror"
+                                id="email" name="email" value="{{ old('email') }}" placeholder="Email Address"
+                                required>
+                            <label for="email">Email Address *</label>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="password"
+                                class="form-control rounded-3 shadow-none border bg-transparent @error('password') is-invalid @enderror"
+                                id="password" name="password" placeholder="Password" required>
+                            <label for="password">Password (Min. 8 characters) *</label>
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="text"
+                                class="form-control rounded-3 shadow-none border bg-transparent @error('phone') is-invalid @enderror"
+                                id="phone" name="phone" value="{{ old('phone') }}" placeholder="Phone Number">
+                            <label for="phone">Phone Number</label>
+                            @error('phone')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="text"
+                                class="form-control rounded-3 shadow-none border bg-transparent @error('business_name') is-invalid @enderror"
+                                id="business_name" name="business_name" value="{{ old('business_name') }}"
+                                placeholder="Business Name">
+                            <label for="business_name">Business Name</label>
+                            @error('business_name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
-                <div class="card-saas-body">
-                    <ul class="list-unstyled mb-0" style="font-size:.875rem;color:var(--text-muted);line-height:1.8">
-                        <li><i class="bi bi-check-circle text-success me-2"></i>Email must be unique</li>
-                        <li><i class="bi bi-check-circle text-success me-2"></i>Password min. 8 characters</li>
-                        <li><i class="bi bi-check-circle text-success me-2"></i>Business name optional</li>
-                        <li><i class="bi bi-check-circle text-success me-2"></i>Customer can reset password via email</li>
-                    </ul>
+
+                <hr class="border-light my-2">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ route('admin.customers.index') }}"
+                        class="btn btn-light border rounded-pill px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift">
+                        <i class="bi bi-check2 me-2"></i> Save Customer
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 @endsection

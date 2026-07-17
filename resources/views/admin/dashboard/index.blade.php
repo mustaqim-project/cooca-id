@@ -1,395 +1,442 @@
-@extends('layouts.admin')
+@extends('admin.layouts.app')
 
 @section('title', 'Dashboard')
-@section('subtitle', 'Welcome back, ' . auth('admin')->user()->name)
-
-@section('page-actions')
-    <div class="d-flex align-items-center gap-2">
-        <select class="form-select form-select-sm" id="dashboardPeriod" style="width:auto">
-            <option value="7">Last 7 days</option>
-            <option value="30" selected>Last 30 days</option>
-            <option value="90">Last 90 days</option>
-            <option value="365">Last 12 months</option>
-        </select>
-        <button class="btn-saas btn-saas-outline btn-sm" onclick="window.print()">
-            <i class="bi bi-download me-1"></i>Export
-        </button>
-    </div>
-@endsection
 
 @section('content')
+    <div class="d-flex flex-column gap-4">
 
-    {{-- Stat Cards --}}
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="stat-card">
-                <div class="stat-card-icon" style="background:rgba(99,102,241,.12);color:#6366f1">
-                    <i class="bi bi-currency-dollar fs-4"></i>
-                </div>
-                <div class="stat-card-body">
-                    <p class="stat-card-label">Total Revenue</p>
-                    <h3 class="stat-card-value">
-                        Rp {{ number_format($stats['total_revenue'] ?? 0, 0, ',', '.') }}
-                    </h3>
-                    <span class="stat-card-change positive">
-                        <i class="bi bi-arrow-up-short"></i>
-                        {{ $stats['revenue_growth'] ?? '0' }}% vs last month
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="stat-card">
-                <div class="stat-card-icon" style="background:rgba(16,185,129,.12);color:#10b981">
-                    <i class="bi bi-people fs-4"></i>
-                </div>
-                <div class="stat-card-body">
-                    <p class="stat-card-label">Total Customers</p>
-                    <h3 class="stat-card-value">
-                        {{ number_format($stats['total_customers'] ?? 0) }}
-                    </h3>
-                    <span class="stat-card-change positive">
-                        <i class="bi bi-arrow-up-short"></i>
-                        {{ $stats['customers_growth'] ?? '0' }}% vs last month
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="stat-card">
-                <div class="stat-card-icon" style="background:rgba(245,158,11,.12);color:#f59e0b">
-                    <i class="bi bi-patch-check fs-4"></i>
-                </div>
-                <div class="stat-card-body">
-                    <p class="stat-card-label">Active Subscriptions</p>
-                    <h3 class="stat-card-value">
-                        {{ number_format($stats['active_subscriptions'] ?? 0) }}
-                    </h3>
-                    <span class="stat-card-change neutral">
-                        <i class="bi bi-dash"></i>
-                        {{ $stats['subscriptions_growth'] ?? '0' }}% vs last month
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="stat-card">
-                <div class="stat-card-icon" style="background:rgba(239,68,68,.12);color:#ef4444">
-                    <i class="bi bi-headset fs-4"></i>
-                </div>
-                <div class="stat-card-body">
-                    <p class="stat-card-label">Pending Tickets</p>
-                    <h3 class="stat-card-value">
-                        {{ number_format($stats['pending_tickets'] ?? 0) }}
-                    </h3>
-                    <span class="stat-card-change {{ ($stats['pending_tickets'] ?? 0) > 0 ? 'negative' : 'positive' }}">
-                        <i class="bi bi-{{ ($stats['pending_tickets'] ?? 0) > 0 ? 'arrow-up-short' : 'check2' }}"></i>
-                        {{ ($stats['pending_tickets'] ?? 0) > 0 ? 'Needs attention' : 'All resolved' }}
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Charts Row --}}
-    <div class="row g-4 mb-4">
-        <div class="col-12 col-xl-8">
-            <div class="card-saas h-100">
-                <div class="card-saas-header d-flex align-items-center justify-content-between">
-                    <div>
-                        <h6 class="card-saas-title mb-0">Revenue Trend</h6>
-                        <p class="text-muted-text small mb-0">Monthly revenue over time</p>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <span class="badge-saas badge-saas-primary">MRR</span>
-                    </div>
-                </div>
-                <div class="card-saas-body">
-                    <div id="revenueChart" style="min-height:280px"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-xl-4">
-            <div class="card-saas h-100">
-                <div class="card-saas-header">
-                    <h6 class="card-saas-title mb-0">Transaction Status</h6>
-                    <p class="text-muted-text small mb-0">Distribution this month</p>
-                </div>
-                <div class="card-saas-body d-flex align-items-center justify-content-center">
-                    <div id="statusChart" style="min-height:280px;width:100%"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Recent Transactions --}}
-    <div class="card-saas">
-        <div class="card-saas-header d-flex align-items-center justify-content-between">
+        <!-- Welcome Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div>
-                <h6 class="card-saas-title mb-0">Recent Transactions</h6>
-                <p class="text-muted-text small mb-0">Latest payment activity</p>
+                <h2 class="mb-1 fw-bold">Welcome back, Admin 👋</h2>
+                <p class="text-secondary mb-0">Here's what's happening with Cooca ID today.</p>
             </div>
-            @if (isset($recentTransactions) && $recentTransactions->count())
-                <a href="{{ route('admin.transactions.index') }}" class="btn-saas btn-saas-ghost btn-sm">
-                    View all <i class="bi bi-arrow-right ms-1"></i>
-                </a>
-            @endif
+            <div class="d-flex gap-2">
+                <button class="btn btn-light bg-white border shadow-sm rounded-pill px-3 hover-lift text-secondary">
+                    <i class="bi bi-calendar3 me-2"></i> Last 30 Days
+                </button>
+                <button class="btn btn-primary rounded-pill px-3 hover-lift shadow-sm">
+                    <i class="bi bi-download me-2"></i> Report
+                </button>
+            </div>
         </div>
-        <div class="card-saas-body p-0">
-            <div class="table-responsive">
-                <table class="table-saas">
-                    <thead>
-                        <tr>
-                            <th>Invoice</th>
-                            <th>Customer</th>
-                            <th>Product</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($recentTransactions ?? [] as $transaction)
-                            <tr>
-                                <td>
-                                    <span class="fw-medium font-monospace small">
-                                        #{{ $transaction->invoice_number ?? $transaction->id }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="admin-avatar" style="width:32px;height:32px;font-size:.75rem">
-                                            {{ strtoupper(substr($transaction->customer->name ?? 'U', 0, 1)) }}
-                                        </div>
-                                        <div>
-                                            <div class="fw-medium small">{{ $transaction->customer->name ?? '-' }}</div>
-                                            <div class="text-muted-text" style="font-size:.75rem">
-                                                {{ $transaction->customer->email ?? '' }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="small text-secondary-text">
-                                    {{ $transaction->product->name ?? '-' }}
-                                </td>
-                                <td class="fw-semibold small">
-                                    Rp {{ number_format($transaction->amount ?? 0, 0, ',', '.') }}
-                                </td>
-                                <td>
-                                    @php
-                                        $statusMap = [
-                                            'paid' => 'success',
-                                            'success' => 'success',
-                                            'pending' => 'warning',
-                                            'failed' => 'danger',
-                                            'expired' => 'secondary',
-                                            'refund' => 'info',
-                                        ];
-                                        $st = strtolower($transaction->status ?? '');
-                                        $badgeType = $statusMap[$st] ?? 'secondary';
-                                    @endphp
-                                    <span class="badge-saas badge-saas-{{ $badgeType }}">
-                                        {{ ucfirst($st ?: 'unknown') }}
-                                    </span>
-                                </td>
-                                <td class="text-muted-text small">
-                                    {{ $transaction->created_at?->format('d M Y') ?? '-' }}
-                                </td>
-                                <td>
-                                    <a href="{{ route('admin.transactions.show', $transaction) }}"
-                                        class="btn-saas btn-saas-ghost btn-sm py-0 px-2">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
+
+        <!-- Bento Grid Stats -->
+        <div class="row g-4">
+            <!-- Stat 1 -->
+            <div class="col-12 col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="0">
+                <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift overflow-hidden position-relative glass">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                style="width: 48px; height: 48px;">
+                                <i class="bi bi-currency-dollar fs-4"></i>
+                            </div>
+                            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1"><i
+                                    class="bi bi-arrow-up-short"></i> {{ $stats['revenueGrowth'] ?? 0 }}%</span>
+                        </div>
+                        <div class="text-secondary mb-1 fw-medium">Total Revenue</div>
+                        <h3 class="fw-bold mb-0">Rp {{ number_format($stats['totalRevenue'] ?? 0, 0, ',', '.') }}</h3>
+                        <div class="text-secondary mt-1" style="font-size: 0.75rem;">
+                            {{ number_format($stats['todayRevenue'] ?? 0, 0, ',', '.') }} today</div>
+                    </div>
+                    <div class="position-absolute bottom-0 start-0 w-100"
+                        style="height: 40px; background: linear-gradient(to top, rgba(var(--color-primary-rgb), 0.05), transparent);">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat 2 -->
+            <div class="col-12 col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift overflow-hidden position-relative glass">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="bg-success-subtle text-success rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                style="width: 48px; height: 48px;">
+                                <i class="bi bi-arrow-repeat fs-4"></i>
+                            </div>
+                            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1"><i
+                                    class="bi bi-arrow-up-short"></i> {{ $stats['newSubscriptionsThisMonth'] ?? 0 }}
+                                New</span>
+                        </div>
+                        <div class="text-secondary mb-1 fw-medium">Active Subscriptions</div>
+                        <h3 class="fw-bold mb-0">{{ number_format($stats['activeSubscriptions'] ?? 0) }}</h3>
+                        <div class="text-secondary mt-1" style="font-size: 0.75rem;">{{ $stats['totalSubscriptions'] ?? 0 }}
+                            total · {{ $stats['expiredSubscriptions'] ?? 0 }} expired</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat 3 -->
+            <div class="col-12 col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift overflow-hidden position-relative glass">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="bg-warning-subtle text-warning rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                style="width: 48px; height: 48px;">
+                                <i class="bi bi-hdd-network fs-4"></i>
+                            </div>
+                            <span
+                                class="badge bg-{{ $stats['pendingTransactions'] > 0 ? 'danger' : 'success' }}-subtle text-{{ $stats['pendingTransactions'] > 0 ? 'danger' : 'success' }} rounded-pill px-2 py-1">{{ $stats['pendingTransactions'] ?? 0 }}
+                                Pending</span>
+                        </div>
+                        <div class="text-secondary mb-1 fw-medium">Active Licenses</div>
+                        <h3 class="fw-bold mb-0">{{ number_format($stats['activeLicenses'] ?? 0) }}</h3>
+                        <div class="text-secondary mt-1" style="font-size: 0.75rem;">{{ $stats['totalLicenses'] ?? 0 }}
+                            total · {{ $stats['expiredLicenses'] ?? 0 }} expired</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat 4 -->
+            <div class="col-12 col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift overflow-hidden position-relative glass">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="bg-info-subtle text-info rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                style="width: 48px; height: 48px;">
+                                <i class="bi bi-people fs-4"></i>
+                            </div>
+                            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1"><i
+                                    class="bi bi-arrow-up-short"></i> {{ $stats['customerGrowth'] ?? 0 }}%</span>
+                        </div>
+                        <div class="text-secondary mb-1 fw-medium">Total Customers</div>
+                        <h3 class="fw-bold mb-0">{{ number_format($stats['totalCustomers'] ?? 0) }}</h3>
+                        <div class="text-secondary mt-1" style="font-size: 0.75rem;">
+                            {{ $stats['newCustomersThisMonth'] ?? 0 }} new this month</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row g-4">
+            <div class="col-12 col-xl-8" data-aos="fade-up" data-aos-delay="400">
+                <div class="card border-0 shadow-sm rounded-4 h-100 glass">
+                    <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-semibold">Revenue Overview</h5>
+                        <button class="btn btn-sm btn-light rounded-pill"><i class="bi bi-three-dots"></i></button>
+                    </div>
+                    <div class="card-body px-4 pb-4 pt-0">
+                        <div id="revenueChart" style="min-height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="card border-0 shadow-sm rounded-4 h-100 glass">
+                    <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-semibold">Products Traffic</h5>
+                    </div>
+                    <div class="card-body px-4 pb-4 pt-0 d-flex justify-content-center align-items-center">
+                        <div id="trafficChart" style="min-height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lists Section -->
+        <div class="row g-4 pb-4">
+            <!-- Recent ERP Requests -->
+            <div class="col-12 col-lg-6" data-aos="fade-up" data-aos-delay="600">
+                <div class="card border-0 shadow-sm rounded-4 h-100 glass overflow-hidden">
+                    <div
+                        class="card-header bg-transparent border-bottom border-light p-4 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-semibold">Recent ERP Requests</h5>
+                        <a href="{{ route('admin.erp-requests.index') }}"
+                            class="btn btn-sm btn-link text-decoration-none">View All</a>
+                    </div>
+                    <div class="list-group list-group-flush border-0">
+                        @forelse($recentErpRequests ?? [] as $req)
+                            @php
+                                $statusMap = [
+                                    'pending' => [
+                                        'class' => 'warning',
+                                        'text' => 'warning',
+                                        'icon' => 'hourglass-split',
+                                        'label' => 'Pending',
+                                    ],
+                                    'approved' => [
+                                        'class' => 'info',
+                                        'text' => 'info',
+                                        'icon' => 'check2-circle',
+                                        'label' => 'Approved',
+                                    ],
+                                    'rejected' => [
+                                        'class' => 'danger',
+                                        'text' => 'danger',
+                                        'icon' => 'x-circle',
+                                        'label' => 'Rejected',
+                                    ],
+                                    'waiting_setup' => [
+                                        'class' => 'primary',
+                                        'text' => 'primary',
+                                        'icon' => 'gear',
+                                        'label' => 'Waiting Setup',
+                                    ],
+                                    'in_setup' => [
+                                        'class' => 'primary',
+                                        'text' => 'primary',
+                                        'icon' => 'gear',
+                                        'label' => 'In Setup',
+                                    ],
+                                    'domain_setup' => [
+                                        'class' => 'info',
+                                        'text' => 'info',
+                                        'icon' => 'globe',
+                                        'label' => 'Domain Setup',
+                                    ],
+                                    'testing' => [
+                                        'class' => 'warning',
+                                        'text' => 'warning',
+                                        'icon' => 'bug',
+                                        'label' => 'Testing',
+                                    ],
+                                    'ready' => [
+                                        'class' => 'success',
+                                        'text' => 'success',
+                                        'icon' => 'check2-all',
+                                        'label' => 'Ready',
+                                    ],
+                                ];
+                                $s = $statusMap[$req->status] ?? [
+                                    'class' => 'secondary',
+                                    'text' => 'secondary',
+                                    'icon' => 'circle',
+                                    'label' => ucfirst($req->status),
+                                ];
+                            @endphp
+                            <div
+                                class="list-group-item bg-transparent p-4 border-light d-flex align-items-center gap-3 hover-lift">
+                                <div class="bg-{{ $s['class'] }}-subtle text-{{ $s['text'] }} rounded-circle p-2"
+                                    style="width: 40px; height: 40px; display: grid; place-items: center;"><i
+                                        class="bi bi-{{ $s['icon'] }}"></i></div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-medium">
+                                        {{ $req->customer?->name ?? 'Customer #' . $req->customer_id }}</div>
+                                    <div class="text-secondary" style="font-size: 0.8rem;">
+                                        {{ $req->notes ?? 'ERP Request' }}</div>
+                                </div>
+                                <span
+                                    class="badge bg-{{ $s['class'] }} {{ $s['class'] === 'warning' || $s['class'] === 'light' ? 'text-dark' : '' }} rounded-pill">{{ $s['label'] }}</span>
+                            </div>
                         @empty
-                            <tr>
-                                <td colspan="7">
-                                    <div class="empty-state py-5">
-                                        <i class="bi bi-receipt empty-state-icon"></i>
-                                        <h6 class="empty-state-title">No transactions yet</h6>
-                                        <p class="empty-state-desc">Transactions will appear here once customers start
-                                            purchasing.</p>
-                                    </div>
-                                </td>
-                            </tr>
+                            <div class="list-group-item bg-transparent p-4 border-light text-center text-secondary">
+                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                <span>No recent ERP requests</span>
+                            </div>
                         @endforelse
-                    </tbody>
-                </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status/Timeline -->
+            <div class="col-12 col-lg-6" data-aos="fade-up" data-aos-delay="700">
+                <div class="card border-0 shadow-sm rounded-4 h-100 glass">
+                    <div class="card-header bg-transparent border-bottom border-light p-4">
+                        <h5 class="mb-0 fw-semibold">Recent Activity</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        @forelse($recentTransactions ?? [] as $tx)
+                            @php
+                                $colorMap = [
+                                    'paid' => 'success',
+                                    'pending' => 'warning',
+                                    'failed' => 'danger',
+                                    'refunded' => 'info',
+                                ];
+                                $iconMap = [
+                                    'paid' => 'check2-all',
+                                    'pending' => 'hourglass-split',
+                                    'failed' => 'x-circle',
+                                    'refunded' => 'arrow-counterclockwise',
+                                ];
+                                $c = $colorMap[$tx->status] ?? 'primary';
+                                $i = $iconMap[$tx->status] ?? 'circle';
+                            @endphp
+                            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom border-light">
+                                <div class="bg-{{ $c }}-subtle text-{{ $c }} rounded-circle p-2"
+                                    style="width: 40px; height: 40px; display: grid; place-items: center; flex-shrink: 0;">
+                                    <i class="bi bi-{{ $i }}"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-medium">{{ $tx->customer?->name ?? 'Customer #' . $tx->customer_id }}
+                                    </div>
+                                    <div class="text-secondary" style="font-size: 0.8rem;">
+                                        {{ ucfirst($tx->status) }} - Rp
+                                        {{ number_format($tx->net_amount ?? ($tx->gross_amount ?? 0), 0, ',', '.') }}
+                                    </div>
+                                </div>
+                                <div class="text-muted" style="font-size: 0.75rem;">
+                                    {{ $tx->created_at ? $tx->created_at->diffForHumans() : '' }}</div>
+                            </div>
+                        @empty
+                            <div class="text-center text-secondary py-4">
+                                <i class="bi bi-activity fs-2 d-block mb-2"></i>
+                                <span>No recent activity</span>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.0/dist/apexcharts.min.js"></script>
     <script>
-        (function() {
-            const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-            const textColor = isDark ? '#94a3b8' : '#64748b';
-            const gridColor = isDark ? '#1e293b' : '#f1f5f9';
-            const primaryColor = '#6366f1';
+        document.addEventListener('DOMContentLoaded', function() {
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary')
+                .trim();
+            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent')
+                .trim();
+            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-secondary')
+                .trim();
+            const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim();
 
-            // Revenue chart data from PHP
-            const revenueLabels = @json($revenueChart['labels'] ?? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
-            const revenueData = @json($revenueChart['data'] ?? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+            // Revenue Chart (Area) - Real data from controller
+            const revenueMonths = @json(array_column($revenueChartData ?? [], 'month'));
+            const revenueValues = @json(array_column($revenueChartData ?? [], 'revenue'));
 
-            const revenueChart = new ApexCharts(document.getElementById('revenueChart'), {
+            const revenueOptions = {
                 series: [{
                     name: 'Revenue',
-                    data: revenueData
+                    data: revenueValues
                 }],
                 chart: {
                     type: 'area',
-                    height: 280,
+                    height: 300,
                     toolbar: {
                         show: false
                     },
                     background: 'transparent',
-                    fontFamily: 'Inter, sans-serif',
+                    fontFamily: 'inherit',
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800
+                    }
+                },
+                colors: [accentColor],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.4,
+                        opacityTo: 0.05,
+                        stops: [0, 100]
+                    }
                 },
                 dataLabels: {
                     enabled: false
                 },
                 stroke: {
                     curve: 'smooth',
-                    width: 2
+                    width: 3
                 },
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.35,
-                        opacityTo: 0.02,
-                        stops: [0, 100]
-                    }
-                },
-                colors: [primaryColor],
                 xaxis: {
-                    categories: revenueLabels,
-                    labels: {
-                        style: {
-                            colors: textColor,
-                            fontFamily: 'Inter, sans-serif'
-                        }
-                    },
+                    categories: revenueMonths,
                     axisBorder: {
                         show: false
                     },
                     axisTicks: {
                         show: false
                     },
+                    labels: {
+                        style: {
+                            colors: textColor
+                        }
+                    }
                 },
                 yaxis: {
                     labels: {
                         style: {
-                            colors: textColor,
-                            fontFamily: 'Inter, sans-serif'
+                            colors: textColor
                         },
-                        formatter: v => 'Rp ' + (v >= 1000000 ? (v / 1000000).toFixed(1) + 'M' : v >= 1000 ? (
-                            v / 1000).toFixed(0) + 'K' : v)
+                        formatter: (value) => 'Rp ' + (value / 1000).toFixed(0) + 'k'
                     }
                 },
                 grid: {
                     borderColor: gridColor,
-                    strokeDashArray: 4
-                },
-                tooltip: {
-                    theme: isDark ? 'dark' : 'light',
-                    y: {
-                        formatter: v => 'Rp ' + Number(v).toLocaleString('id-ID')
+                    strokeDashArray: 4,
+                    yaxis: {
+                        lines: {
+                            show: true
+                        }
                     }
                 },
-            });
+                theme: {
+                    mode: document.documentElement.getAttribute('data-theme') || 'light'
+                }
+            };
+
+            const revenueChart = new ApexCharts(document.querySelector("#revenueChart"), revenueOptions);
             revenueChart.render();
 
-            // Status donut chart
-            const statusLabels = @json($statusChart['labels'] ?? ['Paid', 'Pending', 'Failed']);
-            const statusData = @json($statusChart['data'] ?? [0, 0, 0]);
-            const statusColors = ['#10b981', '#f59e0b', '#ef4444', '#6366f1', '#94a3b8'];
+            // Traffic Chart (Donut) - Real data from controller
+            const txStatus = @json($transactionStatusBreakdown ?? []);
+            const txLabels = Object.keys(txStatus).map(k => k.charAt(0).toUpperCase() + k.slice(1));
+            const txValues = Object.values(txStatus);
 
-            const statusChart = new ApexCharts(document.getElementById('statusChart'), {
-                series: statusData,
-                labels: statusLabels,
+            const trafficOptions = {
+                series: txValues.length ? txValues : [1],
                 chart: {
                     type: 'donut',
-                    height: 280,
+                    height: 300,
                     background: 'transparent',
-                    fontFamily: 'Inter, sans-serif',
+                    fontFamily: 'inherit',
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800
+                    }
                 },
-                colors: statusColors,
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        colors: textColor
-                    },
+                labels: txLabels.length ? txLabels : ['No Data'],
+                colors: ['#10b981', '#f59e0b', '#ef4444', '#6b7280'],
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '75%'
+                        },
+                        expandOnClick: false
+                    }
                 },
                 dataLabels: {
                     enabled: false
                 },
-                plotOptions: {
-                    pie: {
-                        donut: {
-                            size: '65%',
-                            labels: {
-                                show: true,
-                                total: {
-                                    show: true,
-                                    label: 'Total',
-                                    color: textColor,
-                                    formatter: w => w.globals.seriesTotals.reduce((a, b) => a + b, 0)
-                                }
-                            }
-                        }
+                stroke: {
+                    width: 0
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        colors: textColor
                     }
                 },
-                tooltip: {
-                    theme: isDark ? 'dark' : 'light'
-                },
-            });
-            statusChart.render();
+                theme: {
+                    mode: document.documentElement.getAttribute('data-theme') || 'light'
+                }
+            };
 
-            // Re-render on dark mode toggle
-            document.getElementById('darkModeToggle')?.addEventListener('click', () => {
+            const trafficChart = new ApexCharts(document.querySelector("#trafficChart"), trafficOptions);
+            trafficChart.render();
+
+            // Listen for theme change to update charts
+            document.getElementById('theme-toggle')?.addEventListener('click', () => {
                 setTimeout(() => {
-                    const dark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-                    const tc = dark ? '#94a3b8' : '#64748b';
-                    const gc = dark ? '#1e293b' : '#f1f5f9';
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
                     revenueChart.updateOptions({
-                        xaxis: {
-                            labels: {
-                                style: {
-                                    colors: tc
-                                }
-                            }
-                        },
-                        yaxis: {
-                            labels: {
-                                style: {
-                                    colors: tc
-                                }
-                            }
-                        },
-                        grid: {
-                            borderColor: gc
-                        },
-                        tooltip: {
-                            theme: dark ? 'dark' : 'light'
+                        theme: {
+                            mode: currentTheme
                         }
                     });
-                    statusChart.updateOptions({
-                        legend: {
-                            labels: {
-                                colors: tc
-                            }
-                        },
-                        tooltip: {
-                            theme: dark ? 'dark' : 'light'
+                    trafficChart.updateOptions({
+                        theme: {
+                            mode: currentTheme
                         }
                     });
-                }, 50);
+                }, 100);
             });
-        })();
+        });
     </script>
 @endpush

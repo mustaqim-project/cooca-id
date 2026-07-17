@@ -7,13 +7,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\EmailTemplate;
 use Illuminate\Http\Request;
-
-
 use Illuminate\Http\JsonResponse;
 
 /**
  * Admin Email Template Controller
- * 
+ *
  * Manages email templates for system notifications and campaigns.
  */
 class EmailTemplateController extends Controller
@@ -28,8 +26,8 @@ class EmailTemplateController extends Controller
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('subject', 'like', "%{$search}%")
-                  ->orWhere('key', 'like', "%{$search}%");
+                    ->orWhere('subject', 'like', "%{$search}%")
+                    ->orWhere('key', 'like', "%{$search}%");
             });
         }
 
@@ -52,7 +50,7 @@ class EmailTemplateController extends Controller
             ->whereNotNull('category')
             ->pluck('category');
 
-        return view('admin.emailtemplates.index', [
+        return view('admin.email-templates.index', [
             'templates' => $templates,
             'categories' => $categories,
             'filters' => [
@@ -68,7 +66,7 @@ class EmailTemplateController extends Controller
      */
     public function create()
     {
-        return view('admin.emailtemplates.create', [
+        return view('admin.email-templates.create', [
             'template' => null,
             'categories' => EmailTemplate::select('category')
                 ->distinct()
@@ -100,11 +98,8 @@ class EmailTemplateController extends Controller
 
         $template = EmailTemplate::create($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Email template created successfully',
-            'data' => $template,
-        ]);
+        return redirect()->route('admin.email-templates.index')
+            ->with('success', 'Email template created successfully');
     }
 
     /**
@@ -112,7 +107,7 @@ class EmailTemplateController extends Controller
      */
     public function show(EmailTemplate $template)
     {
-        return view('admin.emailtemplates.show', [
+        return view('admin.email-templates.show', [
             'template' => $template->load(['creator', 'updater']),
         ]);
     }
@@ -122,7 +117,7 @@ class EmailTemplateController extends Controller
      */
     public function edit(EmailTemplate $template)
     {
-        return view('admin.emailtemplates.edit', [
+        return view('admin.email-templates.edit', [
             'template' => $template,
             'categories' => EmailTemplate::select('category')
                 ->distinct()
@@ -154,11 +149,8 @@ class EmailTemplateController extends Controller
 
         $template->update($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Email template updated successfully',
-            'data' => $template,
-        ]);
+        return redirect()->route('admin.email-templates.index')
+            ->with('success', 'Email template updated successfully');
     }
 
     /**
@@ -168,10 +160,8 @@ class EmailTemplateController extends Controller
     {
         $template->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Email template deleted successfully',
-        ]);
+        return redirect()->route('admin.email-templates.index')
+            ->with('success', 'Email template deleted successfully');
     }
 
     /**
@@ -181,11 +171,8 @@ class EmailTemplateController extends Controller
     {
         $template->update(['is_active' => !$template->is_active]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Active status updated successfully',
-            'data' => $template,
-        ]);
+        return redirect()->route('admin.email-templates.index')
+            ->with('success', 'Active status updated successfully');
     }
 
     /**
@@ -193,23 +180,8 @@ class EmailTemplateController extends Controller
      */
     public function preview(EmailTemplate $template)
     {
-        $sampleData = [];
-        
-        // Generate sample data based on variables
-        foreach (($template->variables ?? []) as $var) {
-            $sampleData[$var] = "Sample {$var}";
-        }
-
-        $rendered = $template->render($sampleData);
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'subject' => $rendered['subject'],
-                'html' => $rendered['html'],
-                'text' => $rendered['text'],
-                'variables' => $sampleData,
-            ],
+        return view('admin.email-templates.show', [
+            'template' => $template,
         ]);
     }
 }

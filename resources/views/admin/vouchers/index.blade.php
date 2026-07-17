@@ -1,199 +1,134 @@
-@extends('layouts.admin')
+@extends('admin.layouts.app')
 
-@section('title', 'Vouchers & Discounts')
-@section('subtitle', 'Manage promotional codes and discounts')
+@section('title', 'Vouchers')
 
 @section('content')
-    <div class="page-toolbar mb-4">
-        <div class="page-toolbar-left">
-            <div class="input-group" style="width:300px">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" id="searchInput" placeholder="Search code, name...">
+    <div class="d-flex flex-column gap-4">
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold text-capitalize">Vouchers</h2>
+                <p class="text-secondary mb-0">Manage discount codes and promotions.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.vouchers.create') }}" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
+                    <i class="bi bi-plus-lg me-2"></i> Create Voucher
+                </a>
             </div>
         </div>
-        <div class="page-toolbar-right">
-            <a href="{{ route('admin.vouchers.create') }}" class="btn-saas btn-saas-primary">
-                <i class="bi bi-plus-lg me-1"></i> Add Voucher
-            </a>
-        </div>
-    </div>
 
-    <div class="card-saas">
-        <div class="card-saas-body p-0">
+        <!-- Data Table -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div
+                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
+                    style="max-width: 320px; background: var(--color-bg);">
+                    <span class="input-group-text bg-transparent border-0 pe-1"><i
+                            class="bi bi-search text-secondary"></i></span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
+                        placeholder="Search vouchers...">
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-light border rounded-circle p-2" title="Export CSV"><i
+                            class="bi bi-download"></i></button>
+                </div>
+            </div>
+
             <div class="table-responsive">
-                <table class="table-saas" id="vouchersTable">
-                    <thead>
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
                         <tr>
-                            <th>Code / Name</th>
-                            <th>Discount</th>
-                            <th>Usage</th>
-                            <th>Validity</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="py-3 px-4 border-0">Code</th>
+                            <th class="py-3 px-3 border-0">Type</th>
+                            <th class="py-3 px-3 border-0">Value</th>
+                            <th class="py-3 px-3 border-0">Usage</th>
+                            <th class="py-3 px-3 border-0">Status</th>
+                            <th class="py-3 px-3 border-0">Valid Until</th>
+                            <th class="py-3 px-4 border-0 text-end">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="border-top-0">
                         @forelse($vouchers as $voucher)
-                            @php
-                                $isExpired =
-                                    $voucher->valid_until && \Carbon\Carbon::parse($voucher->valid_until)->isPast();
-                                $isMaxed = $voucher->max_usage > 0 && $voucher->used_count >= $voucher->max_usage;
-                                $usagePct =
-                                    $voucher->max_usage > 0
-                                        ? min(100, ($voucher->used_count / $voucher->max_usage) * 100)
-                                        : 0;
-                                $barColor =
-                                    $usagePct >= 90
-                                        ? 'var(--danger)'
-                                        : ($usagePct >= 75
-                                            ? 'var(--warning)'
-                                            : 'var(--success)');
-
-                                if (!$voucher->is_active) {
-                                    $sBadge = 'neutral';
-                                    $sText = 'Inactive';
-                                } elseif ($isExpired) {
-                                    $sBadge = 'danger';
-                                    $sText = 'Expired';
-                                } elseif ($isMaxed) {
-                                    $sBadge = 'warning';
-                                    $sText = 'Fully Used';
-                                } else {
-                                    $sBadge = 'success';
-                                    $sText = 'Active';
-                                }
-                            @endphp
                             <tr>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="stat-card-icon purple"
-                                            style="width:36px;height:36px;border-radius:8px;flex-shrink:0">
-                                            <i class="bi bi-ticket-perforated" style="font-size:.9rem"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-semibold font-monospace" style="letter-spacing:.05em">
-                                                {{ $voucher->code }}</div>
-                                            <div class="text-muted" style="font-size:.8rem">{{ $voucher->name }}</div>
-                                        </div>
-                                    </div>
+                                <td class="py-3 px-4">
+                                    <span
+                                        class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 fw-bold">{{ $voucher->code }}</span>
                                 </td>
-                                <td>
-                                    <div class="fw-semibold">
-                                        @if ($voucher->type == 'percentage')
-                                            {{ $voucher->value }}% OFF
-                                        @else
-                                            Rp {{ number_format($voucher->value, 0, ',', '.') }} OFF
-                                        @endif
-                                    </div>
-                                    @if ($voucher->min_purchase > 0)
-                                        <div class="text-muted" style="font-size:.8rem">Min: Rp
-                                            {{ number_format($voucher->min_purchase, 0, ',', '.') }}</div>
-                                    @endif
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div
-                                            style="width:80px;height:6px;background:var(--border);border-radius:3px;overflow:hidden">
-                                            <div
-                                                style="width:{{ $usagePct }}%;height:100%;background:{{ $barColor }};border-radius:3px">
-                                            </div>
-                                        </div>
-                                        <span style="font-size:.82rem;color:var(--text-muted)">
-                                            {{ $voucher->used_count }} /
-                                            {{ $voucher->max_usage > 0 ? $voucher->max_usage : '∞' }}
-                                        </span>
-                                    </div>
-                                </td>
-                                <td style="font-size:.85rem">
-                                    @if ($voucher->valid_from)
-                                        <div class="text-muted">From:
-                                            {{ \Carbon\Carbon::parse($voucher->valid_from)->format('d M Y') }}</div>
-                                    @endif
-                                    @if ($voucher->valid_until)
-                                        <div class="{{ $isExpired ? 'text-danger fw-semibold' : '' }}">
-                                            To: {{ \Carbon\Carbon::parse($voucher->valid_until)->format('d M Y') }}
-                                        </div>
+                                <td class="py-3 px-3 text-capitalize">{{ $voucher->type ?? 'percentage' }}</td>
+                                <td class="py-3 px-3 fw-medium">
+                                    @if (($voucher->type ?? '') == 'fixed')
+                                        Rp {{ number_format($voucher->value, 0, ',', '.') }}
                                     @else
-                                        <div class="text-muted">Never expires</div>
+                                        {{ $voucher->value }}%
                                     @endif
                                 </td>
-                                <td>
-                                    <span class="badge-saas badge-saas-{{ $sBadge }}">{{ $sText }}</span>
+                                <td class="py-3 px-3 text-secondary fs-7">
+                                    {{ $voucher->used_count ?? 0 }} / {{ $voucher->max_uses ?? '∞' }}
                                 </td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ route('admin.vouchers.show', $voucher->id) }}"
-                                            class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon" title="View">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ route('admin.vouchers.edit', $voucher->id) }}"
-                                            class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon" title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        @if ($voucher->is_active)
-                                            <form class="form-confirm-submit"
-                                                action="{{ route('admin.vouchers.deactivate', $voucher->id) }}"
-                                                method="POST">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon"
-                                                    title="Deactivate" style="color:var(--warning)">
-                                                    <i class="bi bi-pause-circle"></i>
-                                                </button>
-                                            </form>
-                                        @else
-                                            <form class="form-confirm-submit"
-                                                action="{{ route('admin.vouchers.activate', $voucher->id) }}"
-                                                method="POST">
-                                                @csrf
-                                                <button type="submit"
-                                                    class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon"
-                                                    title="Activate" style="color:var(--success)">
-                                                    <i class="bi bi-play-circle"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-                                        <form class="form-confirm-delete"
-                                            action="{{ route('admin.vouchers.destroy', $voucher->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon"
-                                                title="Delete" style="color:var(--danger)">
-                                                <i class="bi bi-trash3"></i>
-                                            </button>
-                                        </form>
+                                <td class="py-3 px-3">
+                                    @if ($voucher->is_active ?? true)
+                                        <span
+                                            class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">Active</span>
+                                    @else
+                                        <span
+                                            class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-1">Inactive</span>
+                                    @endif
+                                </td>
+                                <td class="py-3 px-3 text-secondary fs-7">
+                                    {{ $voucher->expires_at ? \Carbon\Carbon::parse($voucher->expires_at)->format('d M Y') : 'No Expiry' }}
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light border-0 rounded-circle p-2" type="button"
+                                            data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 glass">
+                                            <li><a class="dropdown-item py-2"
+                                                    href="{{ route('admin.vouchers.show', $voucher->id) }}"><i
+                                                        class="bi bi-eye me-2 text-primary"></i> View Details</a></li>
+                                            <li><a class="dropdown-item py-2"
+                                                    href="{{ route('admin.vouchers.edit', $voucher->id) }}"><i
+                                                        class="bi bi-pencil me-2 text-warning"></i> Edit</a></li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('admin.vouchers.destroy', $voucher->id) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="dropdown-item py-2 text-danger"
+                                                        onclick="return confirm('Are you sure you want to delete this voucher?');">
+                                                        <i class="bi bi-trash me-2"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6">
-                                    <div class="empty-state">
-                                        <div class="empty-state-icon"><i class="bi bi-ticket-perforated"></i></div>
-                                        <div class="empty-state-title">No vouchers found</div>
-                                        <div class="empty-state-description">Create your first promotional code.</div>
-                                        <a href="{{ route('admin.vouchers.create') }}"
-                                            class="btn-saas btn-saas-primary mt-3">
-                                            <i class="bi bi-plus-lg me-1"></i> Create Voucher
-                                        </a>
-                                    </div>
+                                <td colspan="7" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-ticket-perforated fs-1"></i></div>
+                                    <h6 class="fw-medium">No Vouchers Found</h6>
+                                    <p class="fs-7">Get started by creating your first promotional voucher code.</p>
+                                    <a href="{{ route('admin.vouchers.create') }}"
+                                        class="btn btn-sm btn-primary rounded-pill px-3 mt-2">Create Voucher</a>
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
+            @if (isset($vouchers) && $vouchers->hasPages())
+                <div class="card-footer bg-transparent border-top border-light p-4">
+                    {{ $vouchers->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    <script>
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const q = this.value.toLowerCase();
-            document.querySelectorAll('#vouchersTable tbody tr').forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-            });
-        });
-    </script>
-@endpush

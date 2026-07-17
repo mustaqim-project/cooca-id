@@ -1,103 +1,164 @@
-@extends('layouts.admin')
+@extends('admin.layouts.app')
 
 @section('title', 'Subscriptions')
-@section('subtitle', 'Manage customer subscriptions')
 
 @section('content')
-    <div class="page-toolbar mb-4">
-        <div class="page-toolbar-left">
-            <div class="input-group" style="width:320px">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" id="searchInput" placeholder="Search customer, product...">
+    <div class="d-flex flex-column gap-4">
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold text-capitalize">Subscriptions</h2>
+                <p class="text-secondary mb-0">Manage customer subscriptions and billing cycles.</p>
             </div>
         </div>
-    </div>
 
-    <div class="card-saas">
-        <div class="card-saas-body p-0">
+        <!-- Data Table -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div
+                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
+                    style="max-width: 320px; background: var(--color-bg);">
+                    <span class="input-group-text bg-transparent border-0 pe-1"><i
+                            class="bi bi-search text-secondary"></i></span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
+                        placeholder="Search subscriptions...">
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-light border rounded-circle p-2" title="Export CSV"><i
+                            class="bi bi-download"></i></button>
+                </div>
+            </div>
+
             <div class="table-responsive">
-                <table class="table-saas" id="subsTable">
-                    <thead>
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
                         <tr>
-                            <th>Customer</th>
-                            <th>Product</th>
-                            <th>Status</th>
-                            <th>Expires At</th>
-                            <th>Actions</th>
+                            <th class="py-3 px-4 border-0">ID</th>
+                            <th class="py-3 px-3 border-0">Customer</th>
+                            <th class="py-3 px-3 border-0">Product</th>
+                            <th class="py-3 px-3 border-0">Status</th>
+                            <th class="py-3 px-3 border-0">Starts At</th>
+                            <th class="py-3 px-3 border-0">Ends At</th>
+                            <th class="py-3 px-4 border-0 text-end">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="border-top-0">
                         @forelse($subscriptions as $subscription)
                             <tr>
-                                <td>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="stat-card-icon blue"
-                                            style="width:36px;height:36px;min-width:36px;font-size:.85rem">
-                                            {{ strtoupper(substr($subscription->customer->name ?? '?', 0, 1)) }}
-                                        </div>
-                                        <div>
-                                            <a href="{{ route('admin.customers.show', $subscription->customer_id ?? 0) }}"
-                                                class="fw-semibold text-decoration-none">
-                                                {{ $subscription->customer->name ?? 'Unknown Customer' }}
-                                            </a>
-                                            <div class="small text-muted">{{ $subscription->customer->email ?? '' }}</div>
-                                        </div>
-                                    </div>
+                                <td class="py-3 px-4 text-secondary fs-7">#{{ $subscription->id }}</td>
+                                <td class="py-3 px-3">
+                                    <div class="fw-medium">
+                                        {{ $subscription->customer->name ?? ($subscription->user->name ?? 'N/A') }}</div>
+                                    <div class="text-secondary fs-7">
+                                        {{ $subscription->customer->email ?? ($subscription->user->email ?? '') }}</div>
                                 </td>
-                                <td>
-                                    <span class="fw-medium">{{ $subscription->product->name ?? 'Unknown Product' }}</span>
-                                    <div class="small text-muted font-monospace">ID: {{ substr($subscription->id, 0, 8) }}…
-                                    </div>
-                                </td>
-                                <td>
-                                    @php
-                                        $badgeMap = [
-                                            'active' => 'success',
-                                            'trial' => 'info',
-                                            'expired' => 'danger',
-                                            'cancelled' => 'neutral',
-                                        ];
-                                        $badge = $badgeMap[$subscription->status] ?? 'neutral';
-                                    @endphp
+                                <td class="py-3 px-3">
                                     <span
-                                        class="badge-saas badge-saas-{{ $badge }}">{{ ucfirst($subscription->status) }}</span>
+                                        class="badge bg-light text-dark border">{{ $subscription->subscriptionPlan->product->name ?? 'N/A' }}</span>
                                 </td>
-                                <td>
-                                    {{ $subscription->expires_at ? \Carbon\Carbon::parse($subscription->expires_at)->format('d M Y') : 'Lifetime' }}
+                                <td class="py-3 px-3">
+                                    @if ($subscription->status == 'active')
+                                        <span
+                                            class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 text-capitalize">{{ $subscription->status }}</span>
+                                    @elseif($subscription->status == 'expired')
+                                        <span
+                                            class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1 text-capitalize">{{ $subscription->status }}</span>
+                                    @elseif($subscription->status == 'cancelled')
+                                        <span
+                                            class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-1 text-capitalize">{{ $subscription->status }}</span>
+                                    @else
+                                        <span
+                                            class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1 text-capitalize">{{ $subscription->status }}</span>
+                                    @endif
                                 </td>
-                                <td>
-                                    <a href="{{ route('admin.subscriptions.show', $subscription->id) }}"
-                                        class="btn-saas btn-saas-ghost btn-saas-sm">
-                                        <i class="bi bi-eye me-1"></i>Details
-                                    </a>
+                                <td class="py-3 px-3 text-secondary fs-7">
+                                    {{ $subscription->started_at ? $subscription->started_at->format('d M Y') : '-' }}</td>
+                                <td class="py-3 px-3 text-secondary fs-7">
+                                    {{ $subscription->expires_at ? $subscription->expires_at->format('d M Y') : '-' }}</td>
+                                <td class="py-3 px-4 text-end">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light border-0 rounded-circle p-2" type="button"
+                                            data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 glass">
+                                            <li><a class="dropdown-item py-2"
+                                                    href="{{ route('admin.subscriptions.show', $subscription->id) }}"><i
+                                                        class="bi bi-eye me-2 text-primary"></i> View Details</a></li>
+                                            <li>
+                                                <button type="button" class="dropdown-item py-2 text-danger"
+                                                    data-bs-toggle="modal" data-bs-target="#cancelModal{{ $loop->index }}"
+                                                    {{ $subscription->status != 'active' ? 'disabled' : '' }}>
+                                                    <i class="bi bi-x-circle me-2"></i> Cancel
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5">
-                                    <div class="empty-state">
-                                        <div class="empty-state-icon"><i class="bi bi-card-checklist"></i></div>
-                                        <div class="empty-state-title">No subscriptions found</div>
-                                        <div class="empty-state-description">Subscriptions appear here when customers
-                                            purchase a product.</div>
-                                    </div>
+                                <td colspan="7" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-arrow-repeat fs-1"></i></div>
+                                    <h6 class="fw-medium">No Subscriptions Found</h6>
+                                    <p class="fs-7">No subscriptions have been created yet.</p>
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
+            @if (isset($subscriptions) && $subscriptions->hasPages())
+                <div
+                    class="card-footer bg-transparent border-top border-light p-4 d-flex justify-content-between align-items-center">
+                    {{ $subscriptions->links() }}
+                </div>
+            @endif
         </div>
     </div>
-@endsection
 
-@push('scripts')
-    <script>
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const q = this.value.toLowerCase();
-            document.querySelectorAll('#subsTable tbody tr').forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-            });
-        });
-    </script>
-@endpush
+    {{-- Cancel Modals --}}
+    @if (isset($subscriptions))
+        @foreach ($subscriptions as $subscription)
+            <div class="modal fade" id="cancelModal{{ $loop->index }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 rounded-4 shadow">
+                        <form action="{{ route('admin.subscriptions.cancel', $subscription->id) }}" method="POST">
+                            @csrf
+                            <div class="modal-header border-0 pb-0">
+                                <h5 class="modal-title fw-bold">Cancel Subscription</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-secondary mb-3">Cancel subscription for
+                                    <strong>{{ $subscription->customer->name ?? 'N/A' }}</strong>?
+                                </p>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Reason <span class="text-danger">*</span></label>
+                                    <textarea name="reason" class="form-control rounded-3" rows="3" required maxlength="500"
+                                        placeholder="Why is this subscription being cancelled?"></textarea>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" name="immediate" value="1" class="form-check-input"
+                                        id="immediate{{ $loop->index }}">
+                                    <label class="form-check-label" for="immediate{{ $loop->index }}">
+                                        Cancel immediately & revoke license
+                                    </label>
+                                    <div class="form-text text-warning fs-7">If unchecked, subscription remains active
+                                        until expiry.</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 pt-0">
+                                <button type="button" class="btn btn-light rounded-pill px-4"
+                                    data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-danger rounded-pill px-4">Confirm Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    @endif
+@endsection

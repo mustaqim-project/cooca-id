@@ -38,7 +38,7 @@
   <div class="container">
     <div class="text-center reveal">
       <div class="section-label"><i class="bi bi-stars"></i> {{ __('Key Features') }}</div>
-      <h2 class="section-title">{{ __('What Makes <span class="text-gradient">This Product</span> Great') }}</h2>
+      <h2 class="section-title">{!! __('What Makes <span class="text-gradient">This Product</span> Great') !!}</h2>
     </div>
     <div class="row g-4 mt-3">
       <div class="col-md-6 col-lg-4 reveal"><div class="card"><div class="feature-item"><div class="feature-icon"><i class="bi bi-cloud-check"></i></div><div><div class="feature-title">{{ __('Isolated Infrastructure') }}</div><p class="feature-desc">{{ __('Your own dedicated container and database.') }}</p></div></div></div></div>
@@ -52,7 +52,7 @@
   <div class="cta-bg"></div>
   <div class="container cta-content text-center">
     <div class="reveal">
-      <h2 class="section-title">{{ __('Ready to Try <span class="text-gradient">{{ $product->name }}</span>?') }}</h2>
+      <h2 class="section-title">{!! __('Ready to Try <span class="text-gradient">{{ $product->name }}</span>?') !!}</h2>
       <p class="section-subtitle">{{ __('Start your 30-day free trial. Full access. No credit card. 30-minute setup.') }}</p>
       <a href="{{ route('customer.register') }}" class="btn btn-primary btn-lg">{{ __('Start Free Trial') }} <i class="bi bi-arrow-right"></i></a>
     </div>

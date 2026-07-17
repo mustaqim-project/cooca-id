@@ -100,6 +100,62 @@ final class AffiliatorController extends Controller
     }
 
     /**
+     * Show the form for editing the specified affiliator.
+     */
+    public function edit(string $id)
+    {
+        $affiliator = $this->affiliatorRepository->find($id);
+
+        if (!$affiliator) {
+            abort(404, 'Affiliator not found');
+        }
+
+        return view('admin.affiliators.edit', [
+            'affiliator' => new AffiliatorResource($affiliator),
+        ]);
+    }
+
+    /**
+     * Update the specified affiliator.
+     */
+    public function update(Request $request, string $id)
+    {
+        $affiliator = $this->affiliatorRepository->find($id);
+
+        if (!$affiliator) {
+            return redirect()->route('admin.affiliators.index')->with('error', 'Affiliator not found');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:affiliators,email,' . $id,
+            'phone' => 'nullable|string|max:50',
+            'commission_rate' => 'nullable|numeric|min:0|max:100',
+            'status' => 'nullable|in:active,suspended',
+        ]);
+
+        $this->affiliatorRepository->update($id, $validated);
+
+        return redirect()->route('admin.affiliators.index')->with('success', 'Affiliator updated successfully');
+    }
+
+    /**
+     * Remove the specified affiliator.
+     */
+    public function destroy(string $id)
+    {
+        $affiliator = $this->affiliatorRepository->find($id);
+
+        if (!$affiliator) {
+            return redirect()->route('admin.affiliators.index')->with('error', 'Affiliator not found');
+        }
+
+        $this->affiliatorRepository->delete($id);
+
+        return redirect()->route('admin.affiliators.index')->with('success', 'Affiliator deleted successfully');
+    }
+
+    /**
      * Reactivate the specified affiliator.
      */
     public function reactivate(string $id)

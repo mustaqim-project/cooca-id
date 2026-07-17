@@ -116,7 +116,7 @@
   <div class="container">
     <div class="text-center reveal">
       <div class="section-label"><i class="bi bi-stars"></i> {{ __('Core Features') }}</div>
-      <h2 class="section-title">{{ __('Powered by <span class="text-gradient">10 Integrated Modules</span>') }}</h2>
+      <h2 class="section-title">{!! __('Powered by <span class="text-gradient">10 Integrated Modules</span>') !!}</h2>
     </div>
     <div class="row g-4">
       <div class="col-md-4 col-sm-6 reveal"><div class="card module-card"><div class="module-icon"><i class="bi bi-cart-check"></i></div><div class="module-title">{{ __('Point of Sale') }}</div><p class="module-desc">{{ __('Multi-outlet POS with real-time inventory sync.') }}</p></div></div>
@@ -133,7 +133,7 @@
   <div class="container">
     <div class="text-center reveal">
       <div class="section-label"><i class="bi bi-shield-check"></i> {{ __('Why COOCA') }}</div>
-      <h2 class="section-title">{{ __('You Own It. <span class="text-gradient">Forever.</span>') }}</h2>
+      <h2 class="section-title">{!! __('You Own It. <span class="text-gradient">Forever.</span>') !!}</h2>
     </div>
     <div class="row g-4 mt-3">
       <div class="col-lg-4 col-md-6 reveal"><div class="card why-card"><div class="why-icon"><i class="bi bi-infinity"></i></div><h4>{{ __('Lifetime License') }}</h4><p style="margin:0;">{{ __('Pay once. Use forever. No recurring fees.') }}</p></div></div>
@@ -147,7 +147,7 @@
   <div class="container text-center">
     <div class="reveal">
       <div class="section-label"><i class="bi bi-chat-quote"></i> {{ __('Testimonials') }}</div>
-      <h2 class="section-title">{{ __('Trusted by <span class="text-gradient">Business Leaders</span>') }}</h2>
+      <h2 class="section-title">{!! __('Trusted by <span class="text-gradient">Business Leaders</span>') !!}</h2>
     </div>
     <div class="row g-4 mt-4">
       <div class="col-lg-4 col-md-6 reveal"><div class="card testimonial-card"><div class="d-flex align-items-center gap-3 mb-3"><div class="brand-icon" style="width:48px;height:48px;font-size:1.2rem;">BS</div><div><div class="testimonial-name">Budi Santoso</div><div class="testimonial-role">{{ __('CEO, RetailMax Group') }}</div></div></div><div class="testimonial-stars">★★★★★</div><p class="testimonial-text">{{ __('"Switched from annual SaaS to COOCA lifetime. ROI in month 3."') }}</p></div></div>
@@ -161,7 +161,7 @@
   <div class="cta-bg"></div>
   <div class="container cta-content text-center">
     <div class="reveal">
-      <h2 class="section-title">{{ __('Ready to <span class="text-gradient">Own Your System?</span>') }}</h2>
+      <h2 class="section-title">{!! __('Ready to <span class="text-gradient">Own Your System?</span>') !!}</h2>
       <p class="section-subtitle">{{ __('30-day free trial. No credit card. All modules. 30-minute setup.') }}</p>
       <a href="{{ route('customer.register') }}" class="btn btn-primary btn-lg">{{ __('Start Free Trial') }} <i class="bi bi-arrow-right"></i></a>
     </div>
@@ -170,7 +170,7 @@
 
 <section class="section section-alt">
   <div class="container">
-    <div class="text-center reveal"><div class="section-label"><i class="bi bi-question-circle"></i> {{ __('FAQ') }}</div><h2 class="section-title">{{ __('Quick <span class="text-gradient">Answers</span>') }}</h2></div>
+    <div class="text-center reveal"><div class="section-label"><i class="bi bi-question-circle"></i> {{ __('FAQ') }}</div><h2 class="section-title">{!! __('Quick <span class="text-gradient">Answers</span>') !!}</h2></div>
     <div class="row justify-content-center"><div class="col-lg-8 reveal">
       <div class="accordion accordion-c" id="homeFaq">
         <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#hq1">{{ __('What does lifetime license mean?') }}</button></h2><div id="hq1" class="accordion-collapse collapse show" data-bs-parent="#homeFaq"><div class="accordion-body">{{ __('Pay once. Own forever. No annual fees. No forced upgrades. Your license never expires.') }}</div></div></div>
@@ -186,7 +186,7 @@
   <div class="container">
     <div class="reveal">
       <div class="section-label"><i class="bi bi-building-check"></i> {{ __('Enterprise-Ready') }}</div>
-      <h2 class="section-title">{{ __('Built with <span class="text-gradient">Fortune 500</span> infrastructure standards.') }}</h2>
+      <h2 class="section-title">{!! __('Built with <span class="text-gradient">Fortune 500</span> infrastructure standards.') !!}</h2>
       <div class="trust-pills mt-4">
         <span class="trust-pill"><i class="bi bi-shield-check"></i> ISO 27001</span>
         <span class="trust-pill"><i class="bi bi-lock-fill"></i> AES-256</span>

@@ -7,7 +7,7 @@
     <div class="grid-bg"></div>
     <div class="auth-left-content">
       <div class="d-flex align-items-center justify-content-center gap-3 mb-5"><div class="brand-icon">C</div><span style="font-size:1.8rem;font-weight:800;">{{ setting('site.name','COOCA') }}</span></div>
-      <h2>{{ __('Start <span class="text-gradient">Earning</span> Today') }}</h2>
+      <h2>{!! __('Start <span class="text-gradient">Earning</span> Today') !!}</h2>
       <p style="font-size:.95rem;color:var(--text-muted);">{{ __('Join the affiliate program and earn up to 20% commission per sale.') }}</p>
     </div>
   </div>

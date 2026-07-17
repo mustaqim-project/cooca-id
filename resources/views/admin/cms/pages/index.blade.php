@@ -1,79 +1,130 @@
-@extends('layouts.admin')
+@extends('admin.layouts.app')
 
-@section('title', 'Pages')
-@section('subtitle', 'Manage your pages data.')
+@section('title', 'Custom Pages CMS')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
+    <div class="d-flex flex-column gap-4">
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold text-capitalize">CMS Pages</h2>
+                <p class="text-secondary mb-0">Create and manage dynamic pages like Terms, Privacy, and About Us.</p>
             </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
-        </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-                <a href="{{ route('admin.cms.pages.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface-900">
-                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
-                    Add New
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.cms.pages.create') }}"
+                    class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
+                    <i class="bi bi-plus-lg me-2"></i> Create New Page
                 </a>
             </div>
-    </div>
+        </div>
 
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
-                <tr>
-                    <th class="table-th">ID</th>
-                    <th class="table-th">Name / Title</th>
-                    <th class="table-th">Status</th>
-                    <th class="table-th">Date</th>
-                    <th class="table-th">Actions</th>
-                </tr>
-            
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
-                @forelse($pages ?? [] as $page)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">{{ $page->id }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white">{{ $page->title }}</div>
-                        <div class="text-sm text-surface-500 dark:text-surface-400">/{{ $page->slug }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $page->is_published ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300' }}">
-                            {{ $page->is_published ? 'Published' : 'Draft' }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">{{ $page->created_at ? $page->created_at->format('M d, Y') : '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{{ route('admin.cms.pages.edit', $page->id) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 mr-3">Edit</a>
-                        <form class="form-confirm-delete inline" action="{{ route('admin.cms.pages.destroy', $page->id) }}" method="POST">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="5" class="px-6 py-4 text-center text-sm text-surface-500">No pages found.</td></tr>
-                @endforelse
-            
-                
-                
-                </tbody>
-            </table>
+        <!-- Data Table -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div
+                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
+                    style="max-width: 320px; background: var(--color-bg);">
+                    <span class="input-group-text bg-transparent border-0 pe-1"><i
+                            class="bi bi-search text-secondary"></i></span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
+                        placeholder="Search pages by title or slug...">
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-light border rounded-circle p-2" title="Export CSV"><i
+                            class="bi bi-download"></i></button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
+                        <tr>
+                            <th class="py-3 px-4 border-0">Title & Slug</th>
+                            <th class="py-3 px-3 border-0">Template</th>
+                            <th class="py-3 px-3 border-0">Status</th>
+                            <th class="py-3 px-3 border-0">Last Updated</th>
+                            <th class="py-3 px-4 border-0 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @forelse($pages ?? [
+                                (object)
+    ['id' => 1, 'title' => 'Terms of Service', 'slug' => 'terms-of-service', 'template' => 'default', 'is_published' => true, 'updated_at' => now()->subDays(2)],
+                                (object)['id' => 2, 'title' => 'Privacy Policy', 'slug' => 'privacy-policy', 'template' => 'default', 'is_published' => true, 'updated_at' => now()->subDays(5)],
+                                (object)['id' => 3, 'title' => 'About Us', 'slug' => 'about-us', 'template' => 'full-width', 'is_published' => false, 'updated_at' => now()->subHours(4)]
+                            ] as $page)
+                            <tr>
+                                <td class="py-3 px-4">
+                                    <div class="fw-bold fs-6">{{ $page->title }}</div>
+                                    <div class="text-secondary fs-7 font-monospace">/{{ $page->slug }}</div>
+                                </td>
+                                <td class="py-3 px-3 text-capitalize text-secondary">
+                                    <span
+                                        class="badge bg-light text-dark border px-3 py-1 rounded-pill">{{ $page->template ?? 'default' }}</span>
+                                </td>
+                                <td class="py-3 px-3">
+                                    @if ($page->is_published ?? true)
+                                        <span
+                                            class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">Published</span>
+                                    @else
+                                        <span
+                                            class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-1">Draft</span>
+                                    @endif
+                                </td>
+                                <td class="py-3 px-3 text-secondary fs-7">
+                                    {{ is_object($page->updated_at) ? $page->updated_at->format('d M Y, H:i') : 'Oct 15, 2026' }}
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light border-0 rounded-circle p-2" type="button"
+                                            data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 glass">
+                                            <li><a class="dropdown-item py-2"
+                                                    href="{{ route('admin.cms.pages.edit', $page->id ?? 1) }}"><i
+                                                        class="bi bi-pencil me-2 text-warning"></i> Edit Page</a></li>
+                                            <li><a class="dropdown-item py-2" href="#" target="_blank"><i
+                                                        class="bi bi-box-arrow-up-right me-2 text-primary"></i> Preview
+                                                    Live</a></li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('admin.cms.pages.destroy', $page->id ?? 1) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="dropdown-item py-2 text-danger"
+                                                        onclick="return confirm('Are you sure you want to delete this page?');"><i
+                                                            class="bi bi-trash me-2"></i> Delete Page</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-file-earmark-text fs-1"></i></div>
+                                    <h6 class="fw-medium">No Pages Created</h6>
+                                    <p class="fs-7">Get started by creating your first custom CMS page.</p>
+                                    <a href="{{ route('admin.cms.pages.create') }}"
+                                        class="btn btn-sm btn-primary rounded-pill px-4 mt-2">Create Page</a>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if (isset($pages) && method_exists($pages, 'hasPages') && $pages->hasPages())
+                <div class="card-footer bg-transparent border-top border-light p-4">
+                    {{ $pages->links() }}
+                </div>
+            @endif
         </div>
     </div>
-</div>
 @endsection

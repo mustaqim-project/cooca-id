@@ -70,6 +70,7 @@ class SettingsController extends Controller
 
         return view('admin.settings.index', [
             'settings' => $settings,
+            'seoPages' => [],
         ]);
     }
 

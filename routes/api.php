@@ -10,9 +10,40 @@ use App\Http\Controllers\Api\V1\MidtransWebhookController;
 |--------------------------------------------------------------------------
 */
 
+// Public API routes
+Route::prefix('v1')->group(function () {
+    Route::get('/products', [\App\Http\Controllers\Api\V1\CatalogApiController::class, 'products']);
+    Route::get('/products/{product}', [\App\Http\Controllers\Api\V1\CatalogApiController::class, 'show']);
+    Route::get('/products/{product}/plans', [\App\Http\Controllers\Api\V1\CatalogApiController::class, 'plans']);
+});
+
 // Protected API routes (require authentication)
-Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
-    // Add protected API routes here
+Route::prefix('v1')->middleware(['throttle:api'])->group(function () {
+
+    // Customer API
+    Route::middleware(['auth:sanctum', 'type.customer'])->prefix('customer')->group(function () {
+        Route::get('/profile', [\App\Http\Controllers\Api\V1\CustomerApiController::class, 'profile']);
+        Route::put('/profile', [\App\Http\Controllers\Api\V1\CustomerApiController::class, 'updateProfile']);
+        Route::get('/company', [\App\Http\Controllers\Api\V1\CustomerApiController::class, 'company']);
+        Route::put('/company', [\App\Http\Controllers\Api\V1\CustomerApiController::class, 'updateCompany']);
+        Route::get('/trials', [\App\Http\Controllers\Api\V1\CustomerApiController::class, 'trials']);
+        Route::post('/trials', [\App\Http\Controllers\Api\V1\CustomerApiController::class, 'requestTrial']);
+        Route::get('/subscriptions', [\App\Http\Controllers\Api\V1\CustomerApiController::class, 'subscriptions']);
+        Route::get('/invoices', [\App\Http\Controllers\Api\V1\CustomerApiController::class, 'invoices']);
+        Route::get('/licenses', [\App\Http\Controllers\Api\V1\CustomerApiController::class, 'licenses']);
+        Route::get('/tickets', [\App\Http\Controllers\Api\V1\CustomerApiController::class, 'tickets']);
+        Route::post('/tickets', [\App\Http\Controllers\Api\V1\CustomerApiController::class, 'createTicket']);
+    });
+
+    // Affiliator API
+    Route::middleware(['auth:sanctum', 'type.affiliator'])->prefix('affiliator')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Api\V1\AffiliatorApiController::class, 'dashboard']);
+        Route::get('/referrals', [\App\Http\Controllers\Api\V1\AffiliatorApiController::class, 'referrals']);
+        Route::get('/commissions', [\App\Http\Controllers\Api\V1\AffiliatorApiController::class, 'commissions']);
+        Route::get('/withdrawals', [\App\Http\Controllers\Api\V1\AffiliatorApiController::class, 'withdrawals']);
+        Route::post('/withdrawals', [\App\Http\Controllers\Api\V1\AffiliatorApiController::class, 'requestWithdrawal']);
+        Route::get('/downlines', [\App\Http\Controllers\Api\V1\AffiliatorApiController::class, 'downlines']);
+    });
 });
 
 /*

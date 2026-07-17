@@ -1,127 +1,93 @@
-@extends('layouts.admin')
+@extends('admin.layouts.app')
+
 @section('title', 'Edit FAQ')
-@section('subtitle', 'Update question and answer')
 
 @section('content')
-    <div class="mb-4">
-        <a href="{{ route('admin.faqs.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
-            <i class="bi bi-arrow-left me-1"></i> Back to FAQs
-        </a>
-    </div>
+    <div class="d-flex flex-column gap-4" style="max-width: 800px; margin: 0 auto;">
 
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card-saas">
-                <div class="card-saas-header">
-                    <h5 class="card-saas-title">FAQ Content</h5>
-                </div>
-                <div class="card-saas-body">
-                    <form action="{{ route('admin.faqs.update', $faq) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-
-                        <div class="form-saas-group">
-                            <label class="form-saas-label" for="question">Question <span
-                                    class="text-danger">*</span></label>
-                            <input class="form-saas-input @error('question') is-invalid @enderror" type="text"
-                                name="question" id="question" value="{{ old('question', $faq->question) }}" required>
-                            @error('question')
-                                <div class="form-saas-error">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-saas-group">
-                            <label class="form-saas-label" for="answer">Answer <span class="text-danger">*</span></label>
-                            <textarea class="form-saas-textarea @error('answer') is-invalid @enderror" name="answer" id="answer" rows="6"
-                                required>{{ old('answer', $faq->answer) }}</textarea>
-                            @error('answer')
-                                <div class="form-saas-error">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-saas-group mb-0">
-                                    <label class="form-saas-label" for="category">Category</label>
-                                    <input class="form-saas-input @error('category') is-invalid @enderror" type="text"
-                                        name="category" id="category" value="{{ old('category', $faq->category) }}"
-                                        placeholder="e.g. Billing, Technical">
-                                    @error('category')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group mb-0">
-                                    <label class="form-saas-label" for="sort_order">Sort Order</label>
-                                    <input class="form-saas-input @error('sort_order') is-invalid @enderror" type="number"
-                                        name="sort_order" id="sort_order"
-                                        value="{{ old('sort_order', $faq->sort_order ?? 0) }}" min="0">
-                                    @error('sort_order')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-saas-footer mt-4">
-                            <div class="d-flex align-items-center gap-3">
-                                <button type="submit" class="btn-saas btn-saas-primary">
-                                    <i class="bi bi-check-lg me-1"></i> Save Changes
-                                </button>
-                                <a href="{{ route('admin.faqs.index') }}" class="btn-saas btn-saas-ghost">Cancel</a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+        <!-- Header -->
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ route('admin.faqs.index') }}"
+                class="btn btn-light border-0 rounded-circle p-2 shadow-sm hover-lift"><i class="bi bi-arrow-left"></i></a>
+            <div>
+                <h2 class="mb-1 fw-bold">Edit Question</h2>
+                <p class="text-secondary mb-0">Update the details for this frequently asked question.</p>
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="card-saas">
-                <div class="card-saas-header">
-                    <h5 class="card-saas-title">Status</h5>
-                </div>
-                <div class="card-saas-body">
-                    <div class="d-flex align-items-center justify-content-between p-3 rounded-2"
-                        style="background:var(--surface-raised)">
-                        <div>
-                            <div class="fw-semibold" style="font-size:.875rem">Visibility</div>
-                            <div style="font-size:.8rem;color:var(--text-muted)">Show on public FAQ page</div>
-                        </div>
-                        <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" name="is_active" id="is_active"
-                                form="faq-status-form" value="1"
-                                {{ old('is_active', $faq->is_active) ? 'checked' : '' }}>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Form Card -->
+        <div class="card border-0 shadow-sm rounded-4 glass p-4 p-md-5">
+            <form action="{{ route('admin.faqs.update', $faq->id ?? 1) }}" method="POST" class="d-flex flex-column gap-4">
+                @csrf
+                @method('PUT')
 
-            <div class="card-saas mt-3">
-                <div class="card-saas-header">
-                    <h5 class="card-saas-title">Info</h5>
-                </div>
-                <div class="card-saas-body">
-                    <div class="d-flex flex-column gap-2" style="font-size:.85rem">
-                        <div class="d-flex justify-content-between">
-                            <span style="color:var(--text-muted)">ID</span>
-                            <span class="fw-mono">#{{ $faq->id }}</span>
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="text" class="form-control rounded-3 shadow-none border bg-transparent"
+                                id="question" name="question" placeholder="Question"
+                                value="{{ $faq->question ?? 'How do I upgrade my license tier?' }}" required>
+                            <label for="question">Question</label>
                         </div>
-                        <div class="d-flex justify-content-between">
-                            <span style="color:var(--text-muted)">Created</span>
-                            <span>{{ $faq->created_at->format('d M Y') }}</span>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <select class="form-select rounded-3 shadow-none border bg-transparent" id="category"
+                                name="category" required>
+                                <option value="">Select Category</option>
+                                <option value="General" {{ ($faq->category ?? '') == 'General' ? 'selected' : '' }}>General
+                                </option>
+                                <option value="Billing" {{ ($faq->category ?? 'Billing') == 'Billing' ? 'selected' : '' }}>
+                                    Billing</option>
+                                <option value="Technical" {{ ($faq->category ?? '') == 'Technical' ? 'selected' : '' }}>
+                                    Technical</option>
+                                <option value="Licensing" {{ ($faq->category ?? '') == 'Licensing' ? 'selected' : '' }}>
+                                    Licensing</option>
+                            </select>
+                            <label for="category">Category</label>
                         </div>
-                        <div class="d-flex justify-content-between">
-                            <span style="color:var(--text-muted)">Updated</span>
-                            <span>{{ $faq->updated_at->format('d M Y') }}</span>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <select class="form-select rounded-3 shadow-none border bg-transparent" id="is_published"
+                                name="is_published" required>
+                                <option value="1" {{ $faq->is_published ?? true ? 'selected' : '' }}>Published
+                                    (Visible to Users)</option>
+                                <option value="0" {{ !($faq->is_published ?? true) ? 'selected' : '' }}>Draft (Hidden)
+                                </option>
+                            </select>
+                            <label for="is_published">Visibility Status</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label text-secondary fw-medium mb-2">Answer (HTML Supported)</label>
+                            <textarea class="form-control rounded-3 shadow-none border bg-transparent" id="answer" name="answer"
+                                placeholder="Provide a detailed answer..." style="height: 200px" required>{{ $faq->answer ?? 'To upgrade your license tier, go to Settings > Billing and click on Change Plan. Select the tier you want and proceed to checkout.' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="number" class="form-control rounded-3 shadow-none border bg-transparent"
+                                id="order" name="order" value="{{ $faq->order ?? 0 }}" placeholder="Display Order">
+                            <label for="order">Display Order (Lower number = Higher position)</label>
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <hr class="border-light my-2">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ route('admin.faqs.index') }}" class="btn btn-light border rounded-pill px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift">
+                        <i class="bi bi-check2 me-2"></i> Update Question
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-
-    {{-- Hidden status form merged on submit --}}
-    <form id="faq-status-form" style="display:none"></form>
 @endsection

@@ -11,7 +11,7 @@ use App\Models\Subscription;
 use App\Models\Setting;
 use App\Jobs\Notification\SendPaymentConfirmationJob;
 use App\Jobs\Payment\ProcessCommissionJob;
-use App\Jobs\Subscription\ActivateSubscriptionJob;
+use App\Jobs\ActivateSubscriptionJob;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -447,7 +447,7 @@ final class PaymentService
         if (!$transaction) {
             throw new \RuntimeException('Transaction not found');
         }
-        
+
         // This simulates a full refund based on net amount
         return $this->refund($transaction, (float) $transaction->net_amount);
     }

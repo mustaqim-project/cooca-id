@@ -1,173 +1,158 @@
-@extends('layouts.admin')
-@section('title', 'View Post')
-@section('subtitle', $post->title)
+@extends('admin.layouts.app')
+
+@section('title', 'Blog Post Details')
 
 @section('content')
-    <div class="mb-4">
-        <a href="{{ route('admin.blog.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
-            <i class="bi bi-arrow-left me-1"></i> Back to Posts
-        </a>
-    </div>
+    <div class="d-flex flex-column gap-4">
 
-    <div class="row g-4">
-        <div class="col-lg-8">
-            {{-- Featured Image --}}
-            @if ($post->featured_image)
-                <div class="mb-4" style="border-radius:12px;overflow:hidden;max-height:320px">
-                    <img src="{{ $post->featured_image }}" alt="{{ $post->title }}"
-                        style="width:100%;object-fit:cover;max-height:320px">
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ route('admin.blog.index') }}"
+                    class="btn btn-light border-0 rounded-circle p-2 shadow-sm hover-lift"><i
+                        class="bi bi-arrow-left"></i></a>
+                <div>
+                    <h2 class="mb-1 fw-bold text-capitalize">Post Details</h2>
+                    <p class="text-secondary mb-0">Review content and metadata.</p>
                 </div>
-            @endif
-
-            <div class="card-saas mb-4">
-                <div class="card-saas-body">
-                    <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:.75rem">{{ $post->title }}</h2>
-                    <div class="d-flex align-items-center gap-3 mb-4" style="font-size:.85rem;color:var(--text-muted)">
-                        <span><i class="bi bi-person me-1"></i>{{ $post->author->name ?? 'Unknown' }}</span>
-                        <span><i
-                                class="bi bi-calendar me-1"></i>{{ $post->published_at ? $post->published_at->format('d M Y') : $post->created_at->format('d M Y') }}</span>
-                        @if ($post->category)
-                            <span class="badge-saas badge-saas-info">{{ $post->category }}</span>
-                        @endif
-                        @if ($post->is_featured)
-                            <span class="badge-saas badge-saas-warning"><i class="bi bi-star-fill me-1"></i>Featured</span>
-                        @endif
-                    </div>
-
-                    @if ($post->excerpt)
-                        <div class="p-3 rounded-2 mb-4"
-                            style="background:var(--surface-raised);border-left:3px solid var(--primary);font-style:italic;font-size:.925rem">
-                            {{ $post->excerpt }}
-                        </div>
-                    @endif
-
-                    <div style="line-height:1.8;font-size:.95rem">
-                        {!! nl2br(e($post->content)) !!}
-                    </div>
-                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="#" target="_blank"
+                    class="btn btn-light bg-white border shadow-sm rounded-pill px-4 hover-lift text-primary">
+                    <i class="bi bi-box-arrow-up-right me-2"></i> Live Preview
+                </a>
+                <a href="{{ route('admin.blog.edit', $post->id ?? 1) }}"
+                    class="btn btn-light bg-white border shadow-sm rounded-pill px-4 hover-lift text-secondary">
+                    <i class="bi bi-pencil me-2"></i> Edit
+                </a>
+                <form action="{{ route('admin.blog.destroy', $post->id ?? 1) }}" method="POST"
+                    onsubmit="return confirm('Are you sure you want to delete this post?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 hover-lift shadow-sm">
+                        <i class="bi bi-trash me-2"></i> Delete
+                    </button>
+                </form>
             </div>
         </div>
 
-        <div class="col-lg-4">
-            {{-- Actions --}}
-            <div class="card-saas mb-4">
-                <div class="card-saas-header">
-                    <h5 class="card-saas-title">Actions</h5>
-                </div>
-                <div class="card-saas-body d-flex flex-column gap-2">
-                    <a href="{{ route('admin.blog.edit', $post) }}" class="btn-saas btn-saas-primary">
-                        <i class="bi bi-pencil me-2"></i> Edit Post
-                    </a>
-                    <form action="{{ route('admin.blog.destroy', $post) }}" method="POST" class="form-confirm-delete">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn-saas btn-saas-danger w-100">
-                            <i class="bi bi-trash me-2"></i> Delete Post
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            {{-- Publishing Status --}}
-            <div class="card-saas mb-4">
-                <div class="card-saas-header">
-                    <h5 class="card-saas-title">Publishing Status</h5>
-                </div>
-                <div class="card-saas-body">
-                    <div class="d-flex flex-column gap-3" style="font-size:.875rem">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span style="color:var(--text-muted)">Status</span>
-                            @if ($post->is_published)
-                                <span class="badge-saas badge-saas-success">Published</span>
-                            @else
-                                <span class="badge-saas badge-saas-neutral">Draft</span>
-                            @endif
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span style="color:var(--text-muted)">Featured</span>
-                            @if ($post->is_featured)
-                                <span class="badge-saas badge-saas-warning">Yes</span>
-                            @else
-                                <span style="color:var(--text-muted)">No</span>
-                            @endif
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span style="color:var(--text-muted)">Author</span>
-                            <span>{{ $post->author->name ?? '—' }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span style="color:var(--text-muted)">Created</span>
-                            <span>{{ $post->created_at->format('d M Y') }}</span>
-                        </div>
-                        @if ($post->published_at)
-                            <div class="d-flex justify-content-between">
-                                <span style="color:var(--text-muted)">Published</span>
-                                <span>{{ $post->published_at->format('d M Y') }}</span>
-                            </div>
-                        @endif
+        <div class="row g-4">
+            <!-- Sidebar Info -->
+            <div class="col-12 col-xl-4 d-flex flex-column gap-4">
+                <div class="card border-0 shadow-sm rounded-4 glass p-4 text-center">
+                    <div class="bg-light rounded-4 overflow-hidden mb-3 border shadow-sm" style="height: 160px;">
+                        <img src="{{ $post->image ?? 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80' }}"
+                            class="w-100 h-100" style="object-fit: cover;" alt="Cover">
                     </div>
-                </div>
-            </div>
-
-            {{-- SEO --}}
-            <div class="card-saas mb-4">
-                <div class="card-saas-header">
-                    <h5 class="card-saas-title">SEO & Metadata</h5>
-                </div>
-                <div class="card-saas-body d-flex flex-column gap-3" style="font-size:.875rem">
+                    <h4 class="fw-bold mb-1">{{ $post->title ?? 'Top 5 ERP Trends in 2026' }}</h4>
+                    <p class="text-secondary mb-3 font-monospace fs-7">/{{ $post->slug ?? 'top-5-erp-trends-in-2026' }}</p>
                     <div>
-                        <div style="color:var(--text-muted);margin-bottom:.25rem">Slug</div>
-                        <code
-                            style="font-size:.8rem;background:var(--surface-raised);padding:2px 6px;border-radius:4px">{{ $post->slug ?? '—' }}</code>
+                        @if ($post->is_published ?? true)
+                            <span
+                                class="badge bg-success-subtle text-success rounded-pill px-3 py-2 border border-success-subtle">Published</span>
+                        @else
+                            <span
+                                class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2 border border-secondary-subtle">Draft</span>
+                        @endif
+                        <span
+                            class="badge bg-light text-dark rounded-pill px-3 py-2 border ms-1">{{ $post->category ?? 'Technology' }}</span>
                     </div>
-                    @if ($post->meta_title)
-                        <div>
-                            <div style="color:var(--text-muted);margin-bottom:.25rem">Meta Title</div>
-                            <div>{{ $post->meta_title }}</div>
+
+                    <hr class="border-light my-4">
+
+                    <div class="d-flex justify-content-between text-start mb-3">
+                        <span class="text-secondary fs-7">Author</span>
+                        <span class="fw-medium fs-7">Admin</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-start mb-3">
+                        <span class="text-secondary fs-7">Created At</span>
+                        <span
+                            class="fw-medium fs-7">{{ is_object($post->created_at ?? null) ? $post->created_at->format('M d, Y h:i A') : 'Oct 12, 2026 10:00 AM' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-start">
+                        <span class="text-secondary fs-7">Last Updated</span>
+                        <span
+                            class="fw-medium fs-7">{{ is_object($post->updated_at ?? null) ? $post->updated_at->format('M d, Y h:i A') : 'Oct 15, 2026 14:30 PM' }}</span>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 glass p-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-graph-up-arrow me-2 text-primary"></i> Metrics</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-primary-subtle text-primary p-2 rounded-circle"><i class="bi bi-eye"></i></div>
+                            <span class="text-secondary">Views</span>
                         </div>
-                    @endif
-                    @if ($post->meta_description)
-                        <div>
-                            <div style="color:var(--text-muted);margin-bottom:.25rem">Meta Description</div>
-                            <div style="font-size:.8rem">{{ $post->meta_description }}</div>
+                        <span class="fw-bold fs-5">1,204</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-success-subtle text-success p-2 rounded-circle"><i class="bi bi-share"></i></div>
+                            <span class="text-secondary">Shares</span>
                         </div>
-                    @endif
-                    @if ($post->tags)
-                        <div>
-                            <div style="color:var(--text-muted);margin-bottom:.25rem">Tags</div>
-                            <div class="d-flex flex-wrap gap-1">
-                                @php $tags = is_string($post->tags) ? json_decode($post->tags, true) : (array)$post->tags; @endphp
-                                @foreach ($tags ?? [] as $tag)
-                                    <span class="badge-saas badge-saas-neutral">{{ $tag }}</span>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
+                        <span class="fw-bold fs-5">86</span>
+                    </div>
                 </div>
             </div>
 
-            {{-- Engagement --}}
-            <div class="card-saas">
-                <div class="card-saas-header">
-                    <h5 class="card-saas-title">Engagement</h5>
-                </div>
-                <div class="card-saas-body">
-                    <div class="row g-3">
-                        <div class="col-6 text-center">
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--primary)">
-                                {{ number_format($post->views ?? 0) }}</div>
-                            <div style="font-size:.8rem;color:var(--text-muted)">Views</div>
-                        </div>
-                        <div class="col-6 text-center">
-                            <div style="font-size:1.5rem;font-weight:700;color:var(--primary)">
-                                {{ $post->comments_count ?? 0 }}</div>
-                            <div style="font-size:.8rem;color:var(--text-muted)">Comments</div>
+            <!-- Main Details -->
+            <div class="col-12 col-xl-8">
+                <div class="card border-0 shadow-sm rounded-4 glass h-100">
+                    <div class="card-header bg-transparent border-bottom border-light p-4">
+                        <h5 class="fw-bold mb-0">Article Content</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="p-4 p-md-5">
+                            <div class="border rounded-4 p-4 p-md-5 bg-white shadow-sm article-content"
+                                style="min-height: 600px;">
+                                <style>
+                                    .article-content h2 {
+                                        font-weight: bold;
+                                        margin-bottom: 1rem;
+                                        margin-top: 2rem;
+                                        font-size: 1.75rem;
+                                    }
+
+                                    .article-content h2:first-child {
+                                        margin-top: 0;
+                                    }
+
+                                    .article-content p {
+                                        color: var(--color-text-primary);
+                                        line-height: 1.8;
+                                        margin-bottom: 1.5rem;
+                                    }
+
+                                    .article-content ul,
+                                    .article-content ol {
+                                        margin-bottom: 1.5rem;
+                                        padding-left: 1.5rem;
+                                        line-height: 1.8;
+                                    }
+
+                                    .article-content li {
+                                        margin-bottom: 0.5rem;
+                                    }
+                                </style>
+
+                                {!! $post->content ??
+                                    "
+                                                                                                <h2>Introduction</h2>
+                                                                                                <p>Enterprise Resource Planning (ERP) is evolving faster than ever before. As businesses continue to scale globally and operations become increasingly complex, relying on outdated spreadsheet models and fragmented software solutions is no longer a viable strategy for sustained growth.</p>
+                                
+                                                                                                <p>In 2026, we are witnessing a massive paradigm shift in how organizations manage their core processes. From AI-driven insights to hyper-automation, modern ERP systems are transitioning from simple systems of record to proactive systems of intelligence.</p>
+                                
+                                                                                                <h2>1. Artificial Intelligence as Standard</h2>
+                                                                                                <p>AI is no longer an expensive add-on. Modern ERPs integrate machine learning algorithms directly into core modules to predict inventory shortages, flag anomalous financial transactions, and automate routine data entry tasks.</p>
+                                
+                                                                                                <h2>2. Composable Architecture</h2>
+                                                                                                <p>The era of rigid, monolithic ERP deployments is ending. Businesses now demand 'composable' systems where they can plug-and-play specific modules (finance, HR, supply chain) from different best-of-breed vendors using robust API integrations.</p>
+                                                                                            " !!}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    @include('components.swal-alert')
 @endsection

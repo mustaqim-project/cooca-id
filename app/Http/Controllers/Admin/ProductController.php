@@ -37,7 +37,11 @@ final class ProductController extends Controller
      */
     public function create()
     {
-        return view('admin.products.create');
+        $categories = \App\Models\ProductCategory::where('is_active', true)->orderBy('sort_order')->get();
+
+        return view('admin.products.create', [
+            'categories' => $categories,
+        ]);
     }
 
     /**
@@ -67,10 +71,12 @@ final class ProductController extends Controller
             abort(404, 'Product not found');
         }
 
+        $categories = \App\Models\ProductCategory::where('is_active', true)->orderBy('sort_order')->get();
         $plans = $product->subscriptionPlans()->orderBy('sort_order')->orderBy('duration_months')->get();
 
         return view('admin.products.edit', [
             'product' => $product,
+            'categories' => $categories,
             'plans'   => $plans,
         ]);
     }

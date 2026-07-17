@@ -153,14 +153,17 @@
 @endphp
 
 @foreach ($navigationGroups as $group)
-    <div class="sidebar-nav-group">
-        <span class="sidebar-group-label">{{ $group['title'] }}</span>
-        <ul class="sidebar-nav-list">
+    <div class="sidebar-nav-group mb-3 px-3">
+        <span class="sidebar-group-label text-muted text-uppercase fw-bold ls-wider mb-2 d-block"
+            style="font-size: 0.7rem;">{{ $group['title'] }}</span>
+        <ul class="sidebar-nav-list list-unstyled mb-0">
             @foreach ($group['items'] as $item)
                 @php $isActive = request()->routeIs($item['route_name']); @endphp
-                <li class="sidebar-nav-item">
-                    <a href="{{ $item['href'] }}" class="sidebar-nav-link {{ $isActive ? 'active' : '' }}">
-                        <i class="bi {{ $item['icon'] }} sidebar-nav-icon"></i>
+                <li class="sidebar-nav-item mb-1">
+                    <a href="{{ $item['href'] }}"
+                        class="sidebar-nav-link text-decoration-none d-flex align-items-center py-2 px-3 rounded-2 transition-all {{ $isActive ? 'active bg-primary bg-opacity-10 text-primary fw-medium' : 'text-body-secondary hover-bg-light hover-text-primary' }}">
+                        <i
+                            class="bi {{ $item['icon'] }} sidebar-nav-icon me-3 fs-5 {{ $isActive ? 'text-primary' : '' }}"></i>
                         <span class="sidebar-nav-text">{{ $item['name'] }}</span>
                     </a>
                 </li>

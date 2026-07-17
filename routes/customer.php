@@ -61,6 +61,27 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'veri
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
+    // Company Profile
+    Route::get('/company-profile', [\App\Http\Controllers\Customer\CompanyProfileController::class, 'edit'])->name('company-profile.edit');
+    Route::put('/company-profile', [\App\Http\Controllers\Customer\CompanyProfileController::class, 'update'])->name('company-profile.update');
+
+    // Trials
+    Route::get('/trials', [\App\Http\Controllers\Customer\TrialController::class, 'index'])->name('trials.index');
+    Route::get('/trials/create', [\App\Http\Controllers\Customer\TrialController::class, 'create'])->name('trials.create');
+    Route::post('/trials', [\App\Http\Controllers\Customer\TrialController::class, 'store'])->name('trials.store');
+    Route::get('/trials/{trial}', [\App\Http\Controllers\Customer\TrialController::class, 'show'])->name('trials.show');
+
+    // Domains
+    Route::get('/domains', [\App\Http\Controllers\Customer\DomainController::class, 'index'])->name('domains.index');
+    Route::put('/domains/{tenant}', [\App\Http\Controllers\Customer\DomainController::class, 'update'])->name('domains.update');
+    Route::post('/domains/{tenant}/verify', [\App\Http\Controllers\Customer\DomainController::class, 'verify'])->name('domains.verify');
+
+    // Tickets
+    Route::get('/tickets', [\App\Http\Controllers\Customer\TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/create', [\App\Http\Controllers\Customer\TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/tickets', [\App\Http\Controllers\Customer\TicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/{ticket}', [\App\Http\Controllers\Customer\TicketController::class, 'show'])->name('tickets.show');
+
     // Profile Settings
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');

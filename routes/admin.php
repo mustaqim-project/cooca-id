@@ -80,6 +80,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::get('/affiliators/create', [AffiliatorController::class, 'create'])->name('affiliators.create');
     Route::post('/affiliators', [AffiliatorController::class, 'store'])->name('affiliators.store');
     Route::get('/affiliators/{affiliator}', [AffiliatorController::class, 'show'])->name('affiliators.show');
+    Route::get('/affiliators/{affiliator}/edit', [AffiliatorController::class, 'edit'])->name('affiliators.edit');
+    Route::put('/affiliators/{affiliator}', [AffiliatorController::class, 'update'])->name('affiliators.update');
+    Route::delete('/affiliators/{affiliator}', [AffiliatorController::class, 'destroy'])->name('affiliators.destroy');
     Route::post('/affiliators/{affiliator}/suspend', [AffiliatorController::class, 'suspend'])->name('affiliators.suspend');
     Route::post('/affiliators/{affiliator}/reactivate', [AffiliatorController::class, 'reactivate'])->name('affiliators.reactivate');
 
@@ -147,6 +150,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::get('/email-campaigns/create', [EmailCampaignController::class, 'create'])->name('email-campaigns.create');
     Route::post('/email-campaigns', [EmailCampaignController::class, 'store'])->name('email-campaigns.store');
     Route::get('/email-campaigns/{campaign}', [EmailCampaignController::class, 'show'])->name('email-campaigns.show');
+    Route::get('/email-campaigns/{campaign}/edit', [EmailCampaignController::class, 'edit'])->name('email-campaigns.edit');
+    Route::put('/email-campaigns/{campaign}', [EmailCampaignController::class, 'update'])->name('email-campaigns.update');
+    Route::delete('/email-campaigns/{campaign}', [EmailCampaignController::class, 'destroy'])->name('email-campaigns.destroy');
     Route::post('/email-campaigns/{campaign}/send', [EmailCampaignController::class, 'send'])->name('email-campaigns.send');
 
     // Support Tickets

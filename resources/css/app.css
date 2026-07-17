@@ -377,6 +377,10 @@ html.dark ::-webkit-scrollbar-thumb:hover {
     scrollbar-width: thin;
 }
 
+.sidebar-nav-text {
+    margin-left: 0.5rem;
+}
+
 .sidebar-nav-group {
     margin-bottom: var(--spacing-6);
 }

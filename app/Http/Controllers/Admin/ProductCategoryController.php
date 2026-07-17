@@ -13,7 +13,7 @@ use Illuminate\View\View;
 
 /**
  * Admin Product Category Controller
- * 
+ *
  * Manages product categories.
  */
 class ProductCategoryController extends Controller
@@ -28,7 +28,7 @@ class ProductCategoryController extends Controller
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -42,7 +42,7 @@ class ProductCategoryController extends Controller
 
         $categories = $query->orderBy('sort_order')->paginate(20)->withQueryString();
 
-        return view('admin.productcategories.index', [
+        return view('admin.product-categories.index', [
             'categories' => $categories,
             'filters' => [
                 'search' => $request->get('search'),
@@ -56,7 +56,7 @@ class ProductCategoryController extends Controller
      */
     public function create()
     {
-        return view('admin.productcategories.create', [
+        return view('admin.product-categories.create', [
             'category' => null,
         ]);
     }
@@ -94,7 +94,7 @@ class ProductCategoryController extends Controller
      */
     public function show(ProductCategory $category)
     {
-        return view('admin.productcategories.show', [
+        return view('admin.product-categories.show', [
             'category' => $category->load('products'),
         ]);
     }
@@ -104,7 +104,7 @@ class ProductCategoryController extends Controller
      */
     public function edit(ProductCategory $category)
     {
-        return view('admin.productcategories.edit', [
+        return view('admin.product-categories.edit', [
             'category' => $category,
         ]);
     }

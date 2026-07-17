@@ -41,7 +41,7 @@
   <div class="container">
     <div class="reveal">
       <div class="section-label"><i class="bi bi-gift"></i> {{ __('Benefits') }}</div>
-      <h2 class="section-title">{{ __('Why Join <span class="text-gradient">COOCA Affiliate?</span>') }}</h2>
+      <h2 class="section-title">{!! __('Why Join <span class="text-gradient">COOCA Affiliate?</span>') !!}</h2>
     </div>
     <div class="row g-4 mt-3">
       <div class="col-md-4 reveal"><div class="card why-card"><div class="why-icon"><i class="bi bi-percent"></i></div><h4>{{ __('High Commission') }}</h4><p style="margin:0;">{{ __('Earn up to 20% per sale with no cap on earnings.') }}</p></div></div>

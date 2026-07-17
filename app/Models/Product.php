@@ -16,21 +16,49 @@ final class Product extends Model
 
     protected $table = 'products';
 
+    // ponytail: product_type as string enum; upgrade to DB enum or separate table if types become dynamic
+    public const TYPES = [
+        'saas'        => 'SaaS',
+        'lifetime'    => 'Lifetime Software',
+        'license'     => 'Licensing',
+        'subscription' => 'Subscription',
+        'addon'       => 'Add-on',
+        'bundle'      => 'Bundle',
+        'custom_dev'  => 'Custom Development',
+        'maintenance' => 'Maintenance',
+        'project'     => 'Project-Based',
+    ];
+
+    public const LICENSE_TYPES = [
+        'perpetual'    => 'Perpetual',
+        'annual'       => 'Annual',
+        'monthly'      => 'Monthly',
+        'domain_based' => 'Domain-Based',
+    ];
+
     protected $fillable = [
         'category_id',
+        'product_type',
+        'license_type',
         'name',
         'slug',
         'icon',
         'description',
         'short_description',
         'base_price',
+        'setup_fee',
+        'maintenance_fee',
         'features',
         'specifications',
+        'requirements',
         'demo_url',
+        'version',
+        'max_domains',
         'thumbnail',
         'screenshots',
         'is_active',
         'is_featured',
+        'is_bundleable',
         'sort_order',
         'views',
     ];
@@ -40,12 +68,25 @@ final class Product extends Model
         return [
             ...parent::casts(),
             'base_price' => 'decimal:2',
+            'setup_fee' => 'decimal:2',
+            'maintenance_fee' => 'decimal:2',
             'features' => 'array',
             'specifications' => 'array',
             'screenshots' => 'array',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
+            'is_bundleable' => 'boolean',
         ];
+    }
+
+    public function getProductTypeLabelAttribute(): string
+    {
+        return self::TYPES[$this->product_type] ?? $this->product_type;
+    }
+
+    public function getLicenseTypeLabelAttribute(): ?string
+    {
+        return $this->license_type ? (self::LICENSE_TYPES[$this->license_type] ?? $this->license_type) : null;
     }
 
     public function category(): BelongsTo

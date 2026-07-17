@@ -1,473 +1,281 @@
-@extends('layouts.admin')
-@section('title', 'Settings')
+@extends('admin.layouts.app')
+
+@section('title', 'Global Settings')
 
 @section('content')
-    <div class="page-toolbar">
-        <div class="page-toolbar-left">
-            <h1 class="page-title">Settings</h1>
-            <p class="page-subtitle">Platform configuration and preferences</p>
-        </div>
-    </div>
+    <div class="d-flex flex-column gap-4">
 
-    @include('components.swal-alert')
-
-    <div class="card-saas">
-        <div class="card-saas-header" style="border-bottom:none;padding-bottom:0;">
-            <nav id="settingsTabs" class="d-flex gap-1 flex-wrap">
-                <button class="tab-btn active" data-tab="general"><i class="bi bi-gear me-1"></i>General</button>
-                <button class="tab-btn" data-tab="landing"><i class="bi bi-layout-text-window me-1"></i>Landing
-                    Page</button>
-                <button class="tab-btn" data-tab="contact"><i class="bi bi-envelope me-1"></i>Contact & Footer</button>
-                <button class="tab-btn" data-tab="social"><i class="bi bi-share me-1"></i>Social Media</button>
-                <button class="tab-btn" data-tab="seo"><i class="bi bi-search me-1"></i>SEO Meta</button>
-                <button class="tab-btn" data-tab="affiliate"><i class="bi bi-people me-1"></i>Affiliate</button>
-            </nav>
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold">Global Settings</h2>
+                <p class="text-secondary mb-0">Configure your application settings, integrations, and preferences.</p>
+            </div>
+            <div>
+                <button type="submit" form="settings-form" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
+                    <i class="bi bi-check2-circle me-2"></i> Save Changes
+                </button>
+            </div>
         </div>
 
-        <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data"
-            class="form-confirm-submit">
+        <form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
-            {{-- GENERAL --}}
-            <div class="tab-panel" id="tab-general">
-                <div class="card-saas-body">
-                    <h6 class="fw-semibold mb-4" style="color:var(--primary);">Platform Identity</h6>
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Platform Name</label>
-                                <input type="text" name="platform_name"
-                                    class="form-saas-input @error('platform_name') is-invalid @enderror"
-                                    value="{{ old('platform_name', $settings['platform_name'] ?? '') }}">
-                                @error('platform_name')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Preloader Text</label>
-                                <input type="text" name="preloader_text"
-                                    class="form-saas-input @error('preloader_text') is-invalid @enderror"
-                                    value="{{ old('preloader_text', $settings['preloader_text'] ?? '') }}">
-                                @error('preloader_text')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
+            <div class="row g-4">
 
-                        <div class="col-md-4">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Logo Light</label>
-                                @if (!empty($settings['logo_light']))
-                                    <div class="mb-2 p-2 rounded" style="background:#1a1a2e;">
-                                        <img src="{{ asset('storage/' . $settings['logo_light']) }}" alt="Logo Light"
-                                            style="height:40px;">
-                                    </div>
-                                @endif
-                                <input type="file" name="logo_light"
-                                    class="form-saas-input @error('logo_light') is-invalid @enderror" accept="image/*">
-                                @error('logo_light')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                                <div class="form-saas-hint">For dark backgrounds. PNG recommended.</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Logo Dark</label>
-                                @if (!empty($settings['logo_dark']))
-                                    <div class="mb-2 p-2 rounded"
-                                        style="background:#f8f9fa;border:1px solid var(--border);">
-                                        <img src="{{ asset('storage/' . $settings['logo_dark']) }}" alt="Logo Dark"
-                                            style="height:40px;">
-                                    </div>
-                                @endif
-                                <input type="file" name="logo_dark"
-                                    class="form-saas-input @error('logo_dark') is-invalid @enderror" accept="image/*">
-                                @error('logo_dark')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                                <div class="form-saas-hint">For light backgrounds. PNG recommended.</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Favicon</label>
-                                @if (!empty($settings['favicon']))
-                                    <div class="mb-2">
-                                        <img src="{{ asset('storage/' . $settings['favicon']) }}" alt="Favicon"
-                                            style="height:32px;width:32px;object-fit:contain;">
-                                    </div>
-                                @endif
-                                <input type="file" name="favicon"
-                                    class="form-saas-input @error('favicon') is-invalid @enderror" accept="image/*">
-                                @error('favicon')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                                <div class="form-saas-hint">32×32 or 64×64 ICO/PNG.</div>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <hr style="border-color:var(--border);">
-                            <h6 class="fw-semibold mb-3" style="color:var(--primary);">Maintenance</h6>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label d-flex align-items-center gap-3">
-                                    <div class="form-check form-switch mb-0">
-                                        <input class="form-check-input" type="checkbox" name="maintenance_mode"
-                                            value="1"
-                                            {{ old('maintenance_mode', $settings['maintenance_mode'] ?? false) ? 'checked' : '' }}>
-                                    </div>
-                                    Maintenance Mode
-                                </label>
-                                <div class="form-saas-hint">Visitors see maintenance page when enabled.</div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Maintenance Message</label>
-                                <textarea name="maintenance_message" class="form-saas-textarea @error('maintenance_message') is-invalid @enderror"
-                                    rows="3">{{ old('maintenance_message', $settings['maintenance_message'] ?? '') }}</textarea>
-                                @error('maintenance_message')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
+                <!-- Left Sidebar Navigation for Settings -->
+                <div class="col-12 col-md-3">
+                    <div class="card border-0 shadow-sm rounded-4 glass position-sticky" style="top: 100px;">
+                        <div class="list-group list-group-flush rounded-4 overflow-hidden p-2">
+                            <a href="#general" data-bs-toggle="list"
+                                class="list-group-item list-group-item-action bg-transparent border-0 rounded-3 mb-1 active">
+                                <i class="bi bi-sliders me-2"></i> General
+                            </a>
+                            <a href="#payment" data-bs-toggle="list"
+                                class="list-group-item list-group-item-action bg-transparent border-0 rounded-3 mb-1">
+                                <i class="bi bi-credit-card me-2"></i> Payment Gateway
+                            </a>
+                            <a href="#mail" data-bs-toggle="list"
+                                class="list-group-item list-group-item-action bg-transparent border-0 rounded-3 mb-1">
+                                <i class="bi bi-envelope-at me-2"></i> SMTP & Mail
+                            </a>
+                            <a href="#company" data-bs-toggle="list"
+                                class="list-group-item list-group-item-action bg-transparent border-0 rounded-3 mb-1">
+                                <i class="bi bi-building me-2"></i> Company Profile
+                            </a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- LANDING PAGE --}}
-            <div class="tab-panel d-none" id="tab-landing">
-                <div class="card-saas-body">
-                    <h6 class="fw-semibold mb-4" style="color:var(--primary);">Hero Section</h6>
-                    <div class="row g-4">
-                        <div class="col-12">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Hero Title</label>
-                                <input type="text" name="hero_title"
-                                    class="form-saas-input @error('hero_title') is-invalid @enderror"
-                                    value="{{ old('hero_title', $settings['hero_title'] ?? '') }}">
-                                @error('hero_title')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Hero Subtitle</label>
-                                <textarea name="hero_subtitle" class="form-saas-textarea @error('hero_subtitle') is-invalid @enderror"
-                                    rows="2">{{ old('hero_subtitle', $settings['hero_subtitle'] ?? '') }}</textarea>
-                                @error('hero_subtitle')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">CTA Button Text</label>
-                                <input type="text" name="hero_cta_text"
-                                    class="form-saas-input @error('hero_cta_text') is-invalid @enderror"
-                                    value="{{ old('hero_cta_text', $settings['hero_cta_text'] ?? '') }}">
-                                @error('hero_cta_text')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">CTA Button URL</label>
-                                <input type="url" name="hero_cta_url"
-                                    class="form-saas-input @error('hero_cta_url') is-invalid @enderror"
-                                    value="{{ old('hero_cta_url', $settings['hero_cta_url'] ?? '') }}">
-                                @error('hero_cta_url')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
+                <!-- Right Content Panels -->
+                <div class="col-12 col-md-9">
+                    <div class="tab-content">
 
-                        <div class="col-12">
-                            <hr style="border-color:var(--border);">
-                            <h6 class="fw-semibold mb-3" style="color:var(--primary);">Features Section</h6>
-                        </div>
-                        @for ($i = 1; $i <= 3; $i++)
-                            <div class="col-md-4">
-                                <div class="card-saas" style="border:1px solid var(--border);">
-                                    <div class="card-saas-body">
-                                        <p class="fw-semibold mb-3">Feature {{ $i }}</p>
-                                        <div class="form-saas-group">
-                                            <label class="form-saas-label">Icon Class</label>
-                                            <input type="text" name="feature_{{ $i }}_icon"
-                                                class="form-saas-input"
-                                                value="{{ old('feature_' . $i . '_icon', $settings['feature_' . $i . '_icon'] ?? '') }}"
-                                                placeholder="bi bi-star">
+                        <!-- General Settings -->
+                        <div class="tab-pane fade show active" id="general">
+                            <div class="card border-0 shadow-sm rounded-4 glass p-4 mb-4">
+                                <h5 class="fw-bold mb-4">General Preferences</h5>
+
+                                <div class="row g-4">
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control rounded-3" id="app_name"
+                                                name="app_name" value="Cooca ID" placeholder="App Name" required>
+                                            <label for="app_name">Application Name</label>
                                         </div>
-                                        <div class="form-saas-group">
-                                            <label class="form-saas-label">Title</label>
-                                            <input type="text" name="feature_{{ $i }}_title"
-                                                class="form-saas-input"
-                                                value="{{ old('feature_' . $i . '_title', $settings['feature_' . $i . '_title'] ?? '') }}">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-floating">
+                                            <select class="form-select rounded-3" id="app_timezone" name="app_timezone">
+                                                <option value="Asia/Jakarta" selected>Asia/Jakarta (UTC+7)</option>
+                                                <option value="UTC">UTC</option>
+                                            </select>
+                                            <label for="app_timezone">Timezone</label>
                                         </div>
-                                        <div class="form-saas-group mb-0">
-                                            <label class="form-saas-label">Description</label>
-                                            <textarea name="feature_{{ $i }}_description" class="form-saas-textarea" rows="2">{{ old('feature_' . $i . '_description', $settings['feature_' . $i . '_description'] ?? '') }}</textarea>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="text-secondary fs-7 mb-2 d-block">Application Logo</label>
+                                        <div class="d-flex align-items-center gap-4 p-3 bg-light rounded-3 border">
+                                            <div class="bg-white p-2 rounded border" style="width: 80px; height: 80px;">
+                                                <img src="https://ui-avatars.com/api/?name=Cooca&background=primary&color=fff"
+                                                    class="w-100 h-100 object-fit-contain" alt="Logo">
+                                            </div>
+                                            <div>
+                                                <input type="file" class="form-control form-control-sm mb-2"
+                                                    id="app_logo" name="app_logo"
+                                                    accept="image/png, image/jpeg, image/svg+xml">
+                                                <span class="fs-8 text-secondary">Recommended: 512x512px, transparent PNG or
+                                                    SVG.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div
+                                            class="form-check form-switch p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center m-0">
+                                            <div>
+                                                <label class="form-check-label fw-medium d-block"
+                                                    for="maintenance_mode">Maintenance Mode</label>
+                                                <span class="fs-8 text-secondary">Turn off application access for
+                                                    users.</span>
+                                            </div>
+                                            <input class="form-check-input fs-4 m-0" type="checkbox" role="switch"
+                                                id="maintenance_mode" name="maintenance_mode">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @endfor
-                    </div>
-                </div>
-            </div>
-
-            {{-- CONTACT & FOOTER --}}
-            <div class="tab-panel d-none" id="tab-contact">
-                <div class="card-saas-body">
-                    <h6 class="fw-semibold mb-4" style="color:var(--primary);">Contact Information</h6>
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Contact Email</label>
-                                <input type="email" name="contact_email"
-                                    class="form-saas-input @error('contact_email') is-invalid @enderror"
-                                    value="{{ old('contact_email', $settings['contact_email'] ?? '') }}">
-                                @error('contact_email')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Contact Phone</label>
-                                <input type="text" name="contact_phone"
-                                    class="form-saas-input @error('contact_phone') is-invalid @enderror"
-                                    value="{{ old('contact_phone', $settings['contact_phone'] ?? '') }}">
-                                @error('contact_phone')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Contact Address</label>
-                                <textarea name="contact_address" class="form-saas-textarea @error('contact_address') is-invalid @enderror"
-                                    rows="3">{{ old('contact_address', $settings['contact_address'] ?? '') }}</textarea>
-                                @error('contact_address')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
                         </div>
 
-                        <div class="col-12">
-                            <hr style="border-color:var(--border);">
-                            <h6 class="fw-semibold mb-3" style="color:var(--primary);">Footer</h6>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Footer Text</label>
-                                <textarea name="footer_text" class="form-saas-textarea @error('footer_text') is-invalid @enderror" rows="3">{{ old('footer_text', $settings['footer_text'] ?? '') }}</textarea>
-                                @error('footer_text')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Copyright Text</label>
-                                <input type="text" name="copyright_text"
-                                    class="form-saas-input @error('copyright_text') is-invalid @enderror"
-                                    value="{{ old('copyright_text', $settings['copyright_text'] ?? '') }}">
-                                @error('copyright_text')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        <!-- Payment Settings -->
+                        <div class="tab-pane fade" id="payment">
+                            <div class="card border-0 shadow-sm rounded-4 glass p-4 mb-4">
+                                <h5 class="fw-bold mb-4">Midtrans Integration</h5>
 
-            {{-- SOCIAL MEDIA --}}
-            <div class="tab-panel d-none" id="tab-social">
-                <div class="card-saas-body">
-                    <h6 class="fw-semibold mb-4" style="color:var(--primary);">Social Media Links</h6>
-                    <div class="row g-4">
-                        @php
-                            $socials = [
-                                'social_facebook' => ['Facebook', 'bi bi-facebook', 'https://facebook.com/yourpage'],
-                                'social_twitter' => ['Twitter/X', 'bi bi-twitter-x', 'https://x.com/yourhandle'],
-                                'social_instagram' => [
-                                    'Instagram',
-                                    'bi bi-instagram',
-                                    'https://instagram.com/yourpage',
-                                ],
-                                'social_linkedin' => [
-                                    'LinkedIn',
-                                    'bi bi-linkedin',
-                                    'https://linkedin.com/company/yourco',
-                                ],
-                                'social_youtube' => ['YouTube', 'bi bi-youtube', 'https://youtube.com/@yourchannel'],
-                            ];
-                        @endphp
-                        @foreach ($socials as $key => [$label, $icon, $placeholder])
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label">
-                                        <i class="{{ $icon }} me-1"></i>{{ $label }}
-                                    </label>
-                                    <input type="url" name="{{ $key }}"
-                                        class="form-saas-input @error($key) is-invalid @enderror"
-                                        value="{{ old($key, $settings[$key] ?? '') }}"
-                                        placeholder="{{ $placeholder }}">
-                                    @error($key)
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
+                                <div
+                                    class="alert bg-primary-subtle text-primary border-primary-subtle rounded-3 d-flex gap-3 align-items-center mb-4">
+                                    <i class="bi bi-info-circle-fill fs-4"></i>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">Sandbox Mode</h6>
+                                        <p class="mb-0 fs-7">Payments are currently operating in test mode. No real cards
+                                            will be charged.</p>
+                                    </div>
+                                </div>
+
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <select class="form-select rounded-3" id="midtrans_environment"
+                                                name="midtrans_environment">
+                                                <option value="sandbox" selected>Sandbox (Testing)</option>
+                                                <option value="production">Production (Live)</option>
+                                            </select>
+                                            <label for="midtrans_environment">Environment</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="password" class="form-control rounded-3 font-monospace fs-7"
+                                                id="midtrans_server_key" name="midtrans_server_key"
+                                                value="SB-Mid-server-xxxxxxxxxxxxxx" placeholder="Server Key">
+                                            <label for="midtrans_server_key">Server Key</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control rounded-3 font-monospace fs-7"
+                                                id="midtrans_client_key" name="midtrans_client_key"
+                                                value="SB-Mid-client-xxxxxxxxxxxxxx" placeholder="Client Key">
+                                            <label for="midtrans_client_key">Client Key</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
+                        </div>
 
-            {{-- SEO META --}}
-            <div class="tab-panel d-none" id="tab-seo">
-                <div class="card-saas-body">
-                    <h6 class="fw-semibold mb-1" style="color:var(--primary);">SEO Meta Tags</h6>
-                    <p class="text-muted mb-4" style="font-size:.85rem;">Configure title, description, and keywords per
-                        page.</p>
-                    <div class="accordion" id="seoAccordion">
-                        @foreach ($seoPages as $index => $page)
-                            <div class="accordion-item"
-                                style="border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:.5rem;overflow:hidden;">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button {{ $index > 0 ? 'collapsed' : '' }}" type="button"
-                                        data-bs-toggle="collapse" data-bs-target="#seo-{{ $page }}"
-                                        style="font-weight:600;font-size:.9rem;background:var(--surface-raised);">
-                                        <i class="bi bi-file-text me-2" style="color:var(--primary);"></i>
-                                        {{ ucfirst(str_replace('-', ' ', $page)) }}
+                        <!-- Mail Settings -->
+                        <div class="tab-pane fade" id="mail">
+                            <div class="card border-0 shadow-sm rounded-4 glass p-4 mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="fw-bold mb-0">SMTP Configuration</h5>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                                        <i class="bi bi-send me-1"></i> Send Test Mail
                                     </button>
-                                </h2>
-                                <div id="seo-{{ $page }}"
-                                    class="accordion-collapse collapse {{ $index === 0 ? 'show' : '' }}"
-                                    data-bs-parent="#seoAccordion">
-                                    <div class="accordion-body" style="background:var(--surface-base);">
-                                        <div class="row g-3">
-                                            <div class="col-12">
-                                                <div class="form-saas-group">
-                                                    <label class="form-saas-label">SEO Title</label>
-                                                    <input type="text" name="seo_title_{{ $page }}"
-                                                        class="form-saas-input"
-                                                        value="{{ old('seo_title_' . $page, $settings['seo_title_' . $page] ?? '') }}"
-                                                        placeholder="Page title for search engines">
-                                                </div>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="form-saas-group">
-                                                    <label class="form-saas-label">Meta Description</label>
-                                                    <textarea name="seo_description_{{ $page }}" class="form-saas-textarea" rows="2"
-                                                        placeholder="150-160 characters recommended">{{ old('seo_description_' . $page, $settings['seo_description_' . $page] ?? '') }}</textarea>
-                                                </div>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="form-saas-group mb-0">
-                                                    <label class="form-saas-label">Keywords</label>
-                                                    <input type="text" name="seo_keywords_{{ $page }}"
-                                                        class="form-saas-input"
-                                                        value="{{ old('seo_keywords_' . $page, $settings['seo_keywords_' . $page] ?? '') }}"
-                                                        placeholder="keyword1, keyword2, keyword3">
-                                                    <div class="form-saas-hint">Comma-separated.</div>
-                                                </div>
-                                            </div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control rounded-3" id="mail_host"
+                                                name="mail_host" value="smtp.mailgun.org" placeholder="Host">
+                                            <label for="mail_host">Mail Host</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="form-floating">
+                                            <input type="number" class="form-control rounded-3" id="mail_port"
+                                                name="mail_port" value="587" placeholder="Port">
+                                            <label for="mail_port">Port</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="form-floating">
+                                            <select class="form-select rounded-3" id="mail_encryption"
+                                                name="mail_encryption">
+                                                <option value="tls" selected>TLS</option>
+                                                <option value="ssl">SSL</option>
+                                                <option value="">None</option>
+                                            </select>
+                                            <label for="mail_encryption">Encryption</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control rounded-3" id="mail_username"
+                                                name="mail_username" value="postmaster@cooca.id" placeholder="Username">
+                                            <label for="mail_username">Username</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-floating">
+                                            <input type="password" class="form-control rounded-3" id="mail_password"
+                                                name="mail_password" value="********" placeholder="Password">
+                                            <label for="mail_password">Password</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-floating">
+                                            <input type="email" class="form-control rounded-3" id="mail_from_address"
+                                                name="mail_from_address" value="hello@cooca.id"
+                                                placeholder="From Address">
+                                            <label for="mail_from_address">From Address</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control rounded-3" id="mail_from_name"
+                                                name="mail_from_name" value="Cooca Support" placeholder="From Name">
+                                            <label for="mail_from_name">From Name</label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                        </div>
+
+                        <!-- Company Profile -->
+                        <div class="tab-pane fade" id="company">
+                            <div class="card border-0 shadow-sm rounded-4 glass p-4 mb-4">
+                                <h5 class="fw-bold mb-4">Company Details</h5>
+
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control rounded-3" id="company_name"
+                                                name="company_name" value="PT Cooca Teknologi Indonesia"
+                                                placeholder="Company Legal Name">
+                                            <label for="company_name">Company Legal Name</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-floating">
+                                            <input type="email" class="form-control rounded-3" id="company_email"
+                                                name="company_email" value="contact@cooca.id"
+                                                placeholder="Contact Email">
+                                            <label for="company_email">Contact Email</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control rounded-3" id="company_phone"
+                                                name="company_phone" value="+62 812 3456 7890"
+                                                placeholder="Contact Phone">
+                                            <label for="company_phone">Contact Phone</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <textarea class="form-control rounded-3" id="company_address" name="company_address" placeholder="Physical Address"
+                                                style="height: 100px;">Gedung Cyber 1 Lt. 2, Jl. Kuningan Barat Raya No.8, Jakarta Selatan 12710</textarea>
+                                            <label for="company_address">Physical Address</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-            </div>
 
-            {{-- AFFILIATE --}}
-            <div class="tab-panel d-none" id="tab-affiliate">
-                <div class="card-saas-body">
-                    <h6 class="fw-semibold mb-4" style="color:var(--primary);">Affiliate Program Settings</h6>
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Commission Percent (%)</label>
-                                <input type="number" name="affiliate_commission_percent"
-                                    class="form-saas-input @error('affiliate_commission_percent') is-invalid @enderror"
-                                    value="{{ old('affiliate_commission_percent', $settings['affiliate_commission_percent'] ?? '') }}"
-                                    min="0" max="100" step="0.01">
-                                @error('affiliate_commission_percent')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                                <div class="form-saas-hint">Percentage of sale paid to affiliator.</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Cookie Duration (days)</label>
-                                <input type="number" name="affiliate_cookie_days"
-                                    class="form-saas-input @error('affiliate_cookie_days') is-invalid @enderror"
-                                    value="{{ old('affiliate_cookie_days', $settings['affiliate_cookie_days'] ?? '') }}"
-                                    min="1">
-                                @error('affiliate_cookie_days')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                                <div class="form-saas-hint">Referral tracking cookie lifetime.</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Minimum Withdrawal (Rp)</label>
-                                <input type="number" name="affiliate_min_withdrawal"
-                                    class="form-saas-input @error('affiliate_min_withdrawal') is-invalid @enderror"
-                                    value="{{ old('affiliate_min_withdrawal', $settings['affiliate_min_withdrawal'] ?? '') }}"
-                                    min="0">
-                                @error('affiliate_min_withdrawal')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-saas-group">
-                                <label class="form-saas-label">Payment Method Options</label>
-                                <textarea name="affiliate_payment_method_options"
-                                    class="form-saas-textarea @error('affiliate_payment_method_options') is-invalid @enderror" rows="4"
-                                    placeholder="One option per line, e.g.:&#10;BCA&#10;Mandiri&#10;GoPay">{{ old('affiliate_payment_method_options', $settings['affiliate_payment_method_options'] ?? '') }}</textarea>
-                                @error('affiliate_payment_method_options')
-                                    <div class="form-saas-error">{{ $message }}</div>
-                                @enderror
-                                <div class="form-saas-hint">One payment method per line.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-saas-footer d-flex justify-content-end gap-2">
-                <button type="submit" class="btn-saas btn-saas-primary">
-                    <i class="bi bi-check2 me-1"></i>Save Settings
-                </button>
             </div>
         </form>
     </div>
 @endsection
-
-@push('scripts')
-    <script>
-        document.querySelectorAll('#settingsTabs .tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('#settingsTabs .tab-btn').forEach(b => b.classList.remove(
-                    'active'));
-                document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('d-none'));
-                this.classList.add('active');
-                document.getElementById('tab-' + this.dataset.tab).classList.remove('d-none');
-            });
-        });
-    </script>
-@endpush

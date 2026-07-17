@@ -7,7 +7,7 @@
     <div class="grid-bg"></div>
     <div class="auth-left-content">
       <div class="d-flex align-items-center justify-content-center gap-3 mb-5"><div class="brand-icon">C</div><span style="font-size:1.8rem;font-weight:800;">{{ setting('site.name','COOCA') }}</span></div>
-      <h2>{{ __('Create <span class="text-gradient">New Password</span>') }}</h2>
+      <h2>{!! __('Create <span class="text-gradient">New Password</span>') !!}</h2>
     </div>
   </div>
   <div class="auth-right auth-panel">

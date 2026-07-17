@@ -62,7 +62,7 @@
   <div class="cta-bg"></div>
   <div class="container cta-content text-center">
     <div class="reveal">
-      <h2 class="section-title">{{ __('Still Have <span class="text-gradient">Questions?</span>') }}</h2>
+      <h2 class="section-title">{!! __('Still Have <span class="text-gradient">Questions?</span>') !!}</h2>
       <p class="section-subtitle">{{ __('Our team is ready to answer any specific questions about your industry and requirements.') }}</p>
       <a href="{{ route('contact') }}" class="btn btn-primary btn-lg">{{ __('Contact Us') }} <i class="bi bi-chat-dots"></i></a>
     </div>

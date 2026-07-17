@@ -1,217 +1,164 @@
-@extends('layouts.admin')
+@extends('admin.layouts.app')
 
 @section('title', 'Review Details')
-@section('subtitle', 'Moderate customer review')
 
 @section('content')
-    <div class="mb-4 d-flex align-items-center gap-2">
-        <a href="{{ route('admin.reviews.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
-            <i class="bi bi-arrow-left me-1"></i> Back to Reviews
-        </a>
-    </div>
+    <div class="d-flex flex-column gap-4">
 
-    <div class="row g-4">
-        {{-- Main --}}
-        <div class="col-lg-8">
-            <div class="card-saas">
-                <div class="card-saas-header">
-                    <span class="card-saas-title">Review Content</span>
-                    @php
-                        $badge = match ($review->status) {
-                            'approved' => 'success',
-                            'pending' => 'warning',
-                            'rejected' => 'danger',
-                            default => 'neutral',
-                        };
-                    @endphp
-                    <span class="badge-saas badge-saas-{{ $badge }}">{{ ucfirst($review->status) }}</span>
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ route('admin.reviews.index') }}"
+                    class="btn btn-light border-0 rounded-circle p-2 shadow-sm hover-lift"><i
+                        class="bi bi-arrow-left"></i></a>
+                <div>
+                    <h2 class="mb-1 fw-bold text-capitalize">Review #101</h2>
+                    <p class="text-secondary mb-0">Review details and moderation tools.</p>
                 </div>
-                <div class="card-saas-body">
-                    {{-- Rating --}}
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                        <div class="d-flex gap-1" style="color:#f59e0b;font-size:1.2rem">
-                            @for ($i = 1; $i <= 5; $i++)
-                                <i class="bi bi-star{{ $i <= $review->rating ? '-fill' : '' }}"></i>
-                            @endfor
-                        </div>
-                        <span class="fw-semibold">{{ $review->rating }} / 5</span>
-                    </div>
-
-                    {{-- Title --}}
-                    <h5 class="fw-bold mb-2">{{ $review->title ?? 'No Title' }}</h5>
-
-                    {{-- Body --}}
-                    <div class="p-3 rounded-3 mb-4"
-                        style="background:var(--surface-raised);border:1px solid var(--border);font-size:0.9rem;line-height:1.7">
-                        {!! nl2br(e($review->comment)) !!}
-                    </div>
-
-                    {{-- Images --}}
-                    @if (!empty($review->images) && count($review->images) > 0)
-                        <div class="mb-4">
-                            <div class="text-muted fw-medium mb-2" style="font-size:0.85rem">Attached Images</div>
-                            <div class="d-flex flex-wrap gap-2">
-                                @foreach ($review->images as $image)
-                                    <img src="{{ $image }}" alt="Review image" class="rounded-3"
-                                        style="width:96px;height:96px;object-fit:cover;border:1px solid var(--border)">
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Rejection reason --}}
-                    @if ($review->status === 'rejected' && $review->rejection_reason)
-                        <div class="p-3 rounded-3" style="background:#fef2f2;border:1px solid #fecaca">
-                            <div class="fw-semibold mb-1" style="color:#b91c1c;font-size:0.85rem">
-                                <i class="bi bi-exclamation-triangle me-1"></i> Rejection Reason
-                            </div>
-                            <div style="color:#7f1d1d;font-size:0.85rem">{{ $review->rejection_reason }}</div>
-                            @if ($review->rejected_at)
-                                <div class="text-muted mt-1" style="font-size:0.78rem">Rejected:
-                                    {{ $review->rejected_at->format('d M Y H:i') }}</div>
-                            @endif
-                        </div>
-                    @endif
-                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <form action="{{ route('admin.reviews.approve', $review->id ?? 1) }}" method="POST" class="d-inline-block">
+                    @csrf
+                    <button type="submit" class="btn btn-success rounded-pill px-4 hover-lift shadow-sm">
+                        <i class="bi bi-check-circle me-2"></i> Approve
+                    </button>
+                </form>
+                <form action="{{ route('admin.reviews.reject', $review->id ?? 1) }}" method="POST" class="d-inline-block">
+                    @csrf
+                    <button type="submit" class="btn btn-warning rounded-pill px-4 hover-lift shadow-sm">
+                        <i class="bi bi-x-circle me-2"></i> Reject
+                    </button>
+                </form>
             </div>
         </div>
 
-        {{-- Sidebar --}}
-        <div class="col-lg-4">
-            {{-- Actions --}}
-            <div class="card-saas mb-4">
-                <div class="card-saas-header"><span class="card-saas-title">Actions</span></div>
-                <div class="card-saas-body d-flex flex-column gap-2">
-                    @if (in_array($review->status, ['pending', 'rejected']))
-                        <form class="form-confirm-submit" action="{{ route('admin.reviews.approve', $review->id) }}"
-                            method="POST">
-                            @csrf
-                            <button type="submit" class="btn-saas btn-saas-primary w-100">
-                                <i class="bi bi-check-lg me-1"></i> Approve Review
-                            </button>
-                        </form>
-                    @endif
+        <div class="row g-4">
+            <!-- Review Content -->
+            <div class="col-12 col-xl-8">
+                <div class="card border-0 shadow-sm rounded-4 glass h-100">
+                    <div
+                        class="card-header bg-transparent border-bottom border-light p-4 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Review Content</h5>
+                        <span
+                            class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1">Pending
+                            Moderation</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-column gap-4">
 
-                    @if (in_array($review->status, ['pending', 'approved']))
-                        <button type="button" onclick="rejectReview()" class="btn-saas btn-saas-outline w-100"
-                            style="color:var(--warning);border-color:var(--warning)">
-                            <i class="bi bi-x-lg me-1"></i> Reject Review
-                        </button>
-                    @endif
+                            <!-- Rating -->
+                            <div>
+                                <label class="text-secondary fs-7 mb-2 d-block">Rating Given</label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="text-warning fs-3">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                    </div>
+                                    <span class="fw-bold fs-5">5.0 / 5.0</span>
+                                </div>
+                            </div>
 
-                    <form class="form-confirm-delete" action="{{ route('admin.reviews.destroy', $review->id) }}"
-                        method="POST">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="btn-saas btn-saas-danger w-100">
-                            <i class="bi bi-trash3 me-1"></i> Delete Review
-                        </button>
-                    </form>
-                </div>
-            </div>
+                            <!-- Review Text -->
+                            <div>
+                                <label class="text-secondary fs-7 mb-2 d-block">Review Text</label>
+                                <div class="p-4 bg-light rounded-4 border fs-5 fst-italic text-dark">
+                                    "Sangat membantu operasional bisnis saya. Fiturnya lengkap dan mudah digunakan oleh
+                                    karyawan saya yang awam IT sekalipun. Customer service nya juga cepat tanggap."
+                                </div>
+                            </div>
 
-            {{-- Author --}}
-            <div class="card-saas mb-4">
-                <div class="card-saas-header"><span class="card-saas-title">Author</span></div>
-                <div class="card-saas-body">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="stat-card-icon blue" style="width:44px;height:44px;font-size:1rem;flex-shrink:0">
-                            {{ strtoupper(substr($review->customer->name ?? '?', 0, 1)) }}
-                        </div>
-                        <div>
-                            <div class="fw-semibold">{{ $review->customer->name ?? 'Unknown' }}</div>
-                            <div class="text-muted" style="font-size:0.82rem">{{ $review->customer->email ?? '' }}</div>
+                            <!-- Attachments (if any) -->
+                            <div>
+                                <label class="text-secondary fs-7 mb-2 d-block">Attached Media</label>
+                                <div class="d-flex gap-3">
+                                    <div class="bg-light border rounded-3 d-flex align-items-center justify-content-center text-secondary"
+                                        style="width: 100px; height: 100px;">
+                                        <i class="bi bi-image fs-3"></i>
+                                    </div>
+                                    <div class="bg-light border rounded-3 d-flex align-items-center justify-content-center text-secondary"
+                                        style="width: 100px; height: 100px;">
+                                        <i class="bi bi-image fs-3"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-light my-2">
+
+                            <!-- Reply Section -->
+                            <div>
+                                <label class="fw-bold mb-3 d-block"><i class="bi bi-reply text-primary me-2"></i> Official
+                                    Response</label>
+                                <form action="{{ route('admin.reviews.reply', $review->id ?? 1) }}" method="POST">
+                                    @csrf
+                                    <textarea name="reply" class="form-control bg-light border shadow-none rounded-3 mb-3" rows="4"
+                                        placeholder="Write an official response to this review (visible to public)..."></textarea>
+                                    <div class="text-end">
+                                        <button type="submit"
+                                            class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift">Post
+                                            Response</button>
+                                    </div>
+                                </form>
+                            </div>
+
                         </div>
                     </div>
-                    @if ($review->customer)
-                        <a href="{{ route('admin.customers.show', $review->customer->id) }}"
-                            class="btn-saas btn-saas-ghost btn-saas-sm">
-                            View Profile <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
-                    @endif
                 </div>
             </div>
 
-            {{-- Product --}}
-            <div class="card-saas mb-4">
-                <div class="card-saas-header"><span class="card-saas-title">Reviewed Product</span></div>
-                <div class="card-saas-body">
-                    @if ($review->product)
-                        <div class="fw-medium mb-1">{{ $review->product->name }}</div>
-                        <div class="text-muted" style="font-size:0.82rem">
-                            {{ Str::limit($review->product->description, 100) }}</div>
-                        <div class="mt-3">
-                            <a href="{{ route('admin.products.show', $review->product->id) }}"
-                                class="btn-saas btn-saas-ghost btn-saas-sm">
-                                View Product <i class="bi bi-arrow-right ms-1"></i>
-                            </a>
+            <!-- Sidebar Info -->
+            <div class="col-12 col-xl-4 d-flex flex-column gap-4">
+
+                <!-- Author Info -->
+                <div class="card border-0 shadow-sm rounded-4 glass p-4 text-center">
+                    <img src="https://ui-avatars.com/api/?name=Budi+Santoso&background=random"
+                        class="rounded-circle mx-auto mb-3 shadow-sm" width="80" height="80" alt="Author">
+                    <h4 class="fw-bold mb-1">Budi Santoso</h4>
+                    <p class="text-secondary mb-3">budi.santoso@email.com</p>
+                    <div>
+                        <span class="badge bg-light text-dark border rounded-pill px-3 py-2"><i
+                                class="bi bi-patch-check-fill text-primary me-1"></i> Verified Buyer</span>
+                    </div>
+
+                    <hr class="border-light my-4">
+
+                    <div class="d-flex justify-content-between text-start mb-3">
+                        <span class="text-secondary fs-7">Member Since</span>
+                        <span class="fw-medium fs-7">Jan 2025</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-start">
+                        <span class="text-secondary fs-7">Total Reviews Left</span>
+                        <span class="fw-medium fs-7">4 Reviews</span>
+                    </div>
+                </div>
+
+                <!-- Context Info -->
+                <div class="card border-0 shadow-sm rounded-4 glass p-4">
+                    <h5 class="fw-bold mb-4">Review Context</h5>
+
+                    <div class="mb-4">
+                        <label class="text-secondary fs-7 mb-1 d-block">Product Reviewed</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-primary-subtle text-primary rounded p-2"><i class="bi bi-box-seam"></i></div>
+                            <button type="button" class="btn btn-link fw-bold text-decoration-none p-0">Cooca ERP
+                                Pro</button>
                         </div>
-                    @else
-                        <span class="text-muted" style="font-size:0.85rem">Product deleted or unavailable.</span>
-                    @endif
-                </div>
-            </div>
+                    </div>
 
-            {{-- Metadata --}}
-            <div class="card-saas">
-                <div class="card-saas-header"><span class="card-saas-title">Metadata</span></div>
-                <div class="card-saas-body">
-                    <table class="table table-sm table-borderless mb-0" style="font-size:0.85rem">
-                        <tbody>
-                            <tr>
-                                <td class="text-muted">Submitted</td>
-                                <td class="fw-medium">{{ $review->created_at->format('d M Y H:i') }}</td>
-                            </tr>
-                            @if ($review->approved_at)
-                                <tr>
-                                    <td class="text-muted">Approved</td>
-                                    <td class="fw-medium">{{ $review->approved_at->format('d M Y H:i') }}</td>
-                                </tr>
-                            @endif
-                            <tr>
-                                <td class="text-muted">Verified Purchase</td>
-                                <td class="fw-medium"
-                                    style="color:{{ $review->is_verified_purchase ? 'var(--success)' : 'inherit' }}">
-                                    {{ $review->is_verified_purchase ? 'Yes' : 'No' }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="mb-4">
+                        <label class="text-secondary fs-7 mb-1 d-block">Transaction Ref</label>
+                        <span class="fw-medium font-monospace">TRX-2026-902</span>
+                    </div>
+
+                    <div class="mb-0">
+                        <label class="text-secondary fs-7 mb-1 d-block">Submitted On</label>
+                        <div class="fw-medium">Jul 15, 2026 14:30 WIB</div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
-
-    {{-- Hidden reject form --}}
-    <form class="form-confirm-submit" id="reject-form" action="{{ route('admin.reviews.reject', $review->id) }}"
-        method="POST" style="display:none">
-        @csrf
-        <input type="hidden" name="rejection_reason" id="rejection_reason">
-    </form>
 @endsection
-
-@push('scripts')
-    <script>
-        function rejectReview() {
-            Swal.fire({
-                title: 'Reject Review',
-                text: 'Please provide a reason for rejecting this review.',
-                icon: 'warning',
-                input: 'textarea',
-                inputLabel: 'Rejection Reason (internal)',
-                inputPlaceholder: 'Inappropriate language, spam, etc.',
-                inputValidator: (v) => {
-                    if (!v) return 'Reason is required.';
-                },
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, reject it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('rejection_reason').value = result.value;
-                    document.getElementById('reject-form').submit();
-                }
-            });
-        }
-    </script>
-@endpush

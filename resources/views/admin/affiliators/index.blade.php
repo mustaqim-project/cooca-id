@@ -1,116 +1,136 @@
-@extends('layouts.admin')
+@extends('admin.layouts.app')
+
 @section('title', 'Affiliators')
-@section('subtitle', 'Manage affiliate partners')
+
 @section('content')
-    <div class="page-toolbar mb-4">
-        <div class="page-toolbar-left">
-            <div class="input-group" style="width:300px">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" id="searchInput" placeholder="Search affiliators...">
+    <div class="d-flex flex-column gap-4">
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold text-capitalize">Affiliators</h2>
+                <p class="text-secondary mb-0">Manage and view affiliators data.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.affiliators.create') }}"
+                    class="btn btn-primary rounded-pill px-3 hover-lift shadow-sm">
+                    <i class="bi bi-plus-lg me-2"></i> Create Affiliator
+                </a>
             </div>
         </div>
-        <div class="page-toolbar-right">
-            <a href="{{ route('admin.affiliators.create') }}" class="btn-saas btn-saas-primary">
-                <i class="bi bi-plus-lg me-1"></i> Add Affiliator
-            </a>
-        </div>
-    </div>
-    <div class="card-saas">
-        <div class="card-saas-body p-0">
+
+        <!-- Data Table -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div
+                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
+                    style="max-width: 320px; background: var(--color-bg);">
+                    <span class="input-group-text bg-transparent border-0 pe-1"><i
+                            class="bi bi-search text-secondary"></i></span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
+                        placeholder="Search affiliators...">
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-light border rounded-circle p-2" title="Export CSV"><i
+                            class="bi bi-download"></i></button>
+                </div>
+            </div>
+
             <div class="table-responsive">
-                <table class="table-saas" id="affiliatorsTable">
-                    <thead>
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
                         <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Referral Code</th>
-                            <th>Downlines</th>
-                            <th>Commission</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="py-3 px-4 border-0">Affiliator</th>
+                            <th class="py-3 px-3 border-0">Referral Code</th>
+                            <th class="py-3 px-3 border-0">Balance</th>
+                            <th class="py-3 px-3 border-0">Status</th>
+                            <th class="py-3 px-3 border-0">Date</th>
+                            <th class="py-3 px-4 border-0 text-end">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="border-top-0">
                         @forelse($affiliators as $affiliator)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div
-                                            style="width:32px;height:32px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0">
+                                <td class="py-3 px-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                                            style="width: 32px; height: 32px;">
                                             {{ strtoupper(substr($affiliator->name, 0, 1)) }}
                                         </div>
-                                        <a href="{{ route('admin.affiliators.show', $affiliator) }}"
-                                            style="font-weight:500;color:var(--text-primary);text-decoration:none">{{ $affiliator->name }}</a>
+                                        <div>
+                                            <div class="fw-medium">{{ $affiliator->name }}</div>
+                                            <div class="text-secondary fs-7">{{ $affiliator->email }}</div>
+                                        </div>
                                     </div>
                                 </td>
-                                <td style="color:var(--text-muted)">{{ $affiliator->email }}</td>
-                                <td><code style="font-size:.8rem">{{ $affiliator->referral_code }}</code></td>
-                                <td>{{ $affiliator->downlines_count ?? $affiliator->downlines()->count() }}</td>
-                                <td>Rp {{ number_format($affiliator->total_commission ?? 0, 0, ',', '.') }}</td>
-                                <td>
-                                    @if ($affiliator->is_active)
-                                        <span class="badge-saas badge-saas-success">Active</span>
+                                <td class="py-3 px-3">
+                                    <code class="text-primary">{{ $affiliator->referral_code }}</code>
+                                </td>
+                                <td class="py-3 px-3 fw-medium">
+                                    Rp {{ number_format($affiliator->balance, 0, ',', '.') }}
+                                </td>
+                                <td class="py-3 px-3">
+                                    @if ($affiliator->status === 'active')
+                                        <span
+                                            class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">Active</span>
+                                    @elseif ($affiliator->status === 'suspended')
+                                        <span
+                                            class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1">Suspended</span>
                                     @else
-                                        <span class="badge-saas badge-saas-danger">Inactive</span>
+                                        <span
+                                            class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1">{{ ucfirst($affiliator->status ?? 'inactive') }}</span>
                                     @endif
                                 </td>
-                                <td>
-                                    <div class="d-flex gap-1">
-                                        <a href="{{ route('admin.affiliators.show', $affiliator) }}"
-                                            class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon" title="View">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ route('admin.affiliators.edit', $affiliator) }}"
-                                            class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon" title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <form action="{{ route('admin.affiliators.destroy', $affiliator) }}" method="POST"
-                                            class="form-confirm-delete">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="btn-saas btn-saas-ghost btn-saas-sm btn-saas-icon"
-                                                title="Delete">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+                                <td class="py-3 px-3 text-secondary fs-7">{{ $affiliator->created_at->format('d M Y') }}
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light border-0 rounded-circle p-2" type="button"
+                                            data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 glass">
+                                            <li><a class="dropdown-item py-2"
+                                                    href="{{ route('admin.affiliators.show', $affiliator->id) }}"><i
+                                                        class="bi bi-eye me-2 text-primary"></i> View Details</a></li>
+                                            <li><a class="dropdown-item py-2"
+                                                    href="{{ route('admin.affiliators.edit', $affiliator->id) }}"><i
+                                                        class="bi bi-pencil me-2 text-warning"></i> Edit</a></li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('admin.affiliators.destroy', $affiliator->id) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="dropdown-item py-2 text-danger"
+                                                        onclick="return confirm('Are you sure you want to delete this affiliator?');"><i
+                                                            class="bi bi-trash me-2"></i> Delete</button>
+                                                </form>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8">
-                                    <div class="empty-state">
-                                        <div class="empty-state-icon"><i class="bi bi-people"></i></div>
-                                        <div class="empty-state-title">No affiliators found</div>
-                                        <div class="empty-state-description">Add your first affiliate partner to get started
-                                        </div>
-                                        <a href="{{ route('admin.affiliators.create') }}"
-                                            class="btn-saas btn-saas-primary mt-3">
-                                            <i class="bi bi-plus-lg me-1"></i> Add Affiliator
-                                        </a>
-                                    </div>
+                                <td colspan="6" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-people fs-1"></i></div>
+                                    <h6 class="fw-medium">No Affiliators Found</h6>
+                                    <p class="fs-7">Create your first affiliator.</p>
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
+            @if (isset($affiliators) && $affiliators->hasPages())
+                <div class="card-footer bg-transparent border-top border-light p-4">
+                    {{ $affiliators->links() }}
+                </div>
+            @endif
         </div>
-        @if (isset($affiliators) && method_exists($affiliators, 'links'))
-            <div class="card-saas-footer">
-                {{ $affiliators->links() }}
-            </div>
-        @endif
     </div>
 @endsection
-@push('scripts')
-    <script>
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const q = this.value.toLowerCase();
-            document.querySelectorAll('#affiliatorsTable tbody tr').forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-            });
-        });
-    </script>
-@endpush

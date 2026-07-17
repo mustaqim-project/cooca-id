@@ -6,11 +6,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -19,7 +21,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 final class Customer extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, HasUuids;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable, HasUuids;
     protected $table = 'customers';
 
     protected $fillable = [
@@ -44,6 +46,21 @@ final class Customer extends Authenticatable implements MustVerifyEmail
                 $customer->password = Hash::make(Str::random(32));
             }
         });
+    }
+
+    public function companyProfile(): HasOne
+    {
+        return $this->hasOne(CompanyProfile::class);
+    }
+
+    public function tenants(): HasMany
+    {
+        return $this->hasMany(Tenant::class);
+    }
+
+    public function erpRequests(): HasMany
+    {
+        return $this->hasMany(ErpRequest::class);
     }
 
     public function affiliator(): BelongsTo

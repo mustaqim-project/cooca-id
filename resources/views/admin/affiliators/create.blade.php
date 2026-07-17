@@ -1,89 +1,111 @@
-﻿@extends('layouts.admin')
-@section('title', 'Add Affiliator')
-@section('subtitle', 'Create a new affiliate partner')
+@extends('admin.layouts.app')
+
+@section('title', 'Create Affiliators')
+
 @section('content')
-    <div class="mb-4">
-        <a href="{{ route('admin.affiliators.index') }}" class="btn-saas btn-saas-ghost btn-saas-sm">
-            <i class="bi bi-arrow-left me-1"></i> Back to Affiliators
-        </a>
-    </div>
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card-saas">
-                <div class="card-saas-header">
-                    <h5 class="card-saas-title"><i class="bi bi-person-plus me-2"></i>Affiliator Information</h5>
-                </div>
-                <div class="card-saas-body">
-                    <form action="{{ route('admin.affiliators.store') }}" method="POST">
-                        @csrf
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="name">Full Name <span
-                                            class="text-danger">*</span></label>
-                                    <input class="form-saas-input @error('name') is-invalid @enderror" type="text"
-                                        name="name" id="name" value="{{ old('name') }}" placeholder="Partner Name"
-                                        required>
-                                    @error('name')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="email">Email Address <span
-                                            class="text-danger">*</span></label>
-                                    <input class="form-saas-input @error('email') is-invalid @enderror" type="email"
-                                        name="email" id="email" value="{{ old('email') }}"
-                                        placeholder="partner@example.com" required>
-                                    @error('email')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="password">Password <span
-                                            class="text-danger">*</span></label>
-                                    <input class="form-saas-input @error('password') is-invalid @enderror" type="password"
-                                        name="password" id="password" placeholder="Min. 8 characters" required>
-                                    @error('password')
-                                        <div class="form-saas-error">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-saas-group">
-                                    <label class="form-saas-label" for="password_confirmation">Confirm Password <span
-                                            class="text-danger">*</span></label>
-                                    <input class="form-saas-input" type="password" name="password_confirmation"
-                                        id="password_confirmation" placeholder="Repeat password" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn-saas btn-saas-primary">
-                                <i class="bi bi-floppy me-1"></i> Save Affiliator
-                            </button>
-                            <a href="{{ route('admin.affiliators.index') }}" class="btn-saas btn-saas-ghost">Cancel</a>
-                        </div>
-                    </form>
-                </div>
+    <div class="d-flex flex-column gap-4" style="max-width: 800px; margin: 0 auto;">
+
+        <!-- Header -->
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ route('admin.affiliators.index') }}"
+                class="btn btn-light border-0 rounded-circle p-2 shadow-sm hover-lift"><i class="bi bi-arrow-left"></i></a>
+            <div>
+                <h2 class="mb-1 fw-bold text-capitalize">Create Affiliator</h2>
+                <p class="text-secondary mb-0">Select a user to become an affiliator and configure their code.</p>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="card-saas">
-                <div class="card-saas-header">
-                    <h5 class="card-saas-title"><i class="bi bi-info-circle me-2"></i>Notes</h5>
+
+        <!-- Form Card -->
+        <div class="card border-0 shadow-sm rounded-4 glass p-4 p-md-5">
+            <form action="{{ route('admin.affiliators.store') }}" method="POST" class="d-flex flex-column gap-4">
+                @csrf
+
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <select
+                                class="form-select rounded-3 shadow-none border bg-transparent @error('user_id') is-invalid @enderror"
+                                id="user_id" name="user_id" required>
+                                <option value="">Select a user...</option>
+                                @foreach ($users ?? [] as $user)
+                                    <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
+                                        {{ $user->name }} ({{ $user->email }})</option>
+                                @endforeach
+                            </select>
+                            <label for="user_id">User *</label>
+                            @error('user_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="text"
+                                class="form-control rounded-3 shadow-none border bg-transparent @error('affiliate_code') is-invalid @enderror"
+                                id="affiliate_code" name="affiliate_code" value="{{ old('affiliate_code') }}"
+                                placeholder="Affiliate Code" required>
+                            <label for="affiliate_code">Affiliate Code *</label>
+                            @error('affiliate_code')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text text-secondary mt-2"><i class="bi bi-info-circle me-1"></i> Custom unique
+                                code for this affiliator (e.g. USERNAME20).</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <select
+                                class="form-select rounded-3 shadow-none border bg-transparent @error('is_active') is-invalid @enderror"
+                                id="is_active" name="is_active" required>
+                                <option value="1" {{ old('is_active') == '1' ? 'selected' : '' }}>Active</option>
+                                <option value="0" {{ old('is_active') == '0' ? 'selected' : '' }}>Inactive</option>
+                            </select>
+                            <label for="is_active">Status *</label>
+                            @error('is_active')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="number" step="0.01"
+                                class="form-control rounded-3 shadow-none border bg-transparent @error('discount_percent') is-invalid @enderror"
+                                id="discount_percent" name="discount_percent" value="{{ old('discount_percent', 0) }}"
+                                placeholder="Discount Percent">
+                            <label for="discount_percent">Discount Percent (%)</label>
+                            @error('discount_percent')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="number" step="0.01"
+                                class="form-control rounded-3 shadow-none border bg-transparent @error('discount_amount') is-invalid @enderror"
+                                id="discount_amount" name="discount_amount" value="{{ old('discount_amount', 0) }}"
+                                placeholder="Discount Amount">
+                            <label for="discount_amount">Discount Amount (Fixed)</label>
+                            @error('discount_amount')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
-                <div class="card-saas-body">
-                    <ul class="list-unstyled mb-0" style="font-size:.875rem;color:var(--text-muted);line-height:1.8">
-                        <li><i class="bi bi-check-circle text-success me-2"></i>Referral code auto-generated</li>
-                        <li><i class="bi bi-check-circle text-success me-2"></i>Affiliator can login separately</li>
-                        <li><i class="bi bi-check-circle text-success me-2"></i>Commission tracked automatically</li>
-                    </ul>
+
+                <hr class="border-light my-2">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ route('admin.affiliators.index') }}"
+                        class="btn btn-light border rounded-pill px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift">
+                        <i class="bi bi-check2 me-2"></i> Save Affiliator
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 @endsection

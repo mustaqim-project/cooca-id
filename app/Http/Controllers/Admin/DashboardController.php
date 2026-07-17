@@ -207,6 +207,12 @@ final class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Recent ERP Requests
+        $recentErpRequests = \App\Models\ErpRequest::with(['customer'])
+            ->latest()
+            ->limit(5)
+            ->get();
+
         // ─────────────────────────────────────────────
         // COMMISSION MONTHLY TREND (last 6 months)
         // ─────────────────────────────────────────────
@@ -261,12 +267,13 @@ final class DashboardController extends Controller
             'recentTransactions'        => $recentTransactions,
             'recentWithdrawals'         => $recentWithdrawals,
             'recentCustomers'           => $recentCustomers,
+            'recentErpRequests'        => $recentErpRequests,
             'revenueChartData'          => $revenueChartData,
             'customerChartData'         => $customerChartData,
             'dailyRevenueData'          => $dailyRevenueData,
             'topProducts'               => $topProducts,
             'subscriptionPlanDist'      => $subscriptionPlanDist,
-            'transactionStatusBreakdown'=> $transactionStatusBreakdown,
+            'transactionStatusBreakdown' => $transactionStatusBreakdown,
             'commissionTrend'           => $commissionTrend,
         ]);
     }

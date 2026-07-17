@@ -20,7 +20,7 @@
     <div class="row g-5 align-items-center">
       <div class="col-lg-6 reveal">
         <div class="section-label"><i class="bi bi-building"></i> {{ __('Our Story') }}</div>
-        <h2>{{ __('We Believe Businesses <span class="text-gradient">Should Own Their Tools.</span>') }}</h2>
+        <h2>{!! __('We Believe Businesses <span class="text-gradient">Should Own Their Tools.</span>') !!}</h2>
         <p class="mt-3">{{ __('The SaaS industry has conditioned businesses to rent their software forever. Monthly fees that add up to millions over years. Data locked in platforms you can never leave. Infrastructures shared across thousands of tenants — one breach affects everyone.') }}</p>
         <p>{{ __('COOCA was founded to change this. We believe every serious business deserves its own isolated infrastructure, its own database, and a lifetime license to the software that runs its operations.') }}</p>
         <div class="row g-3 mt-4">
@@ -54,7 +54,7 @@
   <div class="container text-center">
     <div class="reveal">
       <div class="section-label"><i class="bi bi-flag"></i> {{ __('Our Mission') }}</div>
-      <h2 class="section-title">{{ __('To Make <span class="text-gradient">Enterprise-Grade</span> Business Infrastructure Accessible to Every Serious Business in Indonesia.') }}</h2>
+      <h2 class="section-title">{!! __('To Make <span class="text-gradient">Enterprise-Grade</span> Business Infrastructure Accessible to Every Serious Business in Indonesia.') !!}</h2>
       <p class="section-subtitle">{{ __('Not through cheap SaaS subscriptions, but through real ownership. Real isolation. Real long-term value.') }}</p>
     </div>
   </div>
@@ -64,7 +64,7 @@
   <div class="cta-bg"></div>
   <div class="container cta-content text-center">
     <div class="reveal">
-      <h2 class="section-title">{{ __('Ready to <span class="text-gradient">Own Your System?</span>') }}</h2>
+      <h2 class="section-title">{!! __('Ready to <span class="text-gradient">Own Your System?</span>') !!}</h2>
       <p class="section-subtitle">{{ __('Join 1,200+ businesses that have stopped renting their software.') }}</p>
       <a href="{{ route('customer.register') }}" class="btn btn-primary btn-lg">{{ __('Start Free Trial') }} <i class="bi bi-arrow-right"></i></a>
     </div>

@@ -10,7 +10,7 @@
                     <div class="brand-icon">C</div><span
                         style="font-size:1.8rem;font-weight:800;">{{ setting('site.name', 'COOCA') }}</span>
                 </div>
-                <h2>{{ __('Secure <span class="text-gradient">Admin</span> Recovery') }}</h2>
+                <h2>{!! __('Secure <span class="text-gradient">Admin</span> Recovery') !!}</h2>
                 <p style="font-size:.95rem;color:var(--text-muted);">
                     {{ __('We will send a reset link to your registered email.') }}</p>
             </div>
