@@ -36,7 +36,7 @@ final class AffiliateService
         return DB::transaction(function () use ($transaction) {
             $customer = $transaction->customer;
             
-            if (!$customer->affiliator_id) {
+            if (!$customer->referred_by_id) {
                 return ['commissions' => [], 'total' => 0];
             }
 
@@ -81,7 +81,7 @@ final class AffiliateService
                 $this->incrementPendingBalance($l1Affiliator->id, $l1CommissionAmount);
 
                 // Level 2: Parent affiliator
-                if ($l1Affiliator->parent_affiliator_id) {
+                if ($l1Affiliator->parent_referred_by_id) {
                     $l2Affiliator = $l1Affiliator->parent;
                     if ($l2Affiliator) {
                         $l2CommissionPercent = $this->commissionPercent(2);
@@ -132,7 +132,7 @@ final class AffiliateService
         float $commissionAmount,
     ): AffiliateCommission {
         return $this->commissionRepository->create([
-            'affiliator_id'        => $affiliatorId,
+            'referred_by_id'        => $affiliatorId,
             'transaction_id'       => $transactionId,
             'customer_id'          => $customerId,
             'subscription_plan_id' => $subscriptionPlanId,
@@ -157,7 +157,7 @@ final class AffiliateService
     private function wallet(string $affiliatorId): AffiliateWallet
     {
         return AffiliateWallet::firstOrCreate(
-            ['affiliator_id' => $affiliatorId],
+            ['referred_by_id' => $affiliatorId],
             ['balance' => 0, 'pending_balance' => 0]
         );
     }
@@ -189,9 +189,9 @@ final class AffiliateService
             ]);
 
             if ($commission->status === AffiliateCommission::STATUS_CLEARED) {
-                $this->incrementAvailableBalance($commission->affiliator_id, -(float) $commission->commission_amount);
+                $this->incrementAvailableBalance($commission->referred_by_id, -(float) $commission->commission_amount);
             } else {
-                $this->incrementPendingBalance($commission->affiliator_id, -(float) $commission->commission_amount);
+                $this->incrementPendingBalance($commission->referred_by_id, -(float) $commission->commission_amount);
             }
         }
     }
@@ -214,8 +214,8 @@ final class AffiliateService
                 'cleared_at' => now(),
             ]);
 
-            $this->incrementPendingBalance($commission->affiliator_id, -(float) $commission->commission_amount);
-            $this->incrementAvailableBalance($commission->affiliator_id, (float) $commission->commission_amount);
+            $this->incrementPendingBalance($commission->referred_by_id, -(float) $commission->commission_amount);
+            $this->incrementAvailableBalance($commission->referred_by_id, (float) $commission->commission_amount);
 
             $clearedCount++;
         }
@@ -228,7 +228,7 @@ final class AffiliateService
      */
     public function getTotalCommission(Affiliator $affiliator, ?string $status = null): float
     {
-        $query = AffiliateCommission::query()->where('affiliator_id', $affiliator->id);
+        $query = AffiliateCommission::query()->where('referred_by_id', $affiliator->id);
 
         if ($status !== null) {
             $query->where('status', $status);
@@ -241,7 +241,7 @@ final class AffiliateService
     {
         return AffiliateCommission::query()
             ->selectRaw('plan_name as product_name, SUM(commission_amount) as total')
-            ->where('affiliator_id', $affiliator->id)
+            ->where('referred_by_id', $affiliator->id)
             ->whereNotNull('plan_name')
             ->groupBy('plan_name')
             ->orderByDesc('total')
@@ -269,7 +269,7 @@ final class AffiliateService
             $this->wallet($affiliatorId);
 
             $wallet = AffiliateWallet::query()
-                ->where('affiliator_id', $affiliatorId)
+                ->where('referred_by_id', $affiliatorId)
                 ->lockForUpdate()
                 ->first();
             if (!$wallet || (float) $wallet->balance < $amount) {
@@ -283,7 +283,7 @@ final class AffiliateService
             DB::table('affiliators')->where('id', $affiliatorId)->decrement('balance', $amount);
 
             return AffiliateWithdrawal::create([
-                'affiliator_id' => $affiliatorId,
+                'referred_by_id' => $affiliatorId,
                 'amount' => $amount,
                 'fee' => $fee,
                 'net_amount' => $netAmount,
@@ -298,7 +298,7 @@ final class AffiliateService
     public function getWithdrawals(string $affiliatorId, int $perPage = 15): LengthAwarePaginator
     {
         return AffiliateWithdrawal::query()
-            ->where('affiliator_id', $affiliatorId)
+            ->where('referred_by_id', $affiliatorId)
             ->latest()
             ->paginate($perPage);
     }
@@ -306,7 +306,7 @@ final class AffiliateService
     public function getWithdrawalHistory(string $affiliatorId)
     {
         return AffiliateWithdrawal::query()
-            ->where('affiliator_id', $affiliatorId)
+            ->where('referred_by_id', $affiliatorId)
             ->latest()
             ->get();
     }
@@ -315,7 +315,7 @@ final class AffiliateService
     {
         return AffiliateWithdrawal::query()
             ->where('id', $id)
-            ->where('affiliator_id', $affiliatorId)
+            ->where('referred_by_id', $affiliatorId)
             ->first();
     }
 
@@ -355,7 +355,7 @@ final class AffiliateService
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $this->incrementAvailableBalance($withdrawal->affiliator_id, (float) $withdrawal->amount);
+            $this->incrementAvailableBalance($withdrawal->referred_by_id, (float) $withdrawal->amount);
 
             $withdrawal->update([
                 'status' => AffiliateWithdrawal::STATUS_REJECTED,

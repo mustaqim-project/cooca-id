@@ -32,7 +32,7 @@ class SettlementService
 
                 // Move from pending_balance to balance in wallet
                 $wallet = AffiliateWallet::firstOrCreate(
-                    ['affiliator_id' => $commission->affiliator_id],
+                    ['referred_by_id' => $commission->referred_by_id],
                     ['balance' => 0, 'pending_balance' => 0]
                 );
                 

@@ -6,7 +6,7 @@ namespace App\Services\Security;
 
 use App\Models\ActivityLog;
 use App\Models\AuditLog;
-use App\Models\Customer;
+use App\Models\Customer;\nuse App\Models\Affiliator;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Cache;
 
@@ -20,7 +20,7 @@ final class FraudDetectionService
     {
         $customer = $transaction->customer;
         
-        if (!$customer || !$customer->affiliator_id) {
+        if (!$customer || !$customer->referred_by_id) {
             return false;
         }
 
@@ -43,7 +43,7 @@ final class FraudDetectionService
         // In a real scenario, we might check if multiple transactions occurred from the same IP
         // Since we may not have the direct request IP here, we can check rapid transactions for the same affiliator
         $recentTransactions = Transaction::whereHas('customer', function($query) use ($affiliator) {
-                $query->where('affiliator_id', $affiliator->id);
+                $query->where('referred_by_id', $affiliator->id);
             })
             ->where('created_at', '>=', now()->subHour())
             ->count();
@@ -71,7 +71,7 @@ final class FraudDetectionService
             'causer_id' => $customer->id,
             'properties' => [
                 'reason' => $reason,
-                'affiliator_id' => $affiliatorId,
+                'referred_by_id' => $affiliatorId,
                 'transaction_amount' => $transaction->gross_amount,
             ],
             'ip_address' => request()->ip(),
@@ -86,10 +86,12 @@ final class FraudDetectionService
             'model_type' => Transaction::class,
             'model_id' => $transaction->id,
             'old_values' => [],
-            'new_values' => ['reason' => $reason, 'affiliator_id' => $affiliatorId],
+            'new_values' => ['reason' => $reason, 'referred_by_id' => $affiliatorId],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
             'risk_level' => AuditLog::RISK_CRITICAL,
         ]);
     }
 }
+
+

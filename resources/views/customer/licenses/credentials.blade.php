@@ -1,72 +1,76 @@
-@extends('layouts.customer')
+@extends('customer.layouts.app')
 
 @section('title', 'API Credentials')
-@section('subtitle', 'Your secret tokens for accessing the product API')
 
 @section('content')
-<div class="mb-4">
-    <a href="{{ route('customer.licenses.show', $license->id) }}" class="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to License Details
-    </a>
-</div>
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ route('customer.licenses.show', $license->id) }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
+                <div>
+                    <h2 class="mb-1 fw-bold">API Credentials</h2>
+                    <p class="text-secondary mb-0">Your secret tokens for accessing the product API.</p>
+                </div>
+            </div>
 
-<div class="max-w-3xl mx-auto">
-    <div class="bg-white dark:bg-surface-800 animate-fade-in-up shadow-sm rounded-lg border border-surface-200 dark:border-surface-700 overflow-hidden mb-8">
-        <div class="p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900/50">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-red-100 dark:bg-red-900/30 rounded-md p-3">
-                    <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600 dark:text-red-400 text-xl"></i>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-medium text-surface-900 dark:text-white">Keep Your Secrets Safe</h3>
-                    <p class="text-sm text-surface-500 dark:text-surface-400 mt-1">Do not share your API tokens with anyone or commit them to public repositories.</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="p-6 md:p-8 space-y-8">
-            <!-- License Key -->
-            <div>
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">License Key</label>
-                <div class="flex">
-                    <div class="relative flex-grow">
-                        <input type="text" id="license_key" value="{{ $license->license_key }}" readonly class="block w-full bg-surface-50 dark:bg-surface-900 border border-surface-300 dark:border-surface-600 rounded-md rounded-r-none py-3 px-4 text-sm font-mono text-surface-900 dark:text-surface-300 focus:outline-none">
+            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden mb-4">
+                <div class="card-body p-4 bg-danger-subtle d-flex align-items-center gap-3">
+                    <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                        <i class="bi bi-exclamation-triangle fs-5"></i>
                     </div>
-                    <button type="button" onclick="copyToClipboard('license_key')" class="relative -ml-px inline-flex items-center space-x-2 px-4 py-3 border border-surface-300 dark:border-surface-600 text-sm font-medium rounded-r-md text-surface-700 dark:text-surface-300 bg-white dark:bg-surface-800 hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700 focus:outline-none">
-                        <i data-lucide="clipboard" class="w-4 h-4"></i>
-                        <span>Copy</span>
-                    </button>
-                </div>
-                <p class="mt-2 text-xs text-surface-500 dark:text-surface-400">Used for identifying your purchase when interacting with support or API.</p>
-            </div>
-            
-            <!-- API Token (if any) -->
-            <div>
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">Access Token / API Key</label>
-                <div class="flex" x-data="{ showToken: false }">
-                    <div class="relative flex-grow">
-                        <!-- We might only have the token encrypted or generated on the fly, assuming $license->token exists for demo -->
-                        <input :type="showToken ? 'text' : 'password'" id="api_token" value="{{ $license->token ?? 'demo_token_12345_abcdef_xxxxxxxxxx' }}" readonly class="block w-full bg-surface-50 dark:bg-surface-900 border border-surface-300 dark:border-surface-600 rounded-l-md py-3 px-4 text-sm font-mono text-surface-900 dark:text-surface-300 focus:outline-none">
+                    <div>
+                        <h6 class="fw-bold text-danger mb-1">Keep Your Secrets Safe</h6>
+                        <p class="text-danger mb-0 fs-7">Do not share your API tokens with anyone or commit them to public repositories.</p>
                     </div>
-                    <button type="button" @click="showToken = !showToken" class="relative -ml-px inline-flex items-center px-4 py-3 border border-surface-300 dark:border-surface-600 text-sm font-medium text-surface-700 dark:text-surface-300 bg-white dark:bg-surface-800 hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700 focus:outline-none">
-                        <i class="bi" :class="showToken ? 'bi-eye-slash' : 'bi-eye'"></i>
-                    </button>
-                    <button type="button" onclick="copyToClipboard('api_token')" class="relative -ml-px inline-flex items-center space-x-2 px-4 py-3 border border-surface-300 dark:border-surface-600 text-sm font-medium rounded-r-md text-surface-700 dark:text-surface-300 bg-white dark:bg-surface-800 hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700 focus:outline-none">
-                        <i data-lucide="clipboard" class="w-4 h-4"></i>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden">
+                <div class="card-body p-4 p-md-5">
+                    
+                    <!-- License Key -->
+                    <div class="mb-5">
+                        <label class="form-label fw-medium text-secondary">License Key</label>
+                        <div class="input-group">
+                            <input type="text" id="license_key" value="{{ $license->license_key }}" readonly class="form-control bg-light border-end-0 font-monospace text-secondary py-3">
+                            <button type="button" onclick="copyToClipboard('license_key')" class="btn btn-light border border-start-0 text-secondary hover-lift px-4" title="Copy to clipboard">
+                                <i class="bi bi-clipboard"></i> Copy
+                            </button>
+                        </div>
+                        <div class="form-text mt-2 text-secondary fs-7">Used for identifying your purchase when interacting with support or API.</div>
+                    </div>
+                    
+                    <!-- API Token (if any) -->
+                    <div>
+                        <label class="form-label fw-medium text-secondary">Access Token / API Key</label>
+                        <div class="input-group" x-data="{ showToken: false }">
+                            <!-- We might only have the token encrypted or generated on the fly, assuming $license->token exists for demo -->
+                            <input :type="showToken ? 'text' : 'password'" id="api_token" value="{{ $license->token ?? 'demo_token_12345_abcdef_xxxxxxxxxx' }}" readonly class="form-control bg-light border-end-0 font-monospace text-secondary py-3">
+                            <button type="button" @click="showToken = !showToken" class="btn btn-light border border-start-0 border-end-0 text-secondary hover-lift px-3">
+                                <i class="bi" :class="showToken ? 'bi-eye-slash' : 'bi-eye'"></i>
+                            </button>
+                            <button type="button" onclick="copyToClipboard('api_token')" class="btn btn-light border border-start-0 text-secondary hover-lift px-4" title="Copy to clipboard">
+                                <i class="bi bi-clipboard"></i> Copy
+                            </button>
+                        </div>
+                        <div class="form-text mt-2 text-secondary fs-7">
+                            Include this token in the <code class="text-primary">Authorization: Bearer</code> header for API requests.
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="card-footer bg-transparent border-top border-light p-4 d-flex justify-content-end">
+                    <button type="button" onclick="alert('Feature to regenerate token is coming soon!')" class="btn btn-outline-secondary rounded-pill px-4 py-2 hover-lift fw-medium">
+                        <i class="bi bi-arrow-clockwise me-2"></i> Regenerate Token
                     </button>
                 </div>
-                <p class="mt-2 text-xs text-surface-500 dark:text-surface-400">Include this token in the <code class="text-primary-600 dark:text-primary-400">Authorization: Bearer</code> header for API requests.</p>
             </div>
-        </div>
-        
-        <div class="px-6 py-4 bg-surface-50 dark:bg-surface-900/50 border-t border-surface-200 dark:border-surface-700 flex justify-end">
-            <!-- Regenerate Token might be a feature in the future -->
-            <button type="button" onclick="alert('Feature to regenerate token is coming soon!')" class="inline-flex justify-center py-2 px-4 border border-surface-300 dark:border-surface-600 shadow-sm text-sm font-medium rounded-md text-surface-700 dark:text-surface-300 bg-white dark:bg-surface-800 hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700 focus:outline-none">
-                <i data-lucide="arrow-clockwise" class="w-4 h-4 mr-2"></i> Regenerate Token
-            </button>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')

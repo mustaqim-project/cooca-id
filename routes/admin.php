@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Cache\RateLimiting\Limit;
 use App\Http\Controllers\Admin\AffiliatorController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\CmsController;
@@ -26,16 +24,14 @@ use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\ErrorLogController;
 use App\Http\Controllers\Admin\TrialManagementController;
-// Rate limiter for admin routes
-RateLimiter::for('admin', function ($request) {
-    return Limit::perMinute(120)->by($request->user()?->id ?? $request->ip()); // increased limit
-});
-
-RateLimiter::for('admin-login', function ($request) {
-    return Limit::perMinute(5)->by($request->ip());
-});
+use App\Http\Controllers\Admin\ProfileController;
 
 Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admin'])->group(function () {
+    // Profile Settings
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

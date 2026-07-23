@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('affiliate_commissions', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('affiliator_id');
+            $table->uuid('referred_by_id');
             $table->uuid('transaction_id');
-            $table->uuid('customer_id');
+            $table->uuid('affiliator_id');
             $table->tinyInteger('level')->default(1); // 1 = L1, 2 = L2
             $table->decimal('gross_amount', 15, 2);
             $table->decimal('commission_percent', 5, 2);
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->timestamp('cleared_at')->nullable();
             $table->timestamps();
 
-            $table->foreign('affiliator_id')
+            $table->foreign('referred_by_id')
                 ->references('id')
                 ->on('affiliators')
                 ->onDelete('cascade');
@@ -36,16 +36,16 @@ return new class extends Migration
                 ->on('transactions')
                 ->onDelete('cascade');
 
-            $table->foreign('customer_id')
+            $table->foreign('affiliator_id')
                 ->references('id')
-                ->on('customers')
+                ->on('affiliators')
                 ->onDelete('cascade');
 
-            $table->index('affiliator_id');
+            $table->index('referred_by_id');
             $table->index('transaction_id');
             $table->index('level');
             $table->index('status');
-            $table->index(['affiliator_id', 'status']);
+            $table->index(['referred_by_id', 'status']);
             $table->index('cleared_at');
         });
     }
@@ -58,3 +58,4 @@ return new class extends Migration
         Schema::dropIfExists('affiliate_commissions');
     }
 };
+

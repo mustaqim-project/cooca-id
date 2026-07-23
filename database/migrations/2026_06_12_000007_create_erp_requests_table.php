@@ -56,12 +56,12 @@ return new class extends Migration
 
             $table->foreign('affiliate_id')
                 ->references('id')
-                ->on('affiliators')
+                ->on('customers')
                 ->onDelete('set null');
 
             $table->foreign('approved_by')
                 ->references('id')
-                ->on('admins')
+                ->on('customers')
                 ->onDelete('set null');
 
             $table->index('customer_id');
@@ -79,3 +79,4 @@ return new class extends Migration
         Schema::dropIfExists('erp_requests');
     }
 };
+

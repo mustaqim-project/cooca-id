@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Affiliator;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -44,7 +44,7 @@ class AffiliatorFactory extends Factory
     public function withParent(): static
     {
         return $this->state(fn (array $attributes) => [
-            'parent_affiliator_id' => \App\Models\Affiliator::factory(),
+            'parent_affiliator_id' => \App\Models\User::factory(),
         ]);
     }
 

@@ -1,109 +1,93 @@
-@extends('layouts.customer')
+@extends('customer.layouts.app')
 
 @section('title', 'Subscription Details')
-@section('subtitle', 'View and manage your subscription')
 
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <!-- Header Actions -->
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
-        </a>
-    </div>
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ route('customer.subscriptions.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
+                <div>
+                    <h2 class="mb-1 fw-bold">Subscription Details</h2>
+                    <p class="text-secondary mb-0">View and manage your subscription.</p>
+                </div>
+            </div>
 
-    <!-- Details Card -->
-    <div class="corporate-card">
-        <div class="card-header">
-            <h3 class="card-title">Information Details</h3>
-        </div>
-        <div class="card-body">
-            <a href="{{ route('customer.subscriptions.index') }}" class="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Subscriptions
-    </a>
-</div>
-
-<div class="bg-white dark:bg-surface-800 animate-fade-in-up shadow-sm rounded-lg border border-surface-200 dark:border-surface-700 overflow-hidden mb-8">
-    <div class="px-6 py-5 border-b border-surface-200 dark:border-surface-700 flex justify-between items-center bg-surface-50 dark:bg-surface-900/50">
-        <h3 class="text-lg leading-6 font-medium text-surface-900 dark:text-white">
-            Subscription Information
-        </h3>
-        <div>
-            @if($subscription->is_active)
-                <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                    <i data-lucide="check-circle" class="w-4 h-4 mr-1.5 mt-0.5"></i> Active
-                </span>
-            @elseif($subscription->is_cancelled)
-                <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                    <i data-lucide="x-circle" class="w-4 h-4 mr-1.5 mt-0.5"></i> Cancelled
-                </span>
-            @elseif($subscription->expires_at && $subscription->expires_at->isPast())
-                <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                    <i data-lucide="alert-triangle" class="w-4 h-4 mr-1.5 mt-0.5"></i> Expired
-                </span>
-            @else
-                <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-surface-100 dark:bg-surface-800 text-surface-800 dark:text-surface-200 dark:bg-surface-700 dark:text-surface-300">
-                    <i data-lucide="hourglass-split" class="w-4 h-4 mr-1.5 mt-0.5"></i> Pending
-                </span>
-            @endif
-        </div>
-    </div>
-    
-    <div class="px-6 py-5 sm:p-0">
-        <dl class="sm:divide-y sm:divide-surface-200 dark:divide-surface-700 dark:sm:divide-surface-700">
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Product</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2 font-semibold">
-                    {{ $subscription->plan->product->name ?? 'N/A' }}
-                </dd>
-            </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Plan</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    {{ $subscription->plan->name ?? 'N/A' }}
-                </dd>
-            </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Subscription ID</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2 font-mono">
-                    {{ $subscription->id }}
-                </dd>
-            </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Started At</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    {{ $subscription->started_at ? $subscription->started_at->format('F d, Y - H:i') : '-' }}
-                </dd>
-            </div>
-            <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Expires At</dt>
-                <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    {{ $subscription->expires_at ? $subscription->expires_at->format('F d, Y - H:i') : 'Lifetime' }}
-                    @if($subscription->expires_at && $subscription->is_active && $subscription->expires_at->isFuture())
-                        <span class="text-surface-500 dark:text-surface-400 text-xs ml-2">
-                            ({{ $subscription->expires_at->diffForHumans() }})
-                        </span>
+            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden">
+                <div class="card-header bg-transparent border-bottom border-light p-4 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-semibold"><i class="bi bi-info-circle me-2"></i> Subscription Information</h5>
+                    
+                    <div>
+                        @if($subscription->is_active)
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2">
+                                <i class="bi bi-check-circle me-1"></i> Active
+                            </span>
+                        @elseif($subscription->is_cancelled)
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2">
+                                <i class="bi bi-x-circle me-1"></i> Cancelled
+                            </span>
+                        @elseif($subscription->expires_at && $subscription->expires_at->isPast())
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2">
+                                <i class="bi bi-exclamation-triangle me-1"></i> Expired
+                            </span>
+                        @else
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-2">
+                                <i class="bi bi-hourglass-split me-1"></i> Pending
+                            </span>
+                        @endif
+                    </div>
+                </div>
+                
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush border-0">
+                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
+                            <div class="fw-medium text-secondary" style="width: 250px;">Product</div>
+                            <div class="fw-semibold text-dark">{{ $subscription->plan->product->name ?? 'N/A' }}</div>
+                        </li>
+                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
+                            <div class="fw-medium text-secondary" style="width: 250px;">Plan</div>
+                            <div class="text-dark">{{ $subscription->plan->name ?? 'N/A' }}</div>
+                        </li>
+                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
+                            <div class="fw-medium text-secondary" style="width: 250px;">Subscription ID</div>
+                            <div class="text-dark font-monospace">{{ $subscription->id }}</div>
+                        </li>
+                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
+                            <div class="fw-medium text-secondary" style="width: 250px;">Started At</div>
+                            <div class="text-dark">{{ $subscription->started_at ? $subscription->started_at->format('F d, Y - H:i') : '-' }}</div>
+                        </li>
+                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
+                            <div class="fw-medium text-secondary" style="width: 250px;">Expires At</div>
+                            <div class="text-dark">
+                                {{ $subscription->expires_at ? $subscription->expires_at->format('F d, Y - H:i') : 'Lifetime' }}
+                                @if($subscription->expires_at && $subscription->is_active && $subscription->expires_at->isFuture())
+                                    <span class="text-secondary fs-7 ms-2">
+                                        ({{ $subscription->expires_at->diffForHumans() }})
+                                    </span>
+                                @endif
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card-footer bg-transparent border-top border-light p-4 d-flex justify-content-end gap-3">
+                    @if($subscription->is_active)
+                        <button type="button" onclick="renewSubscription('{{ $subscription->id }}')" class="btn btn-primary rounded-pill px-4 hover-lift">
+                            <i class="bi bi-arrow-repeat me-1"></i> Renew
+                        </button>
+                        <button type="button" onclick="cancelSubscription('{{ $subscription->id }}')" class="btn btn-outline-danger rounded-pill px-4 hover-lift">
+                            <i class="bi bi-x me-1"></i> Cancel Subscription
+                        </button>
+                    @else
+                        <a href="{{ route('customer.products.show', $subscription->plan->product->slug ?? '') }}" class="btn btn-primary rounded-pill px-4 hover-lift">
+                            <i class="bi bi-cart-plus me-1"></i> Subscribe Again
+                        </a>
                     @endif
-                </dd>
+                </div>
             </div>
-        </dl>
-    </div>
-    
-    <div class="px-6 py-4 bg-surface-50 dark:bg-surface-900/50 border-t border-surface-200 dark:border-surface-700 flex justify-end gap-3">
-        @if($subscription->is_active)
-            <button type="button" onclick="renewSubscription('{{ $subscription->id }}')" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                <i data-lucide="repeat" class="w-4 h-4"></i> Renew
-            </button>
-            <button type="button" onclick="cancelSubscription('{{ $subscription->id }}')" class="inline-flex justify-center py-2 px-4 border border-surface-300 dark:border-surface-600 shadow-sm text-sm font-medium rounded-md text-red-700 dark:text-red-400 bg-white dark:bg-surface-800 hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                <i data-lucide="x" class="w-4 h-4"></i> Cancel Subscription
-            </button>
-        @else
-            <a href="{{ route('customer.products.show', $subscription->plan->product->slug ?? '') }}" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                Subscribe Again
-            </a>
-        @endif
-    </div>
         </div>
     </div>
-</div>
 @endsection

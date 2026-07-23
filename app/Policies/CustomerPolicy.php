@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\Admin;
-use App\Models\Customer;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CustomerPolicy

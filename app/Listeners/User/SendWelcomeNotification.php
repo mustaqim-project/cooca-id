@@ -10,6 +10,6 @@ final class SendWelcomeNotification
 {
     public function handle(CustomerRegistered $event): void
     {
-        SendWelcomeMailJob::dispatch($event->customer, 'customer');
+        SendWelcomeMailJob::dispatch($event->customer);
     }
 }

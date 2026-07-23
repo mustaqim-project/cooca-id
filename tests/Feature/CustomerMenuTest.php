@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,7 +12,7 @@ class CustomerMenuTest extends TestCase
 
     public function test_customer_can_access_all_menus()
     {
-        $customer = Customer::create([
+        $customer = User::factory()->create([
             'name' => 'Test Customer',
             'email' => 'customer@cooca.id',
             'password' => bcrypt('password123'),
@@ -34,7 +34,7 @@ class CustomerMenuTest extends TestCase
         ];
 
         foreach ($menus as $route) {
-            $response = $this->actingAs($customer, 'customer')->get(route($route));
+            $response = $this->actingAs($customer)->get(route($route));
             $response->assertStatus(200);
         }
     }

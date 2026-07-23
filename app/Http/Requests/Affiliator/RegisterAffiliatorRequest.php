@@ -18,11 +18,11 @@ final class RegisterAffiliatorRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('affiliators', 'email')->whereNull('deleted_at')],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->whereNull('deleted_at')],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'bank_account' => ['nullable', 'string', 'max:50'],
             'bank_name' => ['nullable', 'string', 'max:255'],
-            'parent_referral_code' => ['nullable', 'string', 'exists:affiliators,referral_code'],
+            'parent_referral_code' => ['nullable', 'string', 'exists:affiliator_profiles,referral_code'],
         ];
     }
 

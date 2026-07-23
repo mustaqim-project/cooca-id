@@ -69,9 +69,4 @@ final class AdminRepository extends BaseRepository implements AdminRepositoryInt
     {
         return $this->model->whereNotNull('email')->get();
     }
-
-    public function findOrFail(string $id): Admin
-    {
-        return $this->model->findOrFail($id);
-    }
 }

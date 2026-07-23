@@ -18,10 +18,10 @@ final class RegisterCustomerRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('customers', 'email')->whereNull('deleted_at')],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->whereNull('deleted_at')],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'business_name' => ['nullable', 'string', 'max:255'],
-            'referral_code' => ['nullable', 'string', 'exists:affiliators,referral_code'],
+            'referral_code' => ['nullable', 'string', 'exists:affiliator_profiles,referral_code'],
         ];
     }
 

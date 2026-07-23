@@ -23,7 +23,7 @@ class ProfileController extends Controller
      */
     public function edit()
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         return view('customer.profile.edit', [
             'customer' => $customer,
@@ -35,7 +35,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -60,7 +60,7 @@ class ProfileController extends Controller
      */
     public function updatePassword(Request $request)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         $validated = $request->validate([
             'current_password' => 'required|string',

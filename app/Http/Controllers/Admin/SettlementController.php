@@ -77,7 +77,7 @@ final class SettlementController extends Controller
 
         $reason = (string) $request->input('reason', 'Rejected by admin');
 
-        $adminId = Auth::guard('admin')->id();
+        $adminId = Auth::id();
         abort_if($adminId === null, 403);
 
         $this->affiliateService->rejectWithdrawal($id, (string) $adminId, $reason);

@@ -21,7 +21,7 @@ final class SubscriptionController extends Controller
 
     public function index()
     {
-        $subscriptions = \App\Models\Subscription::where('customer_id', Auth::guard('customer')->id())
+        $subscriptions = \App\Models\Subscription::where('customer_id', Auth::id())
             ->paginate(15);
             
         return view('customer.subscriptions.index', [
@@ -37,7 +37,7 @@ final class SubscriptionController extends Controller
     public function show(string $subscription)
     {
         $subscription = \App\Models\Subscription::where('id', $subscription)
-            ->where('customer_id', Auth::guard('customer')->id())
+            ->where('customer_id', Auth::id())
             ->first();
         
         if (!$subscription) {
@@ -54,7 +54,7 @@ final class SubscriptionController extends Controller
      */
     public function store(CreateSubscriptionRequest $request)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
         $data = $request->validated();
 
         $product = \App\Models\Product::where('slug', $data['product_slug'])->firstOrFail();
@@ -123,7 +123,7 @@ final class SubscriptionController extends Controller
      */
     public function cancel(string $id)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
         $subscription = \App\Models\Subscription::where('id', $id)
             ->where('customer_id', $customer->getKey())
             ->first();
@@ -144,7 +144,7 @@ final class SubscriptionController extends Controller
      */
     public function renew(string $id)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
         $subscription = \App\Models\Subscription::where('id', $id)
             ->where('customer_id', $customer->getKey())
             ->first();

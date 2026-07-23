@@ -16,7 +16,7 @@ final class AffiliateWallet extends Model
     protected $table = 'affiliate_wallets';
 
     protected $fillable = [
-        'affiliator_id',
+        'referred_by_id',
         'balance',
         'pending_balance',
     ];
@@ -28,12 +28,12 @@ final class AffiliateWallet extends Model
 
     public function affiliator(): BelongsTo
     {
-        return $this->belongsTo(Affiliator::class, 'affiliator_id');
+        return $this->belongsTo(Affiliator::class, 'referred_by_id');
     }
 
     public function withdrawals(): HasMany
     {
-        return $this->hasMany(AffiliateWithdrawal::class, 'affiliator_id', 'affiliator_id');
+        return $this->hasMany(AffiliateWithdrawal::class, 'referred_by_id', 'referred_by_id');
     }
 
     public function getAvailableBalanceAttribute(): string
@@ -46,3 +46,4 @@ final class AffiliateWallet extends Model
         return number_format((float) $this->balance + (float) $this->pending_balance, 2);
     }
 }
+

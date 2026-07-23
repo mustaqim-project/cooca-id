@@ -1,56 +1,66 @@
-@extends('layouts.customer')
+@extends('customer.layouts.app')
 
 @section('title', 'My Domains')
-@section('subtitle', 'Manage custom domains for your deployed products')
 
 @section('content')
-    <div class="space-y-6">
-        <div class="corporate-card">
-            <div class="overflow-x-auto">
-                <table class="corporate-table">
-                    <thead class="table-thead">
+    <div class="d-flex flex-column gap-4">
+
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold">My Domains</h2>
+                <p class="text-secondary mb-0">Manage custom domains for your deployed products.</p>
+            </div>
+        </div>
+
+        <!-- Domains Table -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
                         <tr>
-                            <th scope="col" class="table-th">Product</th>
-                            <th scope="col" class="table-th">Current Subdomain</th>
-                            <th scope="col" class="table-th">Custom Domain</th>
-                            <th scope="col" class="table-th">Status</th>
-                            <th scope="col" class="table-th">Actions</th>
+                            <th class="py-3 px-4 border-0">Product</th>
+                            <th class="py-3 px-3 border-0">Current Subdomain</th>
+                            <th class="py-3 px-3 border-0">Custom Domain</th>
+                            <th class="py-3 px-3 border-0">Status</th>
+                            <th class="py-3 px-4 border-0 text-end">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="table-tbody">
+                    <tbody class="border-top-0">
                         @forelse($tenants as $tenant)
-                            <tr class="hover:bg-surface-50 dark:hover:bg-surface-700/50">
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">
-                                    {{ $tenant->product->name ?? 'N/A' }}
+                            <tr>
+                                <td class="py-3 px-4">
+                                    <div class="fw-semibold">{{ $tenant->product->name ?? 'N/A' }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
+                                <td class="py-3 px-3 text-secondary">
                                     {{ $tenant->subdomain }}.cooca.id
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
-                                    {{ $tenant->custom_domain ?: 'Not Set' }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if ($tenant->status === 'active')
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Active</span>
+                                <td class="py-3 px-3 text-secondary">
+                                    @if($tenant->custom_domain)
+                                        <span class="text-dark">{{ $tenant->custom_domain }}</span>
                                     @else
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">{{ ucfirst($tenant->status) }}</span>
+                                        <span class="text-secondary fst-italic">Not Set</span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                    <button type="button" x-data
-                                        x-on:click="$dispatch('open-modal', 'edit-domain-{{ $tenant->id }}')"
-                                        class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                                <td class="py-3 px-3">
+                                    @if ($tenant->status === 'active')
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">
+                                            Active
+                                        </span>
+                                    @else
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1">
+                                            {{ ucfirst($tenant->status) }}
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-2" data-bs-toggle="modal" data-bs-target="#editDomainModal-{{ $tenant->id }}">
                                         Edit Domain
                                     </button>
                                     @if ($tenant->custom_domain)
-                                        <form action="{{ route('customer.domains.verify', $tenant) }}" method="POST"
-                                            class="inline">
+                                        <form action="{{ route('customer.domains.verify', $tenant) }}" method="POST" class="d-inline">
                                             @csrf
-                                            <button type="submit"
-                                                class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                                            <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3 hover-lift">
                                                 Verify
                                             </button>
                                         </form>
@@ -58,52 +68,29 @@
                                 </td>
                             </tr>
 
-                            <!-- Edit Modal (AlpineJS based - assuming modal component exists or implementing basic one) -->
-                            <div x-data="{ show: false }" x-show="show"
-                                x-on:open-modal.window="if ($event.detail === 'edit-domain-{{ $tenant->id }}') show = true"
-                                style="display: none;" class="fixed z-50 inset-0 overflow-y-auto">
-                                <div
-                                    class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                                    <div x-show="show" class="fixed inset-0 transition-opacity" aria-hidden="true"
-                                        x-on:click="show = false">
-                                        <div
-                                            class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-90">
+                            <!-- Edit Domain Modal -->
+                            <div class="modal fade" id="editDomainModal-{{ $tenant->id }}" tabindex="-1" aria-labelledby="editDomainModalLabel-{{ $tenant->id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-sm rounded-4 glass">
+                                        <div class="modal-header border-bottom border-light p-4">
+                                            <h5 class="modal-title fw-bold" id="editDomainModalLabel-{{ $tenant->id }}">Edit Custom Domain</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
-                                    </div>
-                                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
-                                        aria-hidden="true">&#8203;</span>
-                                    <div x-show="show"
-                                        class="inline-block align-bottom bg-white dark:bg-surface-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                                         <form action="{{ route('customer.domains.update', $tenant) }}" method="POST">
                                             @csrf
                                             @method('PUT')
-                                            <div class="bg-white dark:bg-surface-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                                <h3 class="text-lg leading-6 font-medium text-surface-900 dark:text-white"
-                                                    id="modal-title">
-                                                    Edit Custom Domain
-                                                </h3>
-                                                <div class="mt-4">
-                                                    <label
-                                                        class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Custom
-                                                        Domain</label>
-                                                    <input type="text" name="custom_domain"
-                                                        value="{{ $tenant->custom_domain }}"
-                                                        placeholder="e.g. erp.mycompany.com" required
-                                                        class="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg dark:bg-surface-700 dark:text-white">
-                                                    <p class="mt-2 text-sm text-surface-500">Please point your domain's
-                                                        CNAME record to {{ $tenant->subdomain }}.cooca.id</p>
+                                            <div class="modal-body p-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-medium text-secondary">Custom Domain</label>
+                                                    <input type="text" name="custom_domain" value="{{ $tenant->custom_domain }}" placeholder="e.g. erp.mycompany.com" required class="form-control bg-light border-light text-secondary py-2">
+                                                    <div class="form-text mt-2 text-secondary fs-7">
+                                                        Please point your domain's CNAME record to <span class="fw-semibold">{{ $tenant->subdomain }}.cooca.id</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div
-                                                class="bg-gray-50 dark:bg-surface-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                                <button type="submit"
-                                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                                                    Save
-                                                </button>
-                                                <button type="button" x-on:click="show = false"
-                                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-surface-300 dark:border-surface-600 shadow-sm px-4 py-2 bg-white dark:bg-surface-800 text-base font-medium text-surface-700 dark:text-surface-300 hover:bg-gray-50 dark:hover:bg-surface-700 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                                                    Cancel
-                                                </button>
+                                            <div class="modal-footer border-top border-light bg-transparent p-4">
+                                                <button type="button" class="btn btn-light border rounded-pill px-4 hover-lift" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift fw-medium">Save Changes</button>
                                             </div>
                                         </form>
                                     </div>
@@ -111,17 +98,21 @@
                             </div>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-surface-500 dark:text-surface-400">
-                                    No active products found.
+                                <td colspan="5" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-globe fs-1"></i></div>
+                                    <h6 class="fw-medium">No Custom Domains Found</h6>
+                                    <p class="fs-7">You don't have any active products to manage domains for.</p>
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-            <div class="px-6 py-4 border-t border-surface-200 dark:border-surface-700">
-                {{ $tenants->links() }}
-            </div>
+            @if (method_exists($tenants, 'hasPages') && $tenants->hasPages())
+                <div class="card-footer bg-transparent border-top border-light p-4">
+                    {{ $tenants->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection

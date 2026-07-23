@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Midtrans;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApiIntegration;
 use App\Models\MidtransTransaction;
-use App\Models\Setting;
 use App\Models\Transaction;
 use App\Services\Payment\PaymentService;
 use Illuminate\Http\Request;
@@ -135,7 +135,6 @@ class WebhookController extends Controller
             ]);
 
             return response()->json(['message' => 'Webhook processed successfully'], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::channel('payment')->error('Midtrans webhook processing failed', [
@@ -176,17 +175,27 @@ class WebhookController extends Controller
             }
         }
 
-        $serverKey = Setting::get('payment.midtrans_server_key', config('services.midtrans.server_key'));
-        
+        // Attempt to get server key from ApiIntegration first, fallback to config
+        $serverKey = null;
+        $integration = ApiIntegration::where('provider', 'midtrans')
+            ->where('is_active', true)
+            ->first();
+
+        if ($integration && is_array($integration->config) && !empty($integration->config['server_key'])) {
+            $serverKey = $integration->config['server_key'];
+        } else {
+            $serverKey = config('services.midtrans.server_key');
+        }
+
         if (empty($serverKey)) {
             Log::error('Midtrans webhook: Server key not configured');
             return false;
         }
 
         $inputString = $payload['order_id'] .
-                      $payload['status_code'] .
-                      $payload['gross_amount'] .
-                      $serverKey;
+            $payload['status_code'] .
+            $payload['gross_amount'] .
+            $serverKey;
 
         $calculatedSignature = hash('sha512', $inputString);
 

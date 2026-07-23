@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Affiliator;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,7 +12,7 @@ class AffiliatorMenuTest extends TestCase
 
     public function test_affiliator_can_access_all_menus()
     {
-        $affiliator = Affiliator::create([
+        $affiliator = User::factory()->create([
             'name' => 'Test Affiliator',
             'email' => 'affiliate@cooca.id',
             'password' => bcrypt('password123'),
@@ -40,7 +40,7 @@ class AffiliatorMenuTest extends TestCase
         ];
 
         foreach ($menus as $route) {
-            $response = $this->actingAs($affiliator, 'affiliator')->get(route($route));
+            $response = $this->actingAs($affiliator)->get(route($route));
             $response->assertStatus(200);
         }
     }

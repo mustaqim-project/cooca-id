@@ -13,3 +13,5 @@ final class AffiliatorObserver
         event(new AffiliatorRegistered($affiliator));
     }
 }
+
+

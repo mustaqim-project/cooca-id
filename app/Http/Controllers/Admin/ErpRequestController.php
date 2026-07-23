@@ -174,3 +174,5 @@ final class ErpRequestController extends Controller
         return redirect()->back()->with('success', 'Trial activated! License generated and notifications sent.');
     }
 }
+
+

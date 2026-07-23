@@ -21,7 +21,7 @@ return new class extends Migration
             // Date when invoice was paid (starting point for holding period)
             $table->timestamp('invoice_paid_at')->nullable()->after('available_at');
             // Reference to invoice/transaction that generated this commission
-            $table->uuid('invoice_id')->nullable()->after('customer_id');
+            $table->uuid('invoice_id')->nullable()->after('affiliator_id');
             
             $table->foreign('invoice_id')
                 ->references('id')

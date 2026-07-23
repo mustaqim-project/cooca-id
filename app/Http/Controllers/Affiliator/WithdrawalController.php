@@ -25,7 +25,7 @@ final class WithdrawalController extends Controller
      */
     public function store(RequestWithdrawalRequest $request)
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
         $data = $request->validated();
 
         $withdrawal = $this->affiliateService->requestWithdrawal(
@@ -45,7 +45,7 @@ final class WithdrawalController extends Controller
      */
     public function index()
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
         $withdrawals = $this->affiliateService->getWithdrawals($affiliator->getKey());
 
         return view('affiliator.withdrawals.index', [
@@ -60,7 +60,7 @@ final class WithdrawalController extends Controller
      */
     public function create()
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
         $balance = $this->affiliateService->getAvailableBalance($affiliator->getKey());
 
         return view('affiliator.withdrawals.create', [
@@ -84,7 +84,7 @@ final class WithdrawalController extends Controller
      */
     public function show(string $id)
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
         $withdrawal = $this->affiliateService->getWithdrawalById($id, $affiliator->getKey());
 
         if (!$withdrawal) {
@@ -101,7 +101,7 @@ final class WithdrawalController extends Controller
      */
     public function history()
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
         $withdrawals = $this->affiliateService->getWithdrawalHistory($affiliator->getKey());
 
         return view('affiliator.withdrawals.history', [

@@ -13,11 +13,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property string $id
- * @property string $customer_id
+ * @property string $user_id
  * @property string $erp_product_id
  * @property string $subscription_plan_id
  * @property string $subdomain
- * @property string|null $affiliator_id
+ * @property string|null $referred_by_id
  * @property string $status
  * @property string|null $rejection_reason
  * @property \Carbon\Carbon|null $submitted_at
@@ -37,11 +37,11 @@ final class Trial extends Model
     protected $table = 'trials';
 
     protected $fillable = [
-        'customer_id',
+        'user_id',
         'erp_product_id',
         'subscription_plan_id',
         'subdomain',
-        'affiliator_id',
+        'referred_by_id',
         'status',
         'rejection_reason',
         'submitted_at',
@@ -130,7 +130,7 @@ final class Trial extends Model
 
     public function affiliator(): BelongsTo
     {
-        return $this->belongsTo(Affiliator::class, 'affiliator_id');
+        return $this->belongsTo(Affiliator::class, 'referred_by_id');
     }
 
     public function subscription(): BelongsTo
@@ -246,3 +246,4 @@ final class Trial extends Model
         ]);
     }
 }
+

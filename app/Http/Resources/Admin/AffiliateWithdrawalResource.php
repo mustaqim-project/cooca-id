@@ -13,7 +13,7 @@ final class AffiliateWithdrawalResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'affiliator_id' => $this->affiliator_id,
+            'referred_by_id' => $this->referred_by_id,
             'affiliator' => $this->whenLoaded('affiliator', fn () => [
                 'id' => $this->affiliator->id,
                 'name' => $this->affiliator->name,

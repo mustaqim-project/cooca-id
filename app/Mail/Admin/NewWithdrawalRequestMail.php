@@ -29,7 +29,7 @@ final class NewWithdrawalRequestMail extends Mailable implements ShouldQueue
             tags: ['admin', 'withdrawal', 'request'],
             metadata: [
                 'withdrawal_id' => $this->withdrawal->id,
-                'affiliator_id' => $this->withdrawal->affiliator_id,
+                'referred_by_id' => $this->withdrawal->referred_by_id,
             ],
         );
     }

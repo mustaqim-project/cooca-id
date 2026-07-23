@@ -25,7 +25,7 @@ final class RecurringCommissionService
         $renewalTransactions = Transaction::where('type', 'subscription_renewal')
             ->where('status', 'paid')
             ->whereHas('customer', function ($query) {
-                $query->whereNotNull('affiliator_id');
+                $query->whereNotNull('referred_by_id');
             })
             ->whereDoesntHave('commissions', function ($query) {
                 $query->where('status', '!=', 'pending');
@@ -72,14 +72,14 @@ final class RecurringCommissionService
         $totalRenewals = Transaction::where('type', 'subscription_renewal')
             ->where('status', 'paid')
             ->whereHas('customer', function ($query) {
-                $query->whereNotNull('affiliator_id');
+                $query->whereNotNull('referred_by_id');
             })
             ->count();
 
         $totalRenewalCommission = Transaction::where('type', 'subscription_renewal')
             ->where('status', 'paid')
             ->whereHas('customer', function ($query) {
-                $query->whereNotNull('affiliator_id');
+                $query->whereNotNull('referred_by_id');
             })
             ->join('affiliate_commissions', 'transactions.id', '=', 'affiliate_commissions.transaction_id')
             ->sum('affiliate_commissions.commission_amount');

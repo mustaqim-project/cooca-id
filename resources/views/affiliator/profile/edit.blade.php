@@ -1,68 +1,121 @@
-@extends('layouts.affiliator')
+@extends('affiliator.layouts.app')
 
-@section('title', 'Edit Profile')
-@section('subtitle', 'Modify profile record.')
+@section('title', 'Profile Settings')
 
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
-        </a>
-    </div>
+    <div class="d-flex flex-column gap-4">
 
-    <form action="#" method="POST"  class="form-confirm-submit">
-        @csrf
-        
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column: Main Form -->
-            <div class="lg:col-span-2 space-y-6">
-                <div class="corporate-card">
-                    <div class="p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-50/50 dark:bg-surface-900/50">
-                        <h3 class="text-lg font-medium text-surface-900 dark:text-white">Form Details</h3>
-                    </div>
-                    <div class="p-6 space-y-5">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="col-span-2">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Title / Name</label>
-                <input type="text" name="name" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white" placeholder="Enter title">
-            </div>
-            
-            <div class="col-span-2">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Description</label>
-                <textarea name="description" rows="4" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white" placeholder="Enter description"></textarea>
-            </div>
-            
-            <div class="col-span-2 md:col-span-1">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Status</label>
-                <select name="status" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white">
-                    <option value="1">Active</option>
-                    <option value="0">Inactive</option>
-                </select>
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold">Profile Settings</h2>
+                <p class="text-secondary mb-0">Manage your account information and password.</p>
             </div>
         </div>
+
+        <div class="row g-4">
+            <!-- Left: Profile Info -->
+            <div class="col-12 col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 glass h-100">
+                    <div class="card-header bg-transparent border-bottom border-light p-4 d-flex align-items-center gap-2">
+                        <i class="bi bi-person text-primary fs-5"></i>
+                        <h5 class="fw-bold mb-0 text-dark">Account Information</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="{{ route('affiliator.profile.update') }}" method="POST" class="d-flex flex-column gap-4">
+                            @csrf
+                            @method('PUT')
+
+                            @if(session('success'))
+                                <div class="alert alert-success rounded-3 fs-7 border-0 shadow-sm">
+                                    <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+                                </div>
+                            @endif
+
+                            <div>
+                                <label for="name" class="form-label fw-medium text-dark">Full Name</label>
+                                <input type="text" name="name" id="name"
+                                    class="form-control bg-light border-light @error('name') is-invalid @enderror"
+                                    value="{{ old('name', $user['name'] ?? '') }}" required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="email" class="form-label fw-medium text-dark">Email Address</label>
+                                <input type="email" name="email" id="email"
+                                    class="form-control bg-light border-light @error('email') is-invalid @enderror"
+                                    value="{{ old('email', $user['email'] ?? '') }}" required>
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift fw-medium">
+                                    <i class="bi bi-check2-circle me-1"></i> Update Profile
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-            
-            <!-- Right Column: Actions -->
-            <div class="space-y-6">
-                <div class="corporate-card">
-                    <div class="p-6">
-                        <h3 class="text-lg font-medium text-surface-900 dark:text-white mb-2">Actions</h3>
-                        <p class="text-sm text-surface-500 dark:text-surface-400 mb-6">Review your changes before submitting.</p>
-                        
-                        <div class="flex flex-col space-y-3">
-                            
-                            <a href="javascript:history.back()" class="btn btn-secondary w-full">
-                                Cancel
-                            </a>
-                        </div>
+
+            <!-- Right: Change Password -->
+            <div class="col-12 col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 glass h-100">
+                    <div class="card-header bg-transparent border-bottom border-light p-4 d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-lock text-primary fs-5"></i>
+                        <h5 class="fw-bold mb-0 text-dark">Change Password</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="{{ route('affiliator.profile.password.update') }}" method="POST" class="d-flex flex-column gap-4">
+                            @csrf
+                            @method('PUT')
+
+                            @if(session('password_success'))
+                                <div class="alert alert-success rounded-3 fs-7 border-0 shadow-sm">
+                                    <i class="bi bi-check-circle me-2"></i>{{ session('password_success') }}
+                                </div>
+                            @endif
+
+                            <div>
+                                <label for="current_password" class="form-label fw-medium text-dark">Current Password</label>
+                                <input type="password" name="current_password" id="current_password"
+                                    class="form-control bg-light border-light @error('current_password') is-invalid @enderror"
+                                    required>
+                                @error('current_password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="new_password" class="form-label fw-medium text-dark">New Password</label>
+                                <input type="password" name="new_password" id="new_password"
+                                    class="form-control bg-light border-light @error('new_password') is-invalid @enderror"
+                                    required minlength="8">
+                                <div class="form-text text-secondary fs-7"><i class="bi bi-info-circle me-1"></i> Minimum 8 characters.</div>
+                                @error('new_password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="new_password_confirmation" class="form-label fw-medium text-dark">Confirm New Password</label>
+                                <input type="password" name="new_password_confirmation" id="new_password_confirmation"
+                                    class="form-control bg-light border-light" required>
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift fw-medium">
+                                    <i class="bi bi-shield-check me-1"></i> Update Password
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
-</div>
+    </div>
 @endsection

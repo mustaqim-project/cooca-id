@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('affiliate_commissions', function (Blueprint $table) {
             // Link commission to the specific plan that was purchased
-            $table->uuid('subscription_plan_id')->nullable()->after('customer_id');
+            $table->uuid('subscription_plan_id')->nullable()->after('affiliator_id');
             // Snapshot plan name for historical reference (plan may be renamed/deleted later)
             $table->string('plan_name')->nullable()->after('subscription_plan_id');
 
@@ -37,3 +37,4 @@ return new class extends Migration
         });
     }
 };
+

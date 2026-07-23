@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Jobs\Notification;
 
-use App\Models\Customer;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -18,7 +18,7 @@ final class SendWelcomeMailJob implements ShouldQueue
     public int $backoff = 60;
 
     public function __construct(
-        private readonly Customer $customer,
+        private readonly \App\Models\Customer $customer,
     ) {}
 
     public function handle(): void

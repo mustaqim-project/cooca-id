@@ -23,7 +23,7 @@ final class PaymentController extends Controller
 
     public function index()
     {
-        $payments = \App\Models\Transaction::where('customer_id', Auth::guard('customer')->id())
+        $payments = \App\Models\Transaction::where('customer_id', Auth::id())
             ->paginate(15);
             
         return view('customer.payments.index', [
@@ -34,7 +34,7 @@ final class PaymentController extends Controller
     public function show(string $payment)
     {
         $transaction = \App\Models\Transaction::where('id', $payment)
-            ->where('customer_id', Auth::guard('customer')->id())
+            ->where('customer_id', Auth::id())
             ->first();
             
         if (!$transaction) {
@@ -51,7 +51,7 @@ final class PaymentController extends Controller
      */
     public function store(ProcessPaymentRequest $request)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
         $data = $request->validated();
 
         $transactionData = TransactionData::from([

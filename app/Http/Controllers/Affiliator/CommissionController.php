@@ -20,8 +20,8 @@ final class CommissionController extends Controller
      */
     public function index()
     {
-        $affiliator  = Auth::guard('affiliator')->user();
-        $commissions = AffiliateCommission::where('affiliator_id', $affiliator->getKey())
+        $affiliator  = Auth::user();
+        $commissions = AffiliateCommission::where('referred_by_id', $affiliator->getKey())
             ->with(['transaction', 'customer'])
             ->latest()
             ->paginate(20);
@@ -36,16 +36,16 @@ final class CommissionController extends Controller
      */
     public function stats()
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         return view('affiliator.commissions.stats', [
             'total_commission'   => $this->affiliateService->getTotalCommission($affiliator),
             'cleared_commission' => $this->affiliateService->getTotalCommission($affiliator, 'cleared'),
             'pending_commission' => $this->affiliateService->getTotalCommission($affiliator, 'pending'),
             'breakdown'          => $this->affiliateService->getCommissionBreakdown($affiliator),
-            'level1_total'       => AffiliateCommission::where('affiliator_id', $affiliator->getKey())
+            'level1_total'       => AffiliateCommission::where('referred_by_id', $affiliator->getKey())
                                         ->where('level', 1)->sum('commission_amount'),
-            'level2_total'       => AffiliateCommission::where('affiliator_id', $affiliator->getKey())
+            'level2_total'       => AffiliateCommission::where('referred_by_id', $affiliator->getKey())
                                         ->where('level', 2)->sum('commission_amount'),
         ]);
     }
@@ -55,8 +55,8 @@ final class CommissionController extends Controller
      */
     public function export()
     {
-        $affiliator  = Auth::guard('affiliator')->user();
-        $commissions = AffiliateCommission::where('affiliator_id', $affiliator->getKey())
+        $affiliator  = Auth::user();
+        $commissions = AffiliateCommission::where('referred_by_id', $affiliator->getKey())
             ->with(['transaction', 'customer'])
             ->get();
 
@@ -94,8 +94,8 @@ final class CommissionController extends Controller
      */
     public function show(string $commission)
     {
-        $affiliator   = Auth::guard('affiliator')->user();
-        $commission   = AffiliateCommission::where('affiliator_id', $affiliator->getKey())
+        $affiliator   = Auth::user();
+        $commission   = AffiliateCommission::where('referred_by_id', $affiliator->getKey())
             ->with(['transaction', 'customer'])
             ->findOrFail($commission);
 

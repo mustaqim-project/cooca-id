@@ -243,4 +243,116 @@ final class LicenseService
             $this->activateLicense($license, now(), now()->addYear());
         }
     }
+
+    /**
+     * Activate license from ERP client
+     */
+    public function activateErpLicense(array $data): array
+    {
+        $license = $this->licenseRepository->findByCode($data['license_code']);
+
+        if (!$license) {
+            return ['valid' => false, 'message' => 'License code not found'];
+        }
+
+        if ($license->status !== 'active' && $license->status !== 'pending') {
+            return ['valid' => false, 'message' => 'License is ' . $license->status];
+        }
+
+        if ($license->expires_at && $license->expires_at->isPast()) {
+            return ['valid' => false, 'message' => 'License has expired'];
+        }
+
+        // Validate customer registered URL if exists
+        $customerDomain = $license->customer?->domain;
+        if (!empty($customerDomain)) {
+            $normalizedCustomerDomain = str_replace(['http://', 'https://'], '', $customerDomain);
+            $normalizedCustomerDomain = rtrim($normalizedCustomerDomain, '/');
+            
+            $normalizedRequestDomain = str_replace(['http://', 'https://'], '', $data['domain']);
+            $normalizedRequestDomain = rtrim($normalizedRequestDomain, '/');
+            
+            if ($normalizedCustomerDomain !== $normalizedRequestDomain) {
+                return ['valid' => false, 'message' => 'Customer URL mismatch'];
+            }
+        }
+
+        // If domain is not set, bind it. If set, it must match.
+        if (empty($license->domain)) {
+            $this->licenseRepository->update($license->id, [
+                'domain' => $data['domain'],
+                'status' => 'active'
+            ]);
+            $license->domain = $data['domain'];
+            $license->status = 'active';
+            $this->clearLicenseCache($license);
+        } elseif ($license->domain !== $data['domain']) {
+            return ['valid' => false, 'message' => 'License is already bound to another domain'];
+        }
+
+        // Generate response payload
+        return $this->generateErpResponse($license);
+    }
+
+    /**
+     * Sync license from ERP client
+     */
+    public function syncErpLicense(array $data): array
+    {
+        $license = $this->licenseRepository->findByCode($data['license_code']);
+
+        if (!$license) {
+            return ['valid' => false, 'message' => 'License code not found'];
+        }
+
+        if ($license->domain !== $data['domain']) {
+            return ['valid' => false, 'message' => 'Domain mismatch'];
+        }
+
+        return $this->generateErpResponse($license);
+    }
+
+    /**
+     * Generate ERP response payload with HMAC signature
+     */
+    private function generateErpResponse(License $license): array
+    {
+        $payload = [
+            'customer' => [
+                'id' => $license->customer->id ?? null,
+                'business_name' => $license->customer->business_name ?? null,
+                'email' => $license->customer->email ?? null,
+            ],
+            'product' => [
+                'id' => $license->product->id ?? null,
+                'name' => $license->product->name ?? null,
+            ]
+        ];
+        
+        $startedAt = $license->activated_at ?? $license->created_at;
+        $expiredAt = $license->expires_at;
+
+        $data = [
+            'license_code' => $license->license_code,
+            'license_key' => $license->license_key ?? null,
+            'subscription_status' => strtolower($license->status),
+            'subscription_plan' => $license->product->name ?? 'Standard',
+            'subscription_started_at' => $startedAt ? $startedAt->toIso8601String() : null,
+            'subscription_expired_at' => $expiredAt ? $expiredAt->toIso8601String() : null,
+            'license_status' => strtolower($license->status),
+            'token' => $license->token_code,
+            'last_validation' => now()->toIso8601String(),
+            'next_validation' => now()->addDays(7)->toIso8601String(),
+            'payload' => $payload,
+        ];
+
+        $secret = config('services.cooca.secret', config('app.key'));
+        // The signature signs the payload part
+        $data['signature'] = hash_hmac('sha256', json_encode($payload), $secret);
+
+        return [
+            'valid' => true,
+            'data' => $data,
+        ];
+    }
 }

@@ -1,80 +1,95 @@
-@extends('layouts.affiliator')
+@extends('affiliator.layouts.app')
 
-@section('title', 'Reviews')
-@section('subtitle', 'Manage your reviews data.')
+@section('title', 'Referral Reviews')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
-            </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
-        </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-            
-        </div>
-    </div>
+    <div class="d-flex flex-column gap-4">
 
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
-                <tr>
-                    <th class="table-th">ID</th>
-                    <th class="table-th">Name / Title</th>
-                    <th class="table-th">Status</th>
-                    <th class="table-th">Date</th>
-                    <th class="table-th">Actions</th>
-                </tr>
-            
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
-                @forelse($reviews ?? [] as $review)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">{{ $review->id }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white">{{ $review->title ?? 'No Title' }}</div>
-                        <div class="text-sm text-surface-500 dark:text-surface-400">{{ $review->customer->name ?? 'Unknown Customer' }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @php
-                            $statusClass = match($review->status ?? 'pending') {
-                                'approved' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                                'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                                'rejected' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-                                default => 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300'
-                            };
-                        @endphp
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClass }}">
-                            {{ ucfirst($review->status ?? 'pending') }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">{{ $review->created_at ? $review->created_at->format('M d, Y') : '-' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <span class="text-surface-400">View Only</span>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="5" class="px-6 py-4 text-center text-sm text-surface-500">No reviews found from your referred customers.</td></tr>
-                @endforelse
-            
-                
-                
-                </tbody>
-            </table>
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold">Referral Reviews</h2>
+                <p class="text-secondary mb-0">View reviews submitted by your referred customers.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('affiliator.reviews.my_reviews') }}" class="btn btn-light border rounded-pill px-3 hover-lift fw-medium">
+                    <i class="bi bi-star me-1"></i> My Reviews
+                </a>
+            </div>
+        </div>
+
+        <!-- Reviews Table -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div
+                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
+                    style="max-width: 320px; background: var(--color-bg);">
+                    <span class="input-group-text bg-transparent border-0 pe-1"><i
+                            class="bi bi-search text-secondary"></i></span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
+                        placeholder="Search reviews...">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
+                        <tr>
+                            <th class="py-3 px-4 border-0" style="width: 80px;">ID</th>
+                            <th class="py-3 px-3 border-0">Review Title / Customer</th>
+                            <th class="py-3 px-3 border-0">Status</th>
+                            <th class="py-3 px-3 border-0">Date</th>
+                            <th class="py-3 px-4 border-0 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @forelse($reviews ?? [] as $review)
+                            <tr>
+                                <td class="py-3 px-4 fw-medium text-secondary">
+                                    #{{ $review->id }}
+                                </td>
+                                <td class="py-3 px-3">
+                                    <div class="fw-semibold text-dark">{{ $review->title ?? 'No Title' }}</div>
+                                    <div class="text-secondary fs-7"><i class="bi bi-person me-1"></i> {{ $review->customer->name ?? 'Unknown Customer' }}</div>
+                                </td>
+                                <td class="py-3 px-3">
+                                    @php
+                                        $statusClass = match($review->status ?? 'pending') {
+                                            'approved' => 'success',
+                                            'pending' => 'warning',
+                                            'rejected' => 'danger',
+                                            default => 'secondary'
+                                        };
+                                    @endphp
+                                    <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-3 py-1">
+                                        {{ ucfirst($review->status ?? 'pending') }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-3 text-secondary fs-7">
+                                    {{ $review->created_at ? $review->created_at->format('M d, Y') : '-' }}
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    <span class="badge bg-light text-secondary border px-3 py-1 rounded-pill">View Only</span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-chat-left-text fs-1"></i></div>
+                                    <h6 class="fw-medium">No Referral Reviews Found</h6>
+                                    <p class="fs-7 mb-0">No reviews found from your referred customers.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if (method_exists($reviews ?? [], 'hasPages') && ($reviews ?? [])->hasPages())
+                <div class="card-footer bg-transparent border-top border-light p-4">
+                    {{ $reviews->links() }}
+                </div>
+            @endif
         </div>
     </div>
-</div>
 @endsection

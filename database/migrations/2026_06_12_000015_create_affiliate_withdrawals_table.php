@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('affiliate_withdrawals', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('affiliator_id');
+            $table->uuid('referred_by_id');
             $table->decimal('amount', 15, 2);
             $table->decimal('fee', 15, 2)->default(0);
             $table->decimal('net_amount', 15, 2);
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
 
-            $table->foreign('affiliator_id')
+            $table->foreign('referred_by_id')
                 ->references('id')
                 ->on('affiliators')
                 ->onDelete('cascade');
@@ -40,7 +40,7 @@ return new class extends Migration
                 ->on('admins')
                 ->onDelete('set null');
 
-            $table->index('affiliator_id');
+            $table->index('referred_by_id');
             $table->index('status');
         });
     }
@@ -53,3 +53,4 @@ return new class extends Migration
         Schema::dropIfExists('affiliate_withdrawals');
     }
 };
+

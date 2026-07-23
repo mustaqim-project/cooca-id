@@ -1,74 +1,86 @@
-@extends('layouts.customer')
+@extends('customer.layouts.app')
 
 @section('title', 'Available Products')
-@section('subtitle', 'Browse our catalog of digital products and services')
 
 @section('content')
-<div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-    <div class="w-full sm:max-w-xs">
-        <label for="search" class="sr-only">Search products</label>
-        <div class="relative">
-            <div class="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
-                <i data-lucide="search" class="w-4 h-4"></i>
-            </div>
-            <input id="search" name="search" class="block w-full bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-700 rounded-md py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-surface-900 dark:text-white focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm" placeholder="Search for products..." type="search">
-        </div>
-    </div>
-</div>
+    <div class="d-flex flex-column gap-4">
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-    @forelse($products as $product)
-    <div class="bg-white dark:bg-surface-800 animate-fade-in-up rounded-lg border border-surface-200 dark:border-surface-700 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
-        <div class="aspect-w-16 aspect-h-9 bg-surface-100 dark:bg-surface-700">
-            @if($product->thumbnail)
-                <img src="{{ asset('storage/' . $product->thumbnail) }}" alt="{{ $product->name }}" class="object-cover w-full h-48">
-            @else
-                <div class="flex items-center justify-center w-full h-48 bg-primary-50 dark:bg-primary-900/20 text-primary-300">
-                    <i data-lucide="box" class="w-4 h-4 text-5xl"></i>
-                </div>
-            @endif
-        </div>
-        
-        <div class="p-5 flex-1 flex flex-col">
-            <div class="flex justify-between items-start mb-2">
-                <h3 class="text-lg font-bold text-surface-900 dark:text-white line-clamp-1">
-                    {{ $product->name }}
-                </h3>
-                @if($product->category)
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
-                        {{ $product->category->name }}
-                    </span>
-                @endif
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold">Available Products</h2>
+                <p class="text-secondary mb-0">Browse our catalog of digital products and services.</p>
             </div>
-            
-            <p class="text-sm text-surface-500 dark:text-surface-400 mb-4 line-clamp-2 flex-1">
-                {{ $product->description ?? 'No description available for this product.' }}
-            </p>
-            
-            <div class="mt-auto">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="text-sm">
-                        <span class="text-surface-500 dark:text-surface-400">Starting from</span>
-                        <div class="text-lg font-bold text-surface-900 dark:text-white">
-                            Rp {{ number_format($product->price ?? 0, 0, ',', '.') }}
+            <div class="d-flex gap-2">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden border bg-white"
+                    style="max-width: 320px;">
+                    <span class="input-group-text bg-transparent border-0 pe-1">
+                        <i class="bi bi-search text-secondary"></i>
+                    </span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
+                        placeholder="Search products...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="row g-4">
+            @forelse($products as $product)
+                <div class="col-12 col-sm-6 col-lg-4 col-xl-3" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift overflow-hidden glass d-flex flex-column">
+                        <!-- Thumbnail -->
+                        <div class="position-relative bg-light" style="height: 180px;">
+                            @if($product->thumbnail)
+                                <img src="{{ asset('storage/' . $product->thumbnail) }}" alt="{{ $product->name }}" 
+                                    class="w-100 h-100 object-fit-cover">
+                            @else
+                                <div class="d-flex align-items-center justify-content-center w-100 h-100 text-secondary bg-primary-subtle">
+                                    <i class="bi bi-box fs-1"></i>
+                                </div>
+                            @endif
+                            
+                            @if($product->category)
+                                <span class="position-absolute top-0 end-0 m-3 badge bg-white text-primary shadow-sm rounded-pill px-3 py-2">
+                                    {{ $product->category->name }}
+                                </span>
+                            @endif
+                        </div>
+                        
+                        <!-- Details -->
+                        <div class="card-body p-4 d-flex flex-column flex-grow-1">
+                            <h5 class="fw-bold mb-2 text-truncate">{{ $product->name }}</h5>
+                            <p class="text-secondary mb-4 fs-7 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ $product->description ?? 'No description available for this product.' }}
+                            </p>
+                            
+                            <div class="d-flex align-items-end justify-content-between mt-auto">
+                                <div>
+                                    <div class="text-secondary fs-7 mb-1">Starting from</div>
+                                    <h5 class="fw-bold text-primary mb-0">Rp {{ number_format($product->price ?? 0, 0, ',', '.') }}</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action -->
+                        <div class="card-footer bg-transparent border-top border-light p-3">
+                            <a href="{{ route('customer.products.show', $product->slug) }}" 
+                                class="btn btn-light w-100 rounded-pill hover-lift text-primary fw-medium">
+                                View Details <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
-                
-                <a href="{{ route('customer.products.show', $product->slug) }}" class="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                    View Details
-                </a>
-            </div>
+            @empty
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 glass p-5 text-center">
+                        <div class="text-secondary mb-3">
+                            <i class="bi bi-inbox fs-1"></i>
+                        </div>
+                        <h5 class="fw-semibold">No Products Found</h5>
+                        <p class="text-secondary mb-0">There are currently no products available in the catalog.</p>
+                    </div>
+                </div>
+            @endforelse
         </div>
     </div>
-    @empty
-    <div class="col-span-full">
-        <div class="text-center bg-white dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700 p-12 shadow-sm">
-            <i data-lucide="inbox" class="w-4 h-4 text-5xl text-surface-300 dark:text-surface-600 dark:text-surface-400 mb-4 inline-block"></i>
-            <h3 class="mt-2 text-sm font-medium text-surface-900 dark:text-white">No products</h3>
-            <p class="mt-1 text-sm text-surface-500 dark:text-surface-400">No products are currently available in the catalog.</p>
-        </div>
-    </div>
-    @endforelse
-</div>
 @endsection

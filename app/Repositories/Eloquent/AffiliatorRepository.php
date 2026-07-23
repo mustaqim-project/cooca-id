@@ -61,7 +61,7 @@ final class AffiliatorRepository extends BaseRepository implements AffiliatorRep
 
     public function getDownlines(string $affiliatorId): Collection
     {
-        return $this->model->where('parent_affiliator_id', $affiliatorId)->get();
+        return $this->model->where('parent_referred_by_id', $affiliatorId)->get();
     }
 
     public function getAllDownlines(string $affiliatorId): array
@@ -80,7 +80,7 @@ final class AffiliatorRepository extends BaseRepository implements AffiliatorRep
 
     public function countDownlines(string $affiliatorId): int
     {
-        return $this->model->where('parent_affiliator_id', $affiliatorId)->count();
+        return $this->model->where('parent_referred_by_id', $affiliatorId)->count();
     }
 
     public function updateBalance(string $id, float $amount): bool
@@ -97,10 +97,5 @@ final class AffiliatorRepository extends BaseRepository implements AffiliatorRep
     public function getTopAffiliators(int $limit = 10): Collection
     {
         return $this->model->orderByDesc('balance')->limit($limit)->get();
-    }
-
-    public function findOrFail(string $id): Affiliator
-    {
-        return $this->model->findOrFail($id);
     }
 }

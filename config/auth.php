@@ -2,7 +2,7 @@
 
 return [
     'defaults' => [
-        'guard' => 'customer', // Default guard untuk web
+        'guard' => 'web',
         'passwords' => 'customers',
     ],
 
@@ -25,7 +25,7 @@ return [
         ],
         'sanctum' => [
             'driver' => 'sanctum',
-            'provider' => null, // Menggunakan provider default atau custom jika perlu
+            'provider' => null,
         ],
     ],
 
@@ -45,9 +45,24 @@ return [
     ],
 
     'passwords' => [
-        'admins' => ['provider' => 'admins', 'table' => 'password_reset_tokens', 'expire' => 60, 'throttle' => 60],
-        'customers' => ['provider' => 'customers', 'table' => 'password_reset_tokens', 'expire' => 60, 'throttle' => 60],
-        'affiliators' => ['provider' => 'affiliators', 'table' => 'password_reset_tokens', 'expire' => 60, 'throttle' => 60],
+        'admins' => [
+            'provider' => 'admins',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'customers' => [
+            'provider' => 'customers',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'affiliators' => [
+            'provider' => 'affiliators',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
     ],
 
     'password_timeout' => 10800,

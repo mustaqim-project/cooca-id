@@ -20,8 +20,7 @@ return new class extends Migration
             $table->string('to_status');
             $table->text('reason')->nullable();
             $table->uuid('actor_id')->nullable();
-            $table->string('actor_type')->nullable(); // Admin, System, Customer
-            $table->decimal('amount', 15, 2)->nullable(); // Payment amount if applicable
+            $table->string('actor_type')->nullable(); // Admin, System, User $table->decimal('amount', 15, 2)->nullable(); // Payment amount if applicable
             $table->timestamps();
 
             $table->foreign('subscription_id')

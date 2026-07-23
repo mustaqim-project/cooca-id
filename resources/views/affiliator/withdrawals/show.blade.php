@@ -1,116 +1,162 @@
-@extends('layouts.affiliator')
+@extends('affiliator.layouts.app')
 
 @section('title', 'Withdrawal Details')
-@section('subtitle', 'View details for payout request #' . $withdrawal->id)
 
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <!-- Header Actions -->
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
-        </a>
-    </div>
+    <div class="d-flex flex-column gap-4">
 
-    <!-- Details Card -->
-    <div class="corporate-card">
-        <div class="card-header">
-            <h3 class="card-title">Information Details</h3>
-        </div>
-        <div class="card-body">
-            <a href="{{ route('affiliator.withdrawals.index') }}" class="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Withdrawals
-    </a>
-</div>
-
-<div class="max-w-3xl mx-auto">
-    <div class="bg-white dark:bg-surface-800 animate-fade-in-up shadow-sm rounded-lg border border-surface-200 dark:border-surface-700 overflow-hidden mb-8">
-        <div class="px-6 py-5 border-b border-surface-200 dark:border-surface-700 flex justify-between items-center bg-surface-50 dark:bg-surface-900/50">
-            <h3 class="text-lg leading-6 font-medium text-surface-900 dark:text-white">
-                Payout Status
-            </h3>
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ route('affiliator.withdrawals.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
+                <div>
+                    <h2 class="mb-1 fw-bold">Withdrawal Details</h2>
+                    <p class="text-secondary mb-0">Reference: #{{ $withdrawal->id }}</p>
+                </div>
+            </div>
             <div>
                 @php
                     $statusClass = match($withdrawal->status) {
-                        'completed', 'paid', 'approved' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                        'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                        'rejected', 'failed', 'cancelled' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-                        default => 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300'
+                        'completed', 'paid', 'approved' => 'success',
+                        'pending' => 'warning',
+                        'rejected', 'failed', 'cancelled' => 'danger',
+                        default => 'secondary'
                     };
                 @endphp
-                <span class="px-3 py-1 inline-flex text-sm leading-5 font-bold rounded-full {{ $statusClass }}">
-                    {{ strtoupper($withdrawal->status) }}
+                <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-4 py-2 fs-6">
+                    {{ ucfirst($withdrawal->status) }}
                 </span>
             </div>
         </div>
-        
-        <div class="px-6 py-5 sm:p-0">
-            <dl class="sm:divide-y sm:divide-surface-200 dark:divide-surface-700 dark:sm:divide-surface-700">
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Request ID</dt>
-                    <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2 font-mono">
-                        {{ $withdrawal->id }}
-                    </dd>
-                </div>
-                
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Amount Requested</dt>
-                    <dd class="mt-1 text-lg font-bold text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                        Rp {{ number_format($withdrawal->amount, 0, ',', '.') }}
-                    </dd>
-                </div>
-                
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-surface-50 dark:bg-surface-900/30">
-                    <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Destination Account</dt>
-                    <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                        <div class="flex items-center">
-                            <div class="mr-3 text-primary-500"><i data-lucide="bank" class="w-4 h-4 text-xl"></i></div>
-                            <div>
-                                <p class="font-medium">{{ strtoupper($withdrawal->withdrawal_method ?? 'BANK') }} - {{ $withdrawal->account_number }}</p>
-                                <p class="text-surface-500 dark:text-surface-400">A/N: {{ $withdrawal->account_name }}</p>
+
+        <div class="row g-4">
+            <div class="col-12 col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 glass">
+                    <div class="card-header bg-transparent border-bottom border-light p-4">
+                        <h5 class="fw-bold mb-0 text-dark">Request Information</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <!-- Amount -->
+                            <div class="col-12 col-md-6">
+                                <p class="text-secondary fs-7 mb-1 text-uppercase fw-semibold">Amount Requested</p>
+                                <div class="p-3 rounded-3 bg-light border border-light h-100 d-flex flex-column justify-content-center">
+                                    <h3 class="fw-bold text-dark mb-0">Rp {{ number_format($withdrawal->amount, 0, ',', '.') }}</h3>
+                                </div>
                             </div>
+                            
+                            <!-- Destination Account -->
+                            <div class="col-12 col-md-6">
+                                <p class="text-secondary fs-7 mb-1 text-uppercase fw-semibold">Destination Account</p>
+                                <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light border border-light h-100">
+                                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                        style="width: 48px; height: 48px;">
+                                        <i class="bi bi-bank fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark fs-6">{{ strtoupper($withdrawal->withdrawal_method ?? 'BANK') }} - {{ $withdrawal->account_number }}</div>
+                                        <div class="text-secondary fs-7">A/N: {{ $withdrawal->account_name }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <hr class="border-light my-2">
+                            </div>
+                            
+                            <!-- Dates & Details -->
+                            <div class="col-12 col-sm-6">
+                                <p class="text-secondary fs-7 mb-1 text-uppercase fw-semibold">Date Requested</p>
+                                <p class="fw-medium text-dark mb-0"><i class="bi bi-calendar3 me-1 text-secondary"></i> {{ \Carbon\Carbon::parse($withdrawal->created_at)->format('d M Y, H:i') }}</p>
+                            </div>
+                            
+                            @if($withdrawal->processed_at)
+                            <div class="col-12 col-sm-6">
+                                <p class="text-secondary fs-7 mb-1 text-uppercase fw-semibold">Date Processed</p>
+                                <p class="fw-medium text-success mb-0"><i class="bi bi-check-circle me-1"></i> {{ \Carbon\Carbon::parse($withdrawal->processed_at)->format('d M Y, H:i') }}</p>
+                            </div>
+                            @endif
+                            
+                            @if($withdrawal->notes)
+                            <div class="col-12 mt-4">
+                                <div class="p-3 bg-light rounded-3 border border-light">
+                                    <p class="text-secondary fs-7 mb-1 text-uppercase fw-semibold">Admin Notes</p>
+                                    <p class="mb-0 text-dark">{{ $withdrawal->notes }}</p>
+                                </div>
+                            </div>
+                            @endif
+                            
+                            @if($withdrawal->status == 'rejected')
+                            <div class="col-12 mt-4">
+                                <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle">
+                                    <p class="text-danger fs-7 mb-1 text-uppercase fw-semibold">Rejection Reason</p>
+                                    <p class="mb-0 text-dark fw-medium">{{ $withdrawal->reject_reason ?? 'No specific reason provided.' }}</p>
+                                </div>
+                            </div>
+                            @endif
                         </div>
-                    </dd>
+                    </div>
                 </div>
-                
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Date Requested</dt>
-                    <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                        {{ \Carbon\Carbon::parse($withdrawal->created_at)->format('F d, Y - H:i:s') }}
-                    </dd>
+            </div>
+            
+            <div class="col-12 col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 glass h-100">
+                    <div class="card-header bg-transparent border-bottom border-light p-4">
+                        <h5 class="fw-bold mb-0 text-dark">Status Updates</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="position-relative">
+                            <!-- Timeline Line -->
+                            <div class="position-absolute h-100 border-start border-2 border-primary" style="left: 12px; top: 12px; z-index: 0; opacity: 0.2;"></div>
+                            
+                            <!-- Timeline Items -->
+                            <div class="d-flex gap-3 mb-4 position-relative z-1">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 26px; height: 26px; margin-top: 2px;">
+                                    <i class="bi bi-check" style="font-size: 1rem;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1 fs-7">Request Submitted</h6>
+                                    <p class="text-secondary fs-7 mb-0">{{ \Carbon\Carbon::parse($withdrawal->created_at)->format('d M Y, H:i') }}</p>
+                                </div>
+                            </div>
+                            
+                            @if(in_array($withdrawal->status, ['completed', 'paid', 'approved']))
+                            <div class="d-flex gap-3 position-relative z-1">
+                                <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 26px; height: 26px; margin-top: 2px;">
+                                    <i class="bi bi-check-all" style="font-size: 1rem;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold text-success mb-1 fs-7">Payout Completed</h6>
+                                    <p class="text-secondary fs-7 mb-0">Funds have been sent to your account.</p>
+                                </div>
+                            </div>
+                            @elseif($withdrawal->status == 'rejected')
+                            <div class="d-flex gap-3 position-relative z-1">
+                                <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 26px; height: 26px; margin-top: 2px;">
+                                    <i class="bi bi-x" style="font-size: 1rem;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold text-danger mb-1 fs-7">Request Rejected</h6>
+                                    <p class="text-secondary fs-7 mb-0">Please check the rejection reason.</p>
+                                </div>
+                            </div>
+                            @else
+                            <div class="d-flex gap-3 position-relative z-1" style="opacity: 0.5;">
+                                <div class="bg-light border border-2 border-secondary text-secondary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 26px; height: 26px; margin-top: 2px;">
+                                    <i class="bi bi-hourglass" style="font-size: 0.8rem;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold text-secondary mb-1 fs-7">Processing Payout</h6>
+                                    <p class="text-secondary fs-7 mb-0">Pending admin approval.</p>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
                 </div>
-                
-                @if($withdrawal->processed_at)
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Date Processed</dt>
-                    <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                        {{ \Carbon\Carbon::parse($withdrawal->processed_at)->format('F d, Y - H:i:s') }}
-                    </dd>
-                </div>
-                @endif
-                
-                @if($withdrawal->notes)
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-surface-50 dark:bg-surface-900/30">
-                    <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Admin Notes</dt>
-                    <dd class="mt-1 text-sm text-surface-900 dark:text-white sm:mt-0 sm:col-span-2">
-                        {{ $withdrawal->notes }}
-                    </dd>
-                </div>
-                @endif
-                
-                @if($withdrawal->status == 'rejected')
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 bg-red-50 dark:bg-red-900/20">
-                    <dt class="text-sm font-medium text-red-700 dark:text-red-400">Rejection Reason</dt>
-                    <dd class="mt-1 text-sm text-red-800 dark:text-red-300 sm:mt-0 sm:col-span-2 font-medium">
-                        {{ $withdrawal->reject_reason ?? 'No specific reason provided.' }}
-                    </dd>
-                </div>
-                @endif
-            </dl>
+            </div>
         </div>
-        
     </div>
-        </div>
-    </div>
-</div>
 @endsection

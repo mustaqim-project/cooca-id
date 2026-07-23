@@ -37,7 +37,7 @@ class VoucherFactory extends Factory
             'valid_until' => now()->addDays(30),
             'is_active' => true,
             'applicable_products' => null,
-            'created_by' => \App\Models\Admin::inRandomOrder()->first()?->id ?? \App\Models\Admin::factory(),
+            'created_by' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
         ];
     }
 

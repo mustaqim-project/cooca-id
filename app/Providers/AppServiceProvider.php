@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Providers;
 
@@ -142,6 +144,26 @@ final class AppServiceProvider extends ServiceProvider
      */
     private function bootRateLimiters(): void
     {
+        // Customer login rate limiter: 5 requests per minute (brute force protection)
+        RateLimiter::for('customer-login', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip())
+                ->response(function ($request, $headers) {
+                    return response()->json([
+                        'message' => 'Too Many Requests. Please try again later.',
+                    ], 429, $headers);
+                });
+        });
+
+        // Customer registration rate limiter: 10 requests per minute
+        RateLimiter::for('customer-register', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip())
+                ->response(function ($request, $headers) {
+                    return response()->json([
+                        'message' => 'Too Many Requests. Please try again later.',
+                    ], 429, $headers);
+                });
+        });
+
         // Admin routes rate limiter: 120 requests per minute
         RateLimiter::for('admin', function (Request $request) {
             return Limit::perMinute(120)->by($request->user()?->id ?? $request->ip());
@@ -213,3 +235,5 @@ final class AppServiceProvider extends ServiceProvider
         });
     }
 }
+
+

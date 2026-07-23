@@ -18,7 +18,7 @@ final class ErpRequest extends Model
     protected $table = 'erp_requests';
 
     protected $fillable = [
-        'customer_id',
+        'user_id',
         'product_id',
         'affiliate_id',
         'requested_domain',
@@ -102,7 +102,7 @@ final class ErpRequest extends Model
         return $this->belongsTo(Affiliator::class, 'affiliate_id');
     }
 
-    public function approvedBy(): BelongsTo
+    public function adminApproved(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'approved_by');
     }
@@ -196,3 +196,4 @@ final class ErpRequest extends Model
         ]);
     }
 }
+

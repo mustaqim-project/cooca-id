@@ -23,7 +23,7 @@ class ReviewFactory extends Factory
             'reviewable_type' => \App\Models\Product::class,
             'reviewable_id' => \App\Models\Product::inRandomOrder()->first()?->id ?? \App\Models\Product::factory(),
             'reviewer_type' => fake()->randomElement(['customer', 'affiliator']),
-            'reviewer_id' => \App\Models\Customer::inRandomOrder()->first()?->id ?? \App\Models\Customer::factory(),
+            'reviewer_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
             'rating' => fake()->numberBetween(1, 5),
             'title' => fake()->optional(0.8)->sentence(4),
             'comment' => fake()->paragraphs(2, true),
@@ -40,7 +40,7 @@ class ReviewFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'reviewer_type' => 'customer',
-            'reviewer_id' => \App\Models\Customer::factory(),
+            'reviewer_id' => \App\Models\User::factory(),
         ]);
     }
 
@@ -51,7 +51,7 @@ class ReviewFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'reviewer_type' => 'affiliator',
-            'reviewer_id' => \App\Models\Affiliator::factory(),
+            'reviewer_id' => \App\Models\User::factory(),
         ]);
     }
 
@@ -62,7 +62,7 @@ class ReviewFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_approved' => true,
-            'approved_by' => \App\Models\Admin::factory(),
+            'approved_by' => \App\Models\User::factory(),
             'approved_at' => now(),
         ]);
     }

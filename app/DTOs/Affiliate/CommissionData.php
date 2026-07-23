@@ -23,7 +23,7 @@ final readonly class CommissionData
     public static function fromArray(array $data): self
     {
         return new self(
-            affiliatorId: $data['affiliator_id'],
+            affiliatorId: $data['referred_by_id'],
             transactionId: $data['transaction_id'],
             customerId: $data['customer_id'],
             level: (int) ($data['level'] ?? 1),
@@ -37,7 +37,7 @@ final readonly class CommissionData
     public function toArray(): array
     {
         return [
-            'affiliator_id' => $this->affiliatorId->toString(),
+            'referred_by_id' => $this->affiliatorId->toString(),
             'transaction_id' => $this->transactionId->toString(),
             'customer_id' => $this->customerId->toString(),
             'level' => $this->level,

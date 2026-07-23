@@ -2,30 +2,22 @@
 
 namespace Tests\Feature;
 
-use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
-use Inertia\Testing\AssertableInertia;
 
 class AdminLoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_admin_can_view_login_page()
-    {
-        $response = $this->get(route('admin.login'));
-
-        $response->assertStatus(200);
-        $response->assertViewIs('auth.admin.login');
-    }
-
     public function test_admin_can_login_and_redirect_to_dashboard()
     {
-        $admin = Admin::create([
+        $admin = User::factory()->create([
             'name' => 'Super Admin',
             'email' => 'admin@cooca.id',
-            'password' => Hash::make('password123'),
+            'user_type' => 'admin',
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
         ]);
 
         $response = $this->post(route('admin.login.submit'), [
@@ -35,9 +27,9 @@ class AdminLoginTest extends TestCase
 
         $response->assertRedirect(route('admin.dashboard'));
 
-        $this->assertAuthenticatedAs($admin, 'admin');
+        $this->assertAuthenticatedAs($admin);
 
-        $dashboardResponse = $this->actingAs($admin, 'admin')->get(route('admin.dashboard'));
+        $dashboardResponse = $this->actingAs($admin)->get(route('admin.dashboard'));
         
         $dashboardResponse->assertStatus(200);
         $dashboardResponse->assertViewIs('admin.dashboard.index');

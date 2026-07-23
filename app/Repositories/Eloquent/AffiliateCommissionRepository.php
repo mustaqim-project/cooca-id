@@ -28,7 +28,7 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
     public function findByAffiliatorId(string $affiliatorId, int $limit = 50): Collection
     {
         return $this->model
-            ->where('affiliator_id', $affiliatorId)
+            ->where('referred_by_id', $affiliatorId)
             ->with(['transaction', 'customer'])
             ->orderBy('created_at', 'desc')
             ->limit($limit)
@@ -43,7 +43,7 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
     public function getPendingByAffiliator(string $affiliatorId): Collection
     {
         return $this->model
-            ->where('affiliator_id', $affiliatorId)
+            ->where('referred_by_id', $affiliatorId)
             ->where('status', 'pending')
             ->with(['transaction', 'customer'])
             ->orderBy('created_at')
@@ -58,7 +58,7 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
     public function getClearedByAffiliator(string $affiliatorId): Collection
     {
         return $this->model
-            ->where('affiliator_id', $affiliatorId)
+            ->where('referred_by_id', $affiliatorId)
             ->where('status', 'cleared')
             ->with(['transaction', 'customer'])
             ->orderBy('cleared_at', 'desc')
@@ -68,7 +68,7 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
     public function getTotalPendingBalance(string $affiliatorId): float
     {
         return $this->model
-            ->where('affiliator_id', $affiliatorId)
+            ->where('referred_by_id', $affiliatorId)
             ->where('status', 'pending')
             ->sum('commission_amount');
     }
@@ -76,7 +76,7 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
     public function getTotalByAffiliatorAndStatus(string $affiliatorId, string $status): float
     {
         return (float) $this->model
-            ->where('affiliator_id', $affiliatorId)
+            ->where('referred_by_id', $affiliatorId)
             ->where('status', $status)
             ->sum('commission_amount');
     }
@@ -89,7 +89,7 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
     public function getTotalClearedBalance(string $affiliatorId): float
     {
         return $this->model
-            ->where('affiliator_id', $affiliatorId)
+            ->where('referred_by_id', $affiliatorId)
             ->where('status', 'cleared')
             ->sum('commission_amount');
     }
@@ -151,7 +151,7 @@ final class AffiliateCommissionRepository extends BaseRepository implements Affi
     public function getCommissionsByLevel(string $affiliatorId, int $level): Collection
     {
         return $this->model
-            ->where('affiliator_id', $affiliatorId)
+            ->where('referred_by_id', $affiliatorId)
             ->where('level', $level)
             ->with(['transaction', 'customer'])
             ->orderBy('created_at', 'desc')

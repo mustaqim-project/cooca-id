@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 /**
  * @property string $id
  * @property string $ticket_number
- * @property string|null $customer_id
- * @property string|null $affiliator_id
+ * @property string|null $user_id
+ * @property string|null $referred_by_id
  * @property string|null $admin_id
  * @property string $subject
  * @property string $priority
@@ -30,8 +30,8 @@ final class Ticket extends Model
 
     protected $fillable = [
         'ticket_number',
-        'customer_id',
-        'affiliator_id',
+        'user_id',
+        'referred_by_id',
         'admin_id',
         'subject',
         'priority',
@@ -73,7 +73,7 @@ final class Ticket extends Model
 
     public function affiliator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Affiliator::class, 'affiliator_id');
+        return $this->belongsTo(Affiliator::class, 'referred_by_id');
     }
 
     public function admin(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -121,3 +121,4 @@ final class Ticket extends Model
         return $this->status === self::STATUS_CLOSED;
     }
 }
+

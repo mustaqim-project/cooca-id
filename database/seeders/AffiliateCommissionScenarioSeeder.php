@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Admin;
-use App\Models\Affiliator;
-use App\Models\Customer;
+use App\Models\User;
 use App\Models\SubscriptionPlan;
 use App\Models\License;
 use App\Models\Subscription;
@@ -33,38 +31,38 @@ class AffiliateCommissionScenarioSeeder extends Seeder
         $this->command->info('Creating affiliate hierarchy...');
         
         // Level 0: Top affiliate (no parent)
-        $topAffiliate = Affiliator::firstOrCreate(
+        $topAffiliate = User::firstOrCreate(
             ['email' => 'top.affiliate@test.com'],
             [
                 'name' => 'Top Affiliate',
                 'password' => bcrypt('password123'),
                 'referral_code' => 'TOP001',
                 'balance' => 0,
-                'parent_affiliator_id' => null,
+                'parent_referred_by_id' => null,
             ]
         );
 
         // Level 1: Direct downline of top affiliate
-        $level1Affiliate = Affiliator::firstOrCreate(
+        $level1Affiliate = User::firstOrCreate(
             ['email' => 'level1.affiliate@test.com'],
             [
                 'name' => 'Level 1 Affiliate',
                 'password' => bcrypt('password123'),
                 'referral_code' => 'LVL001',
                 'balance' => 0,
-                'parent_affiliator_id' => $topAffiliate->id,
+                'parent_referred_by_id' => $topAffiliate->id,
             ]
         );
 
         // Level 2: Downline of level 1 affiliate
-        $level2Affiliate = Affiliator::firstOrCreate(
+        $level2Affiliate = User::firstOrCreate(
             ['email' => 'level2.affiliate@test.com'],
             [
                 'name' => 'Level 2 Affiliate',
                 'password' => bcrypt('password123'),
                 'referral_code' => 'LVL002',
                 'balance' => 0,
-                'parent_affiliator_id' => $level1Affiliate->id,
+                'parent_referred_by_id' => $level1Affiliate->id,
             ]
         );
 
@@ -103,38 +101,38 @@ class AffiliateCommissionScenarioSeeder extends Seeder
         $this->command->info('Creating test customers...');
 
         // Customer referred by Level 2 affiliate (tests both L1 and L2 commissions)
-        $customerL2 = Customer::firstOrCreate(
+        $customerL2 = User::firstOrCreate(
             ['email' => 'customer.l2@test.com'],
             [
                 'name' => 'Customer Level 2',
                 'password' => bcrypt('password123'),
                 'business_name' => 'Business L2',
                 'domain' => 'l2.cooca.id',
-                'affiliator_id' => $level2Affiliate->id,
+                'referred_by_id' => $level2Affiliate->id,
             ]
         );
 
         // Customer referred by Level 1 affiliate (tests only L1 commission)
-        $customerL1 = Customer::firstOrCreate(
+        $customerL1 = User::firstOrCreate(
             ['email' => 'customer.l1@test.com'],
             [
                 'name' => 'Customer Level 1',
                 'password' => bcrypt('password123'),
                 'business_name' => 'Business L1',
                 'domain' => 'l1.cooca.id',
-                'affiliator_id' => $level1Affiliate->id,
+                'referred_by_id' => $level1Affiliate->id,
             ]
         );
 
         // Customer referred by Top affiliate (tests only L1 commission)
-        $customerTop = Customer::firstOrCreate(
+        $customerTop = User::firstOrCreate(
             ['email' => 'customer.top@test.com'],
             [
                 'name' => 'Customer Top',
                 'password' => bcrypt('password123'),
                 'business_name' => 'Business Top',
                 'domain' => 'top.cooca.id',
-                'affiliator_id' => $topAffiliate->id,
+                'referred_by_id' => $topAffiliate->id,
             ]
         );
 

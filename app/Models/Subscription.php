@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property string $id
- * @property string $customer_id
+ * @property string $user_id
  * @property string $license_id
  * @property string $subscription_plan_id
  * @property string $status
@@ -28,7 +28,7 @@ final class Subscription extends Model
     protected $table = 'subscriptions';
 
     protected $fillable = [
-        'customer_id',
+        'user_id',
         'license_id',
         'subscription_plan_id',
         'status',
@@ -95,3 +95,4 @@ final class Subscription extends Model
             });
     }
 }
+

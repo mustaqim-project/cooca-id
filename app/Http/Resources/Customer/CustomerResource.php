@@ -18,7 +18,7 @@ final class CustomerResource extends JsonResource
             'email' => $this->email,
             'business_name' => $this->business_name,
             'domain' => $this->when($this->domain),
-            'affiliator_id' => $this->when($this->affiliator_id),
+            'referred_by_id' => $this->when($this->referred_by_id),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

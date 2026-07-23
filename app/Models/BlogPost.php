@@ -87,3 +87,5 @@ final class BlogPost extends Model
             && ($this->published_at === null || $this->published_at->isPast());
     }
 }
+
+

@@ -21,7 +21,7 @@ class Testimonial extends Model
         'is_featured',
         'is_active',
         'order',
-        'customer_id',
+        'user_id',
         'created_by',
         'updated_by',
     ];
@@ -68,3 +68,5 @@ class Testimonial extends Model
         return $query->orderBy('order');
     }
 }
+
+

@@ -1,78 +1,79 @@
-@extends('layouts.customer')
+@extends('customer.layouts.app')
 
 @section('title', 'Trial Details')
-@section('subtitle', 'View trial status and information')
 
 @section('content')
-    <div class="space-y-6 max-w-4xl mx-auto">
-        <div class="flex items-center justify-between">
-            <a href="{{ route('customer.trials.index') }}"
-                class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-                <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back to Trials
-            </a>
-        </div>
-
-        <div class="corporate-card overflow-hidden">
-            <div
-                class="p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-50/50 dark:bg-surface-900/50 flex justify-between items-center">
-                <h3 class="text-lg font-medium text-surface-900 dark:text-white">Request Information</h3>
-                @php
-                    $statusColors = [
-                        'submitted' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                        'reviewing' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-                        'approved' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                        'rejected' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-                        'provisioning' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-                        'trial_active' =>
-                            'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-                        'trial_expired' => 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-                    ];
-                    $colorClass = $statusColors[$trial->status] ?? 'bg-surface-100 text-surface-800';
-                @endphp
-                <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full {{ $colorClass }}">
-                    {{ str_replace('_', ' ', ucfirst($trial->status)) }}
-                </span>
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ route('customer.trials.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
+                <div>
+                    <h2 class="mb-1 fw-bold">Trial Details</h2>
+                    <p class="text-secondary mb-0">View trial status and information.</p>
+                </div>
             </div>
 
-            <div class="p-6">
-                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6">
+            <!-- Details Card -->
+            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden">
+                <!-- Status Header -->
+                <div class="card-header bg-transparent border-bottom border-light p-4 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-semibold"><i class="bi bi-info-circle me-2"></i> Request Information</h5>
+                    
                     <div>
-                        <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Product</dt>
-                        <dd class="mt-1 text-sm font-semibold text-surface-900 dark:text-white">
-                            {{ $trial->product->name ?? 'N/A' }}</dd>
+                        @php
+                            $statusConfig = [
+                                'submitted' => 'warning',
+                                'reviewing' => 'info',
+                                'approved' => 'success',
+                                'rejected' => 'danger',
+                                'provisioning' => 'primary',
+                                'trial_active' => 'success',
+                                'trial_expired' => 'secondary',
+                            ];
+                            $statusClass = $statusConfig[$trial->status] ?? 'secondary';
+                        @endphp
+                        <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-4 py-2 fs-6">
+                            {{ str_replace('_', ' ', ucfirst($trial->status)) }}
+                        </span>
                     </div>
-                    <div>
-                        <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Requested Subdomain</dt>
-                        <dd class="mt-1 text-sm font-semibold text-surface-900 dark:text-white">
-                            {{ $trial->requested_subdomain }}.cooca.id</dd>
-                    </div>
-                    <div>
-                        <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Request Date</dt>
-                        <dd class="mt-1 text-sm text-surface-900 dark:text-white">
-                            {{ $trial->created_at->format('F d, Y - H:i') }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Last Updated</dt>
-                        <dd class="mt-1 text-sm text-surface-900 dark:text-white">
-                            {{ $trial->updated_at->format('F d, Y - H:i') }}</dd>
-                    </div>
-                    @if ($trial->notes)
-                        <div class="sm:col-span-2">
-                            <dt class="text-sm font-medium text-surface-500 dark:text-surface-400">Notes</dt>
-                            <dd
-                                class="mt-1 text-sm text-surface-900 dark:text-white bg-surface-50 dark:bg-surface-800 p-3 rounded-lg">
-                                {{ $trial->notes }}</dd>
-                        </div>
-                    @endif
-                    @if ($trial->rejection_reason)
-                        <div class="sm:col-span-2">
-                            <dt class="text-sm font-medium text-red-500 dark:text-red-400">Rejection Reason</dt>
-                            <dd
-                                class="mt-1 text-sm text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
-                                {{ $trial->rejection_reason }}</dd>
-                        </div>
-                    @endif
-                </dl>
+                </div>
+                
+                <!-- Details Body -->
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush border-0">
+                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
+                            <div class="fw-medium text-secondary" style="width: 250px;">Product</div>
+                            <div class="fw-semibold text-dark">{{ $trial->product->name ?? 'N/A' }}</div>
+                        </li>
+                        <li class="list-group-item px-4 py-3 bg-light border-light d-flex flex-column flex-md-row">
+                            <div class="fw-medium text-secondary" style="width: 250px;">Requested Subdomain</div>
+                            <div class="fw-semibold text-primary">{{ $trial->requested_subdomain }}.cooca.id</div>
+                        </li>
+                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
+                            <div class="fw-medium text-secondary" style="width: 250px;">Request Date</div>
+                            <div class="text-dark">{{ $trial->created_at->format('F d, Y - H:i') }}</div>
+                        </li>
+                        <li class="list-group-item px-4 py-3 bg-light border-light d-flex flex-column flex-md-row">
+                            <div class="fw-medium text-secondary" style="width: 250px;">Last Updated</div>
+                            <div class="text-dark">{{ $trial->updated_at->format('F d, Y - H:i') }}</div>
+                        </li>
+                        @if ($trial->notes)
+                            <li class="list-group-item px-4 py-4 bg-transparent border-light">
+                                <div class="fw-medium text-secondary mb-2">Notes</div>
+                                <div class="bg-light p-3 rounded-3 text-secondary">{{ $trial->notes }}</div>
+                            </li>
+                        @endif
+                        @if ($trial->rejection_reason)
+                            <li class="list-group-item px-4 py-4 bg-transparent border-light">
+                                <div class="fw-medium text-danger mb-2">Rejection Reason</div>
+                                <div class="bg-danger-subtle text-danger p-3 rounded-3">{{ $trial->rejection_reason }}</div>
+                            </li>
+                        @endif
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

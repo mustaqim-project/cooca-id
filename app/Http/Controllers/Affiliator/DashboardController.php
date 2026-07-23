@@ -21,7 +21,7 @@ final class DashboardController extends Controller
      */
     public function index()
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         // === Referral Statistics ===
         $totalReferrals       = $affiliator->referrals()->count();
@@ -34,45 +34,45 @@ final class DashboardController extends Controller
             ->count();
 
         // === Commission Statistics (use correct column names) ===
-        $totalEarned = AffiliateCommission::where('affiliator_id', $affiliator->id)
+        $totalEarned = AffiliateCommission::where('referred_by_id', $affiliator->id)
             ->whereIn('status', ['cleared', 'paid'])
             ->sum('commission_amount');
 
-        $pendingCommissions = AffiliateCommission::where('affiliator_id', $affiliator->id)
+        $pendingCommissions = AffiliateCommission::where('referred_by_id', $affiliator->id)
             ->where('status', 'pending')
             ->sum('commission_amount');
 
-        $thisMonthCommissions = AffiliateCommission::where('affiliator_id', $affiliator->id)
+        $thisMonthCommissions = AffiliateCommission::where('referred_by_id', $affiliator->id)
             ->whereIn('status', ['cleared', 'paid'])
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->sum('commission_amount');
 
         // Level breakdown
-        $level1Commissions = AffiliateCommission::where('affiliator_id', $affiliator->id)
+        $level1Commissions = AffiliateCommission::where('referred_by_id', $affiliator->id)
             ->where('level', 1)
             ->sum('commission_amount');
 
-        $level2Commissions = AffiliateCommission::where('affiliator_id', $affiliator->id)
+        $level2Commissions = AffiliateCommission::where('referred_by_id', $affiliator->id)
             ->where('level', 2)
             ->sum('commission_amount');
 
         // === Withdrawal Statistics ===
-        $totalWithdrawals = AffiliateWithdrawal::where('affiliator_id', $affiliator->id)
+        $totalWithdrawals = AffiliateWithdrawal::where('referred_by_id', $affiliator->id)
             ->whereIn('status', ['approved', 'paid'])
             ->sum('amount');
 
-        $pendingWithdrawals = AffiliateWithdrawal::where('affiliator_id', $affiliator->id)
+        $pendingWithdrawals = AffiliateWithdrawal::where('referred_by_id', $affiliator->id)
             ->where('status', 'pending')
             ->sum('amount');
 
-        $recentWithdrawals = AffiliateWithdrawal::where('affiliator_id', $affiliator->id)
+        $recentWithdrawals = AffiliateWithdrawal::where('referred_by_id', $affiliator->id)
             ->latest()
             ->limit(5)
             ->get();
 
         // === Recent Commissions ===
-        $recentCommissions = AffiliateCommission::where('affiliator_id', $affiliator->id)
+        $recentCommissions = AffiliateCommission::where('referred_by_id', $affiliator->id)
             ->with(['transaction', 'customer'])
             ->latest()
             ->limit(10)
@@ -91,7 +91,7 @@ final class DashboardController extends Controller
             $month             = now()->subMonths($i);
             $commissionTrend[] = [
                 'month'  => $month->format('M Y'),
-                'amount' => AffiliateCommission::where('affiliator_id', $affiliator->id)
+                'amount' => AffiliateCommission::where('referred_by_id', $affiliator->id)
                     ->whereIn('status', ['cleared', 'paid'])
                     ->whereYear('created_at', $month->year)
                     ->whereMonth('created_at', $month->month)
@@ -105,7 +105,7 @@ final class DashboardController extends Controller
             $conversionRate = round(($activeReferrals / $totalReferrals) * 100, 2);
         }
 
-        $averageCommission = AffiliateCommission::where('affiliator_id', $affiliator->id)
+        $averageCommission = AffiliateCommission::where('referred_by_id', $affiliator->id)
             ->whereIn('status', ['cleared', 'paid'])
             ->avg('commission_amount') ?? 0;
 

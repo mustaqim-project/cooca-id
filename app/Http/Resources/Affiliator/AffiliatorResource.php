@@ -20,7 +20,7 @@ final class AffiliatorResource extends JsonResource
             'balance' => $this->balance,
             'bank_account' => $this->when($this->bank_account),
             'bank_name' => $this->when($this->bank_name),
-            'parent_affiliator_id' => $this->when($this->parent_affiliator_id),
+            'parent_referred_by_id' => $this->when($this->parent_referred_by_id),
             'total_referrals' => $this->whenLoaded('referrals', fn () => $this->referrals->count()),
             'total_downlines' => $this->whenLoaded('downlines', fn () => $this->downlines->count()),
             'created_at' => $this->created_at?->toIso8601String(),

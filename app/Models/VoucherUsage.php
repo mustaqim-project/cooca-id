@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 /**
  * @property string $id
  * @property string $voucher_id
- * @property string $customer_id
+ * @property string $user_id
  * @property string $transaction_id
  * @property float $discount_amount
  * @property \Carbon\Carbon $used_at
@@ -26,7 +26,7 @@ final class VoucherUsage extends Model
 
     protected $fillable = [
         'voucher_id',
-        'customer_id',
+        'user_id',
         'transaction_id',
         'discount_amount',
         'used_at',
@@ -52,3 +52,4 @@ final class VoucherUsage extends Model
         return $this->belongsTo(Transaction::class, 'transaction_id');
     }
 }
+

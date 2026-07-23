@@ -1,51 +1,39 @@
-﻿@extends('layouts.affiliator')
+@extends('affiliator.layouts.app')
 
-@section('title', 'Marketing')
-@section('subtitle', 'Manage your marketing data.')
+@section('title', 'Marketing Links')
 
 @section('content')
-<div class="mb-4 flex justify-between items-center">
-    <h2 class="text-xl font-bold text-surface-900 dark:text-white">Marketing</h2>
-    
-</div>
+    <div class="d-flex flex-column gap-4">
 
-<div class="corporate-card overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-surface-200 dark:divide-surface-700">
-            <thead class="bg-surface-50 dark:bg-surface-800/50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Name / Title</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Date</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-surface-800 divide-y divide-surface-200 dark:divide-surface-700">
-                @forelse($links ?? [] as $idx => $link)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">{{ $idx + 1 }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white">{{ $link['name'] }}</div>
-                        <div class="text-sm text-surface-500 dark:text-surface-400">{{ $link['description'] }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Ready</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">-</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end">
-                        <button onclick="navigator.clipboard.writeText('{{ addslashes($link['url']) }}'); alert('Link copied to clipboard!')" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 inline-flex items-center" title="Copy Link"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="5" class="px-6 py-4 text-center text-sm text-surface-500">No links found.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ route('affiliator.marketing.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
+                <div>
+                    <h2 class="mb-1 fw-bold">Marketing Links</h2>
+                    <p class="text-secondary mb-0">Custom tracking links for your campaigns.</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary rounded-pill px-4 hover-lift fw-medium">
+                    <i class="bi bi-plus-lg me-1"></i> Create Custom Link
+                </button>
+            </div>
+        </div>
+
+        <!-- Coming Soon -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div class="card-body py-5 text-center text-secondary">
+                <div class="mb-3 d-inline-flex bg-light rounded-circle p-4">
+                    <i class="bi bi-link-45deg fs-1 text-secondary"></i>
+                </div>
+                <h5 class="fw-bold mb-2 text-dark">Custom Link Builder Coming Soon</h5>
+                <p class="mb-0 mx-auto" style="max-width: 500px;">
+                    Soon you'll be able to create custom tracking links to monitor the performance of specific marketing campaigns.
+                </p>
+            </div>
+        </div>
     </div>
-    
-    <div class="px-6 py-4 border-t border-surface-200 dark:border-surface-700">
-        
-    </div>
-</div>
 @endsection

@@ -1,106 +1,114 @@
-@extends('layouts.customer')
+@extends('customer.layouts.app')
 
 @section('title', 'My Invoices')
-@section('subtitle', 'View your billing history and current invoices')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
-            </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
-        </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-            
-        </div>
-    </div>
+    <div class="d-flex flex-column gap-4">
 
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
-                <tr>
-                    <th scope="col" class="table-th">Invoice #</th>
-                    <th scope="col" class="table-th">Date</th>
-                    <th scope="col" class="table-th">Amount</th>
-                    <th scope="col" class="table-th">Status</th>
-                    <th scope="col" class="table-th">Actions</th>
-                </tr>
-            
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
-                @forelse($invoices as $invoice)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">
-                        {{ $invoice->invoice_number }}
-                        @if($invoice->subscription)
-                            <div class="text-xs text-surface-500 dark:text-surface-400 font-normal">{{ $invoice->subscription->plan->product->name ?? 'Subscription' }}</div>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
-                        {{ $invoice->created_at->format('M d, Y') }}
-                        @if($invoice->status == 'unpaid' && $invoice->due_date)
-                            <div class="text-xs {{ $invoice->due_date->isPast() ? 'text-red-500' : 'text-surface-400' }}">
-                                Due: {{ $invoice->due_date->format('M d, Y') }}
-                            </div>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">
-                        Rp {{ number_format($invoice->total, 0, ',', '.') }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @php
-                            $statusClass = match($invoice->status) {
-                                'paid' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                                'unpaid' => ($invoice->due_date && $invoice->due_date->isPast()) 
-                                            ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' 
-                                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                                'cancelled' => 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300',
-                                default => 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300'
-                            };
-                            
-                            $statusText = ($invoice->status == 'unpaid' && $invoice->due_date && $invoice->due_date->isPast()) 
-                                        ? 'Overdue' 
-                                        : ucfirst($invoice->status);
-                        @endphp
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
-                            {{ $statusText }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{{ route('customer.invoices.show', $invoice->id) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
-                            <i data-lucide="eye" class="w-4 h-4"></i> View
-                        </a>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-surface-500 dark:text-surface-400">
-                        <div class="flex flex-col items-center">
-                            <i data-lucide="receipt" class="w-4 h-4 text-4xl mb-3 text-surface-300 dark:text-surface-600 dark:text-surface-400"></i>
-                            <p>No invoices found.</p>
-                        </div>
-                    </td>
-                </tr>
-                @endforelse
-            
-                
-                
-                </tbody>
-            </table>
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold">My Invoices</h2>
+                <p class="text-secondary mb-0">View your billing history and current invoices.</p>
+            </div>
+            <div class="d-flex gap-2">
+            </div>
+        </div>
+
+        <!-- Invoices Table -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div
+                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
+                    style="max-width: 320px; background: var(--color-bg);">
+                    <span class="input-group-text bg-transparent border-0 pe-1"><i
+                            class="bi bi-search text-secondary"></i></span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
+                        placeholder="Search invoices...">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
+                        <tr>
+                            <th class="py-3 px-4 border-0">Invoice #</th>
+                            <th class="py-3 px-3 border-0">Date</th>
+                            <th class="py-3 px-3 border-0">Amount</th>
+                            <th class="py-3 px-3 border-0">Status</th>
+                            <th class="py-3 px-4 border-0 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @forelse($invoices as $invoice)
+                            <tr>
+                                <td class="py-3 px-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center fw-bold"
+                                            style="width: 40px; height: 40px;">
+                                            <i class="bi bi-receipt"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">{{ $invoice->invoice_number }}</div>
+                                            @if($invoice->subscription)
+                                                <div class="text-secondary fs-7">{{ $invoice->subscription->plan->product->name ?? 'Subscription' }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-3">
+                                    <div class="text-secondary">{{ $invoice->created_at->format('M d, Y') }}</div>
+                                    @if($invoice->status == 'unpaid' && $invoice->due_date)
+                                        <div class="fs-7 {{ $invoice->due_date->isPast() ? 'text-danger' : 'text-secondary' }}">
+                                            Due: {{ $invoice->due_date->format('M d, Y') }}
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="py-3 px-3">
+                                    <span class="fw-semibold">Rp {{ number_format($invoice->total, 0, ',', '.') }}</span>
+                                </td>
+                                <td class="py-3 px-3">
+                                    @php
+                                        $statusClass = match($invoice->status) {
+                                            'paid' => 'success',
+                                            'unpaid' => ($invoice->due_date && $invoice->due_date->isPast()) ? 'danger' : 'warning',
+                                            'cancelled' => 'secondary',
+                                            default => 'secondary'
+                                        };
+                                        
+                                        $statusText = ($invoice->status == 'unpaid' && $invoice->due_date && $invoice->due_date->isPast()) 
+                                                    ? 'Overdue' 
+                                                    : ucfirst($invoice->status);
+                                    @endphp
+                                    <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-3 py-1">
+                                        {{ $statusText }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    <a href="{{ route('customer.invoices.show', $invoice->id) }}"
+                                        class="btn btn-sm btn-light border rounded-pill px-3 hover-lift">
+                                        View <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-inbox fs-1"></i></div>
+                                    <h6 class="fw-medium">No Invoices Found</h6>
+                                    <p class="fs-7">You don't have any invoices yet.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if (method_exists($invoices, 'hasPages') && $invoices->hasPages())
+                <div class="card-footer bg-transparent border-top border-light p-4">
+                    {{ $invoices->links() }}
+                </div>
+            @endif
         </div>
     </div>
-</div>
 @endsection

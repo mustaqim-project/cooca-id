@@ -25,7 +25,7 @@ class ReviewController extends Controller
      */
     public function index(Request $request)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         $query = Review::where('reviewer_type', 'customer')
             ->where('reviewer_id', $customer->id)
@@ -71,7 +71,7 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
@@ -123,7 +123,7 @@ class ReviewController extends Controller
      */
     public function update(Request $request, Review $review)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         // Use Policy for authorization (prevents IDOR)
         Gate::authorize('update', $review);
@@ -155,7 +155,7 @@ class ReviewController extends Controller
      */
     public function destroy(Review $review)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         // Use Policy for authorization (prevents IDOR)
         Gate::authorize('delete', $review);

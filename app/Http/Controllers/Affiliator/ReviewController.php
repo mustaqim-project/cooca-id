@@ -22,7 +22,7 @@ class ReviewController extends Controller
      */
     public function index(Request $request)
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         // Get all customers referred by this affiliator (direct referrals)
         $customerIds = \App\Models\Customer::where('referrer_id', $affiliator->id)
@@ -75,7 +75,7 @@ class ReviewController extends Controller
      */
     public function myReviews()
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         // Check if affiliator is also a customer
         $customer = \App\Models\Customer::where('email', $affiliator->email)->first();
@@ -117,7 +117,7 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         // Check if affiliator is also a customer
         $customer = \App\Models\Customer::where('email', $affiliator->email)->first();

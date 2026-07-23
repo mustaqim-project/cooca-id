@@ -21,8 +21,8 @@ final class ReferralController extends Controller
      */
     public function index()
     {
-        $affiliator = Auth::guard('affiliator')->user();
-        $referrals = \App\Models\Customer::where('affiliator_id', $affiliator->getKey())->paginate(15);
+        $affiliator = Auth::user();
+        $referrals = \App\Models\Customer::where('referred_by_id', $affiliator->getKey())->paginate(15);
 
         return view('affiliator.referrals.index', [
             'referrals' => CustomerResource::collection($referrals),

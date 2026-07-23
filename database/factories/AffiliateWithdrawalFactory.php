@@ -23,7 +23,7 @@ class AffiliateWithdrawalFactory extends Factory
         
         return [
             'id' => (string) Str::uuid(),
-            'affiliator_id' => \App\Models\Affiliator::inRandomOrder()->first()?->id ?? \App\Models\Affiliator::factory(),
+            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
             'amount' => $amount,
             'fee' => $fee,
             'net_amount' => $amount - $fee,
@@ -31,7 +31,7 @@ class AffiliateWithdrawalFactory extends Factory
             'account_number' => fake()->bankAccountNumber(),
             'account_name' => fake()->name(),
             'status' => fake()->randomElement(['pending', 'approved', 'rejected', 'paid']),
-            'approved_by' => \App\Models\Admin::inRandomOrder()->first()?->id ?? null,
+            'approved_by' => \App\Models\User::inRandomOrder()->first()?->id ?? null,
             'approved_at' => fake()->optional(0.7)->dateTimeBetween('-6 months', 'now'),
             'rejected_at' => null,
             'rejection_reason' => null,
@@ -56,7 +56,7 @@ class AffiliateWithdrawalFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'approved',
-            'approved_by' => \App\Models\Admin::factory(),
+            'approved_by' => \App\Models\User::factory(),
             'approved_at' => now(),
         ]);
     }
@@ -80,7 +80,7 @@ class AffiliateWithdrawalFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'paid',
-            'approved_by' => \App\Models\Admin::factory(),
+            'approved_by' => \App\Models\User::factory(),
             'approved_at' => now()->subDays(5),
             'paid_at' => now(),
         ]);

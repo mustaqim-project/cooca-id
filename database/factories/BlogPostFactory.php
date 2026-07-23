@@ -27,7 +27,7 @@ class BlogPostFactory extends Factory
             'excerpt' => fake()->sentence(20),
             'content' => fake()->paragraphs(6, true),
             'featured_image' => fake()->optional(0.7)->imageUrl(1200, 630, 'business', true),
-            'author_id' => \App\Models\Admin::inRandomOrder()->first()?->id ?? \App\Models\Admin::factory(),
+            'author_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
             'category' => fake()->randomElement(['Retail', 'Restaurant', 'Hotel', 'Clinic', 'AI & Automation', 'Revenue Optimization', 'Case Studies']),
             'tags' => ['SaaS', 'Business', 'Indonesia', 'Operations', 'Growth'],
             'is_published' => fake()->boolean(85),

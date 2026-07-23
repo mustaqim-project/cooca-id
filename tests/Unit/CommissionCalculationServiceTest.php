@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Models\Affiliator;
+use App\Models\User;
 use App\Models\Product;
 use App\Models\Subscription;
 use App\Services\CommissionCalculationService;
@@ -32,7 +32,7 @@ class CommissionCalculationServiceTest extends TestCase
 
         $affiliator = new \stdClass();
 
-        $subscription->affiliator_id = 1;
+        $subscription->referred_by_id = 1;
         $subscription->affiliator = $affiliator;
 
         $commissionAmount = $this->service->calculateCommission($subscription);
@@ -44,7 +44,7 @@ class CommissionCalculationServiceTest extends TestCase
     {
         $subscription = new \stdClass();
         $subscription->amount = 1000000;
-        $subscription->affiliator_id = null;
+        $subscription->referred_by_id = null;
 
         $commissionAmount = $this->service->calculateCommission($subscription);
 

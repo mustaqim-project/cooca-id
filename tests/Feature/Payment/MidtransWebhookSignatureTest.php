@@ -3,7 +3,7 @@
 namespace Tests\Feature\Payment;
 
 use Tests\TestCase;
-use App\Models\Customer;
+use App\Models\User;
 use App\Models\Transaction;
 use App\Models\Invoice;
 use App\Services\Payment\MidtransSignatureValidator;
@@ -131,11 +131,11 @@ final class MidtransWebhookSignatureTest extends TestCase
     public function test_webhook_endpoint_accepts_valid_signature(): void
     {
         // Create a customer and transaction first
-        $customer = Customer::factory()->create();
+        $customer = User::factory()->create();
         $invoiceNumber = 'INV-TEST-WEBHOOK-001';
         $transaction = Transaction::create([
-            'customer_id' => $customer->id,
-            'invoice_number' => $invoiceNumber,
+            'user_id' => \App\Models\User::factory()->create()->id,
+            'invoice_number' => 'INV-TEST-WEBHOOK-001',
             'gross_amount' => 100000,
             'voucher_discount' => 0,
             'net_amount' => 100000,
@@ -145,7 +145,7 @@ final class MidtransWebhookSignatureTest extends TestCase
         ]);
         $invoice = Invoice::create([
             'transaction_id' => $transaction->id,
-            'customer_id' => $customer->id,
+            'user_id' => $customer->id,
             'invoice_number' => $invoiceNumber,
             'amount' => 100000,
             'status' => 'issued',

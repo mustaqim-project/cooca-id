@@ -17,32 +17,33 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // 1. Admin
-        Admin::updateOrCreate(
+        $admin = Admin::updateOrCreate(
             ['email' => 'admin@cooca.id'],
             [
                 'name' => 'Super Administrator',
                 'password' => Hash::make('password123'),
-                'permissions' => ['super_admin'],
             ]
         );
+        $admin->assignRole('super_admin');
 
         // 2. Affiliator
-        Affiliator::updateOrCreate(
+        $affiliator = Affiliator::updateOrCreate(
             ['email' => 'affiliator@cooca.id'],
             [
                 'name' => 'Demo Affiliator',
                 'password' => Hash::make('password123'),
-                'referral_code' => 'COOCA-DEMO',
             ]
         );
+        $affiliator->assignRole('affiliator');
 
         // 3. Customer
-        Customer::updateOrCreate(
+        $customer = Customer::updateOrCreate(
             ['email' => 'customer@cooca.id'],
             [
                 'name' => 'Demo Customer',
                 'password' => Hash::make('password123'),
             ]
         );
+        $customer->assignRole('customer');
     }
 }

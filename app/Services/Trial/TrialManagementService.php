@@ -9,7 +9,6 @@ use App\Models\TrialStatusHistory;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\SubscriptionPlan;
-use App\Models\Affiliator;
 use App\Services\Provisioning\ProvisioningService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +25,7 @@ final class TrialManagementService
 
     /**
      * Submit trial request untuk approval
-     * Business Rule: Customer dapat submit trial 1x per produk
+     * Business Rule: ?User dapat submit trial 1x per produk
      */
     public function submitTrialRequest(
         string $customerId,
@@ -73,7 +72,7 @@ final class TrialManagementService
                 'erp_product_id' => $erpProductId,
                 'subscription_plan_id' => $subscriptionPlanId,
                 'subdomain' => $subdomain,
-                'affiliator_id' => $affiliatorId,
+                'referred_by_id' => $affiliatorId,
                 'status' => Trial::STATUS_WAITING_APPROVAL,
                 'submitted_at' => now(),
             ]);
@@ -379,3 +378,5 @@ final class TrialManagementService
         return $trial;
     }
 }
+
+

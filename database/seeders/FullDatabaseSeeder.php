@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Admin;
-use App\Models\Affiliator;
-use App\Models\Customer;
+use App\Models\User;
+use App\Models\User;
+use App\Models\User;
 use App\Models\ProductCategory;
 use App\Models\Product;
 use App\Models\SubscriptionPlan;
@@ -35,11 +35,11 @@ class FullDatabaseSeeder extends Seeder
 
         // Seed Admins
         $this->command->info('Seeding Admins...');
-        $admins = Admin::factory()->count(5)->create();
+        $admins = User::factory()->count(5)->create();
 
         // Seed Customers
         $this->command->info('Seeding Customers...');
-        $customers = Customer::factory()
+        $customers = User::factory()
             ->count(25)
             ->sequence(fn($sequence) => [
                 'domain' => 'customer-' . ($sequence->index + 1) . '-' . Str::random(6) . '.cooca.id',
@@ -49,7 +49,7 @@ class FullDatabaseSeeder extends Seeder
 
         // Seed Affiliators
         $this->command->info('Seeding Affiliators...');
-        $affiliators = Affiliator::factory()
+        $affiliators = User::factory()
             ->count(15)
             ->sequence(fn($sequence) => [
                 'referral_code' => 'AFF-' . strtoupper(Str::random(6)) . '-' . ($sequence->index + 1),
@@ -132,7 +132,7 @@ class FullDatabaseSeeder extends Seeder
         $this->command->info('Seeding Affiliate Commissions...');
         foreach ($transactions->random(30) as $trans) {
             AffiliateCommission::factory()->create([
-                'affiliator_id' => $affiliators->random()->id,
+                'referred_by_id' => $affiliators->random()->id,
                 'transaction_id' => $trans->id,
                 'customer_id' => $trans->customer_id,
                 'gross_amount' => $trans->net_amount,
@@ -146,7 +146,7 @@ class FullDatabaseSeeder extends Seeder
         AffiliateWithdrawal::factory()
             ->count(15)
             ->sequence(fn($sequence) => [
-                'affiliator_id' => $affiliators->random()->id,
+                'referred_by_id' => $affiliators->random()->id,
                 'approved_by' => $admins->random()->id,
             ])
             ->create();

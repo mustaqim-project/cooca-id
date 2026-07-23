@@ -16,9 +16,14 @@ final class ValidateLicenseRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'license_code' => ['required', 'string'],
+            'license_key' => ['nullable', 'string'],
+            'product' => ['required', 'string'],
             'domain' => ['required', 'string', 'max:255'],
-            'license_code' => ['required', 'string', 'size:16'],
-            'token_code' => ['required', 'string', 'size:16'],
+            'installation_id' => ['required', 'string'],
+            'application_version' => ['nullable', 'string'],
+            'ip_address' => ['nullable', 'string'],
+            'timestamp' => ['nullable', 'string'],
         ];
     }
 
@@ -27,9 +32,8 @@ final class ValidateLicenseRequest extends FormRequest
         return [
             'domain.required' => 'Domain is required.',
             'license_code.required' => 'License code is required.',
-            'license_code.size' => 'License code must be exactly 16 characters.',
-            'token_code.required' => 'Token code is required.',
-            'token_code.size' => 'Token code must be exactly 16 characters.',
+            'product.required' => 'Product code is required.',
+            'installation_id.required' => 'Installation ID is required.',
         ];
     }
 }

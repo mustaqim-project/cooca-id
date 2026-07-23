@@ -21,9 +21,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\View\View;
-use App\Models\Admin;
-use App\Models\Customer;
-use App\Models\Affiliator;
+
+
+
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -260,14 +260,14 @@ class LandingController extends Controller
 
     public function showCustomerVerificationNotice(Request $request)
     {
-        return $request->user('customer')->hasVerifiedEmail()
+        return $request->user()->hasVerifiedEmail()
             ? redirect()->intended(route('customer.dashboard'))
             : view('auth.customer.verify-email');
     }
 
     public function verifyCustomerEmail(Request $request, $id, $hash)
     {
-        $customer = Customer::findOrFail($id);
+        $customer = \App\Models\Customer::findOrFail($id);
 
         if (! hash_equals((string) $hash, sha1($customer->getEmailForVerification()))) {
             abort(403);
@@ -287,11 +287,11 @@ class LandingController extends Controller
 
     public function resendCustomerVerificationEmail(Request $request)
     {
-        if ($request->user('customer')->hasVerifiedEmail()) {
+        if ($request->user()->hasVerifiedEmail()) {
             return redirect()->intended(route('customer.dashboard'));
         }
 
-        $request->user('customer')->sendEmailVerificationNotification();
+        $request->user()->sendEmailVerificationNotification();
 
         return back()->with('success', 'Link verifikasi telah dikirim ulang ke email Anda.');
     }
@@ -331,7 +331,7 @@ class LandingController extends Controller
 
     public function redirectToGoogleCustomer()
     {
-        return Socialite::guard('customer')->redirect();
+        return Socialite::driver('google')->redirect();
     }
 
     public function handleGoogleCallbackCustomer()
@@ -454,7 +454,7 @@ class LandingController extends Controller
             'email.exists' => 'Email tidak terdaftar dalam sistem kami.',
         ]);
 
-        $status = Password::broker('customers')->sendResetLink(
+        $status = Password::broker()->sendResetLink(
             $request->only('email')
         );
 
@@ -488,10 +488,10 @@ class LandingController extends Controller
             'email.exists' => 'Email tidak terdaftar.',
         ]);
 
-        $status = Password::broker('customers')->reset(
+        $status = Password::broker()->reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (Customer $customer, string $password) {
-                $customer->forceFill([
+            function ($user, string $password) {
+                $user->forceFill([
                     'password' => Hash::make($password),
                     'remember_token' => Str::random(60),
                 ])->save();
@@ -522,7 +522,7 @@ class LandingController extends Controller
             'email.exists' => 'Email affiliator tidak terdaftar.',
         ]);
 
-        $status = Password::broker('affiliators')->sendResetLink(
+        $status = Password::broker()->sendResetLink(
             $request->only('email')
         );
 
@@ -556,10 +556,10 @@ class LandingController extends Controller
             'email.exists' => 'Email affiliator tidak terdaftar.',
         ]);
 
-        $status = Password::broker('affiliators')->reset(
+        $status = Password::broker()->reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (Affiliator $affiliator, string $password) {
-                $affiliator->forceFill([
+            function ($user, string $password) {
+                $user->forceFill([
                     'password' => Hash::make($password),
                     'remember_token' => Str::random(60),
                 ])->save();
@@ -590,7 +590,7 @@ class LandingController extends Controller
             'email.exists' => 'Email admin tidak terdaftar.',
         ]);
 
-        $status = Password::broker('admins')->sendResetLink(
+        $status = Password::broker()->sendResetLink(
             $request->only('email')
         );
 
@@ -624,10 +624,10 @@ class LandingController extends Controller
             'email.exists' => 'Email admin tidak terdaftar.',
         ]);
 
-        $status = Password::broker('admins')->reset(
+        $status = Password::broker()->reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (Admin $admin, string $password) {
-                $admin->forceFill([
+            function ($user, string $password) {
+                $user->forceFill([
                     'password' => Hash::make($password),
                     'remember_token' => Str::random(60),
                 ])->save();
@@ -639,3 +639,5 @@ class LandingController extends Controller
             : back()->withErrors(['email' => ['Gagal mereset password. Link mungkin sudah kadaluarsa.']]);
     }
 }
+
+

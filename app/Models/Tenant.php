@@ -14,7 +14,7 @@ final class Tenant extends Model
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'customer_id',
+        'user_id',
         'erp_request_id',
         'product_id',
         'subdomain',
@@ -57,3 +57,4 @@ final class Tenant extends Model
         return $this->status === 'active';
     }
 }
+

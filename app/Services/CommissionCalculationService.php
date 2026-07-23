@@ -9,7 +9,7 @@ class CommissionCalculationService
 {
     public function calculateCommission($subscription): float
     {
-        if (!$subscription->affiliator_id) {
+        if (!$subscription->referred_by_id) {
             return 0;
         }
 

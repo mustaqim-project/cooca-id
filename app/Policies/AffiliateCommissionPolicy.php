@@ -20,7 +20,7 @@ final class AffiliateCommissionPolicy
             return true;
         }
 
-        return $commission->affiliator_id === $user->id;
+        return $commission->referred_by_id === $user->id;
     }
 
     public function create(Admin $admin): bool

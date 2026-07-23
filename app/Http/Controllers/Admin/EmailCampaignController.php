@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\EmailCampaign;
 use App\Models\Customer;
+use App\Models\Affiliator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

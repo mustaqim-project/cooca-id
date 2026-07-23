@@ -127,3 +127,4 @@ final class Review extends Model
         return $this->is_approved ? 'approved' : 'pending';
     }
 }
+

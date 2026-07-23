@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services\Notification;
 
-use App\Models\Affiliator;
-use App\Models\Customer;
+use App\Models\Customer;\nuse App\Models\Affiliator;
 use App\Models\Notification as NotificationModel;
 use App\Models\NotificationTemplate;
 use Illuminate\Support\Collection;

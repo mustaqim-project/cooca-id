@@ -3,9 +3,7 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use App\Models\Admin;
-use App\Models\Affiliator;
-use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +24,7 @@ class AuthAccessTest extends TestCase
     /** @test */
     public function test_admin_can_authenticate()
     {
-        $admin = Admin::where('email', 'admin@example.com')->first();
+        $admin = User::where('email', 'admin@example.com')->first();
         $this->assertNotNull($admin, 'Admin record should exist in database');
         $this->assertTrue(Hash::check('password123', $admin->password), 'Admin password hash should match');
 
@@ -42,7 +40,7 @@ class AuthAccessTest extends TestCase
     /** @test */
     public function test_affiliator_can_authenticate_via_guard()
     {
-        $affiliator = Affiliator::where('email', 'affiliator@example.com')->first();
+        $affiliator = User::where('email', 'affiliator@example.com')->first();
         $this->assertNotNull($affiliator, 'Affiliator record should exist in database');
         $this->assertTrue(Hash::check('password123', $affiliator->password), 'Affiliator password hash should match');
 
@@ -58,7 +56,7 @@ class AuthAccessTest extends TestCase
     /** @test */
     public function test_customer_can_authenticate()
     {
-        $customer = Customer::where('email', 'customer@example.com')->first();
+        $customer = User::where('email', 'customer@example.com')->first();
         $this->assertNotNull($customer, 'Customer record should exist in database');
         $this->assertTrue(Hash::check('password123', $customer->password), 'Customer password hash should match');
 

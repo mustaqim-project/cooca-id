@@ -97,8 +97,8 @@ class ProcessCommissionHoldingPeriodJob implements ShouldQueue
 
         // Record in activity log
         \App\Models\ActivityLog::create([
-            'causer_id' => $commission->affiliator_id,
-            'causer_type' => \App\Models\Affiliator::class,
+            'causer_id' => $commission->referred_by_id,
+            'causer_type' => \App\Models\System::class,
             'action' => 'commission_available',
             'module' => 'affiliate',
             'description' => "Commission {$commission->id} is now available for withdrawal after 14 days holding period",
@@ -106,7 +106,7 @@ class ProcessCommissionHoldingPeriodJob implements ShouldQueue
             'user_agent' => 'Scheduler',
             'metadata' => [
                 'commission_id' => $commission->id,
-                'affiliator_id' => $commission->affiliator_id,
+                'referred_by_id' => $commission->referred_by_id,
                 'amount' => $commission->commission_amount,
                 'invoice_paid_at' => $commission->invoice_paid_at->toIso8601String(),
                 'holding_days' => $daysSincePayment,
@@ -115,9 +115,11 @@ class ProcessCommissionHoldingPeriodJob implements ShouldQueue
 
         Log::info("Commission marked as available", [
             'commission_id' => $commission->id,
-            'affiliator_id' => $commission->affiliator_id,
+            'referred_by_id' => $commission->referred_by_id,
             'amount' => $commission->commission_amount,
             'days_in_holding' => $daysSincePayment,
         ]);
     }
 }
+
+

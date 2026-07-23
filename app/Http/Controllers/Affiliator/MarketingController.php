@@ -22,7 +22,7 @@ class MarketingController extends Controller
      */
     public function index()
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         $products = Product::where('is_active', true)
             ->with(['category', 'subscriptionPlans'])
@@ -56,7 +56,7 @@ class MarketingController extends Controller
      */
     public function banners()
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         $banners = [
             [
@@ -92,7 +92,7 @@ class MarketingController extends Controller
      */
     public function links()
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         $baseReferralLink = route('home', ['ref' => $affiliator->referral_code]);
         

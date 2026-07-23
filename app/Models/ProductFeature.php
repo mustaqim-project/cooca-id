@@ -58,3 +58,4 @@ class ProductFeature extends Model
         return $query->orderBy('order');
     }
 }
+

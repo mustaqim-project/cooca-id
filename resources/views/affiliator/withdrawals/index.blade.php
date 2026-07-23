@@ -1,96 +1,115 @@
-@extends('layouts.affiliator')
+@extends('affiliator.layouts.app')
 
-@section('title', 'My Withdrawals')
-@section('subtitle', 'Manage your payout requests and view your balance')
+@section('title', 'Withdrawals')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
-            </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
-        </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-            
-        </div>
-    </div>
+    <div class="d-flex flex-column gap-4">
 
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
-                <tr>
-                    <th scope="col" class="table-th">Date</th>
-                    <th scope="col" class="table-th">Amount</th>
-                    <th scope="col" class="table-th">Method</th>
-                    <th scope="col" class="table-th">Status</th>
-                    <th scope="col" class="table-th">Actions</th>
-                </tr>
-            
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold">Withdrawals</h2>
+                <p class="text-secondary mb-0">Manage your payout requests and history.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('affiliator.withdrawals.create') }}" class="btn btn-primary rounded-pill px-4 hover-lift fw-medium">
+                    <i class="bi bi-wallet2 me-1"></i> Request Withdrawal
+                </a>
+            </div>
+        </div>
+
+        <!-- Withdrawals Table -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div
+                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
+                    style="max-width: 320px; background: var(--color-bg);">
+                    <span class="input-group-text bg-transparent border-0 pe-1"><i
+                            class="bi bi-search text-secondary"></i></span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
+                        placeholder="Search withdrawals...">
+                </div>
                 
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
-                @forelse($withdrawals as $withdrawal)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
-                        {{ \Carbon\Carbon::parse($withdrawal->created_at)->format('M d, Y') }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">
-                        Rp {{ number_format($withdrawal->amount, 0, ',', '.') }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
-                        {{ strtoupper($withdrawal->withdrawal_method ?? 'BANK') }}
-                        @if($withdrawal->account_number)
-                            <div class="text-xs">***{{ substr($withdrawal->account_number, -4) }}</div>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @php
-                            $statusClass = match($withdrawal->status) {
-                                'completed', 'paid', 'approved' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                                'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                                'rejected', 'failed', 'cancelled' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-                                default => 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300'
-                            };
-                        @endphp
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
-                            {{ ucfirst($withdrawal->status) }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{{ route('affiliator.withdrawals.show', $withdrawal->id) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
-                            Details
-                        </a>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="px-6 py-12 text-center text-surface-500 dark:text-surface-400">
-                        <div class="flex flex-col items-center">
-                            <i data-lucide="bank" class="w-4 h-4 text-5xl mb-4 text-surface-300 dark:text-surface-600 dark:text-surface-400"></i>
-                            <h3 class="text-lg font-medium text-surface-900 dark:text-white">No withdrawals yet</h3>
-                            <p class="mt-1">When you request a payout, it will appear here.</p>
-                        </div>
-                    </td>
-                </tr>
-                @endforelse
-            
-                
-                
-                </tbody>
-            </table>
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm rounded-pill border-light bg-light text-secondary" style="width: 120px;">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
+                        <tr>
+                            <th class="py-3 px-4 border-0">Request ID</th>
+                            <th class="py-3 px-3 border-0">Date</th>
+                            <th class="py-3 px-3 border-0">Account</th>
+                            <th class="py-3 px-3 border-0 text-end">Amount</th>
+                            <th class="py-3 px-3 border-0 text-center">Status</th>
+                            <th class="py-3 px-4 border-0 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @forelse($withdrawals ?? [] as $withdrawal)
+                            <tr>
+                                <td class="py-3 px-4 fw-medium text-dark">
+                                    #{{ $withdrawal->id }}
+                                </td>
+                                <td class="py-3 px-3 text-secondary fs-7">
+                                    {{ $withdrawal->created_at->format('d M Y, H:i') }}
+                                </td>
+                                <td class="py-3 px-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="text-primary"><i class="bi bi-bank fs-5"></i></div>
+                                        <div>
+                                            <div class="fw-semibold text-dark" style="font-size: 0.8rem;">{{ strtoupper($withdrawal->withdrawal_method ?? 'BANK') }}</div>
+                                            <div class="text-secondary fs-7">{{ $withdrawal->account_number }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-3 fw-bold text-dark text-end">
+                                    Rp {{ number_format($withdrawal->amount, 0, ',', '.') }}
+                                </td>
+                                <td class="py-3 px-3 text-center">
+                                    @php
+                                        $statusClass = match($withdrawal->status) {
+                                            'completed', 'paid', 'approved' => 'success',
+                                            'pending' => 'warning',
+                                            'rejected', 'failed', 'cancelled' => 'danger',
+                                            default => 'secondary'
+                                        };
+                                    @endphp
+                                    <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-3 py-1">
+                                        {{ ucfirst($withdrawal->status) }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    <a href="{{ route('affiliator.withdrawals.show', $withdrawal->id) }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift text-secondary">
+                                        Details
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-inbox fs-1"></i></div>
+                                    <h6 class="fw-medium">No Withdrawals Found</h6>
+                                    <p class="fs-7 mb-0">You don't have any withdrawal requests yet.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if (method_exists($withdrawals ?? [], 'hasPages') && ($withdrawals ?? [])->hasPages())
+                <div class="card-footer bg-transparent border-top border-light p-4">
+                    {{ $withdrawals->links() }}
+                </div>
+            @endif
         </div>
     </div>
-</div>
 @endsection

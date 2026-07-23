@@ -13,7 +13,7 @@ final class CompanyProfile extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'customer_id',
+        'user_id',
         'company_name',
         'industry',
         'company_size',
@@ -32,3 +32,4 @@ final class CompanyProfile extends Model
         return $this->belongsTo(Customer::class);
     }
 }
+

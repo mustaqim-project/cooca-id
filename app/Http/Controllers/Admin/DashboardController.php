@@ -90,7 +90,7 @@ final class DashboardController extends Controller
         // ─────────────────────────────────────────────
         // AFFILIATE KPIs
         // ─────────────────────────────────────────────
-        $totalAffiliators  = Affiliator::count();
+        $totalAffiliators = Affiliator::count();
         $activeAffiliators = Affiliator::whereHas('referrals')->count();
 
         $pendingWithdrawals       = AffiliateWithdrawal::where('status', 'pending')->count();

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('ticket_number')->unique();
             $table->uuid('customer_id')->nullable();
-            $table->uuid('affiliator_id')->nullable();
+            $table->uuid('referred_by_id')->nullable();
             $table->uuid('admin_id')->nullable();
             $table->string('subject');
             $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
@@ -32,14 +32,14 @@ return new class extends Migration
                 ->on('customers')
                 ->onDelete('cascade');
 
-            $table->foreign('affiliator_id')
+            $table->foreign('referred_by_id')
                 ->references('id')
-                ->on('affiliators')
+                ->on('customers')
                 ->onDelete('cascade');
 
             $table->foreign('admin_id')
                 ->references('id')
-                ->on('admins')
+                ->on('customers')
                 ->onDelete('set null');
 
             $table->index('ticket_number');
@@ -56,3 +56,4 @@ return new class extends Migration
         Schema::dropIfExists('tickets');
     }
 };
+

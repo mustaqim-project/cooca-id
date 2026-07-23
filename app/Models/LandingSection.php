@@ -46,3 +46,4 @@ class LandingSection extends Model
         return $query->orderBy('order');
     }
 }
+

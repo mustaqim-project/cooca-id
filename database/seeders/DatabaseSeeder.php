@@ -22,11 +22,10 @@ class DatabaseSeeder extends Seeder
             SubscriptionPlanSeeder::class,
             TestimonialSeeder::class,
             FAQSeeder::class,
+            RbacSeeder::class,
             UserSeeder::class,
-            AdminAffiliatorCustomerSeeder::class,
             BlogPostSeeder::class,
-            AffiliateCommissionScenarioSeeder::class,
-            FullDatabaseSeeder::class,
+            IntegrationSeeder::class,
         ]);
     }
 }

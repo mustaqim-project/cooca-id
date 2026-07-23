@@ -23,6 +23,7 @@ final class Customer extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, HasRoles, Notifiable, HasUuids;
     protected $table = 'customers';
+    protected $guard_name = 'customer';
 
     protected $fillable = [
         'name',

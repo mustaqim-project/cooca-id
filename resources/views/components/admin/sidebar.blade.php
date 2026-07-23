@@ -233,6 +233,13 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{ route('admin.profile.edit') }}"
+                    class="nav-link d-flex align-items-center gap-3 rounded-3 px-3 py-2 text-decoration-none {{ request()->routeIs('admin.profile.*') ? 'bg-primary text-white fw-medium' : 'text-secondary hover-lift' }}">
+                    <i class="bi bi-person fs-5"></i>
+                    <span class="sidebar-text">Profile</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('admin.settings.index') }}"
                     class="nav-link d-flex align-items-center gap-3 rounded-3 px-3 py-2 text-decoration-none {{ request()->routeIs('admin.settings.*') ? 'bg-primary text-white fw-medium' : 'text-secondary hover-lift' }}">
                     <i class="bi bi-gear fs-5"></i>

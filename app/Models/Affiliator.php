@@ -21,6 +21,7 @@ final class Affiliator extends Authenticatable
     use HasFactory, HasRoles, Notifiable, HasUuids;
 
     protected $table = 'affiliators';
+    protected $guard_name = 'affiliator';
 
     protected $fillable = [
         'name',

@@ -22,7 +22,7 @@ final class DownlineController extends Controller
      */
     public function index()
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
         $downlines = $this->affiliatorRepository->getDownlines($affiliator->getKey());
 
         return view('affiliator.downlines.index', [

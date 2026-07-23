@@ -101,7 +101,7 @@
                     <hr class="dropdown-divider">
                 </li>
                 <li>
-                    <form action="#" method="POST" class="m-0">
+                    <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
                         @csrf
                         <button type="submit" class="dropdown-item py-2 text-danger hover-lift"><i
                                 class="bi bi-box-arrow-right me-2"></i> Logout</button>

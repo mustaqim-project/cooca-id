@@ -19,7 +19,7 @@ final class ContractController extends Controller
      */
     public function show(string $licenseId)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         $license = License::where('id', $licenseId)
             ->where('customer_id', $customer->id)
@@ -48,7 +48,7 @@ final class ContractController extends Controller
      */
     public function sign(Request $request, string $licenseId)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         $request->validate([
             'signature_data' => ['required', 'string'], // base64 from canvas
@@ -77,7 +77,7 @@ final class ContractController extends Controller
      */
     public function download(string $licenseId)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         $license = License::where('id', $licenseId)
             ->where('customer_id', $customer->id)

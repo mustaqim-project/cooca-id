@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,7 +12,7 @@ class AdminMenuTest extends TestCase
 
     public function test_admin_can_access_all_menus()
     {
-        $admin = Admin::create([
+        $admin = User::factory()->create([
             'name' => 'Super Admin',
             'email' => 'admin@cooca.id',
             'password' => bcrypt('password123'),
@@ -42,7 +42,7 @@ class AdminMenuTest extends TestCase
         ];
 
         foreach ($menus as $route) {
-            $response = $this->actingAs($admin, 'admin')->get(route($route));
+            $response = $this->actingAs($admin)->get(route($route));
             $response->assertStatus(200);
         }
     }

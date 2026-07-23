@@ -44,17 +44,6 @@ Route::prefix('products')->name('products.')->group(function () {
 Route::get('/blog', [LandingController::class, 'blogIndex'])->name('blog.index');
 Route::get('/blog/{slug}', [LandingController::class, 'blogShow'])->name('blog.show');
 // Customer Auth Routes
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Cache\RateLimiting\Limit;
-
-RateLimiter::for('customer-login', function ($request) {
-    return Limit::perMinute(5)->by($request->ip());
-});
-
-RateLimiter::for('customer-register', function ($request) {
-    return Limit::perMinute(10)->by($request->ip());
-});
-
 Route::prefix('customer')->name('customer.')->group(function () {
     Route::middleware('guest:customer')->group(function () {
         Route::get('login', [LandingController::class, 'showCustomerLogin'])->name('login');
@@ -75,12 +64,12 @@ Route::prefix('customer')->name('customer.')->group(function () {
 
     Route::middleware('auth:customer')->group(function () {
         Route::post('logout', [LandingController::class, 'customerLogout'])->name('logout');
-        
+
         // Email Verification
         Route::get('email/verify', [LandingController::class, 'showCustomerVerificationNotice'])->name('verification.notice');
         Route::get('email/verify/{id}/{hash}', [LandingController::class, 'verifyCustomerEmail'])->middleware('signed')->name('verification.verify');
         Route::post('email/verification-notification', [LandingController::class, 'resendCustomerVerificationEmail'])->middleware('throttle:6,1')->name('verification.send');
-        
+
         // Contract Routes
         Route::get('contracts/{licenseId}', [\App\Http\Controllers\Customer\ContractController::class, 'show'])->name('contracts.show');
         Route::post('contracts/{licenseId}/sign', [\App\Http\Controllers\Customer\ContractController::class, 'sign'])->name('contracts.sign');
@@ -129,3 +118,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::get('/login', [LandingController::class, 'showCustomerLogin'])->name('login');
 
 // Legal Pages Routes (CMS Managed)
+
+

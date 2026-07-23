@@ -28,7 +28,7 @@ final class WithdrawalRejectedMail extends Mailable implements ShouldQueue
             subject: 'Withdrawal Ditolak',
             tags: ['affiliate', 'withdrawal', 'rejected'],
             metadata: [
-                'affiliator_id' => $this->withdrawal->affiliator_id,
+                'referred_by_id' => $this->withdrawal->referred_by_id,
                 'withdrawal_id' => $this->withdrawal->id,
             ],
         );

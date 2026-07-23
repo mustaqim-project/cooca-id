@@ -20,7 +20,7 @@ final class AffiliateWithdrawalPolicy
             return true;
         }
 
-        return $withdrawal->affiliator_id === $user->id;
+        return $withdrawal->referred_by_id === $user->id;
     }
 
     public function create(Affiliator $affiliator): bool

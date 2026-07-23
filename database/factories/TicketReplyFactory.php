@@ -22,7 +22,7 @@ class TicketReplyFactory extends Factory
             'id' => (string) Str::uuid(),
             'ticket_id' => \App\Models\Ticket::inRandomOrder()->first()?->id ?? \App\Models\Ticket::factory(),
             'user_type' => fake()->randomElement(['customer', 'affiliator', 'admin']),
-            'user_id' => \App\Models\Customer::inRandomOrder()->first()?->id ?? \App\Models\Customer::factory(),
+            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
             'message' => fake()->paragraphs(2, true),
             'is_internal' => false,
         ];
@@ -35,7 +35,7 @@ class TicketReplyFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'user_type' => 'customer',
-            'user_id' => \App\Models\Customer::factory(),
+            'user_id' => \App\Models\User::factory(),
         ]);
     }
 
@@ -46,7 +46,7 @@ class TicketReplyFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'user_type' => 'affiliator',
-            'user_id' => \App\Models\Affiliator::factory(),
+            'user_id' => \App\Models\User::factory(),
         ]);
     }
 
@@ -57,7 +57,7 @@ class TicketReplyFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'user_type' => 'admin',
-            'user_id' => \App\Models\Admin::factory(),
+            'user_id' => \App\Models\User::factory(),
         ]);
     }
 
@@ -69,7 +69,7 @@ class TicketReplyFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'is_internal' => true,
             'user_type' => 'admin',
-            'user_id' => \App\Models\Admin::factory(),
+            'user_id' => \App\Models\User::factory(),
         ]);
     }
 }

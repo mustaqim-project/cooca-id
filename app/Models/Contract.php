@@ -17,7 +17,7 @@ final class Contract extends Model
 
     protected $fillable = [
         'license_id',
-        'customer_id',
+        'user_id',
         'contract_number',
         'status',
         'pdf_path',
@@ -56,3 +56,4 @@ final class Contract extends Model
         return sprintf('COOCA-%s%s-%04d', $year, $month, $count);
     }
 }
+

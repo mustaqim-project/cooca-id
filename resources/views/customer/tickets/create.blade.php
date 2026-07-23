@@ -1,56 +1,62 @@
-@extends('layouts.customer')
+@extends('customer.layouts.app')
 
 @section('title', 'Create Ticket')
-@section('subtitle', 'Submit a new support request')
 
 @section('content')
-    <div class="space-y-6 max-w-4xl mx-auto">
-        <div class="flex items-center justify-between">
-            <a href="{{ route('customer.tickets.index') }}"
-                class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-                <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back to Tickets
-            </a>
-        </div>
-
-        <div class="corporate-card">
-            <div class="p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-50/50 dark:bg-surface-900/50">
-                <h3 class="text-lg font-medium text-surface-900 dark:text-white">Ticket Details</h3>
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ route('customer.tickets.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
+                <div>
+                    <h2 class="mb-1 fw-bold">Create Ticket</h2>
+                    <p class="text-secondary mb-0">Submit a new support request.</p>
+                </div>
             </div>
-            <form action="{{ route('customer.tickets.store') }}" method="POST" class="p-6 space-y-6">
-                @csrf
 
-                <div>
-                    <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Subject *</label>
-                    <input type="text" name="subject" value="{{ old('subject') }}" required
-                        class="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg dark:bg-surface-800 dark:text-white"
-                        placeholder="Brief description of the issue">
+            <!-- Form Card -->
+            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden">
+                <div class="card-header bg-transparent border-bottom border-light p-4">
+                    <h5 class="mb-0 fw-semibold"><i class="bi bi-pencil-square me-2"></i> Ticket Details</h5>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Priority</label>
-                    <select name="priority"
-                        class="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg dark:bg-surface-800 dark:text-white">
-                        <option value="low" @selected(old('priority') === 'low')>Low</option>
-                        <option value="medium" @selected(old('priority', 'medium') === 'medium')>Medium</option>
-                        <option value="high" @selected(old('priority') === 'high')>High</option>
-                    </select>
-                    <p class="mt-1 text-sm text-surface-500">Select high priority only for critical system issues.</p>
+                
+                <div class="card-body p-4 p-md-5">
+                    <form action="{{ route('customer.tickets.store') }}" method="POST">
+                        @csrf
+                        
+                        <!-- Subject -->
+                        <div class="mb-4">
+                            <label class="form-label fw-medium text-secondary">Subject <span class="text-danger">*</span></label>
+                            <input type="text" name="subject" value="{{ old('subject') }}" class="form-control bg-light border-light py-2" placeholder="Brief description of the issue" required>
+                        </div>
+                        
+                        <!-- Priority -->
+                        <div class="mb-4">
+                            <label class="form-label fw-medium text-secondary">Priority</label>
+                            <select name="priority" class="form-select bg-light border-light py-2 text-secondary">
+                                <option value="low" @selected(old('priority') === 'low')>Low</option>
+                                <option value="medium" @selected(old('priority', 'medium') === 'medium')>Medium</option>
+                                <option value="high" @selected(old('priority') === 'high')>High</option>
+                            </select>
+                            <div class="form-text mt-2 text-secondary fs-7">Select high priority only for critical system issues.</div>
+                        </div>
+                        
+                        <!-- Message -->
+                        <div class="mb-4">
+                            <label class="form-label fw-medium text-secondary">Message <span class="text-danger">*</span></label>
+                            <textarea name="message" rows="6" class="form-control bg-light border-light py-2" placeholder="Provide detailed information about your issue..." required>{{ old('message') }}</textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end mt-5 pt-3 border-top border-light">
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 hover-lift fw-medium">
+                                Submit Ticket <i class="bi bi-send ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Message *</label>
-                    <textarea name="message" rows="6" required
-                        class="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg dark:bg-surface-800 dark:text-white"
-                        placeholder="Provide detailed information about your issue...">{{ old('message') }}</textarea>
-                </div>
-
-                <div class="pt-4 border-t border-surface-200 dark:border-surface-700 flex justify-end">
-                    <button type="submit"
-                        class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium">
-                        Submit Ticket
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 @endsection

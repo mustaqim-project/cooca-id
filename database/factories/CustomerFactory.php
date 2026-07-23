@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -42,7 +42,7 @@ class CustomerFactory extends Factory
     public function withAffiliator(): static
     {
         return $this->state(fn (array $attributes) => [
-            'affiliator_id' => \App\Models\Affiliator::factory(),
+            'affiliator_id' => \App\Models\User::factory(),
         ]);
     }
 }

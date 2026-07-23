@@ -81,3 +81,4 @@ class EmailTemplate extends Model
         ];
     }
 }
+

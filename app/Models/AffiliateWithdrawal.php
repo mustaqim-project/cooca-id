@@ -16,7 +16,7 @@ final class AffiliateWithdrawal extends Model
     protected $table = 'affiliate_withdrawals';
 
     protected $fillable = [
-        'affiliator_id',
+        'referred_by_id',
         'amount',
         'fee',
         'net_amount',
@@ -58,7 +58,7 @@ final class AffiliateWithdrawal extends Model
 
     public function affiliator(): BelongsTo
     {
-        return $this->belongsTo(Affiliator::class, 'affiliator_id');
+        return $this->belongsTo(Affiliator::class, 'referred_by_id');
     }
 
     public function approver(): BelongsTo
@@ -127,3 +127,4 @@ final class AffiliateWithdrawal extends Model
         return $this->status === self::STATUS_PAID;
     }
 }
+

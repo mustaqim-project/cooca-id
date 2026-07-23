@@ -126,3 +126,4 @@ final class Voucher extends Model
         $this->increment('used_count');
     }
 }
+

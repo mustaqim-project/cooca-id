@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\BlogPost;
-use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -18,7 +18,7 @@ class BlogPostSeeder extends Seeder
         BlogPost::truncate();
         \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
 
-        $admin = Admin::first();
+        $admin = \App\Models\Admin::first();
         $adminId = $admin ? $admin->id : null;
 
         $posts = [

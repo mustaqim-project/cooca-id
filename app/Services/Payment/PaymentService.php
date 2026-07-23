@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Services\Payment;
 
 use App\Models\Transaction;
+use App\Models\ApiIntegration;
 use App\Models\MidtransTransaction;
 use App\Models\Invoice;
 use App\Models\Subscription;
-use App\Models\Setting;
 use App\Jobs\Notification\SendPaymentConfirmationJob;
 use App\Jobs\Payment\ProcessCommissionJob;
 use App\Jobs\ActivateSubscriptionJob;
@@ -24,8 +24,19 @@ final class PaymentService
 
     public function __construct()
     {
-        $this->midtransServerKey = (string) Setting::get('payment.midtrans_server_key', config('services.midtrans.server_key', ''));
-        $this->midtransSandbox = (bool) Setting::get('payment.midtrans_sandbox', config('services.midtrans.sandbox', true));
+        // Load Midtrans config from ApiIntegration first, fallback to config/services.php
+        $integration = ApiIntegration::where('provider', 'midtrans')
+            ->where('is_active', true)
+            ->first();
+
+        if ($integration && !empty($integration->config)) {
+            $this->midtransServerKey = (string) ($integration->config['server_key'] ?? config('services.midtrans.server_key', ''));
+            $sandbox = $integration->config['sandbox'] ?? false;
+            $this->midtransSandbox = filter_var($sandbox, FILTER_VALIDATE_BOOLEAN);
+        } else {
+            $this->midtransServerKey = (string) config('services.midtrans.server_key', '');
+            $this->midtransSandbox = (bool) config('services.midtrans.sandbox', true);
+        }
     }
 
     /**

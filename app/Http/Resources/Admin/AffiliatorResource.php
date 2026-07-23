@@ -24,7 +24,7 @@ final class AffiliatorResource extends JsonResource
             'balance' => $this->balance,
             'bank_account' => $this->whenNotNull($this->bank_account),
             'bank_name' => $this->whenNotNull($this->bank_name),
-            'parent_affiliator_id' => $this->whenNotNull($this->parent_affiliator_id),
+            'parent_referred_by_id' => $this->whenNotNull($this->parent_referred_by_id),
             'google_id' => $this->whenNotNull($this->google_id),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

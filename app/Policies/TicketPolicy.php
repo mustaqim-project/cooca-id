@@ -15,7 +15,7 @@ final class TicketPolicy
         return true;
     }
 
-    public function view(Admin|Customer|Affiliator $user, Ticket $ticket): bool
+    public function view(Admin|Customer|Customer $user, Ticket $ticket): bool
     {
         if ($user instanceof Admin) {
             return true;
@@ -25,19 +25,19 @@ final class TicketPolicy
             return $ticket->customer_id === $user->id;
         }
 
-        if ($user instanceof Affiliator && $ticket->affiliator_id) {
-            return $ticket->affiliator_id === $user->id;
+        if ($user instanceof Affiliator && $ticket->referred_by_id) {
+            return $ticket->referred_by_id === $user->id;
         }
 
         return false;
     }
 
-    public function create(Customer|Affiliator $user): bool
+    public function create(Customer|Customer $user): bool
     {
         return true;
     }
 
-    public function update(Admin|Customer|Affiliator $user, Ticket $ticket): bool
+    public function update(Admin|Customer|Customer $user, Ticket $ticket): bool
     {
         if ($user instanceof Admin) {
             return true;
@@ -47,8 +47,8 @@ final class TicketPolicy
             return $ticket->customer_id === $user->id;
         }
 
-        if ($user instanceof Affiliator && $ticket->affiliator_id) {
-            return $ticket->affiliator_id === $user->id;
+        if ($user instanceof Affiliator && $ticket->referred_by_id) {
+            return $ticket->referred_by_id === $user->id;
         }
 
         return false;

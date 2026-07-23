@@ -39,8 +39,44 @@ final class ApiIntegrationController extends Controller
                 'redirect'      => ['label' => 'Redirect URL', 'type' => 'text', 'required' => true],
             ],
         ],
-        'smtp' => [
-            'name' => 'Email SMTP',
+        'smtp_noreply' => [
+            'name' => 'SMTP Noreply (Auth)',
+            'fields' => [
+                'host'         => ['label' => 'SMTP Host', 'type' => 'text', 'required' => true],
+                'port'         => ['label' => 'SMTP Port', 'type' => 'number', 'required' => true],
+                'username'     => ['label' => 'Username', 'type' => 'text', 'required' => true],
+                'password'     => ['label' => 'Password', 'type' => 'password', 'required' => true],
+                'encryption'   => ['label' => 'Encryption (tls/ssl)', 'type' => 'text', 'required' => false],
+                'from_address' => ['label' => 'From Address', 'type' => 'email', 'required' => true],
+                'from_name'    => ['label' => 'From Name', 'type' => 'text', 'required' => false],
+            ],
+        ],
+        'smtp_support' => [
+            'name' => 'SMTP Support (Tickets)',
+            'fields' => [
+                'host'         => ['label' => 'SMTP Host', 'type' => 'text', 'required' => true],
+                'port'         => ['label' => 'SMTP Port', 'type' => 'number', 'required' => true],
+                'username'     => ['label' => 'Username', 'type' => 'text', 'required' => true],
+                'password'     => ['label' => 'Password', 'type' => 'password', 'required' => true],
+                'encryption'   => ['label' => 'Encryption (tls/ssl)', 'type' => 'text', 'required' => false],
+                'from_address' => ['label' => 'From Address', 'type' => 'email', 'required' => true],
+                'from_name'    => ['label' => 'From Name', 'type' => 'text', 'required' => false],
+            ],
+        ],
+        'smtp_billing' => [
+            'name' => 'SMTP Billing (Invoice)',
+            'fields' => [
+                'host'         => ['label' => 'SMTP Host', 'type' => 'text', 'required' => true],
+                'port'         => ['label' => 'SMTP Port', 'type' => 'number', 'required' => true],
+                'username'     => ['label' => 'Username', 'type' => 'text', 'required' => true],
+                'password'     => ['label' => 'Password', 'type' => 'password', 'required' => true],
+                'encryption'   => ['label' => 'Encryption (tls/ssl)', 'type' => 'text', 'required' => false],
+                'from_address' => ['label' => 'From Address', 'type' => 'email', 'required' => true],
+                'from_name'    => ['label' => 'From Name', 'type' => 'text', 'required' => false],
+            ],
+        ],
+        'smtp_marketing' => [
+            'name' => 'SMTP Marketing',
             'fields' => [
                 'host'         => ['label' => 'SMTP Host', 'type' => 'text', 'required' => true],
                 'port'         => ['label' => 'SMTP Port', 'type' => 'number', 'required' => true],
@@ -154,7 +190,7 @@ final class ApiIntegrationController extends Controller
         );
 
         // Flush cache so ServiceProvider picks up new values
-        Cache::forget('api_integrations.active');
+        Cache::forget('api_integrations.processed_configs');
 
         return redirect()
             ->route('admin.api-integrations.index')
@@ -169,7 +205,7 @@ final class ApiIntegrationController extends Controller
         $integration = ApiIntegration::where('provider', $provider)->firstOrFail();
         $integration->update(['is_active' => !$integration->is_active]);
 
-        Cache::forget('api_integrations.active');
+        Cache::forget('api_integrations.processed_configs');
 
         $status = $integration->is_active ? 'diaktifkan' : 'dinonaktifkan';
         return back()->with('success', "{$integration->name} berhasil {$status}.");
@@ -190,6 +226,10 @@ final class ApiIntegrationController extends Controller
         try {
             switch ($provider) {
                 case 'smtp':
+                case 'smtp_noreply':
+                case 'smtp_support':
+                case 'smtp_billing':
+                case 'smtp_marketing':
                     // Test SMTP by trying to connect
                     $transport = new \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport(
                         $config['host'] ?? 'localhost',

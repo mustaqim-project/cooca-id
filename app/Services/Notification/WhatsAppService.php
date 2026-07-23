@@ -38,7 +38,7 @@ final class WhatsAppService
                     ->first();
             });
 
-            if ($integration && is_array($integration->config)) {
+            if ($integration && !empty($integration->config)) {
                 $this->serverUrl = rtrim($integration->config['server_url'] ?? 'http://localhost:3000', '/');
                 $this->apiToken = $integration->config['api_token'] ?? null;
                 $this->configured = true;

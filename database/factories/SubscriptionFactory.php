@@ -20,7 +20,7 @@ class SubscriptionFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'customer_id' => \App\Models\Customer::inRandomOrder()->first()?->id ?? \App\Models\Customer::factory(),
+            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
             'license_id' => \App\Models\License::inRandomOrder()->first()?->id ?? \App\Models\License::factory(),
             'subscription_plan_id' => \App\Models\SubscriptionPlan::inRandomOrder()->first()?->id ?? \App\Models\SubscriptionPlan::factory(),
             'status' => fake()->randomElement(['trial', 'active', 'expired', 'cancelled']),

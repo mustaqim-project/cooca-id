@@ -1,68 +1,93 @@
-@extends('layouts.customer')
+@extends('customer.layouts.app')
 
-@section('title', 'Edit Profile')
-@section('subtitle', 'Modify profile record.')
+@section('title', 'Profile Settings')
+@section('subtitle', 'Manage your account information and password.')
 
 @section('content')
-<div class="space-y-6 max-w-6xl mx-auto">
-    <div class="flex items-center justify-between">
-        <a href="javascript:history.back()" class="inline-flex items-center text-sm font-medium text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-white transition-colors">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
-        </a>
-    </div>
+    <div class="row g-4">
+        <!-- Left: Profile Info -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 glass p-4">
+                <h5 class="fw-bold mb-4"><i class="bi bi-person me-2"></i> Account Information</h5>
 
-    <form action="#" method="POST"  class="form-confirm-submit">
-        @csrf
-        
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column: Main Form -->
-            <div class="lg:col-span-2 space-y-6">
-                <div class="corporate-card">
-                    <div class="p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-50/50 dark:bg-surface-900/50">
-                        <h3 class="text-lg font-medium text-surface-900 dark:text-white">Form Details</h3>
+                <form action="{{ route('customer.profile.update') }}" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-medium">Name</label>
+                        <input type="text" class="form-control rounded-3 @error('name') is-invalid @enderror"
+                            id="name" name="name" value="{{ old('name', $customer->name) }}" required>
+                        @error('name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                    <div class="p-6 space-y-5">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="col-span-2">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Title / Name</label>
-                <input type="text" name="name" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white" placeholder="Enter title">
-            </div>
-            
-            <div class="col-span-2">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Description</label>
-                <textarea name="description" rows="4" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white" placeholder="Enter description"></textarea>
-            </div>
-            
-            <div class="col-span-2 md:col-span-1">
-                <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">Status</label>
-                <select name="status" class="w-full rounded-md border-surface-300 dark:border-surface-600 dark:bg-surface-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:text-white">
-                    <option value="1">Active</option>
-                    <option value="0">Inactive</option>
-                </select>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-medium">Email</label>
+                        <input type="email" class="form-control rounded-3 @error('email') is-invalid @enderror"
+                            id="email" name="email" value="{{ old('email', $customer->email) }}" required>
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label fw-medium">Phone</label>
+                        <input type="text" class="form-control rounded-3 @error('phone') is-invalid @enderror"
+                            id="phone" name="phone" value="{{ old('phone', $customer->phone ?? '') }}">
+                        @error('phone')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
+                        <i class="bi bi-check2-circle me-2"></i> Update Profile
+                    </button>
+                </form>
             </div>
         </div>
+
+        <!-- Right: Change Password -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 glass p-4">
+                <h5 class="fw-bold mb-4"><i class="bi bi-shield-lock me-2"></i> Change Password</h5>
+
+                <form action="{{ route('customer.profile.password.update') }}" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label fw-medium">Current Password</label>
+                        <input type="password"
+                            class="form-control rounded-3 @error('current_password') is-invalid @enderror"
+                            id="current_password" name="current_password" required>
+                        @error('current_password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                </div>
-            </div>
-            
-            <!-- Right Column: Actions -->
-            <div class="space-y-6">
-                <div class="corporate-card">
-                    <div class="p-6">
-                        <h3 class="text-lg font-medium text-surface-900 dark:text-white mb-2">Actions</h3>
-                        <p class="text-sm text-surface-500 dark:text-surface-400 mb-6">Review your changes before submitting.</p>
-                        
-                        <div class="flex flex-col space-y-3">
-                            
-                            <a href="javascript:history.back()" class="btn btn-secondary w-full">
-                                Cancel
-                            </a>
-                        </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label fw-medium">New Password</label>
+                        <input type="password" class="form-control rounded-3 @error('password') is-invalid @enderror"
+                            id="password" name="password" required minlength="8">
+                        <div class="form-text">Minimum 8 characters.</div>
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                </div>
+
+                    <div class="mb-3">
+                        <label for="password_confirmation" class="form-label fw-medium">Confirm New Password</label>
+                        <input type="password" class="form-control rounded-3" id="password_confirmation"
+                            name="password_confirmation" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
+                        <i class="bi bi-check2-circle me-2"></i> Update Password
+                    </button>
+                </form>
             </div>
         </div>
-    </form>
-</div>
+    </div>
 @endsection

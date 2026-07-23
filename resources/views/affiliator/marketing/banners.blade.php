@@ -1,51 +1,78 @@
-﻿@extends('layouts.affiliator')
+@extends('affiliator.layouts.app')
 
-@section('title', 'Marketing')
-@section('subtitle', 'Manage your marketing data.')
+@section('title', 'Marketing Banners')
 
 @section('content')
-<div class="mb-4 flex justify-between items-center">
-    <h2 class="text-xl font-bold text-surface-900 dark:text-white">Marketing</h2>
-    
-</div>
+    <div class="d-flex flex-column gap-4">
 
-<div class="corporate-card overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-surface-200 dark:divide-surface-700">
-            <thead class="bg-surface-50 dark:bg-surface-800/50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Name / Title</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Date</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-surface-800 divide-y divide-surface-200 dark:divide-surface-700">
-                @forelse($banners ?? [] as $banner)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">{{ $banner['id'] }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white">{{ $banner['name'] }}</div>
-                        <div class="text-sm text-surface-500 dark:text-surface-400">Size: {{ $banner['size'] }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Ready</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">-</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end">
-                        <button onclick="navigator.clipboard.writeText('{{ addslashes($banner['html_code']) }}'); alert('Copied to clipboard!')" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 inline-flex items-center" title="Copy HTML"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="5" class="px-6 py-4 text-center text-sm text-surface-500">No banners found.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ route('affiliator.marketing.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
+                <div>
+                    <h2 class="mb-1 fw-bold">Marketing Banners</h2>
+                    <p class="text-secondary mb-0">Embeddable banners for your website or blog.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Banners Table -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div class="card-header bg-transparent border-bottom border-light p-4">
+                <h5 class="fw-bold mb-0 text-dark">Available Banners</h5>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
+                        <tr>
+                            <th class="py-3 px-4 border-0" style="width: 80px;">ID</th>
+                            <th class="py-3 px-3 border-0">Name / Size</th>
+                            <th class="py-3 px-3 border-0 text-center">Status</th>
+                            <th class="py-3 px-4 border-0 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @forelse($banners ?? [] as $banner)
+                            <tr>
+                                <td class="py-3 px-4 fw-medium text-secondary">
+                                    #{{ $banner['id'] }}
+                                </td>
+                                <td class="py-3 px-3">
+                                    <div class="fw-semibold text-dark">{{ $banner['name'] }}</div>
+                                    <div class="text-secondary fs-7"><i class="bi bi-aspect-ratio me-1"></i> {{ $banner['size'] }}</div>
+                                </td>
+                                <td class="py-3 px-3 text-center">
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">
+                                        Ready
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    <button onclick="navigator.clipboard.writeText('{{ addslashes($banner['html_code']) }}'); alert('Copied to clipboard!')" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift text-secondary">
+                                        <i class="bi bi-code-slash me-1"></i> Copy HTML
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-images fs-1"></i></div>
+                                    <h6 class="fw-medium">No Banners Found</h6>
+                                    <p class="fs-7 mb-0">There are currently no banners available to embed.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if (method_exists($banners ?? [], 'hasPages') && ($banners ?? [])->hasPages())
+                <div class="card-footer bg-transparent border-top border-light p-4">
+                    {{ $banners->links() }}
+                </div>
+            @endif
+        </div>
     </div>
-    
-    <div class="px-6 py-4 border-t border-surface-200 dark:border-surface-700">
-        
-    </div>
-</div>
 @endsection

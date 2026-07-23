@@ -18,7 +18,7 @@ final class Invoice extends Model
     protected $fillable = [
         'transaction_id',
         'invoice_number',
-        'customer_id',
+        'user_id',
         'amount',
         'status',
         'issued_at',
@@ -88,3 +88,4 @@ final class Invoice extends Model
         $this->update(['status' => self::STATUS_CANCELLED]);
     }
 }
+

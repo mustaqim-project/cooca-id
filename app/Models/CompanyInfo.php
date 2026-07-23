@@ -81,3 +81,4 @@ class CompanyInfo extends Model
             ->toArray();
     }
 }
+

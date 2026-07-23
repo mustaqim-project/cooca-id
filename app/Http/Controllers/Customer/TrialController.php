@@ -53,7 +53,7 @@ class TrialController extends Controller
             'requested_subdomain' => $validated['requested_subdomain'],
             'status' => ErpRequest::STATUS_SUBMITTED,
             'notes' => $validated['notes'] ?? null,
-            'affiliate_id' => $request->user()->affiliator_id,
+            'affiliate_id' => $request->user()->referred_by_id,
         ]);
 
         event(new \App\Events\Trial\TrialSubmitted($trial));

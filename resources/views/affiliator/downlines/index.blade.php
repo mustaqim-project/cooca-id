@@ -1,72 +1,98 @@
-@extends('layouts.affiliator')
+@extends('affiliator.layouts.app')
 
-@section('title', 'Downlines')
-@section('subtitle', 'Manage your downlines data.')
+@section('title', 'My Downlines')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
-            </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
-        </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-            
-        </div>
-    </div>
+    <div class="d-flex flex-column gap-4">
 
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
-                <tr>
-                    <th class="table-th">ID</th>
-                    <th class="table-th">Name / Title</th>
-                    <th class="table-th">Status</th>
-                    <th class="table-th">Date</th>
-                    <th class="table-th">Actions</th>
-                </tr>
-            
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
-                @forelse($downlines ?? [] as $downline)
-                <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">{{ $downline->id ?? $downline['id'] }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-surface-900 dark:text-white">{{ $downline->name ?? $downline['name'] }}</div>
-                        <div class="text-sm text-surface-500 dark:text-surface-400">{{ $downline->email ?? $downline['email'] }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                            Active
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">Today</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <span class="text-surface-400">Read Only</span>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="5" class="px-6 py-4 text-center text-sm text-surface-500">You don't have any downlines yet.</td></tr>
-                @endforelse
-            
-                
-                
-                </tbody>
-            </table>
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold">My Downlines</h2>
+                <p class="text-secondary mb-0">Manage your downlines data.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('affiliator.downlines.stats') }}" class="btn btn-light border rounded-pill px-3 hover-lift fw-medium">
+                    <i class="bi bi-bar-chart me-1"></i> Statistics
+                </a>
+                <a href="{{ route('affiliator.downlines.tree') }}" class="btn btn-primary rounded-pill px-4 hover-lift fw-medium">
+                    <i class="bi bi-diagram-3 me-1"></i> View Tree
+                </a>
+            </div>
+        </div>
+
+        <!-- Downlines Table -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div
+                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
+                    style="max-width: 320px; background: var(--color-bg);">
+                    <span class="input-group-text bg-transparent border-0 pe-1"><i
+                            class="bi bi-search text-secondary"></i></span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
+                        placeholder="Search downlines...">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
+                        <tr>
+                            <th class="py-3 px-4 border-0" style="width: 80px;">ID</th>
+                            <th class="py-3 px-3 border-0">Name / Email</th>
+                            <th class="py-3 px-3 border-0">Status</th>
+                            <th class="py-3 px-3 border-0">Date Added</th>
+                            <th class="py-3 px-4 border-0 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @forelse($downlines ?? [] as $downline)
+                            <tr>
+                                <td class="py-3 px-4 fw-medium text-secondary">
+                                    #{{ $downline->id ?? $downline['id'] }}
+                                </td>
+                                <td class="py-3 px-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                                            style="width: 40px; height: 40px;">
+                                            {{ strtoupper(substr($downline->name ?? $downline['name'], 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold text-dark">{{ $downline->name ?? $downline['name'] }}</div>
+                                            <div class="text-secondary fs-7">{{ $downline->email ?? $downline['email'] }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-3">
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">
+                                        Active
+                                    </span>
+                                </td>
+                                <td class="py-3 px-3 text-secondary fs-7">
+                                    Today
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    <span class="badge bg-light text-secondary border px-3 py-1 rounded-pill">Read Only</span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-diagram-3 fs-1"></i></div>
+                                    <h6 class="fw-medium">No Downlines Found</h6>
+                                    <p class="fs-7 mb-0">You don't have any downlines yet.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if (method_exists($downlines ?? [], 'hasPages') && ($downlines ?? [])->hasPages())
+                <div class="card-footer bg-transparent border-top border-light p-4">
+                    {{ $downlines->links() }}
+                </div>
+            @endif
         </div>
     </div>
-</div>
 @endsection

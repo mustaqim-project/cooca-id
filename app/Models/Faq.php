@@ -50,3 +50,4 @@ class Faq extends Model
         return $query->orderBy('order');
     }
 }
+

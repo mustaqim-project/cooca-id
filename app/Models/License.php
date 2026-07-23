@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property string $id
- * @property string $customer_id
+ * @property string $user_id
  * @property string $product_id
  * @property string $subscription_plan_id
  * @property string $license_code
@@ -33,7 +33,7 @@ final class License extends Model
     protected $table = 'licenses';
 
     protected $fillable = [
-        'customer_id',
+        'user_id',
         'product_id',
         'subscription_plan_id',
         'erp_request_id',
@@ -110,7 +110,7 @@ final class License extends Model
         return $this->belongsTo(Domain::class, 'domain_id');
     }
 
-    public function revokedBy(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function adminRevoked(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Admin::class, 'revoked_by');
     }
@@ -186,3 +186,4 @@ final class License extends Model
         ]);
     }
 }
+

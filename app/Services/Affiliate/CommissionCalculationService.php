@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Affiliate;
 
 use App\Models\Transaction;
-use App\Models\Affiliator;
+use App\Models\Affiliator;\nuse App\Models\Customer;
 use App\Models\AffiliateWallet;
 use App\Models\AffiliateCommission;
 use App\Models\Setting;
@@ -38,14 +38,14 @@ final class CommissionCalculationService
      */
     public function calculateForTransaction(Transaction $transaction): void
     {
-        if (!$transaction->customer?->affiliator_id) {
+        if (!$transaction->customer?->referred_by_id) {
             return;
         }
 
         DB::beginTransaction();
         try {
             $customer = $transaction->customer;
-            $affiliate = Affiliator::findOrFail($customer->affiliator_id);
+            $affiliate = Customer::findOrFail($customer->referred_by_id);
             
             // Calculate based on gross revenue (before voucher discount)
             $grossAmount = $transaction->gross_amount;
@@ -57,8 +57,8 @@ final class CommissionCalculationService
             $this->recordCommission($affiliate, $transaction, $level1Commission, 1, $level1Rate * 100);
 
             // Level 2 commission (upline)
-            if ($affiliate->parent_affiliator_id) {
-                $upline = Affiliator::findOrFail($affiliate->parent_affiliator_id);
+            if ($affiliate->parent_referred_by_id) {
+                $upline = Customer::findOrFail($affiliate->parent_referred_by_id);
                 $level2Rate = $this->getCommissionRate(2);
                 $level2Commission = $grossAmount * $level2Rate;
                 
@@ -78,7 +78,7 @@ final class CommissionCalculationService
     private function recordCommission(Affiliator $affiliate, Transaction $transaction, float $amount, int $level, float $percent): void
     {
         $commission = AffiliateCommission::create([
-            'affiliator_id' => $affiliate->id,
+            'referred_by_id' => $affiliate->id,
             'transaction_id' => $transaction->id,
             'customer_id' => $transaction->customer_id,
             'level' => $level,
@@ -91,7 +91,7 @@ final class CommissionCalculationService
 
         // Add to wallet as pending
         $wallet = AffiliateWallet::firstOrCreate(
-            ['affiliator_id' => $affiliate->id],
+            ['referred_by_id' => $affiliate->id],
             ['balance' => 0, 'pending_balance' => 0]
         );
 

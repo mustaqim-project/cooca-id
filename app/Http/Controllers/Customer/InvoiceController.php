@@ -24,7 +24,7 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         $query = Invoice::where('customer_id', $customer->id)
             ->with(['subscription', 'transaction'])
@@ -66,7 +66,7 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         // Use Policy for authorization (prevents IDOR)
         Gate::authorize('view', $invoice);
@@ -83,7 +83,7 @@ class InvoiceController extends Controller
      */
     public function download(Invoice $invoice)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
 
         // Use Policy for authorization (prevents IDOR)
         Gate::authorize('download', $invoice);

@@ -1,91 +1,96 @@
-@extends('layouts.customer')
+@extends('customer.layouts.app')
 
 @section('title', 'My Tickets')
-@section('subtitle', 'Get help and support for your products')
 
 @section('content')
-    <div class="space-y-6">
-        <div class="flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-surface-900 dark:text-white">Support Tickets</h2>
-            <a href="{{ route('customer.tickets.create') }}"
-                class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium">
-                Create Ticket
-            </a>
+    <div class="d-flex flex-column gap-4">
+
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold">Support Tickets</h2>
+                <p class="text-secondary mb-0">Get help and support for your products.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('customer.tickets.create') }}" class="btn btn-primary rounded-pill px-4 hover-lift fw-medium">
+                    <i class="bi bi-plus-lg me-1"></i> Create Ticket
+                </a>
+            </div>
         </div>
 
-        <div class="corporate-card">
-            <div class="overflow-x-auto">
-                <table class="corporate-table">
-                    <thead class="table-thead">
+        <!-- Tickets Table -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
                         <tr>
-                            <th scope="col" class="table-th">Subject</th>
-                            <th scope="col" class="table-th">Status</th>
-                            <th scope="col" class="table-th">Priority</th>
-                            <th scope="col" class="table-th">Created At</th>
-                            <th scope="col" class="table-th">Actions</th>
+                            <th class="py-3 px-4 border-0">Subject</th>
+                            <th class="py-3 px-3 border-0">Status</th>
+                            <th class="py-3 px-3 border-0">Priority</th>
+                            <th class="py-3 px-3 border-0">Created At</th>
+                            <th class="py-3 px-4 border-0 text-end">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="table-tbody">
+                    <tbody class="border-top-0">
                         @forelse($tickets as $ticket)
-                            <tr class="hover:bg-surface-50 dark:hover:bg-surface-700/50">
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">
-                                    {{ $ticket->subject }}
+                            <tr>
+                                <td class="py-3 px-4">
+                                    <div class="fw-semibold">{{ $ticket->subject }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="py-3 px-3">
                                     @php
-                                        $statusColors = [
-                                            'open' =>
-                                                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                                            'in_progress' =>
-                                                'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-                                            'resolved' =>
-                                                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                                            'closed' => 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-                                        ];
-                                        $colorClass =
-                                            $statusColors[$ticket->status] ?? 'bg-surface-100 text-surface-800';
+                                        $statusClass = match($ticket->status) {
+                                            'open' => 'warning',
+                                            'in_progress' => 'info',
+                                            'resolved' => 'success',
+                                            'closed' => 'secondary',
+                                            default => 'secondary'
+                                        };
                                     @endphp
-                                    <span
-                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $colorClass }}">
+                                    <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-3 py-1">
                                         {{ str_replace('_', ' ', ucfirst($ticket->status)) }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="py-3 px-3">
                                     @php
-                                        $priorityColors = [
-                                            'low' => 'text-gray-600 dark:text-gray-400',
-                                            'medium' => 'text-yellow-600 dark:text-yellow-400',
-                                            'high' => 'text-red-600 dark:text-red-400 font-bold',
-                                        ];
+                                        $priorityClass = match($ticket->priority) {
+                                            'low' => 'text-secondary',
+                                            'medium' => 'text-warning',
+                                            'high' => 'text-danger fw-bold',
+                                            default => 'text-secondary'
+                                        };
                                     @endphp
-                                    <span class="text-sm {{ $priorityColors[$ticket->priority] ?? '' }}">
+                                    <span class="fs-7 {{ $priorityClass }}">
                                         {{ ucfirst($ticket->priority) }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
+                                <td class="py-3 px-3 text-secondary fs-7">
                                     {{ $ticket->created_at->format('M d, Y H:i') }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a href="{{ route('customer.tickets.show', $ticket) }}"
-                                        class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
-                                        View
+                                <td class="py-3 px-4 text-end">
+                                    <a href="{{ route('customer.tickets.show', $ticket) }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift">
+                                        View <i class="bi bi-arrow-right ms-1"></i>
                                     </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-surface-500 dark:text-surface-400">
-                                    You have no support tickets.
+                                <td colspan="5" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-inbox fs-1"></i></div>
+                                    <h6 class="fw-medium">No Tickets Found</h6>
+                                    <p class="fs-7">You have no support tickets.</p>
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-            <div class="px-6 py-4 border-t border-surface-200 dark:border-surface-700">
-                {{ $tickets->links() }}
-            </div>
+
+            @if (method_exists($tickets, 'hasPages') && $tickets->hasPages())
+                <div class="card-footer bg-transparent border-top border-light p-4">
+                    {{ $tickets->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection

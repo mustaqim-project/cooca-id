@@ -28,7 +28,7 @@ final class WithdrawalApprovedMail extends Mailable implements ShouldQueue
             subject: 'Withdrawal Disetujui - Rp ' . number_format($this->withdrawal->net_amount, 0, ',', '.'),
             tags: ['affiliate', 'withdrawal', 'approved'],
             metadata: [
-                'affiliator_id' => $this->withdrawal->affiliator_id,
+                'referred_by_id' => $this->withdrawal->referred_by_id,
                 'withdrawal_id' => $this->withdrawal->id,
             ],
         );

@@ -5,7 +5,7 @@ namespace App\Mail\Affiliator;
 
 use App\Traits\HasQueueConfiguration;
 
-use App\Models\Affiliator;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -31,7 +31,7 @@ final class CommissionReceivedMail extends Mailable implements ShouldQueue
             subject: 'Komisi Diterima - Rp ' . number_format($this->commissionAmount, 0, ',', '.'),
             tags: ['affiliate', 'commission'],
             metadata: [
-                'affiliator_id' => $this->affiliator->id,
+                'referred_by_id' => $this->affiliator->id,
                 'commission_amount' => $this->commissionAmount,
             ],
         );

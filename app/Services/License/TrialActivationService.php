@@ -127,7 +127,7 @@ final class TrialActivationService
     {
         \App\Models\ActivityLog::create([
             'causer_id' => auth()->id(),
-            'causer_type' => \App\Models\Admin::class,
+            'causer_type' => \App\Models\Customer::class,
             'action' => 'trial_activated',
             'module' => 'erp_request',
             'description' => "Trial activated for customer {$erpRequest->customer->email}",
@@ -180,3 +180,5 @@ final class TrialActivationService
         );
     }
 }
+
+

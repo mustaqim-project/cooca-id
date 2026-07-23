@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Affiliate;
 
-use App\Models\Affiliator;
-use App\Models\Customer;
+use App\Models\User;
+
 use App\Models\SubscriptionPlan;
 use App\Models\Subscription;
 use App\Models\Transaction;
@@ -39,26 +39,27 @@ class CommissionCalculationTest extends TestCase
     public function test_level_1_commission_calculation(): void
     {
         // Create affiliate hierarchy
-        $topAffiliate = Affiliator::create([
+        $topAffiliate = User::factory()->create([
+            'user_type' => 'affiliator',
             'name' => 'Top Affiliate',
             'email' => 'top@test.com',
-            'code' => 'TOP001',
             'status' => 'active',
         ]);
 
-        $level1Affiliate = Affiliator::create([
+        $level1Affiliate = User::factory()->create([
+            'user_type' => 'affiliator',
             'name' => 'Level 1 Affiliate',
             'email' => 'level1@test.com',
-            'code' => 'LVL001',
             'status' => 'active',
-            'parent_affiliator_id' => $topAffiliate->id,
+            'referred_by_id' => $topAffiliate->id,
         ]);
 
         // Create customer referred by level 1 affiliate
-        $customer = Customer::create([
+        $customer = User::factory()->create([
+            'user_type' => 'customer',
             'name' => 'Test Customer',
             'email' => 'customer@test.com',
-            'affiliator_id' => $level1Affiliate->id,
+            'referred_by_id' => $level1Affiliate->id,
         ]);
 
         // Create plan and subscription
@@ -71,13 +72,13 @@ class CommissionCalculationTest extends TestCase
             'is_active' => true,
         ]);
         $license = License::factory()->active()->create([
-            'customer_id' => $customer->id,
+            'user_id' => $customer->id,
             'product_id' => $product->id,
             'subscription_plan_id' => $plan->id,
         ]);
 
         $subscription = Subscription::create([
-            'customer_id' => $customer->id,
+            'user_id' => $customer->id,
             'license_id' => $license->id,
             'subscription_plan_id' => $plan->id,
             'status' => 'active',
@@ -85,7 +86,7 @@ class CommissionCalculationTest extends TestCase
 
         // Create transaction
         $transaction = Transaction::create([
-            'customer_id' => $customer->id,
+            'user_id' => $customer->id,
             'subscription_id' => $subscription->id,
             'invoice_number' => 'INV-AFF-001',
             'type' => 'subscription_new',
@@ -105,7 +106,7 @@ class CommissionCalculationTest extends TestCase
 
         // Level 1 commission (25% of 100000)
         $this->assertDatabaseHas('affiliate_commissions', [
-            'affiliator_id' => $level1Affiliate->id,
+            'referred_by_id' => $level1Affiliate->id,
             'level' => 1,
             'commission_percent' => 25.0,
             'commission_amount' => 25000,
@@ -114,7 +115,7 @@ class CommissionCalculationTest extends TestCase
 
         // Level 2 commission (5% of 100000) - goes to upline (topAffiliate)
         $this->assertDatabaseHas('affiliate_commissions', [
-            'affiliator_id' => $topAffiliate->id,
+            'referred_by_id' => $topAffiliate->id,
             'level' => 2,
             'commission_percent' => 5.0,
             'commission_amount' => 5000,
@@ -122,27 +123,28 @@ class CommissionCalculationTest extends TestCase
         ]);
 
         // Check wallet pending balance
-        $level1Wallet = AffiliateWallet::where('affiliator_id', $level1Affiliate->id)->first();
+        $level1Wallet = AffiliateWallet::where('referred_by_id', $level1Affiliate->id)->first();
         $this->assertEquals(25000, $level1Wallet->pending_balance);
 
-        $topWallet = AffiliateWallet::where('affiliator_id', $topAffiliate->id)->first();
+        $topWallet = AffiliateWallet::where('referred_by_id', $topAffiliate->id)->first();
         $this->assertEquals(5000, $topWallet->pending_balance);
     }
 
     public function test_recurring_commission_processing(): void
     {
         // Create affiliate and customer
-        $affiliate = Affiliator::create([
+        $affiliate = User::factory()->create([
+            'user_type' => 'affiliator',
             'name' => 'Test Affiliate',
             'email' => 'affiliate@test.com',
-            'code' => 'AFF001',
             'status' => 'active',
         ]);
 
-        $customer = Customer::create([
+        $customer = User::factory()->create([
+            'user_type' => 'customer',
             'name' => 'Test Customer',
             'email' => 'customer@test.com',
-            'affiliator_id' => $affiliate->id,
+            'referred_by_id' => $affiliate->id,
         ]);
 
         $product = Product::factory()->create();
@@ -154,13 +156,13 @@ class CommissionCalculationTest extends TestCase
             'is_active' => true,
         ]);
         $license = License::factory()->active()->create([
-            'customer_id' => $customer->id,
+            'user_id' => $customer->id,
             'product_id' => $product->id,
             'subscription_plan_id' => $plan->id,
         ]);
 
         $subscription = Subscription::create([
-            'customer_id' => $customer->id,
+            'user_id' => $customer->id,
             'license_id' => $license->id,
             'subscription_plan_id' => $plan->id,
             'status' => 'active',
@@ -168,7 +170,7 @@ class CommissionCalculationTest extends TestCase
 
         // Create renewal transaction (no commission yet)
         $renewalTransaction = Transaction::create([
-            'customer_id' => $customer->id,
+            'user_id' => $customer->id,
             'subscription_id' => $subscription->id,
             'invoice_number' => 'INV-AFF-002',
             'type' => 'subscription_renewal',
@@ -188,7 +190,7 @@ class CommissionCalculationTest extends TestCase
 
         // Verify commission was created
         $this->assertDatabaseHas('affiliate_commissions', [
-            'affiliator_id' => $affiliate->id,
+            'referred_by_id' => $affiliate->id,
             'transaction_id' => $renewalTransaction->id,
             'level' => 1,
             'commission_amount' => 25000,
@@ -219,10 +221,11 @@ class CommissionCalculationTest extends TestCase
     public function test_no_commission_without_affiliate(): void
     {
         // Create customer without affiliate
-        $customer = Customer::create([
+        $customer = User::factory()->create([
+            'user_type' => 'customer',
             'name' => 'Test Customer',
             'email' => 'customer@test.com',
-            'affiliator_id' => null,
+            'referred_by_id' => null,
         ]);
 
         $product = Product::factory()->create();
@@ -234,20 +237,20 @@ class CommissionCalculationTest extends TestCase
             'is_active' => true,
         ]);
         $license = License::factory()->active()->create([
-            'customer_id' => $customer->id,
+            'user_id' => $customer->id,
             'product_id' => $product->id,
             'subscription_plan_id' => $plan->id,
         ]);
 
         $subscription = Subscription::create([
-            'customer_id' => $customer->id,
+            'user_id' => $customer->id,
             'license_id' => $license->id,
             'subscription_plan_id' => $plan->id,
             'status' => 'active',
         ]);
 
         $transaction = Transaction::create([
-            'customer_id' => $customer->id,
+            'user_id' => $customer->id,
             'subscription_id' => $subscription->id,
             'invoice_number' => 'INV-AFF-003',
             'type' => 'subscription_new',

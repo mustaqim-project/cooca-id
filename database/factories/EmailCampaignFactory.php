@@ -32,7 +32,7 @@ class EmailCampaignFactory extends Factory
             'status' => fake()->randomElement(['draft', 'scheduled', 'sending', 'completed', 'failed']),
             'scheduled_at' => fake()->optional(0.5)->dateTimeBetween('now', '+1 week'),
             'sent_at' => fake()->optional(0.6)->dateTimeBetween('-2 months', 'now'),
-            'created_by' => \App\Models\Admin::inRandomOrder()->first()?->id ?? \App\Models\Admin::factory(),
+            'created_by' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
         ];
     }
 

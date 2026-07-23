@@ -13,38 +13,23 @@ final class LicenseValidationController extends Controller
         private readonly LicenseService $licenseService
     ) {}
 
-    /**
-     * Validate license for ERP client.
-     * Triple-check: domain + license_code + token_code
-     */
-    public function validate(ValidateLicenseRequest $request)
+    public function validate(ValidateLicenseRequest $request): JsonResponse
     {
         $data = $request->validated();
 
-        $result = $this->licenseService->validateLicense(
-            $data['domain'],
-            $data['license_code'],
-            $data['token_code']
-        );
+        // Use the activateErpLicense which handles binding domain if missing, and generating proper payload
+        $result = $this->licenseService->activateErpLicense($data);
 
         if ($result['valid']) {
             return response()->json([
-                'valid' => true,
-                'status' => $result['license']->status,
-                'expires_at' => $result['license']->expires_at?->toIso8601String(),
-                'customer' => [
-                    'id' => $result['license']->customer->id,
-                    'business_name' => $result['license']->customer->business_name,
-                ],
-                'product' => [
-                    'id' => $result['license']->product->id,
-                    'name' => $result['license']->product->name,
-                ],
+                'success' => true,
+                'message' => 'License berhasil divalidasi.',
+                'data' => $result['data'],
             ]);
         }
 
         return response()->json([
-            'valid' => false,
+            'success' => false,
             'message' => $result['message'] ?? 'Invalid license',
         ], 403);
     }

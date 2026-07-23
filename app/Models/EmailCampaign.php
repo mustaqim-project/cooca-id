@@ -108,3 +108,4 @@ final class EmailCampaign extends Model
         return $this->status === self::STATUS_COMPLETED;
     }
 }
+

@@ -18,7 +18,7 @@ class WithdrawalService
         DB::beginTransaction();
         try {
             $wallet = AffiliateWallet::firstOrCreate(
-                ['affiliator_id' => $affiliate->id],
+                ['referred_by_id' => $affiliate->id],
                 ['balance' => 0, 'pending_balance' => 0]
             );
             
@@ -46,7 +46,7 @@ class WithdrawalService
 
             // Create withdrawal request
             $withdrawal = AffiliateWithdrawal::create([
-                'affiliator_id' => $affiliate->id,
+                'referred_by_id' => $affiliate->id,
                 'amount' => $amount,
                 'fee' => $fee,
                 'net_amount' => max(0, $amount - $fee),
@@ -100,7 +100,7 @@ class WithdrawalService
                 'user_type' => 'admin',
                 'action' => 'withdrawal_approved',
                 'module' => 'Affiliate',
-                'description' => "Withdrawal approved for user {$withdrawal->affiliator_id}",
+                'description' => "Withdrawal approved for user {$withdrawal->referred_by_id}",
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
                 'metadata' => [
@@ -129,7 +129,7 @@ class WithdrawalService
         DB::beginTransaction();
         try {
             // Refund to wallet
-            $wallet = AffiliateWallet::where('affiliator_id', $withdrawal->affiliator_id)->firstOrFail();
+            $wallet = AffiliateWallet::where('referred_by_id', $withdrawal->referred_by_id)->firstOrFail();
             $wallet->increment('balance', $withdrawal->amount);
             $withdrawal->affiliator?->increment('balance', $withdrawal->amount);
 
@@ -146,7 +146,7 @@ class WithdrawalService
                 'user_type' => 'admin',
                 'action' => 'withdrawal_rejected',
                 'module' => 'Affiliate',
-                'description' => "Withdrawal rejected for user {$withdrawal->affiliator_id}: {$reason}",
+                'description' => "Withdrawal rejected for user {$withdrawal->referred_by_id}: {$reason}",
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
                 'metadata' => [
@@ -172,11 +172,11 @@ class WithdrawalService
      */
     public function getStatistics(Affiliator $affiliate): array
     {
-        $totalWithdrawn = AffiliateWithdrawal::where('affiliator_id', $affiliate->id)
+        $totalWithdrawn = AffiliateWithdrawal::where('referred_by_id', $affiliate->id)
             ->where('status', 'approved')
             ->sum('amount');
 
-        $pendingWithdrawals = AffiliateWithdrawal::where('affiliator_id', $affiliate->id)
+        $pendingWithdrawals = AffiliateWithdrawal::where('referred_by_id', $affiliate->id)
             ->where('status', 'pending')
             ->sum('amount');
 

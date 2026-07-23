@@ -12,17 +12,17 @@ return new class extends Migration
     {
         Schema::create('affiliate_wallets', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('affiliator_id')->unique();
+            $table->uuid('referred_by_id')->unique();
             $table->decimal('balance', 15, 2)->default(0);
             $table->decimal('pending_balance', 15, 2)->default(0);
             $table->timestamps();
 
-            $table->foreign('affiliator_id')
+            $table->foreign('referred_by_id')
                 ->references('id')
                 ->on('affiliators')
                 ->cascadeOnDelete();
 
-            $table->index('affiliator_id');
+            $table->index('referred_by_id');
         });
     }
 
@@ -31,3 +31,4 @@ return new class extends Migration
         Schema::dropIfExists('affiliate_wallets');
     }
 };
+

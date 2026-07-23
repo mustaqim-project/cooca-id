@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -22,7 +22,7 @@ class CustomerLoginTest extends TestCase
 
     public function test_customer_can_login_and_redirect_to_dashboard()
     {
-        $customer = Customer::create([
+        $customer = User::factory()->create([
             'name' => 'Test Customer',
             'email' => 'test@cooca.id',
             'password' => Hash::make('password123'),
@@ -39,9 +39,9 @@ class CustomerLoginTest extends TestCase
 
         $response->assertRedirect(route('customer.dashboard'));
 
-        $this->assertAuthenticatedAs($customer, 'customer');
+        $this->assertAuthenticatedAs($customer);
 
-        $dashboardResponse = $this->actingAs($customer, 'customer')->get(route('customer.dashboard'));
+        $dashboardResponse = $this->actingAs($customer)->get(route('customer.dashboard'));
         
         $dashboardResponse->assertStatus(200);
         $dashboardResponse->assertViewIs('customer.dashboard.index');

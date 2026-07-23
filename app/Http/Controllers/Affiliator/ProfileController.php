@@ -23,7 +23,7 @@ class ProfileController extends Controller
      */
     public function edit()
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         return view('affiliator.profile.edit', [
             'user' => [
@@ -46,7 +46,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request)
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -63,7 +63,7 @@ class ProfileController extends Controller
      */
     public function updateBankAccount(Request $request)
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         $validated = $request->validate([
             'bank_name' => 'required|string|max:100',
@@ -84,7 +84,7 @@ class ProfileController extends Controller
      */
     public function updatePassword(Request $request)
     {
-        $affiliator = Auth::guard('affiliator')->user();
+        $affiliator = Auth::user();
 
         $validated = $request->validate([
             'current_password' => 'required|string',

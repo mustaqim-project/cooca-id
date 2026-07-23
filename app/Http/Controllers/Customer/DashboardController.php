@@ -25,7 +25,7 @@ final class DashboardController extends Controller
      */
     public function index(): View
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
         $now      = Carbon::now();
 
         // ─────────────────────────────────────────────

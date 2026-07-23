@@ -29,7 +29,7 @@ class PageFactory extends Factory
             'meta_description' => fake()->optional(0.7)->sentence(15),
             'is_published' => true,
             'published_at' => now(),
-            'created_by' => \App\Models\Admin::factory(),
+            'created_by' => \App\Models\User::factory(),
         ];
     }
 

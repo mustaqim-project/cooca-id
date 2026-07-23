@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property string $id
- * @property string $customer_id
+ * @property string $user_id
  * @property string $subscription_id
  * @property string $invoice_number
  * @property float $gross_amount
@@ -36,7 +36,7 @@ final class Transaction extends Model
     protected $table = 'transactions';
 
     protected $fillable = [
-        'customer_id',
+        'user_id',
         'subscription_id',
         'type',
         'invoice_number',
@@ -138,3 +138,4 @@ final class Transaction extends Model
         return $this->customer?->name ?? 'Unknown';
     }
 }
+

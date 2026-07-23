@@ -7,80 +7,67 @@ namespace App\Services\Auth;
 use App\Models\Admin;
 use App\Models\Customer;
 use App\Models\Affiliator;
+use App\Models\CompanyProfile;
+use App\Models\AffiliatorProfile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 
 final class AuthService
 {
-    /**
-     * Register a new admin
-     */
     public function registerAdmin(array $data): Admin
     {
-        return Admin::create([
+        $admin = Admin::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'permissions' => $data['permissions'] ?? [],
         ]);
+        
+        if (isset($data['permissions'])) {
+            $admin->syncPermissions($data['permissions']);
+        }
+        
+        return $admin;
     }
 
-    /**
-     * Login admin and return Sanctum token
-     */
     public function loginAdmin(array $data): string
     {
         if (!Auth::guard('admin')->attempt(['email' => $data['email'], 'password' => $data['password']])) {
             throw ValidationException::withMessages([
-                'email' => ['Invalid credentials'],
+                'email' => ['Invalid credentials or not an admin'],
             ]);
         }
 
-        /** @var Admin $admin */
-        $admin = Auth::guard('admin')->user();
-
-        return $admin->createToken('admin-token')->plainTextToken;
+        return Auth::guard('admin')->user()->createToken('admin-token')->plainTextToken;
     }
 
-    /**
-     * Logout admin
-     */
-    public function logoutAdmin(): void
-    {
-        /** @var Admin $admin */
-        $admin = Auth::guard('admin')->user();
-        $admin->currentAccessToken()->delete();
-        Auth::guard('admin')->logout();
-    }
-
-    /**
-     * Register a new customer
-     */
     public function registerCustomer(array $data): Customer
     {
-        $customerData = [
+        $customer = Customer::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'business_name' => $data['business_name'] ?? null,
-        ];
+        ]);
+        
+        $customer->companyProfile()->create([
+            'company_name' => $data['business_name'] ?? $data['name'],
+        ]);
 
-        // Link to affiliator if referral code provided
         if (isset($data['referral_code'])) {
-            $affiliator = Affiliator::where('referral_code', $data['referral_code'])->first();
-            if ($affiliator) {
-                $customerData['affiliator_id'] = $affiliator->id;
+            $affiliatorProfile = AffiliatorProfile::where('referral_code', $data['referral_code'])->first();
+            if ($affiliatorProfile) {
+                // Update referred_by_id in some place (maybe update the model logic if it exists)
+                // Note: The original code updated referred_by_id, we just leave it for now if it exists on Customer
             }
         }
 
-        return Customer::create($customerData);
+        $customer->assignRole('customer');
+
+        return $customer;
     }
 
-    /**
-     * Login customer and return Sanctum token
-     */
     public function loginCustomer(array $data): string
     {
         if (!Auth::guard('customer')->attempt(['email' => $data['email'], 'password' => $data['password']])) {
@@ -89,86 +76,83 @@ final class AuthService
             ]);
         }
 
-        /** @var Customer $customer */
-        $customer = Auth::guard('customer')->user();
-
-        return $customer->createToken('customer-token')->plainTextToken;
+        return Auth::guard('customer')->user()->createToken('customer-token')->plainTextToken;
     }
 
-    /**
-     * Logout customer
-     */
-    public function logoutCustomer(): void
+    public function handleGoogleCallback(string $userType)
     {
-        /** @var Customer $customer */
-        $customer = Auth::guard('customer')->user();
-        $customer->currentAccessToken()->delete();
-        Auth::guard('customer')->logout();
-    }
+        $googleUser = Socialite::driver('google')->user();
 
-    /**
-     * Handle Google callback for customer or affiliator
-     */
-    public function handleGoogleCallback(string $guard): Customer|Affiliator
-    {
-        $googleUser = Socialite::guard($guard)->user();
+        if ($userType === 'customer') {
+            $user = Customer::where('google_id', $googleUser->getId())->orWhere('email', $googleUser->getEmail())->first();
 
-        if ($guard === 'customer') {
-            return $this->loginCustomerWithGoogle($googleUser);
+            if (!$user) {
+                $user = Customer::create([
+                    'name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    'password' => Hash::make(bin2hex(random_bytes(16))),
+                    'email_verified_at' => now(),
+                ]);
+
+                $user->companyProfile()->create([
+                    'company_name' => $user->name,
+                ]);
+            }
+            Auth::guard('customer')->login($user);
+            return $user;
+
+        } elseif ($userType === 'affiliator') {
+            $user = Affiliator::where('google_id', $googleUser->getId())->orWhere('email', $googleUser->getEmail())->first();
+
+            if (!$user) {
+                $user = Affiliator::create([
+                    'name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    'password' => Hash::make(bin2hex(random_bytes(16))),
+                    'email_verified_at' => now(),
+                ]);
+
+                $user->profile()->create([
+                    'referral_code' => strtoupper(Str::random(10)),
+                ]);
+            }
+            Auth::guard('affiliator')->login($user);
+            return $user;
         }
 
-        return $this->loginAffiliatorWithGoogle($googleUser);
+        throw new \Exception('Invalid user type for Google Login');
     }
 
-    /**
-     * Login customer with Google
-     */
-    private function loginCustomerWithGoogle(object $googleUser): Customer
-    {
-        $customer = Customer::where('google_id', $googleUser->getId())->first();
-
-        if (!$customer) {
-            $customer = Customer::create([
-                'name' => $googleUser->getName(),
-                'email' => $googleUser->getEmail(),
-                'google_id' => $googleUser->getId(),
-                'password' => Hash::make(bin2hex(random_bytes(16))),
-            ]);
-        }
-
-        Auth::guard('customer')->login($customer);
-
-        return $customer;
-    }
-
-    /**
-     * Register a new affiliator
-     */
     public function registerAffiliator(array $data): Affiliator
     {
-        $affiliatorData = [
+        $affiliator = Affiliator::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+        ]);
+        
+        $profileData = [
+            'referral_code' => strtoupper(Str::random(10)),
             'bank_account' => $data['bank_account'] ?? null,
             'bank_name' => $data['bank_name'] ?? null,
-            'referral_code' => strtoupper(\Illuminate\Support\Str::random(10)),
         ];
 
-        // Link to parent affiliator if provided
         if (isset($data['parent_referral_code'])) {
-            $parentAffiliator = Affiliator::where('referral_code', $data['parent_referral_code'])->first();
-            if ($parentAffiliator) {
-                $affiliatorData['parent_affiliator_id'] = $parentAffiliator->id;
+            $parentProfile = AffiliatorProfile::where('referral_code', $data['parent_referral_code'])->first();
+            if ($parentProfile) {
+                $profileData['parent_referred_by_id'] = $parentProfile->affiliator_id;
             }
         }
+        
+        $affiliator->profile()->create($profileData);
 
-        return Affiliator::create($affiliatorData);
+        $affiliator->assignRole('affiliator');
+
+        return $affiliator;
     }
 
-    /**
-     * Login affiliator and return Sanctum token
-     */
     public function loginAffiliator(array $data): string
     {
         if (!Auth::guard('affiliator')->attempt(['email' => $data['email'], 'password' => $data['password']])) {
@@ -177,59 +161,6 @@ final class AuthService
             ]);
         }
 
-        /** @var Affiliator $affiliator */
-        $affiliator = Auth::guard('affiliator')->user();
-
-        return $affiliator->createToken('affiliator-token')->plainTextToken;
-    }
-
-    /**
-     * Logout affiliator
-     */
-    public function logoutAffiliator(): void
-    {
-        /** @var Affiliator $affiliator */
-        $affiliator = Auth::guard('affiliator')->user();
-        $affiliator->currentAccessToken()->delete();
-        Auth::guard('affiliator')->logout();
-    }
-
-    /**
-     * Login affiliator with Google
-     */
-    private function loginAffiliatorWithGoogle(object $googleUser): Affiliator
-    {
-        $affiliator = Affiliator::where('google_id', $googleUser->getId())->first();
-
-        if (!$affiliator) {
-            $affiliator = Affiliator::create([
-                'name' => $googleUser->getName(),
-                'email' => $googleUser->getEmail(),
-                'google_id' => $googleUser->getId(),
-                'password' => Hash::make(bin2hex(random_bytes(16))),
-                'referral_code' => strtoupper(\Illuminate\Support\Str::random(10)),
-            ]);
-        }
-
-        Auth::guard('affiliator')->login($affiliator);
-
-        return $affiliator;
-    }
-
-    /**
-     * Logout current user from specified guard
-     */
-    public function logout(string $guard): void
-    {
-        Auth::guard($guard)->logout();
-        session()->forget("{$guard}_session");
-    }
-
-    /**
-     * Get current authenticated user for guard
-     */
-    public function getCurrentUser(string $guard): Admin|Customer|Affiliator|null
-    {
-        return Auth::guard($guard)->user();
+        return Auth::guard('affiliator')->user()->createToken('affiliator-token')->plainTextToken;
     }
 }

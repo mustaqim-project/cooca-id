@@ -23,7 +23,7 @@ final class LicenseController extends Controller
      */
     public function index()
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
         $licenses = \App\Models\License::where('customer_id', $customer->getKey())->get();
 
         return view('customer.licenses.index', [
@@ -36,7 +36,7 @@ final class LicenseController extends Controller
      */
     public function show(string $id)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
         $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->first();
 
         if (!$license) {
@@ -53,7 +53,7 @@ final class LicenseController extends Controller
      */
     public function activate(string $id)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
         
         try {
             $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->firstOrFail();
@@ -71,7 +71,7 @@ final class LicenseController extends Controller
      */
     public function credentials(string $id)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::user();
         $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->first();
 
         if (!$license) {

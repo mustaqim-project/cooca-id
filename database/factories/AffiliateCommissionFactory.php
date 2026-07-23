@@ -24,9 +24,9 @@ class AffiliateCommissionFactory extends Factory
         
         return [
             'id' => (string) Str::uuid(),
-            'affiliator_id' => \App\Models\Affiliator::inRandomOrder()->first()?->id ?? \App\Models\Affiliator::factory(),
+            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
             'transaction_id' => \App\Models\Transaction::inRandomOrder()->first()?->id ?? \App\Models\Transaction::factory(),
-            'customer_id' => \App\Models\Customer::inRandomOrder()->first()?->id ?? \App\Models\Customer::factory(),
+            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
             'level' => fake()->numberBetween(1, 2),
             'gross_amount' => $grossAmount,
             'commission_percent' => $commissionPercent,

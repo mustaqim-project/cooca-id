@@ -20,7 +20,7 @@ class LicenseFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'customer_id' => \App\Models\Customer::inRandomOrder()->first()?->id ?? \App\Models\Customer::factory(),
+            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
             'product_id' => \App\Models\Product::inRandomOrder()->first()?->id ?? \App\Models\Product::factory(),
             'subscription_plan_id' => \App\Models\SubscriptionPlan::inRandomOrder()->first()?->id ?? \App\Models\SubscriptionPlan::factory(),
             'license_code' => strtoupper(Str::random(16)),
@@ -67,7 +67,7 @@ class LicenseFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'revoked',
             'revoked_at' => now(),
-            'revoked_by' => \App\Models\Admin::factory(),
+            'revoked_by' => \App\Models\User::factory(),
             'revocation_reason' => fake()->sentence(),
         ]);
     }

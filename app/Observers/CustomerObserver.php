@@ -13,3 +13,5 @@ final class CustomerObserver
         event(new CustomerRegistered($customer));
     }
 }
+
+

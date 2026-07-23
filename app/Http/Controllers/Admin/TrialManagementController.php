@@ -93,7 +93,7 @@ class TrialManagementController extends Controller
         ]);
 
         try {
-            $adminId = Auth::guard('admin')->user()->id;
+            $adminId = Auth::user()->id;
             $trial = $this->trialService->approveTrial($id, $adminId);
 
             return redirect()->route('admin.trials.show', $trial->id)
@@ -117,7 +117,7 @@ class TrialManagementController extends Controller
         ]);
 
         try {
-            $adminId = Auth::guard('admin')->user()->id;
+            $adminId = Auth::user()->id;
             $trial = $this->trialService->rejectTrial($id, $adminId, $validated['rejection_reason']);
 
             return redirect()->route('admin.trials.show', $trial->id)

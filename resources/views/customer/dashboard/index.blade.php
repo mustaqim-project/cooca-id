@@ -1,88 +1,95 @@
-@extends('layouts.customer')
+@extends('customer.layouts.app')
 
 @section('title', 'Customer Dashboard')
-@section('subtitle', 'Welcome back, ' . auth()->user()->name . '!')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
-            </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
-        </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-            
-        </div>
-    </div>
+    <div class="d-flex flex-column gap-4">
 
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold">Welcome back, {{ auth()->user()->name ?? 'Customer' }}! 👋</h2>
+                <p class="text-secondary mb-0">Here's an overview of your recent transactions and activities.</p>
+            </div>
+            <div class="d-flex gap-2">
+            </div>
+        </div>
+
+        <!-- Stats Table / Filter Toolbar -->
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div
+                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                
+                <h5 class="mb-0 fw-semibold">Recent Transactions</h5>
+
+                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
+                    style="max-width: 320px; background: var(--color-bg);">
+                    <span class="input-group-text bg-transparent border-0 pe-1"><i
+                            class="bi bi-search text-secondary"></i></span>
+                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
+                        placeholder="Search transactions...">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
                         <tr>
-                            <th scope="col" class="table-th">Invoice #</th>
-                            <th scope="col" class="table-th">Product</th>
-                            <th scope="col" class="table-th">Amount</th>
-                            <th scope="col" class="table-th">Status</th>
-                            <th scope="col" class="table-th">Date</th>
+                            <th class="py-3 px-4 border-0">Invoice #</th>
+                            <th class="py-3 px-3 border-0">Product</th>
+                            <th class="py-3 px-3 border-0">Amount</th>
+                            <th class="py-3 px-3 border-0">Status</th>
+                            <th class="py-3 px-4 border-0 text-end">Date</th>
                         </tr>
-                    
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
+                    </thead>
+                    <tbody class="border-top-0">
                         @forelse($recentTransactions ?? [] as $transaction)
-                            <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">
+                            <tr>
+                                <td class="py-3 px-4 fw-medium">
                                     {{ $transaction->invoice_number }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
-                                    {{ $transaction->subscription->plan->product->name ?? 'Unknown Product' }}
+                                <td class="py-3 px-3">
+                                    <span class="fw-semibold">{{ $transaction->subscription->plan->product->name ?? 'Unknown Product' }}</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
+                                <td class="py-3 px-3 text-secondary">
                                     Rp {{ number_format($transaction->gross_amount, 0, ',', '.') }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="py-3 px-3">
                                     @php
                                         $statusClass = match($transaction->status) {
-                                            'paid' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                                            'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                                            'failed' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-                                            'refunded' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-                                            default => 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300'
+                                            'paid' => 'success',
+                                            'pending' => 'warning',
+                                            'failed' => 'danger',
+                                            'refunded' => 'info',
+                                            default => 'secondary'
                                         };
                                     @endphp
-                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
-                                        {{ ucfirst($transaction->status) }}
+                                    <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-3 py-1 text-capitalize">
+                                        {{ $transaction->status }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
+                                <td class="py-3 px-4 text-secondary fs-7 text-end">
                                     {{ $transaction->created_at->format('d M Y') }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-surface-500 dark:text-surface-400 text-sm">
-                                    No recent transactions found.
+                                <td colspan="5" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-inbox fs-1"></i></div>
+                                    <h6 class="fw-medium">No Recent Transactions</h6>
+                                    <p class="fs-7">You haven't made any transactions recently.</p>
                                 </td>
                             </tr>
                         @endforelse
-                    
-                
-                
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
+
+            @if (isset($recentTransactions) && method_exists($recentTransactions, 'hasPages') && $recentTransactions->hasPages())
+                <div class="card-footer bg-transparent border-top border-light p-4">
+                    {{ $recentTransactions->links() }}
+                </div>
+            @endif
         </div>
     </div>
-</div>
 @endsection

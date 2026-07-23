@@ -18,97 +18,136 @@
     <section class="section">
         <div class="container">
             @if (isset($products) && count($products))
-                @foreach ($products as $product)
-                    @if ($product->subscriptionPlans && $product->subscriptionPlans->where('is_active', true)->count())
-                        <div class="mb-5">
-                            <div class="text-center mb-4 reveal">
-                                <span
-                                    class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2 mb-2">
-                                    {{ $product->product_type_label ?? $product->name }}
-                                </span>
-                                <h3 class="fw-bold">{{ $product->name }}</h3>
-                                @if ($product->short_description)
-                                    <p class="text-secondary" style="max-width:600px;margin:0 auto;">
-                                        {{ $product->short_description }}</p>
-                                @endif
-                            </div>
-                            <div class="row g-4 justify-content-center">
-                                @foreach ($product->subscriptionPlans->where('is_active', true)->sortBy('sort_order') as $plan)
-                                    @php
-                                        // ponytail: period label from duration_months; upgrade to plan.period_label column if custom labels needed
-                                        $periodLabel = match (true) {
-                                            $plan->duration_months === null || $plan->duration_months === 0 => __(
-                                                'lifetime',
-                                            ),
-                                            $plan->duration_months === 1 => __('month'),
-                                            $plan->duration_months === 3 => __('quarter'),
-                                            $plan->duration_months === 6 => __('6 months'),
-                                            $plan->duration_months === 12 => __('year'),
-                                            $plan->duration_months === 24 => __('2 years'),
-                                            $plan->duration_months === 36 => __('3 years'),
-                                            default => $plan->duration_months . ' ' . __('months'),
-                                        };
-                                        $finalPrice = $plan->discount_percent
-                                            ? $plan->price * (1 - $plan->discount_percent / 100)
-                                            : $plan->price;
-                                    @endphp
-                                    <div class="col-lg-4 col-md-6 reveal">
-                                        <div
-                                            class="card pricing-card {{ $product->is_featured && $loop->first ? 'popular' : '' }}">
-                                            @if ($product->is_featured && $loop->first)
-                                                <div class="pricing-badge">{{ __('Most Popular') }}</div>
+                @php
+                    $groupedProducts = $products->groupBy(function($item) {
+                        return $item->category ? $item->category->name : ($item->product_type_label ?? 'Layanan');
+                    });
+                @endphp
+
+                <!-- Custom Styling for Tabs -->
+                <style>
+                    .pricing-tabs .nav-link {
+                        color: var(--bs-body-color);
+                        background-color: var(--bs-secondary-bg);
+                        transition: all 0.3s ease;
+                        border: 1px solid transparent;
+                    }
+                    .pricing-tabs .nav-link:hover {
+                        background-color: var(--bs-primary-bg-subtle);
+                        color: var(--bs-primary);
+                    }
+                    .pricing-tabs .nav-link.active {
+                        background: linear-gradient(135deg, var(--bs-primary), #6f42c1);
+                        color: #fff;
+                        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+                        border-color: transparent;
+                        transform: translateY(-2px);
+                    }
+                </style>
+
+                <!-- Category Tabs -->
+                <ul class="nav nav-pills pricing-tabs justify-content-center mb-5 reveal" id="pricing-tabs" role="tablist">
+                    @foreach($groupedProducts as $categoryName => $categoryProducts)
+                        @php $slug = Str::slug($categoryName); @endphp
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ $loop->first ? 'active' : '' }} rounded-pill px-4 py-2 mx-2 fw-semibold" 
+                                id="tab-{{ $slug }}" data-bs-toggle="pill" data-bs-target="#content-{{ $slug }}" 
+                                type="button" role="tab" aria-controls="content-{{ $slug }}" 
+                                aria-selected="{{ $loop->first ? 'true' : 'false' }}">
+                                {{ $categoryName }}
+                            </button>
+                        </li>
+                    @endforeach
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="pricing-tabs-content">
+                    @foreach($groupedProducts as $categoryName => $categoryProducts)
+                        @php $slug = Str::slug($categoryName); @endphp
+                        <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" 
+                            id="content-{{ $slug }}" role="tabpanel" aria-labelledby="tab-{{ $slug }}">
+                            
+                            @foreach ($categoryProducts as $product)
+                                @if ($product->subscriptionPlans && $product->subscriptionPlans->where('is_active', true)->count())
+                                    <div class="mb-5">
+                                        <div class="text-center mb-4 reveal">
+                                            <h3 class="fw-bold">{{ $product->name }}</h3>
+                                            @if ($product->short_description)
+                                                <p class="text-secondary" style="max-width:600px;margin:0 auto;">
+                                                    {{ $product->short_description }}</p>
                                             @endif
-                                            <div class="pricing-name">{{ $plan->name }}</div>
-                                            <div class="pricing-price">
-                                                @if ($plan->discount_percent)
-                                                    <small class="text-decoration-line-through text-secondary me-1"
-                                                        style="font-size:0.5em;">
-                                                        {{ setting('currency.symbol', 'Rp') }}{{ number_format($plan->price, 0, ',', '.') }}
-                                                    </small>
-                                                @endif
-                                                <span
-                                                    class="currency">{{ setting('currency.symbol', 'Rp') }}</span>{{ number_format($finalPrice, 0, ',', '.') }}
-                                                <span class="period">/{{ $periodLabel }}</span>
-                                            </div>
-                                            @if ($product->setup_fee && $product->setup_fee > 0)
-                                                <p class="text-secondary fs-7 mb-2">
-                                                    +
-                                                    {{ setting('currency.symbol', 'Rp') }}{{ number_format($product->setup_fee, 0, ',', '.') }}
-                                                    {{ __('setup fee') }}
-                                                </p>
-                                            @endif
-                                            <p class="pricing-desc">
-                                                {{ Str::limit($product->short_description ?? $product->description, 80) }}
-                                            </p>
-                                            @if ($product->features && is_array($product->features))
-                                                <ul class="pricing-features">
-                                                    @foreach (array_slice($product->features, 0, 5) as $feature)
-                                                        <li><i class="bi bi-check-circle-fill"></i>
-                                                            {{ is_array($feature) ? $feature['name'] ?? ($feature[0] ?? '') : $feature }}
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                            @else
-                                                <ul class="pricing-features">
-                                                    <li><i class="bi bi-check-circle-fill"></i> {{ __('Full Access') }}
-                                                    </li>
-                                                    <li><i class="bi bi-check-circle-fill"></i>
-                                                        {{ __('Priority Support') }}</li>
-                                                    <li><i class="bi bi-check-circle-fill"></i> {{ __('Regular Updates') }}
-                                                    </li>
-                                                </ul>
-                                            @endif
-                                            <a href="{{ route('customer.register') }}"
-                                                class="btn {{ $product->is_featured && $loop->first ? 'btn-primary' : 'btn-outline' }} btn-block">
-                                                {{ __('Get Started') }}
-                                            </a>
+                                        </div>
+                                        <div class="row g-4 justify-content-center">
+                                            @foreach ($product->subscriptionPlans->where('is_active', true)->sortBy('sort_order') as $plan)
+                                                @php
+                                                    $periodLabel = match (true) {
+                                                        $plan->duration_months === null || $plan->duration_months === 0 => __('lifetime'),
+                                                        $plan->duration_months === 1 => __('month'),
+                                                        $plan->duration_months === 3 => __('quarter'),
+                                                        $plan->duration_months === 6 => __('6 months'),
+                                                        $plan->duration_months === 12 => __('year'),
+                                                        $plan->duration_months === 24 => __('2 years'),
+                                                        $plan->duration_months === 36 => __('3 years'),
+                                                        default => $plan->duration_months . ' ' . __('months'),
+                                                    };
+                                                    $finalPrice = $plan->discount_percent
+                                                        ? $plan->price * (1 - $plan->discount_percent / 100)
+                                                        : $plan->price;
+                                                @endphp
+                                                <div class="col-lg-4 col-md-6 reveal">
+                                                    <div class="card pricing-card {{ $product->is_featured && $loop->first ? 'popular' : '' }}">
+                                                        @if ($product->is_featured && $loop->first)
+                                                            <div class="pricing-badge">{{ __('Most Popular') }}</div>
+                                                        @endif
+                                                        <div class="pricing-name">{{ $plan->name }}</div>
+                                                        <div class="pricing-price">
+                                                            @if ($plan->discount_percent)
+                                                                <small class="text-decoration-line-through text-secondary me-1"
+                                                                    style="font-size:0.5em;">
+                                                                    {{ setting('currency.symbol', 'Rp') }}{{ number_format($plan->price, 0, ',', '.') }}
+                                                                </small>
+                                                            @endif
+                                                            <span class="currency">{{ setting('currency.symbol', 'Rp') }}</span>{{ number_format($finalPrice, 0, ',', '.') }}
+                                                            <span class="period">/{{ $periodLabel }}</span>
+                                                        </div>
+                                                        @if ($product->setup_fee && $product->setup_fee > 0)
+                                                            <p class="text-secondary fs-7 mb-2">
+                                                                + {{ setting('currency.symbol', 'Rp') }}{{ number_format($product->setup_fee, 0, ',', '.') }} {{ __('setup fee') }}
+                                                            </p>
+                                                        @endif
+                                                        <p class="pricing-desc">
+                                                            {{ Str::limit($product->short_description ?? $product->description, 80) }}
+                                                        </p>
+                                                        @if ($product->features && is_array($product->features))
+                                                            <ul class="pricing-features">
+                                                                @foreach (array_slice($product->features, 0, 5) as $feature)
+                                                                    <li><i class="bi bi-check-circle-fill"></i>
+                                                                        {{ is_array($feature) ? $feature['name'] ?? ($feature[0] ?? '') : $feature }}
+                                                                    </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        @else
+                                                            <ul class="pricing-features">
+                                                                <li><i class="bi bi-check-circle-fill"></i> {{ __('Full Access') }}</li>
+                                                                <li><i class="bi bi-check-circle-fill"></i> {{ __('Priority Support') }}</li>
+                                                                <li><i class="bi bi-check-circle-fill"></i> {{ __('Regular Updates') }}</li>
+                                                            </ul>
+                                                        @endif
+                                                        <a href="{{ route('customer.register') }}"
+                                                            class="btn {{ $product->is_featured && $loop->first ? 'btn-primary' : 'btn-outline' }} btn-block">
+                                                            {{ __('Get Started') }}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     </div>
-                                @endforeach
-                            </div>
+                                @endif
+                            @endforeach
+
                         </div>
-                    @endif
-                @endforeach
+                    @endforeach
+                </div>
             @else
                 <div class="text-center py-5 reveal">
                     <div class="empty-state">

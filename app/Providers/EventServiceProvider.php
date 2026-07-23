@@ -26,10 +26,10 @@ final class EventServiceProvider extends ServiceProvider
         \App\Events\Affiliate\CommissionCalculated::class => [],
         \App\Events\Affiliate\WithdrawalRequested::class => [],
         \App\Events\Affiliate\WithdrawalApproved::class => [],
-        \App\Events\User\CustomerRegistered::class => [
-            \App\Listeners\User\SendWelcomeNotification::class,
+        \App\Events\Customer\CustomerRegistered::class => [
+            \App\Listeners\Customer\SendWelcomeNotification::class,
         ],
-        \App\Events\User\AffiliatorRegistered::class => [],
+        \App\Events\Customer\AffiliatorRegistered::class => [],
     ];
 
     public function boot(): void

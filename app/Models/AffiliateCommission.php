@@ -16,9 +16,9 @@ final class AffiliateCommission extends Model
     protected $table = 'affiliate_commissions';
 
     protected $fillable = [
-        'affiliator_id',
+        'referred_by_id',
         'transaction_id',
-        'customer_id',
+        'user_id',
         'invoice_id',
         'subscription_plan_id',
         'plan_name',
@@ -62,7 +62,7 @@ final class AffiliateCommission extends Model
 
     public function affiliator(): BelongsTo
     {
-        return $this->belongsTo(Affiliator::class, 'affiliator_id');
+        return $this->belongsTo(Affiliator::class, 'referred_by_id');
     }
 
     public function transaction(): BelongsTo
@@ -192,3 +192,4 @@ final class AffiliateCommission extends Model
         return number_format($this->commission_percent, 1) . '%';
     }
 }
+

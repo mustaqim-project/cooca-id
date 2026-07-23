@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Jobs\Notification;
 
-use App\Models\Customer;
+
 use App\Models\Subscription;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

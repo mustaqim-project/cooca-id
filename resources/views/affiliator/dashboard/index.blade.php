@@ -1,89 +1,158 @@
-@extends('layouts.affiliator')
+@extends('affiliator.layouts.app')
 
 @section('title', 'Affiliator Dashboard')
-@section('subtitle', 'Welcome back, ' . auth()->user()->name . '!')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-        <div class="relative w-full sm:w-96">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="w-5 h-5 text-surface-400"></i>
-            </div>
-            <input type="text" placeholder="Search..." class="block w-full pl-10 pr-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white placeholder-surface-400 shadow-sm transition-shadow hover:shadow-md">
-        </div>
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
-            
-        </div>
-    </div>
+    <div class="d-flex flex-column gap-4">
 
-    <!-- Data Table -->
-    <div class="corporate-card">
-        <div class="overflow-x-auto">
-            <table class="corporate-table">
-                <thead class="table-thead">
-                    
-                    
-                    
+        <!-- Page Header & Toolbar -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold">Dashboard</h2>
+                <p class="text-secondary mb-0">Welcome back, {{ auth()->user()->name }}!</p>
+            </div>
+            <div class="d-flex gap-2">
+            </div>
+        </div>
+
+        <!-- Metrics Row -->
+        <div class="row g-4 mb-2">
+            <!-- Total Earnings -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm rounded-4 glass h-100 hover-lift cursor-pointer">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="bg-success-subtle text-success rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                style="width: 48px; height: 48px;">
+                                <i class="bi bi-wallet2 fs-4"></i>
+                            </div>
+                            <span class="badge bg-success-subtle text-success rounded-pill border border-success-subtle px-2 py-1"><i
+                                    class="bi bi-arrow-up-short"></i> 12%</span>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-1">Rp 1.2M</h3>
+                            <p class="text-secondary fs-7 mb-0">Total Earnings</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Referrals -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm rounded-4 glass h-100 hover-lift cursor-pointer">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                style="width: 48px; height: 48px;">
+                                <i class="bi bi-people fs-4"></i>
+                            </div>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill border border-primary-subtle px-2 py-1"><i
+                                    class="bi bi-arrow-up-short"></i> 5%</span>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-1">45</h3>
+                            <p class="text-secondary fs-7 mb-0">Active Referrals</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Commissions -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm rounded-4 glass h-100 hover-lift cursor-pointer">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="bg-warning-subtle text-warning rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                style="width: 48px; height: 48px;">
+                                <i class="bi bi-hourglass-split fs-4"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-1">Rp 450K</h3>
+                            <p class="text-secondary fs-7 mb-0">Pending Commissions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conversion Rate -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm rounded-4 glass h-100 hover-lift cursor-pointer">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="bg-info-subtle text-info rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                style="width: 48px; height: 48px;">
+                                <i class="bi bi-graph-up fs-4"></i>
+                            </div>
+                            <span class="badge bg-info-subtle text-info rounded-pill border border-info-subtle px-2 py-1"><i
+                                    class="bi bi-arrow-up-short"></i> 2.4%</span>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-1">8.5%</h3>
+                            <p class="text-secondary fs-7 mb-0">Conversion Rate</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Commissions -->
+        <h5 class="fw-bold mt-2 mb-0">Recent Commissions</h5>
+        <div class="card border-0 shadow-sm rounded-4 glass">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
+                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
                         <tr>
-                            <th scope="col" class="table-th">Transaction ID</th>
-                            <th scope="col" class="table-th">Type</th>
-                            <th scope="col" class="table-th">Amount</th>
-                            <th scope="col" class="table-th">Status</th>
-                            <th scope="col" class="table-th">Date</th>
+                            <th class="py-3 px-4 border-0">Transaction ID</th>
+                            <th class="py-3 px-3 border-0">Type</th>
+                            <th class="py-3 px-3 border-0 text-end">Amount</th>
+                            <th class="py-3 px-3 border-0 text-center">Status</th>
+                            <th class="py-3 px-4 border-0 text-end">Date</th>
                         </tr>
-                    
-                
-                
-                </thead>
-                <tbody class="table-tbody">
-                    
-                    
-                    
+                    </thead>
+                    <tbody class="border-top-0">
                         @forelse($recentCommissions ?? [] as $commission)
-                            <tr class="hover:bg-surface-50 dark:bg-surface-900 dark:hover:bg-surface-700/50 transition-colors">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900 dark:text-white">
+                            <tr>
+                                <td class="py-3 px-4 fw-medium text-dark">
                                     {{ $commission->transaction->invoice_number ?? '-' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                <td class="py-3 px-3">
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-3 py-1 fs-7">
                                         Level {{ $commission->level ?? 1 }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 dark:text-green-400">
+                                <td class="py-3 px-3 fw-bold text-success text-end">
                                     + Rp {{ number_format($commission->amount, 0, ',', '.') }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="py-3 px-3 text-center">
                                     @php
-                                        $statusClass = match($commission->status) {
-                                            'paid' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                                            'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                                            'failed' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-                                            default => 'bg-surface-100 text-surface-800 dark:bg-surface-700 dark:text-surface-300'
+                                        $statusClass = match($commission->status ?? 'pending') {
+                                            'paid' => 'success',
+                                            'pending' => 'warning',
+                                            'failed' => 'danger',
+                                            default => 'secondary'
                                         };
                                     @endphp
-                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
-                                        {{ ucfirst($commission->status) }}
+                                    <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-3 py-1">
+                                        {{ ucfirst($commission->status ?? 'pending') }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500 dark:text-surface-400">
+                                <td class="py-3 px-4 text-end text-secondary fs-7">
                                     {{ $commission->created_at->format('d M Y') }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-surface-500 dark:text-surface-400 text-sm">
-                                    No recent commissions found.
+                                <td colspan="5" class="py-5 text-center text-secondary">
+                                    <div class="mb-3"><i class="bi bi-inbox fs-1"></i></div>
+                                    <h6 class="fw-medium">No Recent Commissions</h6>
+                                    <p class="fs-7 mb-0">Your recent commission history will appear here.</p>
                                 </td>
                             </tr>
                         @endforelse
-                    
-                
-                
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 @endsection
