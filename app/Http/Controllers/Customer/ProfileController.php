@@ -39,18 +39,30 @@ class ProfileController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:customers,email,' . $customer->id,
             'phone' => 'nullable|string|max:20',
-            'company_name' => 'nullable|string|max:255',
-            'business_type' => 'nullable|string|max:100',
-            'address' => 'nullable|string|max:500',
-            'city' => 'nullable|string|max:100',
-            'province' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-            'country' => 'nullable|string|max:100',
+            'business_name' => 'nullable|string|max:255',
         ]);
 
         $customer->update($validated);
+
+        // Synchronize with Company Profile
+        if ($customer->companyProfile) {
+            $customer->companyProfile->update([
+                'company_name' => $validated['business_name'] ?? $customer->companyProfile->company_name,
+                'phone' => $validated['phone'] ?? $customer->companyProfile->phone,
+            ]);
+        } else {
+            $customer->companyProfile()->create([
+                'company_name' => $validated['business_name'] ?? $customer->name,
+                'phone' => $validated['phone'] ?? $customer->phone ?? '',
+                'industry' => 'other',
+                'company_size' => '1-10',
+                'address' => '',
+                'city' => '',
+                'province' => '',
+                'postal_code' => '',
+            ]);
+        }
 
         return back()->with('success', 'Profile updated successfully.');
     }
