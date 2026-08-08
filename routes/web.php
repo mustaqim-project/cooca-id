@@ -151,9 +151,20 @@ Route::get('/login', [AuthWebController::class, 'showCustomerLogin'])->name('log
 Route::get('/clear-app-cache', [\App\Http\Controllers\Web\SystemController::class, 'clearAppCache']);
 
 Route::get('/debug-mail-config', function () {
+    $latestFailed = \Illuminate\Support\Facades\DB::table('failed_jobs')->latest()->first();
     return response()->json([
         'default_mailer' => config('mail.default'),
         'mail_from' => config('mail.from'),
+        'queue_connection' => config('queue.default'),
+        'jobs_count' => \Illuminate\Support\Facades\DB::table('jobs')->count(),
+        'failed_jobs_count' => \Illuminate\Support\Facades\DB::table('failed_jobs')->count(),
+        'latest_failed_job' => $latestFailed ? [
+            'id' => $latestFailed->id,
+            'connection' => $latestFailed->connection,
+            'queue' => $latestFailed->queue,
+            'failed_at' => $latestFailed->failed_at,
+            'exception' => substr($latestFailed->exception, 0, 1000), // First 1000 chars of exception
+        ] : null,
         'mailers' => collect(config('mail.mailers'))->map(function ($mailer) {
             if (isset($mailer['password'])) {
                 $mailer['password'] = '******'; // Hide password for security
