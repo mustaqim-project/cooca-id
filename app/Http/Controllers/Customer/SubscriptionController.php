@@ -228,14 +228,17 @@ final class SubscriptionController extends Controller
                     $subscription->license->delete();
                 }
 
+                // Get transaction IDs associated with this subscription
+                $transactionIds = Transaction::where('subscription_id', $subscription->id)->pluck('id');
+
+                // Delete pending invoices associated with those transactions
+                Invoice::whereIn('transaction_id', $transactionIds)
+                    ->whereIn('status', ['issued', 'pending'])
+                    ->delete();
+
                 // Delete pending transactions
                 Transaction::where('subscription_id', $subscription->id)
                     ->whereIn('status', ['pending', 'expire', 'cancel'])
-                    ->delete();
-
-                // Delete pending invoices
-                Invoice::where('subscription_id', $subscription->id)
-                    ->whereIn('status', ['issued', 'pending'])
                     ->delete();
 
                 // Delete the subscription
