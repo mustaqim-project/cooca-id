@@ -155,10 +155,13 @@ final class ErpRequest extends Model
 
     public function approve(string $adminId): void
     {
+        $now = now();
         $this->update([
             'status' => self::STATUS_WAITING_SETUP,
             'approved_by' => $adminId,
-            'approved_at' => now(),
+            'approved_at' => $now,
+            'trial_starts_at' => $now,
+            'trial_ends_at' => $now->copy()->addDays(14),
         ]);
     }
 

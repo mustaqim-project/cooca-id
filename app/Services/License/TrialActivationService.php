@@ -22,8 +22,8 @@ final class TrialActivationService
     public function activateTrial(ErpRequest $erpRequest, int $trialDays = 14): License
     {
         return DB::transaction(function () use ($erpRequest, $trialDays) {
-            $trialStartsAt = now();
-            $trialEndsAt = now()->addDays($trialDays);
+            $trialStartsAt = $erpRequest->trial_starts_at ?? now();
+            $trialEndsAt = $erpRequest->trial_ends_at ?? now()->addDays($trialDays);
 
             $domain = $this->getOrCreateDomain($erpRequest);
             $licenseCode = $this->generateUniqueCode();

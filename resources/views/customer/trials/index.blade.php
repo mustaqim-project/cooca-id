@@ -32,21 +32,21 @@
                 </thead>
                 <tbody>
                     @forelse($trials ?? [] as $trial)
-                    @php $daysLeft = $trial->expires_at ? max(0, now()->diffInDays($trial->expires_at, false)) : null; @endphp
+                    @php $daysLeft = $trial->trial_ends_at ? max(0, now()->diffInDays($trial->trial_ends_at, false)) : null; @endphp
                     <tr>
                         <td class="font-bold text-sm">{{ $trial->product?->name ?? 'COOCA Module' }}</td>
                         <td><span class="badge badge-accent">14-Day Free Trial</span></td>
-                        <td>
-                            @if($trial->status === 'active')   <span class="badge badge-success">Active</span>
-                            @elseif($trial->status === 'expired')<span class="badge badge-danger">Expired</span>
-                            @elseif($trial->status === 'pending')<span class="badge badge-warning">Pending Provisioning</span>
-                            @else <span class="badge badge-muted">{{ ucfirst($trial->status) }}</span>
+                            @if($trial->status === 'active_trial')   <span class="badge badge-success">Active</span>
+                            @elseif($trial->status === 'trial_expired')<span class="badge badge-danger">Expired</span>
+                            @elseif(in_array($trial->status, ['waiting_setup', 'in_setup', 'domain_setup', 'testing']))<span class="badge badge-warning">Approved (Setup In Progress)</span>
+                            @elseif($trial->status === 'waiting_approval')<span class="badge badge-info">Waiting Approval</span>
+                            @else <span class="badge badge-muted">{{ ucwords(str_replace('_', ' ', $trial->status)) }}</span>
                             @endif
                         </td>
-                        <td class="text-xs text-muted">{{ $trial->started_at?->format('d M Y') ?? '—' }}</td>
+                        <td class="text-xs text-muted">{{ $trial->trial_starts_at?->format('d M Y') ?? '—' }}</td>
                         <td class="text-xs text-muted">
-                            {{ $trial->expires_at?->format('d M Y') ?? '—' }}
-                            @if($daysLeft !== null && $trial->status === 'active')
+                            {{ $trial->trial_ends_at?->format('d M Y') ?? '—' }}
+                            @if($daysLeft !== null && $trial->status === 'active_trial')
                                 <span class="text-warning font-bold">({{ $daysLeft }}d left)</span>
                             @endif
                         </td>
