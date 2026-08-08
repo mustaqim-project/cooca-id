@@ -153,6 +153,15 @@ Route::get('/clear-app-cache', [\App\Http\Controllers\Web\SystemController::clas
 Route::get('/debug-mail-config', function () {
     $latestFailed = \Illuminate\Support\Facades\DB::table('failed_jobs')->latest('failed_at')->first();
     $erpRequest = \Illuminate\Support\Facades\DB::table('erp_requests')->where('id', '019fe170-c56c-73e8-b6f4-9ae7eac2edd2')->first();
+    
+    // Read tail of laravel.log
+    $logLines = [];
+    $logPath = storage_path('logs/laravel.log');
+    if (file_exists($logPath)) {
+        $file = file($logPath);
+        $logLines = array_slice($file, -50); // Get last 50 lines
+    }
+
     return response()->json([
         'default_mailer' => config('mail.default'),
         'mail_from' => config('mail.from'),
@@ -172,8 +181,9 @@ Route::get('/debug-mail-config', function () {
             'connection' => $latestFailed->connection,
             'queue' => $latestFailed->queue,
             'failed_at' => $latestFailed->failed_at,
-            'exception' => substr($latestFailed->exception, 0, 1000), // First 1000 chars of exception
+            'exception' => substr($latestFailed->exception, 0, 1000),
         ] : null,
+        'recent_logs' => $logLines,
         'mailers' => collect(config('mail.mailers'))->map(function ($mailer) {
             if (isset($mailer['password'])) {
                 $mailer['password'] = '******'; // Hide password for security
