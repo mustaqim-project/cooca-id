@@ -57,7 +57,7 @@ class DealsAndProjectsTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.deals.index');
-        $response->assertSee('Enterprise Sales Pipeline & CRM');
+        $response->assertSeeText('Enterprise Sales Pipeline & CRM');
     }
 
     public function test_admin_can_create_deal_with_agreement_document()
