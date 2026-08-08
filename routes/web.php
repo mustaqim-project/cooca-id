@@ -153,5 +153,7 @@ Route::get('/clear-app-cache', function () {
     \Illuminate\Support\Facades\Artisan::call('cache:clear');
     \Illuminate\Support\Facades\Artisan::call('route:clear');
     \Illuminate\Support\Facades\Artisan::call('config:clear');
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    \Illuminate\Support\Facades\Artisan::call('optimize');
     return 'View, Cache, Route, and Config cleared successfully!';
 });
