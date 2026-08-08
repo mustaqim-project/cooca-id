@@ -11,27 +11,30 @@
 @endsection
 
 @section('content')
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-    <div>
-        <h2 style="font-size:20px;font-weight:800;color:var(--text);">Downlines Network Statistics</h2>
-        <p style="font-size:13px;color:var(--text-muted);margin-top:2px;">Performance analytics of sub-affiliates in your multi-tier network.</p>
-    </div>
-    <a href="{{ route('affiliator.downlines.index') }}" class="btn btn-s btn-sm">
-        <i class="fa-solid fa-arrow-left"></i> Back to Downlines
-    </a>
-</div>
-
-<div class="portal-card">
-    <div class="portal-card-header">
-        <div class="portal-card-title">
-            <i class="fa-solid fa-chart-line" style="color:var(--primary);"></i>
-            Network Analytics
+    <div class="page-header">
+        <div>
+            <div class="page-title">Downlines Network Statistics</div>
+            <div class="page-subtitle">Performance analytics of sub-affiliates in your multi-tier network.</div>
+        </div>
+        <div class="page-actions">
+            <a href="{{ route('affiliator.downlines.index') }}" class="btn btn-outline btn-sm">
+                <i class="fa-solid fa-arrow-left"></i> Back to Downlines
+            </a>
         </div>
     </div>
-    <div class="portal-card-body text-center py-6">
-        <i class="fa-solid fa-sitemap" style="font-size:48px;color:var(--text-faint);margin-bottom:12px;display:block;"></i>
-        <h4 style="font-size:16px;font-weight:700;color:var(--text);">Tier 2 Network Analytics</h4>
-        <p style="font-size:13px;color:var(--text-muted);max-width:480px;margin:6px auto 0;">Detailed breakdowns of multi-level commissions earned through your downline sub-affiliates will appear here.</p>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-chart-line"
+                    style="color:var(--primary);margin-right:8px;"></i>Network Analytics</div>
+        </div>
+        <div class="card-body">
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="fa-solid fa-sitemap" style="color:var(--text-faint);"></i></div>
+                <div class="empty-state-title">Tier 2 Network Analytics</div>
+                <div class="empty-state-text">Detailed breakdowns of multi-level commissions earned through your downline
+                    sub-affiliates will appear here.</div>
+            </div>
+        </div>
     </div>
-</div>
 @endsection

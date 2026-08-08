@@ -9,103 +9,103 @@
 @endsection
 
 @section('content')
-<div class="portal-card mb-6">
-    <div class="portal-card-header" style="flex-wrap:wrap;gap:12px;">
+    <div class="page-header">
         <div>
-            <div class="portal-card-title">
-                <i class="fa-solid fa-wallet" style="color:var(--primary);"></i>
-                Commissions History
-            </div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Track your affiliate earnings and commission clearance statuses.</div>
+            <div class="page-title">Commissions History</div>
+            <div class="page-subtitle">Track your affiliate earnings and commission clearance statuses.</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-            <a href="{{ route('affiliator.commissions.stats') }}" class="btn btn-s btn-sm">
+        <div class="page-actions">
+            <a href="{{ route('affiliator.commissions.stats') }}" class="btn btn-outline btn-sm">
                 <i class="fa-solid fa-chart-pie"></i> Statistics
             </a>
-            <a href="{{ route('affiliator.withdrawals.index') }}" class="btn btn-p btn-sm">
+            <a href="{{ route('affiliator.withdrawals.index') }}" class="btn btn-primary btn-sm">
                 <i class="fa-solid fa-building-columns"></i> Request Withdrawal
             </a>
         </div>
     </div>
 
-    <div class="portal-card-body p-0">
-        <div class="table-wrap">
-            <table class="portal-table">
-                <thead>
-                    <tr>
-                        <th class="portal-th">Invoice Ref</th>
-                        <th class="portal-th">Customer</th>
-                        <th class="portal-th">Tier Level</th>
-                        <th class="portal-th text-right">Commission Amount</th>
-                        <th class="portal-th text-center">Status</th>
-                        <th class="portal-th text-right">Date</th>
-                        <th class="portal-th text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($commissions ?? [] as $commission)
+    <div class="card">
+        <div class="card-body" style="padding:0;">
+            <div class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
                         <tr>
-                            <td class="portal-td font-medium">
-                                <a href="{{ route('affiliator.commissions.show', $commission->id) }}" style="color:var(--primary);font-weight:600;">
-                                    {{ $commission->transaction->invoice_number ?? $commission->invoice_number ?? '#COMM-'.$commission->id }}
-                                </a>
-                            </td>
-                            <td class="portal-td">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <div class="user-avatar" style="width:28px;height:28px;font-size:11px;">
-                                        {{ strtoupper(substr($commission->customer->name ?? $commission->transaction?->customer?->name ?? 'C', 0, 2)) }}
+                            <th>Invoice Ref</th>
+                            <th>Customer</th>
+                            <th>Tier Level</th>
+                            <th class="text-right">Commission Amount</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-right">Date</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($commissions ?? [] as $commission)
+                            <tr>
+                                <td>
+                                    <a href="{{ route('affiliator.commissions.show', $commission->id) }}"
+                                        class="text-primary font-semibold text-sm">
+                                        {{ $commission->transaction->invoice_number ?? ($commission->invoice_number ?? '#COMM-' . $commission->id) }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <div style="display:flex;align-items:center;gap:8px;">
+                                        <div class="user-avatar" style="width:28px;height:28px;font-size:11px;">
+                                            {{ strtoupper(substr($commission->customer->name ?? ($commission->transaction?->customer?->name ?? 'C'), 0, 2)) }}
+                                        </div>
+                                        <span
+                                            class="text-sm">{{ $commission->customer->name ?? ($commission->transaction?->customer?->name ?? 'Direct Customer') }}</span>
                                     </div>
-                                    <span>{{ $commission->customer->name ?? $commission->transaction?->customer?->name ?? 'Direct Customer' }}</span>
-                                </div>
-                            </td>
-                            <td class="portal-td">
-                                <span class="badge-status status-info">
-                                    Level {{ $commission->level ?? 1 }}
-                                </span>
-                            </td>
-                            <td class="portal-td text-right font-bold text-success">
-                                + Rp {{ number_format($commission->commission_amount ?? $commission->amount ?? 0, 0, ',', '.') }}
-                            </td>
-                            <td class="portal-td text-center">
-                                @php
-                                    $st = $commission->status ?? 'pending';
-                                    $badgeClass = match($st) {
-                                        'paid', 'cleared' => 'status-paid',
-                                        'pending'          => 'status-pending',
-                                        'failed', 'rejected' => 'status-cancelled',
-                                        default            => 'status-issued',
-                                    };
-                                @endphp
-                                <span class="badge-status {{ $badgeClass }}">
-                                    {{ ucfirst($st) }}
-                                </span>
-                            </td>
-                            <td class="portal-td text-right text-muted" style="font-size:12px;">
-                                {{ $commission->created_at?->format('d M Y') }}
-                            </td>
-                            <td class="portal-td text-center">
-                                <a href="{{ route('affiliator.commissions.show', $commission->id) }}" class="btn btn-s btn-sm" style="padding:2px 8px;font-size:11px;">
-                                    Details
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="portal-td text-center py-6 text-muted">
-                                <i class="fa-solid fa-receipt" style="font-size:28px;margin-bottom:8px;display:block;color:var(--text-faint);"></i>
-                                No commission records found yet.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        @if (method_exists($commissions ?? [], 'hasPages') && ($commissions ?? [])->hasPages())
-            <div style="padding:16px;border-top:1px solid var(--border);">
-                {{ $commissions->links() }}
+                                </td>
+                                <td>
+                                    <span class="badge badge-primary">Level {{ $commission->level ?? 1 }}</span>
+                                </td>
+                                <td class="text-right font-bold text-sm text-success">
+                                    + Rp
+                                    {{ number_format($commission->commission_amount ?? ($commission->amount ?? 0), 0, ',', '.') }}
+                                </td>
+                                <td class="text-center">
+                                    @php
+                                        $st = $commission->status ?? 'pending';
+                                        $badgeClass = match ($st) {
+                                            'paid', 'cleared' => 'badge-success',
+                                            'pending' => 'badge-warning',
+                                            'failed', 'rejected' => 'badge-danger',
+                                            default => 'badge-muted',
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $badgeClass }}">
+                                        {{ ucfirst($st) }}
+                                    </span>
+                                </td>
+                                <td class="text-right text-muted text-xs">
+                                    {{ $commission->created_at?->format('d M Y') }}
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ route('affiliator.commissions.show', $commission->id) }}"
+                                        class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:11px;">
+                                        Details
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted" style="padding:28px;">
+                                    <i class="fa-solid fa-receipt"
+                                        style="font-size:28px;margin-bottom:8px;display:block;color:var(--text-faint);"></i>
+                                    No commission records found yet.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-        @endif
+
+            @if (method_exists($commissions ?? [], 'hasPages') && ($commissions ?? [])->hasPages())
+                <div style="padding:16px;border-top:1px solid var(--border);">
+                    {{ $commissions->links() }}
+                </div>
+            @endif
+        </div>
     </div>
-</div>
 @endsection
