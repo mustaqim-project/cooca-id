@@ -154,12 +154,21 @@ Route::get('/debug-mail-config', function () {
     $latestFailed = \Illuminate\Support\Facades\DB::table('failed_jobs')->latest('failed_at')->first();
     $erpRequest = \Illuminate\Support\Facades\DB::table('erp_requests')->where('id', '019fe170-c56c-73e8-b6f4-9ae7eac2edd2')->first();
     
-    // Read tail of laravel.log
+    // Find newest log file in storage/logs
     $logLines = [];
-    $logPath = storage_path('logs/laravel.log');
-    if (file_exists($logPath)) {
-        $file = file($logPath);
-        $logLines = array_slice($file, -50); // Get last 50 lines
+    $logDir = storage_path('logs');
+    if (is_dir($logDir)) {
+        $logFiles = glob($logDir . '/*.log');
+        if (!empty($logFiles)) {
+            // Sort by modified time descending
+            usort($logFiles, function ($a, $b) {
+                return filemtime($b) - filemtime($a);
+            });
+            $newestLog = $logFiles[0];
+            $file = file($newestLog);
+            $logLines = array_slice($file, -50); // Get last 50 lines
+            $logLines = array_merge(["Newest Log File: " . basename($newestLog)], $logLines);
+        }
     }
 
     return response()->json([
@@ -168,6 +177,7 @@ Route::get('/debug-mail-config', function () {
         'queue_connection' => config('queue.default'),
         'jobs_count' => \Illuminate\Support\Facades\DB::table('jobs')->count(),
         'failed_jobs_count' => \Illuminate\Support\Facades\DB::table('failed_jobs')->count(),
+        'licenses_columns' => \Illuminate\Support\Facades\Schema::getColumnListing('licenses'),
         'target_erp_request' => $erpRequest ? [
             'id' => $erpRequest->id,
             'status' => $erpRequest->status,
