@@ -59,13 +59,43 @@
                                         E-commerce</option>
                                     <option value="manufacturing"
                                         {{ old('industry', $profile?->industry) === 'manufacturing' ? 'selected' : '' }}>
-                                        Manufacturing & ERP</option>
+                                        Manufacturing & Production</option>
                                     <option value="services"
                                         {{ old('industry', $profile?->industry) === 'services' ? 'selected' : '' }}>
-                                        Professional Services</option>
+                                        Professional Services & Consulting</option>
                                     <option value="technology"
                                         {{ old('industry', $profile?->industry) === 'technology' ? 'selected' : '' }}>
-                                        Technology & Software</option>
+                                        Technology, IT & Software</option>
+                                    <option value="construction"
+                                        {{ old('industry', $profile?->industry) === 'construction' ? 'selected' : '' }}>
+                                        Construction & Real Estate</option>
+                                    <option value="healthcare"
+                                        {{ old('industry', $profile?->industry) === 'healthcare' ? 'selected' : '' }}>
+                                        Healthcare & Medical</option>
+                                    <option value="hospitality"
+                                        {{ old('industry', $profile?->industry) === 'hospitality' ? 'selected' : '' }}>
+                                        Hospitality, Tourism & Food Services</option>
+                                    <option value="education"
+                                        {{ old('industry', $profile?->industry) === 'education' ? 'selected' : '' }}>
+                                        Education & Training</option>
+                                    <option value="agriculture"
+                                        {{ old('industry', $profile?->industry) === 'agriculture' ? 'selected' : '' }}>
+                                        Agriculture, Farming & Forestry</option>
+                                    <option value="automotive"
+                                        {{ old('industry', $profile?->industry) === 'automotive' ? 'selected' : '' }}>
+                                        Automotive, Workshop & Transportation</option>
+                                    <option value="finance"
+                                        {{ old('industry', $profile?->industry) === 'finance' ? 'selected' : '' }}>
+                                        Finance, Banking & Insurance</option>
+                                    <option value="logistics"
+                                        {{ old('industry', $profile?->industry) === 'logistics' ? 'selected' : '' }}>
+                                        Logistics & Supply Chain</option>
+                                    <option value="wholesale"
+                                        {{ old('industry', $profile?->industry) === 'wholesale' ? 'selected' : '' }}>
+                                        Wholesale & Distribution</option>
+                                    <option value="creative"
+                                        {{ old('industry', $profile?->industry) === 'creative' ? 'selected' : '' }}>
+                                        Entertainment, Media & Creative</option>
                                     <option value="other"
                                         {{ old('industry', $profile?->industry) === 'other' ? 'selected' : '' }}>Other
                                     </option>
