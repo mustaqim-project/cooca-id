@@ -267,6 +267,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::resource('stages', \App\Http\Controllers\Admin\StageController::class);
     Route::resource('deals', \App\Http\Controllers\Admin\DealController::class);
     Route::resource('projects', \App\Http\Controllers\Admin\ProjectController::class);
+    Route::post('projects/{project}/billing', [\App\Http\Controllers\Admin\ProjectController::class, 'createBilling'])->name('projects.billing');
     Route::resource('project-tasks', \App\Http\Controllers\Admin\ProjectTaskController::class);
 
     // WhatsApp API Device Generator Management

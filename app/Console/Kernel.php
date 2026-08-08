@@ -45,6 +45,11 @@ class Kernel extends ConsoleKernel
         // Auto end inactive live chat sessions (2-minute timeout)
         $schedule->command('live-chats:auto-end')->everyMinute();
 
+        // Monitor active tenant subdomains every 5 minutes
+        $schedule->command('tenants:monitor')
+            ->everyFiveMinutes()
+            ->timezone('Asia/Jakarta');
+
         // Database backups
         $schedule->command('backup:clean')->daily()->at('01:00');
         $schedule->command('backup:run')->daily()->at('01:30');

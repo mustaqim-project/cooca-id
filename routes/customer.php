@@ -103,6 +103,7 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'veri
 
     // Projects
     Route::resource('projects', \App\Http\Controllers\Customer\ProjectController::class)->only(['index', 'show']);
+    Route::get('projects/{project}/pay/{invoice}', [\App\Http\Controllers\Customer\ProjectController::class, 'checkout'])->name('projects.pay');
 
     // WhatsApp API Device Generator Management for Customer
     Route::resource('whatsapp-devices', \App\Http\Controllers\Customer\WhatsAppDeviceController::class);

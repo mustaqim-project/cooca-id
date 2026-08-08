@@ -65,16 +65,11 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
-                <div class="form-group">
-                    <label class="form-label">Current Version</label>
-                    <input type="text" name="version" class="form-input" placeholder="e.g. 1.0.0" value="{{ old('version') }}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Max Domains allowed</label>
-                    <input type="number" name="max_domains" class="form-input" placeholder="1" value="{{ old('max_domains', 1) }}">
-                </div>
+            <div class="form-group">
+                <label class="form-label">Current Version</label>
+                <input type="text" name="version" class="form-input" placeholder="e.g. 1.0.0" value="{{ old('version') }}">
             </div>
+            <input type="hidden" name="max_domains" value="1">
 
             <div class="form-group">
                 <label class="form-label">Short Description</label>
@@ -91,20 +86,17 @@
                 <textarea name="requirements" class="form-textarea" rows="3" placeholder="System requirements, e.g. PHP >= 8.2, MySQL >= 8.0">{{ old('requirements') }}</textarea>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
                 <div class="form-group">
                     <label class="form-label">Base Price (IDR)</label>
                     <input type="number" name="base_price" class="form-input" placeholder="0" value="{{ old('base_price', 0) }}">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Setup Fee (IDR)</label>
-                    <input type="number" name="setup_fee" class="form-input" placeholder="0" value="{{ old('setup_fee', 0) }}">
-                </div>
-                <div class="form-group">
+                <div class="form-group" id="maintenance_fee_group" style="display: none;">
                     <label class="form-label">Maintenance Fee (IDR)</label>
                     <input type="number" name="maintenance_fee" class="form-input" placeholder="0" value="{{ old('maintenance_fee', 0) }}">
                 </div>
             </div>
+            <input type="hidden" name="setup_fee" value="0">
 
             <div class="form-group">
                 <label class="form-label">Sort Order</label>
@@ -192,13 +184,7 @@
                     </select>
                 </div>
 
-                <div class="form-group" style="margin-top: 12px;">
-                    <label class="form-label">Bundle Options</label>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" name="is_bundleable" value="1" id="is_bundleable" {{ old('is_bundleable') ? 'checked' : '' }}>
-                        <label for="is_bundleable" style="cursor: pointer; font-size: 14px; color: var(--text);">Can be included in bundles</label>
-                    </div>
-                </div>
+                <input type="hidden" name="is_bundleable" value="0">
 
                 <div class="form-group">
                     <label class="form-label">Product Thumbnail</label>
@@ -317,6 +303,25 @@
                 document.querySelectorAll('.icon-grid-dropdown').forEach(d => d.style.display = 'none');
             }
         });
+
+        // Toggle maintenance fee visibility based on product type
+        const productTypeSelect = document.querySelector('select[name="product_type"]');
+        const maintenanceGroup = document.getElementById('maintenance_fee_group');
+        
+        function toggleMaintenanceFee() {
+            if (productTypeSelect && maintenanceGroup) {
+                if (productTypeSelect.value === 'lifetime') {
+                    maintenanceGroup.style.display = 'block';
+                } else {
+                    maintenanceGroup.style.display = 'none';
+                }
+            }
+        }
+        
+        if (productTypeSelect) {
+            productTypeSelect.addEventListener('change', toggleMaintenanceFee);
+            toggleMaintenanceFee();
+        }
     });
 </script>
 @endpush

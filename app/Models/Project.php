@@ -26,4 +26,19 @@ class Project extends Model
     {
         return $this->belongsTo(Contract::class, 'contract_id');
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'project_id');
+    }
+
+    public function getProgressPercentageAttribute(): int
+    {
+        $total = $this->tasks()->count();
+        if ($total === 0) {
+            return 0;
+        }
+        $completed = $this->tasks()->where('is_complete', true)->count();
+        return (int) round(($completed / $total) * 100);
+    }
 }

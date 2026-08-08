@@ -20,6 +20,14 @@ class WhatsAppWorkerController extends Controller
     {
         $this->authenticate($request);
 
+        // Return empty queue if WhatsApp is globally disabled
+        if (! (bool) \App\Models\Setting::get('whatsapp.notifications_active', true)) {
+            return response()->json([
+                'success' => true,
+                'data'    => [],
+            ]);
+        }
+
         $queues = \App\Models\WhatsAppQueue::where('status', 'pending')
             ->orderBy('id', 'asc')
             ->limit(10)

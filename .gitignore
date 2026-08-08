@@ -12,7 +12,8 @@ Homestead.json
 Homestead.yaml
 auth.json
 /.phpunit.result.cache
-
+vendor/
+wa-server/
 # Laravel Storage & Framework Cache
 /storage/app/*
 !/storage/app/.gitignore
@@ -41,6 +42,8 @@ wa-server/.wwebjs_auth/
 wa-server/.wwebjs_cache/
 .wwebjs_auth/
 .wwebjs_cache/
+wa-server/.baileys_auth/
+.baileys_auth/
 
 # OS & IDE Files
 .DS_Store

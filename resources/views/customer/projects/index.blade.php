@@ -17,14 +17,14 @@
         <div class="card-body">
             <div class="flex justify-between items-start mb-3">
                 <div>
-                    <div class="font-bold text-base">{{ $project->name }}</div>
+                    <div class="font-bold text-base">{{ $project->project_name }}</div>
                     <div class="text-xs text-muted">Started {{ $project->created_at->format('d M Y') }}</div>
                 </div>
                 <span class="badge badge-primary">{{ ucfirst($project->status ?? 'in_progress') }}</span>
             </div>
             <div class="text-sm text-muted mb-4">{{ $project->description ?? 'Custom implementation & onboarding project.' }}</div>
 
-            @php $progress = $project->progress_percentage ?? 45; @endphp
+            @php $progress = $project->progress_percentage; @endphp
             <div class="mb-3">
                 <div class="flex justify-between text-xs text-muted mb-1">
                     <span>Implementation Progress</span>

@@ -4,121 +4,156 @@
     <span class="crumb-current">Company Profile</span>
 @endsection
 @section('content')
-<div class="page-header">
-    <div>
-        <h1 class="page-title"><i class="fa-solid fa-building" style="color:var(--primary);margin-right:10px;"></i>Company Profile</h1>
-        <p class="page-subtitle">Configure your company identity, tax details, and branding for invoices and reports.</p>
-    </div>
-</div>
-
-@php
-    $customer = auth('customer')->user();
-    $profile  = $companyProfile ?? $customer->companyProfile;
-@endphp
-
-<div class="grid-31">
-    <div>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Business Information</div>
-            </div>
-            <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success mb-4"><i class="fa-solid fa-check-circle"></i> {{ session('success') }}</div>
-                @endif
-                <form method="POST" action="{{ route('customer.company-profile.update') }}" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label class="form-label">Legal Business Name <span style="color:var(--danger);">*</span></label>
-                            <input type="text" name="company_name" class="form-input"
-                                   value="{{ old('company_name', $profile?->company_name ?? $customer->business_name) }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Tax ID / NPWP</label>
-                            <input type="text" name="tax_id" class="form-input"
-                                   value="{{ old('tax_id', $profile?->tax_id) }}" placeholder="e.g. 01.234.567.8-901.000">
-                        </div>
-                    </div>
-
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label class="form-label">Business Industry</label>
-                            <select name="industry" class="form-select">
-                                <option value="retail" {{ old('industry', $profile?->industry) === 'retail' ? 'selected' : '' }}>Retail & E-commerce</option>
-                                <option value="manufacturing" {{ old('industry', $profile?->industry) === 'manufacturing' ? 'selected' : '' }}>Manufacturing & ERP</option>
-                                <option value="services" {{ old('industry', $profile?->industry) === 'services' ? 'selected' : '' }}>Professional Services</option>
-                                <option value="technology" {{ old('industry', $profile?->industry) === 'technology' ? 'selected' : '' }}>Technology & Software</option>
-                                <option value="other" {{ old('industry', $profile?->industry) === 'other' ? 'selected' : '' }}>Other</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Company Size</label>
-                            <select name="company_size" class="form-select">
-                                <option value="1-10" {{ old('company_size', $profile?->company_size) === '1-10' ? 'selected' : '' }}>1-10 Employees</option>
-                                <option value="11-50" {{ old('company_size', $profile?->company_size) === '11-50' ? 'selected' : '' }}>11-50 Employees</option>
-                                <option value="51-200" {{ old('company_size', $profile?->company_size) === '51-200' ? 'selected' : '' }}>51-200 Employees</option>
-                                <option value="201+" {{ old('company_size', $profile?->company_size) === '201+' ? 'selected' : '' }}>200+ Enterprise</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Street Address</label>
-                        <textarea name="address" class="form-textarea" rows="3" placeholder="Full address for billing & invoices">{{ old('address', $profile?->address) }}</textarea>
-                    </div>
-
-                    <div class="grid-3">
-                        <div class="form-group">
-                            <label class="form-label">City</label>
-                            <input type="text" name="city" class="form-input" value="{{ old('city', $profile?->city) }}">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Province / State</label>
-                            <input type="text" name="province" class="form-input" value="{{ old('province', $profile?->province) }}">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Postal Code</label>
-                            <input type="text" name="postal_code" class="form-input" value="{{ old('postal_code', $profile?->postal_code) }}">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Company Logo</label>
-                        <input type="file" name="logo" class="form-input" accept="image/*">
-                        <div class="form-hint">Upload PNG or JPG (max 2MB). Used on custom reports & invoices.</div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary mt-2">
-                        <i class="fa-solid fa-floppy-disk"></i> Update Company Profile
-                    </button>
-                </form>
-            </div>
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i class="fa-solid fa-building" style="color:var(--primary);margin-right:10px;"></i>Company
+                Profile</h1>
+            <p class="page-subtitle">Configure your company identity, tax details, and branding for invoices and reports.</p>
         </div>
     </div>
 
-    {{-- Sidebar --}}
-    <div style="display:flex;flex-direction:column;gap:20px;">
-        <div class="card">
-            <div class="card-body text-center">
-                <div style="width:72px;height:72px;border-radius:16px;background:var(--primary-light);color:var(--primary);font-size:32px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
-                    <i class="fa-solid fa-building"></i>
+    @php
+        $customer = auth('customer')->user();
+        $profile = $companyProfile ?? $customer->companyProfile;
+    @endphp
+
+    <div class="grid-31">
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Business Information</div>
                 </div>
-                <div class="font-bold text-lg">{{ $profile?->company_name ?? $customer->business_name ?? 'Company' }}</div>
-                <div class="text-sm text-muted mt-1">{{ $profile?->industry ? ucfirst($profile->industry) : 'Enterprise Client' }}</div>
+                <div class="card-body">
+                    @if (session('success'))
+                        <div class="alert alert-success mb-4"><i class="fa-solid fa-check-circle"></i>
+                            {{ session('success') }}</div>
+                    @endif
+                    <form method="POST" action="{{ route('customer.company-profile.update') }}"
+                        enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Legal Business Name <span
+                                        style="color:var(--danger);">*</span></label>
+                                <input type="text" name="company_name" class="form-input"
+                                    value="{{ old('company_name', $profile?->company_name ?? $customer->business_name) }}"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tax ID / NPWP</label>
+                                <input type="text" name="tax_id" class="form-input"
+                                    value="{{ old('tax_id', $profile?->tax_id) }}" placeholder="e.g. 01.234.567.8-901.000">
+                                <!-- NOT required -->
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Business Industry <span
+                                        style="color:var(--danger);">*</span></label>
+                                <select name="industry" class="form-select" required>
+                                    <option value="retail"
+                                        {{ old('industry', $profile?->industry) === 'retail' ? 'selected' : '' }}>Retail &
+                                        E-commerce</option>
+                                    <option value="manufacturing"
+                                        {{ old('industry', $profile?->industry) === 'manufacturing' ? 'selected' : '' }}>
+                                        Manufacturing & ERP</option>
+                                    <option value="services"
+                                        {{ old('industry', $profile?->industry) === 'services' ? 'selected' : '' }}>
+                                        Professional Services</option>
+                                    <option value="technology"
+                                        {{ old('industry', $profile?->industry) === 'technology' ? 'selected' : '' }}>
+                                        Technology & Software</option>
+                                    <option value="other"
+                                        {{ old('industry', $profile?->industry) === 'other' ? 'selected' : '' }}>Other
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Company Size <span style="color:var(--danger);">*</span></label>
+                                <select name="company_size" class="form-select" required>
+                                    <option value="1-10"
+                                        {{ old('company_size', $profile?->company_size) === '1-10' ? 'selected' : '' }}>1-10
+                                        Employees</option>
+                                    <option value="11-50"
+                                        {{ old('company_size', $profile?->company_size) === '11-50' ? 'selected' : '' }}>
+                                        11-50 Employees</option>
+                                    <option value="51-200"
+                                        {{ old('company_size', $profile?->company_size) === '51-200' ? 'selected' : '' }}>
+                                        51-200 Employees</option>
+                                    <option value="201+"
+                                        {{ old('company_size', $profile?->company_size) === '201+' ? 'selected' : '' }}>
+                                        200+ Enterprise</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Street Address <span style="color:var(--danger);">*</span></label>
+                            <textarea name="address" class="form-textarea" rows="3" placeholder="Full address for billing & invoices"
+                                required>{{ old('address', $profile?->address) }}</textarea>
+                        </div>
+
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label class="form-label">City <span style="color:var(--danger);">*</span></label>
+                                <input type="text" name="city" class="form-input"
+                                    value="{{ old('city', $profile?->city) }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Province / State <span
+                                        style="color:var(--danger);">*</span></label>
+                                <input type="text" name="province" class="form-input"
+                                    value="{{ old('province', $profile?->province) }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Postal Code <span style="color:var(--danger);">*</span></label>
+                                <input type="text" name="postal_code" class="form-input"
+                                    value="{{ old('postal_code', $profile?->postal_code) }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Company Logo</label>
+                            <input type="file" name="logo" class="form-input" accept="image/*">
+                            <div class="form-hint">Upload PNG or JPG (max 2MB). Used on custom reports & invoices.</div>
+                            <!-- NOT required -->
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-2">
+                            <i class="fa-solid fa-floppy-disk"></i> Update Company Profile
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">💡 Why update this?</div>
+        {{-- Sidebar --}}
+        <div style="display:flex;flex-direction:column;gap:20px;">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div
+                        style="width:72px;height:72px;border-radius:16px;background:var(--primary-light);color:var(--primary);font-size:32px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                    <div class="font-bold text-lg">{{ $profile?->company_name ?? ($customer->business_name ?? 'Company') }}
+                    </div>
+                    <div class="text-sm text-muted mt-1">
+                        {{ $profile?->industry ? ucfirst($profile->industry) : 'Enterprise Client' }}</div>
+                </div>
             </div>
-            <div class="card-body text-xs text-muted" style="line-height:1.6;">
-                Your company name, NPWP, and address will automatically populate tax invoices (Faktur Pajak) and official receipts generated by COOCA.ID.
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">💡 Why update this?</div>
+                </div>
+                <div class="card-body text-xs text-muted" style="line-height:1.6;">
+                    Your company name, NPWP, and address will automatically populate tax invoices (Faktur Pajak) and
+                    official receipts generated by COOCA.ID.
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection

@@ -177,7 +177,11 @@
                                 <div>
                                     <div class="font-bold text-base">{{ $plan->name }}</div>
                                     <div class="text-xs text-muted">
-                                        {{ $plan->duration_months ?? 1 }} bulan ·
+                                        @if(($plan->duration_months ?? 1) >= 999)
+                                            Lifetime ·
+                                        @else
+                                            {{ $plan->duration_months ?? 1 }} bulan ·
+                                        @endif
                                         {{ ucfirst($plan->billing_cycle) }}
                                         @if($plan->description) · {{ $plan->description }} @endif
                                     </div>
@@ -191,7 +195,13 @@
                                     @else
                                     <div class="font-bold" style="color:var(--primary);">Rp {{ number_format($plan->price, 0, ',', '.') }}</div>
                                     @endif
-                                    <div class="text-xs text-muted">/{{ $plan->billing_cycle }}</div>
+                                    <div class="text-xs text-muted">
+                                        @if(($plan->duration_months ?? 1) >= 999)
+                                            Sekali Bayar
+                                        @else
+                                            /{{ $plan->billing_cycle }}
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </label>

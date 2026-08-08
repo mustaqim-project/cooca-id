@@ -94,6 +94,14 @@
                     <input type="text" name="whatsapp_link" class="form-input" value="{{ $settings['whatsapp_link'] ?? '' }}">
                 </div>
 
+                <div class="form-group mt-4" style="background:var(--bg);padding:15px;border-radius:var(--radius);border:1px solid var(--border);">
+                    <label class="flex items-center gap-2 cursor-pointer" style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" name="whatsapp_notifications_active" value="1" {{ !empty($settings['whatsapp_notifications_active']) ? 'checked' : '' }}>
+                        <span class="font-bold" style="font-size:14px;">🟢 Aktifkan Notifikasi WhatsApp Secara Global</span>
+                    </label>
+                    <div class="text-xs text-muted" style="margin-top:5px;margin-left:25px;">Jika dinonaktifkan, pengiriman pesan WhatsApp untuk pendaftaran, status trial, subscription, invoice, dll. akan ditangguhkan secara global.</div>
+                </div>
+
                 <div class="form-group mt-4">
                     <label class="form-label">Office Address</label>
                     <textarea name="contact_address" class="form-textarea" rows="3">{{ $settings['contact_address'] ?? '' }}</textarea>

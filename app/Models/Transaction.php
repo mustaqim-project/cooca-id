@@ -38,6 +38,8 @@ final class Transaction extends Model
     protected $fillable = [
         'customer_id',
         'subscription_id',
+        'project_id',
+        'description',
         'type',
         'invoice_number',
         'gross_amount',
@@ -91,6 +93,11 @@ final class Transaction extends Model
     public function subscription(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Subscription::class, 'subscription_id');
+    }
+
+    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Project::class, 'project_id');
     }
 
     public function voucher(): \Illuminate\Database\Eloquent\Relations\BelongsTo

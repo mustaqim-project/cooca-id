@@ -130,35 +130,51 @@ pm2 startup
 
 ### Langkah 5: Setup Background Queue Worker & Scheduler
 
-#### **A. Menggunakan Supervisor (Rekomendasi VPS)**
-Buat file `/etc/supervisor/conf.d/cooca-worker.conf`:
+Pilih salah satu metode di bawah ini sesuai dengan tipe server hosting Anda:
 
-```ini
-[program:cooca-worker]
-process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/cooca-id/artisan queue:work --sleep=3 --tries=3 --max-time=3600
-autostart=true
-autorestart=true
-stopasgroup=true
-killasgroup=true
-user=www-data
-numprocs=2
-redirect_stderr=true
-stdout_logfile=/var/www/cooca-id/storage/logs/worker.log
-```
+#### **Opsi A: VPS (Menggunakan Supervisor & Cron Job - Rekomendasi)**
+1. **Setup Queue Worker (Supervisor):**
+   Buat file `/etc/supervisor/conf.d/cooca-worker.conf`:
+   ```ini
+   [program:cooca-worker]
+   process_name=%(program_name)s_%(process_num)02d
+   command=php /var/www/cooca-id/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+   autostart=true
+   autorestart=true
+   stopasgroup=true
+   killasgroup=true
+   user=www-data
+   numprocs=2
+   redirect_stderr=true
+   stdout_logfile=/var/www/cooca-id/storage/logs/worker.log
+   ```
+   Aktifkan Supervisor:
+   ```bash
+   sudo supervisorctl reread
+   sudo supervisorctl update
+   sudo supervisorctl start cooca-worker:*
+   ```
 
-Aktifkan Supervisor:
-```bash
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo supervisorctl start cooca-worker:*
-```
+2. **Setup Scheduler (Cron Job):**
+   Tambahkan baris ini di crontab (`crontab -e`):
+   ```bash
+   * * * * * cd /var/www/cooca-id && php artisan schedule:run >> /dev/null 2>&1
+   ```
 
-#### **B. Setup Cron Job Scheduler (Wajib)**
-Buka crontab: `crontab -e` dan tambahkan perintah:
-```bash
-* * * * * cd /var/www/cooca-id && php artisan schedule:run >> /dev/null 2>&1
-```
+---
+
+#### **Opsi B: Shared Hosting (Hostinger, cPanel, dll. - Tanpa SSH / Terminal Root)**
+Pada shared hosting (seperti Hostinger), Anda tidak dapat menjalankan program daemon / *background process* seperti Supervisor. Sebagai solusinya, **semua tugas eksekusi (Queue & Scheduler) digabungkan ke dalam 1 baris perintah Cron Job** yang berjalan setiap menit:
+
+1. Masuk ke Panel Hostinger -> **Advanced** -> **Cron Jobs**.
+2. Set tipe interval ke **Custom / Common (Every Minute)**: `* * * * *`.
+3. Masukkan perintah berikut di kolom **Command** (sesuaikan `/home/uXXXX/public_html` dengan path absolute root folder Laravel Anda di Hostinger):
+   ```bash
+   cd /home/uXXXX/public_html && php artisan schedule:run >> /dev/null 2>&1; php artisan queue:work --stop-when-empty >> /dev/null 2>&1
+   ```
+
+> [!NOTE]
+> Perintah `queue:work --stop-when-empty` akan memproses semua antrean job yang masuk (seperti auto-provisioning database, pengiriman email verifikasi, dll.) sampai antrean kosong, lalu berhenti secara aman. Ini sangat ideal untuk shared hosting karena mencegah pemakaian memory berlebih dan tidak diblokir oleh sistem Hostinger.
 
 ---
 

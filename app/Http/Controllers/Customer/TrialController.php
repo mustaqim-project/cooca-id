@@ -51,12 +51,6 @@ class TrialController extends Controller
 
     public function create(Request $request): View|\Illuminate\Http\RedirectResponse
     {
-        $customer = $request->user();
-        if (!$customer->isCompanyProfileComplete()) {
-            return redirect()->route('customer.company-profile.edit')
-                ->with('error', 'Silakan lengkapi Profil Perusahaan Anda terlebih dahulu sebelum request trial.');
-        }
-
         $products = Product::active()->get();
 
         return view('customer.trials.create', compact('products'));
@@ -65,18 +59,38 @@ class TrialController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $customer = $request->user();
-        if (!$customer->isCompanyProfileComplete()) {
-            return redirect()->route('customer.company-profile.edit')
-                ->with('error', 'Silakan lengkapi Profil Perusahaan Anda terlebih dahulu sebelum request trial.');
-        }
 
         $validated = $request->validate([
             'product_id' => 'required|uuid|exists:products,id',
-            'requested_subdomain' => 'required|string|max:63|alpha_dash|unique:erp_requests,requested_subdomain',
+            'business_name' => 'required|string|max:255',
+            'requested_subdomain' => [
+                'required',
+                'string',
+                'max:63',
+                'alpha_dash',
+                function ($attribute, $value, $fail) use ($customer) {
+                    $existsInRequests = ErpRequest::where('requested_subdomain', $value)
+                        ->where('customer_id', '!=', $customer->id)
+                        ->whereNotIn('status', [ErpRequest::STATUS_REJECTED, ErpRequest::STATUS_TRIAL_EXPIRED])
+                        ->exists();
+
+                    $domainStr = $value . '.cooca.id';
+                    $existsInLicenses = \App\Models\License::where('domain', $domainStr)
+                        ->where('customer_id', '!=', $customer->id)
+                        ->exists();
+
+                    if ($existsInRequests || $existsInLicenses) {
+                        $fail('Subdomain sudah digunakan oleh pengguna lain.');
+                    }
+                }
+            ],
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        $existing = ErpRequest::where('customer_id', $request->user()->id)
+        // Update customer's business name
+        $customer->update(['business_name' => $validated['business_name']]);
+
+        $existing = ErpRequest::where('customer_id', $customer->id)
             ->where('product_id', $validated['product_id'])
             ->whereNotIn('status', [ErpRequest::STATUS_REJECTED, ErpRequest::STATUS_TRIAL_EXPIRED])
             ->exists();
@@ -86,13 +100,13 @@ class TrialController extends Controller
         }
 
         // Make sure the affiliator actually exists in customers table before assigning
-        $affiliatorId = $request->user()->affiliator_id;
+        $affiliatorId = $customer->affiliator_id;
         if ($affiliatorId && !\App\Models\Customer::where('id', $affiliatorId)->exists()) {
             $affiliatorId = null;
         }
 
         $trial = ErpRequest::create([
-            'customer_id' => $request->user()->id,
+            'customer_id' => $customer->id,
             'product_id' => $validated['product_id'],
             'requested_subdomain' => $validated['requested_subdomain'],
             'status' => ErpRequest::STATUS_SUBMITTED,

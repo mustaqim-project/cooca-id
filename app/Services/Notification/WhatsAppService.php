@@ -95,6 +95,11 @@ final class WhatsAppService
      */
     public function sendMessage(string $number, string $message): array
     {
+        // Check global setting toggle
+        if (! (bool) \App\Models\Setting::get('whatsapp.notifications_active', true)) {
+            return ['success' => false, 'message' => 'WhatsApp is globally disabled.'];
+        }
+
         $normalizedPhone = $this->normalizePhone($number);
         if (empty($normalizedPhone)) {
             return ['success' => false, 'message' => 'Nomor telepon tidak valid.'];

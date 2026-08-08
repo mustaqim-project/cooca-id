@@ -19,20 +19,23 @@
             {{-- Left: Content --}}
             <div class="hero-content">
                 {{-- Badge --}}
-                <div class="hero-badge">
-                    <span class="badge-dot"></span>
-                    <span class="badge-label">Platform ERP #1 Untuk Bisnis Indonesia</span>
-                </div>
+                <!--<div class="hero-badge">-->
+                <!--    <span class="badge-dot"></span>-->
+                <!--    <span class="badge-label">Dari Cooca Untuk UMKM</span>-->
+                <!--</div>-->
+
 
                 {{-- Headline --}}
                 <h1 class="hero-title" id="hero-heading">
-                    Satu Platform ERP<br>
-                    untuk <span class="highlight">Seluruh<br>Skala Bisnis</span> Anda
+                    Optimalkan Bisnis<br>
+                    Dengan <span class="highlight">ERP</span>
                 </h1>
-
+                
                 <p class="hero-desc">
-                    Kelola Restoran, Klinik, Bengkel, Kantor Legal, hingga Sistem Booking secara terpusat — lewat otomatisasi &amp; arsitektur cloud terdepan per-tenant.
+                    Kelola operasional lebih rapi, cepat, dan terukur dengan satu platform ERP dari Cooca.
                 </p>
+
+
 
                 {{-- CTAs --}}
                 <div class="hero-actions">

@@ -12,7 +12,7 @@ use Tests\TestCase;
 class SubscriptionTrialFlowTest extends TestCase
 {
     // We won't use RefreshDatabase so we test against the real dev DB
-    // use RefreshDatabase;
+    use RefreshDatabase;
 
     public function test_subscribe_flow_and_trial_flow()
     {
@@ -54,6 +54,7 @@ class SubscriptionTrialFlowTest extends TestCase
         // Test Trial Submit
         $postTrial = $this->post('/customer/trials', [
             'product_id' => $product->id,
+            'business_name' => 'Flow Test Business',
             'requested_subdomain' => 'test-subdomain-123',
             'notes' => 'Testing trial flow from script',
         ]);

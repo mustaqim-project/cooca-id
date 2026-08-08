@@ -36,6 +36,7 @@ class SettingsController extends Controller
             'email_support' => Setting::get('contact.email', 'hello@cooca.id'),
             'whatsapp_number' => Setting::get('contact.whatsapp', '6281234567890'),
             'whatsapp_link' => Setting::get('contact.whatsapp_link', 'https://wa.me/6281234567890'),
+            'whatsapp_notifications_active' => (bool) Setting::get('whatsapp.notifications_active', true),
             'contact_address' => Setting::get('contact.address', 'Jl. Jend. Sudirman No. 52, Jakarta Selatan, DKI Jakarta 12920'),
             'footer_description' => Setting::get('footer.description', ''),
 
@@ -141,6 +142,9 @@ class SettingsController extends Controller
 
             // SEO Options
             'google_no_follow' => ['sometimes', 'boolean'],
+
+            // WhatsApp Settings
+            'whatsapp_notifications_active' => ['sometimes', 'boolean'],
         ]);
 
         // Handle File Uploads
@@ -228,7 +232,7 @@ class SettingsController extends Controller
         ];
 
         foreach ($validated as $field => $value) {
-            if (in_array($field, ['logo', 'logo_light', 'logo_dark', 'preloader_image_light', 'preloader_image_dark', 'favicon', 'google_no_follow'])) continue;
+            if (in_array($field, ['logo', 'logo_light', 'logo_dark', 'preloader_image_light', 'preloader_image_dark', 'favicon', 'google_no_follow', 'whatsapp_notifications_active'])) continue;
 
             if (!isset($map[$field])) continue;
 
@@ -252,6 +256,16 @@ class SettingsController extends Controller
                 'value' => $request->boolean('google_no_follow') ? '1' : '0',
                 'type' => 'boolean',
                 'group' => 'seo',
+                'updated_by' => $request->user('admin')?->id,
+            ]
+        );
+
+        Setting::updateOrCreate(
+            ['key' => 'whatsapp.notifications_active'],
+            [
+                'value' => $request->boolean('whatsapp_notifications_active') ? '1' : '0',
+                'type' => 'boolean',
+                'group' => 'contact',
                 'updated_by' => $request->user('admin')?->id,
             ]
         );

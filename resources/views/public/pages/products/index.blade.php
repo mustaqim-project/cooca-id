@@ -129,7 +129,18 @@
                             @php
                                 $lowestPlan = $product->subscriptionPlans->where('is_active', true)->sortBy('price')->first();
                                 $displayPrice = $lowestPlan ? $lowestPlan->price : $product->base_price;
-                                $period = $lowestPlan ? ($lowestPlan->duration_months == 1 ? '/bln' : '/thn') : '';
+                                $period = '';
+                                if ($lowestPlan) {
+                                    if ($lowestPlan->duration_months >= 999) {
+                                        $period = ' / Lifetime';
+                                    } elseif ($lowestPlan->duration_months == 1) {
+                                        $period = '/bln';
+                                    } elseif ($lowestPlan->duration_months == 12) {
+                                        $period = '/thn';
+                                    } else {
+                                        $period = '/' . $lowestPlan->duration_months . ' bln';
+                                    }
+                                }
                             @endphp
                             @if($displayPrice)
                             <div class="product-price">Rp {{ number_format($displayPrice, 0, ',', '.') }}<span class="price-period">{{ $period }}</span></div>

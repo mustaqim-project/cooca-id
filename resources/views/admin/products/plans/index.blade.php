@@ -36,7 +36,13 @@
                             @php $pObj = is_array($plan) ? (object)$plan : $plan; @endphp
                             <tr>
                                 <td class="font-bold">{{ $pObj->name ?? 'Tier' }}</td>
-                                <td>{{ $pObj->duration_months ?? 1 }} Months</td>
+                                <td>
+                                    @if(($pObj->duration_months ?? 1) >= 999)
+                                        <span class="badge badge-success" style="font-weight: bold;">Lifetime</span>
+                                    @else
+                                        {{ $pObj->duration_months ?? 1 }} Months
+                                    @endif
+                                </td>
                                 <td class="font-bold text-primary">Rp {{ number_format($pObj->price ?? 0, 0, ',', '.') }}</td>
                                 <td><span class="badge badge-accent">{{ $pObj->discount_percent ?? 0 }}%</span></td>
                                 <td>
@@ -68,8 +74,14 @@
                     <input type="text" name="name" class="form-input" placeholder="Starter / Business / Enterprise" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Duration (Months) *</label>
-                    <input type="number" name="duration_months" class="form-input" value="12" required>
+                    <label class="form-label">Duration (Period) *</label>
+                    <select name="duration_months" class="form-select" required>
+                        <option value="1">1 Month (Monthly)</option>
+                        <option value="3">3 Months (Quarterly)</option>
+                        <option value="6">6 Months (Semi-Annually)</option>
+                        <option value="12" selected>12 Months (Annually)</option>
+                        <option value="999">Lifetime (One-Time Purchase)</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Price (IDR) *</label>

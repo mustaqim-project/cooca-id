@@ -283,6 +283,11 @@
                             @if($daysLeft > 0) <span class="text-muted">({{ $daysLeft }} hari)</span> @endif
                         </span>
                     </div>
+                    @elseif($plan && $plan->duration_months >= 999)
+                    <div class="stats-row" style="margin:0;">
+                        <span class="text-xs text-muted">Masa Aktif</span>
+                        <span class="text-xs font-bold text-success">Selamanya (Lifetime)</span>
+                    </div>
                     @endif
                     @if($lic?->domain)
                     <div class="stats-row" style="margin:0;">
@@ -295,7 +300,7 @@
                 </div>
 
                 {{-- Expiry progress bar --}}
-                @if($plan?->duration_months && $daysLeft !== null && $sub->started_at)
+                @if($plan?->duration_months && $plan->duration_months < 999 && $daysLeft !== null && $sub->started_at)
                 @php
                     $totalDays = $plan->duration_months * 30;
                     $usedDays = max(0, $totalDays - $daysLeft);

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\Setting;
 
 class WhatsAppGatewayService
 {
@@ -72,6 +73,12 @@ class WhatsAppGatewayService
      */
     public function sendMessage(string $sessionId, string $target, ?string $message = null, ?string $mediaUrl = null, array $options = []): array
     {
+        // Check global setting toggle
+        if (! (bool) Setting::get('whatsapp.notifications_active', true)) {
+            Log::info("[WhatsAppGatewayService] Send message skipped: WhatsApp notifications are globally disabled.");
+            return ['success' => false, 'error' => 'WhatsApp notifications are globally disabled'];
+        }
+
         try {
             $payload = array_merge([
                 'session' => $sessionId,

@@ -50,6 +50,13 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label">Nama Bisnis / Perusahaan <span style="color:var(--danger);">*</span></label>
+                        <input type="text" name="business_name" class="form-input" 
+                               placeholder="Contoh: PT. Bintang Terang" 
+                               value="{{ old('business_name', auth()->user()->business_name ?? auth()->user()->companyProfile?->company_name) }}" required>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">Requested Subdomain <span style="color:var(--danger);">*</span></label>
                         <div class="flex items-center gap-2">
                             <input type="text" name="requested_subdomain" id="subdomain_input" class="form-input"

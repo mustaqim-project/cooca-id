@@ -23,6 +23,12 @@ class CustomerMenuTest extends TestCase
             'phone_verified_at' => now(),
         ])->save();
 
+        $customer->companyProfile()->create([
+            'company_name' => 'Enterprise Corp',
+            'phone' => '1234567890',
+            'address' => 'Test Address',
+        ]);
+
         $routes = [
             'customer.dashboard',
             'customer.products.index',

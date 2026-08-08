@@ -13,6 +13,11 @@ class CustomerOtpController extends Controller
 {
     public function showNotice(Request $request)
     {
+        // Redirect to dashboard if WhatsApp is globally disabled
+        if (! (bool) \App\Models\Setting::get('whatsapp.notifications_active', true)) {
+            return redirect()->route('customer.dashboard');
+        }
+
         $customer = $request->user('customer');
         if ($customer->phone_verified_at) {
             return redirect()->route('customer.dashboard');

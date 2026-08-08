@@ -6,8 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Customer;
 use App\Models\Contract;
+use App\Models\Transaction;
+use App\Models\Invoice;
+use App\Services\Payment\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 
 class ProjectController extends Controller
 {
@@ -67,7 +71,7 @@ class ProjectController extends Controller
      */
     public function show(string $id)
     {
-        $project = Project::with(['customer', 'contract', 'tasks'])->findOrFail($id);
+        $project = Project::with(['customer', 'contract', 'tasks', 'transactions.invoice'])->findOrFail($id);
         return view('admin.projects.show', compact('project'));
     }
 
@@ -135,5 +139,62 @@ class ProjectController extends Controller
         $project->delete();
 
         return redirect()->route('admin.projects.index')->with('success', 'Project berhasil dihapus.');
+    }
+
+    /**
+     * Create billing/payment link for the project.
+     */
+    public function createBilling(Request $request, string $id, PaymentService $paymentService)
+    {
+        $project = Project::findOrFail($id);
+
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'description' => 'required|string|max:255',
+        ]);
+
+        try {
+            DB::transaction(function () use ($project, $validated, $paymentService) {
+                $yearMonth = now()->format('Ym');
+                $lastTxn = Transaction::where('invoice_number', 'like', "INV/{$yearMonth}%")
+                    ->orderBy('invoice_number', 'desc')
+                    ->lockForUpdate()
+                    ->first();
+                $lastNum = $lastTxn ? (int) substr($lastTxn->invoice_number, -5) : 0;
+                $invoiceNumber = "INV/{$yearMonth}/" . str_pad((string) ($lastNum + 1), 5, '0', STR_PAD_LEFT);
+
+                $transaction = Transaction::create([
+                    'customer_id'      => $project->customer_id,
+                    'project_id'       => $project->id,
+                    'description'      => $validated['description'],
+                    'type'             => 'project_payment',
+                    'invoice_number'   => $invoiceNumber,
+                    'gross_amount'     => $validated['amount'],
+                    'net_amount'       => $validated['amount'],
+                    'payment_method'   => 'midtrans',
+                    'payment_gateway'  => 'midtrans',
+                    'status'           => 'pending',
+                ]);
+
+                Invoice::create([
+                    'transaction_id' => $transaction->id,
+                    'invoice_number' => $invoiceNumber,
+                    'customer_id'    => $project->customer_id,
+                    'amount'         => $validated['amount'],
+                    'status'         => 'issued',
+                    'issued_at'      => now(),
+                    'due_at'         => now()->addDays(3),
+                ]);
+
+                // Register transaction with Midtrans Snap to set midtrans_order_id inside transaction
+                $paymentService->createSnapTransaction($transaction);
+            });
+
+            return redirect()->route('admin.projects.show', $project->id)
+                ->with('success', 'Link pembayaran project berhasil dibuat.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.projects.show', $project->id)
+                ->with('error', 'Gagal membuat link pembayaran: ' . $e->getMessage());
+        }
     }
 }

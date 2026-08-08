@@ -17,6 +17,11 @@ class EnsurePhoneIsVerified
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Skip phone verification check if WhatsApp is globally disabled
+        if (! (bool) \App\Models\Setting::get('whatsapp.notifications_active', true)) {
+            return $next($request);
+        }
+
         $user = $request->user('customer');
         if (! $user || ! $user->phone_verified_at) {
             return $request->expectsJson()

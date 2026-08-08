@@ -47,6 +47,11 @@ final class AuthService
     {
         $logoPath = $data['logo_path'] ?? null;
 
+        $phoneVerifiedAt = null;
+        if (! (bool) \App\Models\Setting::get('whatsapp.notifications_active', true)) {
+            $phoneVerifiedAt = now();
+        }
+
         $customer = Customer::create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -54,6 +59,7 @@ final class AuthService
             'password' => Hash::make($data['password']),
             'business_name' => $data['business_name'] ?? null,
             'logo_path' => $logoPath,
+            'phone_verified_at' => $phoneVerifiedAt,
         ]);
         
         $customer->companyProfile()->create([
