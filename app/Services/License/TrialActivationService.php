@@ -90,6 +90,22 @@ final class TrialActivationService
         $domainValue = $erpRequest->requested_domain ?? 
                        ($erpRequest->requested_subdomain ? $erpRequest->requested_subdomain . '.cooca.id' : 'trial-' . Str::random(8) . '.cooca.id');
 
+        // Check if the domain name already exists in the database to prevent duplicate entry exception
+        $duplicateDomain = Domain::where('domain', $domainValue)->first();
+        if ($duplicateDomain) {
+            // If it belongs to the same customer or has no request linked, reuse it
+            if ($duplicateDomain->customer_id === $erpRequest->customer_id || empty($duplicateDomain->erp_request_id)) {
+                $duplicateDomain->update([
+                    'erp_request_id' => $erpRequest->id,
+                    'status' => Domain::STATUS_ACTIVE,
+                ]);
+                return $duplicateDomain;
+            }
+            
+            // Otherwise, since the domain is taken by another customer, append a random suffix to make it unique
+            $domainValue = $erpRequest->requested_subdomain . '-' . Str::lower(Str::random(4)) . '.cooca.id';
+        }
+
         return Domain::create([
             'customer_id' => $erpRequest->customer_id,
             'erp_request_id' => $erpRequest->id,
