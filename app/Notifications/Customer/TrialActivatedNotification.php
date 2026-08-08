@@ -16,10 +16,15 @@ final class TrialActivatedNotification extends Notification implements ShouldQue
 {
     use Queueable, HasQueueConfiguration;
 
+    private readonly ?string $note;
+
     public function __construct(
         private readonly License $license,
         private readonly \DateTimeInterface $trialEndsAt,
-    ) {}
+        ?string $note = null,
+    ) {
+        $this->note = $note;
+    }
 
     public function via(object $notifiable): array
     {
@@ -28,7 +33,7 @@ final class TrialActivatedNotification extends Notification implements ShouldQue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        $mail = (new MailMessage())
             ->subject('🎉 Trial Activated - Your COOCA.ID ERP is Ready!')
             ->greeting('Hello ' . $notifiable->name . '!')
             ->line('Great news! Your ERP trial has been activated and is ready to use.')
@@ -36,7 +41,14 @@ final class TrialActivatedNotification extends Notification implements ShouldQue
             ->line('- Domain: ' . $this->license->domain)
             ->line('- License Code: ' . $this->license->license_code)
             ->line('- Token Code: ' . $this->license->token_code)
-            ->line('- Trial Ends: ' . $this->trialEndsAt->format('d F Y'))
+            ->line('- Trial Ends: ' . $this->trialEndsAt->format('d F Y'));
+
+        if (!empty($this->note)) {
+            $mail->line('Catatan Admin / Note:')
+                 ->line($this->note);
+        }
+
+        return $mail
             ->action('Login to Your ERP', route('customer.login'))
             ->line('If you have any questions during your trial, feel free to contact our support team.')
             ->salutation('Welcome to COOCA.ID!');

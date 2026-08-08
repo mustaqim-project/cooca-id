@@ -20,7 +20,10 @@
     <div class="card">
         <div class="card-header">
             <div class="card-title">Request Summary</div>
-            <span class="badge badge-accent">{{ ucfirst($trial->status) }}</span>
+            @php
+                $labels = \App\Models\ErpRequest::getStatusLabels();
+            @endphp
+            <span class="badge badge-accent">{{ $labels[$trial->status] ?? ucfirst(str_replace('_', ' ', $trial->status)) }}</span>
         </div>
         <div class="card-body">
             <div class="stats-row">

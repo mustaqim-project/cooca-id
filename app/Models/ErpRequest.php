@@ -81,7 +81,7 @@ final class ErpRequest extends Model
             self::STATUS_IN_SETUP => 'In Setup',
             self::STATUS_DOMAIN_SETUP => 'Domain Setup',
             self::STATUS_TESTING => 'Testing',
-            self::STATUS_ACTIVE_TRIAL => 'Active Trial',
+            self::STATUS_ACTIVE_TRIAL => 'Approved',
             self::STATUS_TRIAL_EXPIRED => 'Trial Expired',
             self::STATUS_REJECTED => 'Rejected',
         ];

@@ -36,7 +36,8 @@
                     <tr>
                         <td class="font-bold text-sm">{{ $trial->product?->name ?? 'COOCA Module' }}</td>
                         <td><span class="badge badge-accent">14-Day Free Trial</span></td>
-                            @if($trial->status === 'active_trial')   <span class="badge badge-success">Active</span>
+                        <td>
+                            @if($trial->status === 'active_trial')   <span class="badge badge-success">Approved</span>
                             @elseif($trial->status === 'trial_expired')<span class="badge badge-danger">Expired</span>
                             @elseif(in_array($trial->status, ['waiting_setup', 'in_setup', 'domain_setup', 'testing']))<span class="badge badge-warning">Approved (Setup In Progress)</span>
                             @elseif($trial->status === 'waiting_approval')<span class="badge badge-info">Waiting Approval</span>

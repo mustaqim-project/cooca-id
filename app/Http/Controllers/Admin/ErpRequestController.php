@@ -57,15 +57,22 @@ final class ErpRequestController extends Controller
         $this->authorizeManagement();
 
         $validated = $request->validate([
-            'admin_notes' => 'nullable|string|max:1000',
+            'admin_notes' => 'required|string|max:1000',
         ]);
 
         $adminId = auth()->id();
-        $erpRequest->approve($adminId);
+        
+        $now = now();
+        $erpRequest->update([
+            'approved_by' => $adminId,
+            'approved_at' => $now,
+            'admin_notes' => $validated['admin_notes'],
+            'trial_starts_at' => $now,
+            'trial_ends_at' => $now->copy()->addDays(14),
+        ]);
 
-        if (!empty($validated['admin_notes'])) {
-            $erpRequest->update(['admin_notes' => $validated['admin_notes']]);
-        }
+        // Immediate trial activation
+        $this->trialActivationService->activateTrial($erpRequest, 14);
 
         \App\Models\ActivityLog::create([
             'causer_id' => $adminId,

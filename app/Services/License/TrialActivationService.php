@@ -10,6 +10,8 @@ use App\Models\LicenseLog;
 use App\Models\Subscription;
 use App\Models\Domain;
 use App\Services\Notification\NotificationService;
+use App\Notifications\Customer\TrialActivatedNotification;
+use App\Services\Notification\WhatsAppService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -146,38 +148,21 @@ final class TrialActivationService
     {
         $customer = $erpRequest->customer;
 
-        $this->notificationService->queueEmail(
-            $customer->email,
-            'Trial Activated - Your COOCA.ID ERP is Ready!',
-            'notifications.trial.activated',
-            [
-                'customerName' => $customer->name,
-                'businessName' => $customer->business_name,
-                'domain' => $license->domain,
-                'licenseCode' => $license->license_code,
-                'tokenCode' => $license->token_code,
-                'trialEndsAt' => $trialEndsAt->format('d F Y'),
-                'loginUrl' => route('customer.login'),
-            ]
-        );
+        // Send email and DB notification
+        $customer->notify(new TrialActivatedNotification(
+            $license,
+            $trialEndsAt,
+            $erpRequest->admin_notes
+        ));
 
+        // Send WhatsApp notification
         if (!empty($customer->phone)) {
-            $this->notificationService->queueWhatsApp(
+            $whatsappService = app(WhatsAppService::class);
+            $whatsappService->send(
                 $customer->phone,
                 "🎉 Trial Activated!\n\nYour COOCA.ID ERP is ready.\nDomain: {$license->domain}\nLicense: {$license->license_code}\nTrial ends: {$trialEndsAt->format('d M Y')}\n\nLogin: " . route('customer.login')
             );
         }
-
-        $this->notificationService->createDatabaseNotification(
-            $customer,
-            'trial_activated',
-            'Your trial has been activated! Your ERP system is ready to use.',
-            [
-                'license_code' => $license->license_code,
-                'domain' => $license->domain,
-                'trial_ends_at' => $trialEndsAt->toIso8601String(),
-            ]
-        );
     }
 }
 

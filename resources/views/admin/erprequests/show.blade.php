@@ -99,10 +99,14 @@
             {{-- Action Buttons --}}
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 @if(in_array($request->status, ['submitted', 'waiting_approval']))
-                    <form action="{{ route('admin.erp-requests.approve', $request->id) }}" method="POST">
+                    <form action="{{ route('admin.erp-requests.approve', $request->id) }}" method="POST" style="background: #F8FAFC; padding: 14px; border-radius: 10px; border: 1px solid #E2E8F0;">
                         @csrf
+                        <div style="margin-bottom: 12px;">
+                            <label for="admin_notes" style="display: block; font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase;">Catatan Persetujuan (Wajib)</label>
+                            <textarea name="admin_notes" id="admin_notes" rows="3" required style="width: 100%; border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px; font-size: 12px; font-family: inherit; resize: vertical;" placeholder="Tulis catatan persetujuan untuk dikirim ke email customer..."></textarea>
+                        </div>
                         <button type="submit" style="width: 100%; background: #10B981; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer;">
-                            <i class="fa-solid fa-check"></i> Setujui Pengajuan ERP
+                            <i class="fa-solid fa-check"></i> Setujui & Aktifkan ERP
                         </button>
                     </form>
 
