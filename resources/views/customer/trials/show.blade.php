@@ -17,34 +17,68 @@
 </div>
 
 <div class="grid-31">
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title">Request Summary</div>
-            @php
-                $labels = \App\Models\ErpRequest::getStatusLabels();
-            @endphp
-            <span class="badge badge-accent">{{ $labels[$trial->status] ?? ucfirst(str_replace('_', ' ', $trial->status)) }}</span>
+    <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Request Summary</div>
+                @php
+                    $labels = \App\Models\ErpRequest::getStatusLabels();
+                @endphp
+                <span class="badge badge-accent">{{ $labels[$trial->status] ?? ucfirst(str_replace('_', ' ', $trial->status)) }}</span>
+            </div>
+            <div class="card-body">
+                <div class="stats-row">
+                    <span class="text-sm text-muted">Requested Product</span>
+                    <span class="font-bold text-sm">{{ $trial->product?->name ?? 'COOCA Module' }}</span>
+                </div>
+                <div class="stats-row">
+                    <span class="text-sm text-muted">Requested Subdomain</span>
+                    <span class="font-bold text-sm">{{ $trial->requested_subdomain }}.cooca.id</span>
+                </div>
+                <div class="stats-row">
+                    <span class="text-sm text-muted">Submitted Date</span>
+                    <span class="text-sm">{{ $trial->created_at->format('d M Y H:i') }}</span>
+                </div>
+                @if($trial->notes)
+                <div class="mt-4">
+                    <div class="text-xs font-bold text-muted mb-1">Notes:</div>
+                    <div class="text-xs text-muted background:var(--bg) padding:10px;border-radius:6px;">{{ $trial->notes }}</div>
+                </div>
+                @endif
+            </div>
         </div>
-        <div class="card-body">
-            <div class="stats-row">
-                <span class="text-sm text-muted">Requested Product</span>
-                <span class="font-bold text-sm">{{ $trial->product?->name ?? 'COOCA Module' }}</span>
+
+        @if($trial->license)
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fa-solid fa-key" style="color:var(--accent);margin-right:10px;"></i>Informasi Lisensi ERP
+                </div>
             </div>
-            <div class="stats-row">
-                <span class="text-sm text-muted">Requested Subdomain</span>
-                <span class="font-bold text-sm">{{ $trial->requested_subdomain }}.cooca.id</span>
+            <div class="card-body">
+                <div class="stats-row" style="margin-bottom:12px;">
+                    <span class="text-sm text-muted">License Code</span>
+                    <code style="font-family:monospace;background:var(--bg);padding:4px 8px;border-radius:4px;word-break:break-all;font-size:12px;font-weight:bold;color:var(--text);display:block;margin-top:4px;">{{ $trial->license->license_code }}</code>
+                </div>
+                <div class="stats-row" style="margin-bottom:12px;">
+                    <span class="text-sm text-muted">Token Code</span>
+                    <code style="font-family:monospace;background:var(--bg);padding:4px 8px;border-radius:4px;word-break:break-all;font-size:12px;font-weight:bold;color:var(--text);display:block;margin-top:4px;">{{ $trial->license->token_code }}</code>
+                </div>
+                <div class="stats-row" style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+                    <span class="text-sm text-muted">Domain Terdaftar</span>
+                    <span class="font-bold text-sm">
+                        <a href="https://{{ $trial->license->domain }}" target="_blank" style="color:var(--accent);text-decoration:none;">
+                            {{ $trial->license->domain }} <i class="fa-solid fa-up-right-from-square" style="font-size:10px;"></i>
+                        </a>
+                    </span>
+                </div>
+                <div class="stats-row" style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="text-sm text-muted">Masa Berlaku</span>
+                    <span class="text-sm font-bold">{{ $trial->license->starts_at?->format('d M Y') ?? '—' }} s/d {{ $trial->license->expires_at?->format('d M Y') ?? '—' }}</span>
+                </div>
             </div>
-            <div class="stats-row">
-                <span class="text-sm text-muted">Submitted Date</span>
-                <span class="text-sm">{{ $trial->created_at->format('d M Y H:i') }}</span>
-            </div>
-            @if($trial->notes)
-            <div class="mt-4">
-                <div class="text-xs font-bold text-muted mb-1">Notes:</div>
-                <div class="text-xs text-muted background:var(--bg) padding:10px;border-radius:6px;">{{ $trial->notes }}</div>
-            </div>
-            @endif
         </div>
+        @endif
     </div>
 
     <div style="display:flex;flex-direction:column;gap:20px;">

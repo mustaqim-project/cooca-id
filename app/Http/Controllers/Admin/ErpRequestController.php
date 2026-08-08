@@ -43,18 +43,22 @@ final class ErpRequestController extends Controller
         ]);
     }
 
-    public function show(ErpRequest $request)
+    public function show(ErpRequest $erpRequest)
     {
-        $request->load(['customer', 'product', 'affiliator', 'approvedBy', 'domains', 'license']);
+        $erpRequest->load(['customer', 'product', 'affiliator', 'approvedBy', 'domains', 'license']);
 
         return view('admin.erprequests.show', [
-            'request' => $request,
+            'request' => $erpRequest,
         ]);
     }
 
     public function approve(Request $request, ErpRequest $erpRequest)
     {
         $this->authorizeManagement();
+
+        if (!in_array($erpRequest->status, ['submitted', 'waiting_approval'])) {
+            return redirect()->back()->with('error', 'ERP request has already been processed.');
+        }
 
         $validated = $request->validate([
             'admin_notes' => 'required|string|max:1000',
@@ -91,6 +95,10 @@ final class ErpRequestController extends Controller
     public function reject(Request $request, ErpRequest $erpRequest)
     {
         $this->authorizeManagement();
+        if (!in_array($erpRequest->status, ['submitted', 'waiting_approval'])) {
+            return redirect()->back()->with('error', 'ERP request has already been processed.');
+        }
+
         $validated = $request->validate([
             'rejection_reason' => 'required|string|max:1000',
         ]);

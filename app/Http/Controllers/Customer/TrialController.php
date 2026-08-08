@@ -124,7 +124,7 @@ class TrialController extends Controller
         if ($request->user()->id !== $trial->customer_id) {
             abort(403);
         }
-        $trial->load('product');
+        $trial->load(['product', 'license']);
 
         return view('customer.trials.show', compact('trial'));
     }

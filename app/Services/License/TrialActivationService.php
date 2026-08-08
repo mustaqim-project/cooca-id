@@ -34,7 +34,7 @@ final class TrialActivationService
             $license = License::create([
                 'customer_id' => $erpRequest->customer_id,
                 'product_id' => $erpRequest->product_id,
-                'subscription_plan_id' => $this->getTrialPlanId(),
+                'subscription_plan_id' => $this->getTrialPlanId($erpRequest->product_id),
                 'erp_request_id' => $erpRequest->id,
                 'domain_id' => $domain->id,
                 'license_code' => $licenseCode,
@@ -100,17 +100,19 @@ final class TrialActivationService
         ]);
     }
 
-    private function getTrialPlanId(): string
+    private function getTrialPlanId(string $productId): string
     {
-        $plan = \App\Models\SubscriptionPlan::where('code', 'trial')->first();
+        $plan = \App\Models\SubscriptionPlan::where('product_id', $productId)
+            ->where('price', 0)
+            ->first();
         
         if (!$plan) {
             $plan = \App\Models\SubscriptionPlan::create([
+                'product_id' => $productId,
                 'name' => 'Trial Plan',
-                'code' => 'trial',
                 'price' => 0,
                 'duration_months' => 0,
-                'is_trial' => true,
+                'is_active' => true,
             ]);
         }
 
@@ -137,7 +139,7 @@ final class TrialActivationService
             'user_agent' => request()->userAgent(),
             'metadata' => [
                 'erp_request_id' => $erpRequest->id,
-                'customer_id' => $erpRequest->customer_id->toString(),
+                'customer_id' => (string) $erpRequest->customer_id,
                 'license_id' => $license->id,
                 'license_code' => $license->license_code,
             ],

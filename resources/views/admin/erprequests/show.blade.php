@@ -157,6 +157,38 @@
                 @endif
             </div>
         </div>
+
+        @if($request->license)
+            <div style="background: white; border-radius: 16px; border: 1px solid #E2E8F0; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <h4 style="font-size: 14px; font-weight: 800; color: #1E293B; margin-bottom: 12px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+                    <i class="fa-solid fa-key" style="color: #4F46E5; margin-right: 6px;"></i> Informasi Lisensi ERP
+                </h4>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 12px; font-size: 13px;">
+                    <div>
+                        <span style="color: #64748B; font-weight: 600; font-size: 11px; text-transform: uppercase;">License Code:</span>
+                        <code style="font-family: monospace; background: #F1F5F9; padding: 4px 8px; border-radius: 4px; display: block; margin-top: 2px; font-weight: bold; color: #0F172A; font-size: 12px;">{{ $request->license->license_code }}</code>
+                    </div>
+                    <div>
+                        <span style="color: #64748B; font-weight: 600; font-size: 11px; text-transform: uppercase;">Token Code:</span>
+                        <code style="font-family: monospace; background: #F1F5F9; padding: 4px 8px; border-radius: 4px; display: block; margin-top: 2px; font-weight: bold; color: #0F172A; font-size: 12px;">{{ $request->license->token_code }}</code>
+                    </div>
+                    <div>
+                        <span style="color: #64748B; font-weight: 600; font-size: 11px; text-transform: uppercase;">Domain Terdaftar:</span>
+                        <div style="font-weight: 700; color: #1E293B; margin-top: 2px;">
+                            <a href="https://{{ $request->license->domain }}" target="_blank" style="color: #4F46E5; text-decoration: none;">
+                                {{ $request->license->domain }} <i class="fa-solid fa-up-right-from-square" style="font-size: 10px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <span style="color: #64748B; font-weight: 600; font-size: 11px; text-transform: uppercase;">Masa Berlaku:</span>
+                        <div style="font-weight: 700; color: #1E293B; margin-top: 2px;">
+                            {{ $request->license->starts_at?->format('d M Y') ?? '—' }} s/d {{ $request->license->expires_at?->format('d M Y') ?? '—' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 @endsection
