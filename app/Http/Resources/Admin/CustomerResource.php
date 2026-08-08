@@ -22,7 +22,7 @@ final class CustomerResource extends JsonResource
             'email' => $this->email,
             'business_name' => $this->business_name,
             'domain' => $this->domain,
-            'referred_by_id' => $this->referred_by_id,
+            'affiliator_id' => $this->affiliator_id,
             'google_id' => $this->whenNotNull($this->google_id),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

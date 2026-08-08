@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -20,7 +22,7 @@ final class DeactivateVouchersCommand extends Command
                 $query->where(function ($q) use ($now) {
                     $q->whereNotNull('valid_until')->where('valid_until', '<', $now);
                 })->orWhere(function ($q) {
-                    $q->where('usage_limit', '>', 0)->whereColumn('used_count', '>=', 'usage_limit');
+                    $q->where('max_usage', '>', 0)->whereColumn('used_count', '>=', 'max_usage');
                 });
             })
             ->get();

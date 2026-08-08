@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * Affiliator Review Controller
- * 
+ *
  * Manages reviews from affiliator perspective.
  */
 class ReviewController extends Controller
@@ -25,7 +25,7 @@ class ReviewController extends Controller
         $affiliator = Auth::user();
 
         // Get all customers referred by this affiliator (direct referrals)
-        $customerIds = \App\Models\Customer::where('referrer_id', $affiliator->id)
+        $customerIds = \App\Models\Customer::where('affiliator_id', $affiliator->id)
             ->pluck('id');
 
         // Get reviews from referred customers
@@ -46,7 +46,7 @@ class ReviewController extends Controller
 
         if ($product = $request->get('product_id')) {
             $query->where('reviewable_type', \App\Models\Product::class)
-                  ->where('reviewable_id', $product);
+                ->where('reviewable_id', $product);
         }
 
         $reviews = $query->paginate(20)->withQueryString();

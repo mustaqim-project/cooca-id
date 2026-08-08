@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -21,9 +23,9 @@ final class ExpireSubscriptionsCommand extends Command
     public function handle(): int
     {
         $now = now();
-        
+
         $expiredSubscriptions = Subscription::where('status', 'active')
-            ->where('ends_at', '<', $now)
+            ->where('expires_at', '<', $now)
             ->get();
 
         if ($expiredSubscriptions->isEmpty()) {
