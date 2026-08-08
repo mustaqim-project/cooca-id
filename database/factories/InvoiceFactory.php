@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Invoice;
+use App\Models\Customer;
+use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -20,47 +22,13 @@ class InvoiceFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'transaction_id' => \App\Models\Transaction::inRandomOrder()->first()?->id ?? \App\Models\Transaction::factory(),
-            'invoice_number' => 'INV-' . strtoupper(Str::random(10)),
-            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
+            'customer_id' => Customer::inRandomOrder()->first()?->id ?? Customer::factory(),
+            'transaction_id' => Transaction::inRandomOrder()->first()?->id ?? Transaction::factory(),
+            'invoice_number' => 'INV-' . strtoupper(Str::random(8)),
             'amount' => fake()->randomElement([250000, 500000, 750000, 1500000, 2500000, 5000000, 7500000, 12500000]),
-            'status' => fake()->randomElement(['draft', 'issued', 'paid', 'overdue', 'cancelled']),
-            'issued_at' => fake()->dateTimeBetween('-1 year', 'now'),
-            'due_at' => fake()->dateTimeBetween('now', '+1 month'),
-            'paid_at' => fake()->optional(0.7)->dateTimeBetween('-1 year', 'now'),
-            'pdf_path' => fake()->optional(0.5)->filePath(),
+            'status' => fake()->randomElement(['pending', 'paid', 'overdue', 'cancelled']),
+            'due_date' => fake()->dateTimeBetween('now', '+30 days'),
+            'paid_at' => fake()->optional(0.7)->dateTimeBetween('-1 month', 'now'),
         ];
-    }
-
-    /**
-     * Indicate that the invoice is paid.
-     */
-    public function paid(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'paid',
-            'paid_at' => now(),
-        ]);
-    }
-
-    /**
-     * Indicate that the invoice is overdue.
-     */
-    public function overdue(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'overdue',
-            'due_at' => now()->subDays(10),
-        ]);
-    }
-
-    /**
-     * Indicate that the invoice is cancelled.
-     */
-    public function cancelled(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'cancelled',
-        ]);
     }
 }

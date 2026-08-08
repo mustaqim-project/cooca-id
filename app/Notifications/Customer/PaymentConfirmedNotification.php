@@ -18,8 +18,7 @@ final class PaymentConfirmedNotification extends Notification implements ShouldQ
 
 
     public function __construct(
-        private readonly string $invoiceNumber,
-        private readonly float $amount,
+        private readonly \App\Models\Transaction $transaction
     ) {}
 
     public function via(object $notifiable): array
@@ -29,23 +28,28 @@ final class PaymentConfirmedNotification extends Notification implements ShouldQ
 
     public function toMail(object $notifiable): MailMessage
     {
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.invoice', ['transaction' => $this->transaction]);
+
         return (new MailMessage())
-            ->subject('Pembayaran Berhasil - Invoice ' . $this->invoiceNumber)
+            ->subject('Pembayaran Berhasil - Invoice ' . $this->transaction->invoice_number)
             ->greeting('Halo ' . $notifiable->name . ',')
             ->line('Pembayaran Anda telah berhasil diproses.')
-            ->line('Invoice Number: ' . $this->invoiceNumber)
-            ->line('Jumlah Dibayar: Rp ' . number_format($this->amount, 0, ',', '.'))
+            ->line('Invoice Number: ' . $this->transaction->invoice_number)
+            ->line('Jumlah Dibayar: Rp ' . number_format((float) $this->transaction->net_amount, 0, ',', '.'))
             ->action('Lihat Dashboard', route('customer.dashboard'))
-            ->line('Terima kasih telah menggunakan COOCA.ID.');
+            ->line('Terima kasih telah menggunakan COOCA.ID.')
+            ->attachData($pdf->output(), 'Invoice_' . $this->transaction->invoice_number . '.pdf', [
+                'mime' => 'application/pdf',
+            ]);
     }
 
     public function toArray(object $notifiable): array
     {
         return [
             'type' => 'payment_confirmed',
-            'invoice_number' => $this->invoiceNumber,
-            'amount' => $this->amount,
-            'message' => 'Pembayaran Anda dengan invoice ' . $this->invoiceNumber . ' sebesar Rp ' . number_format($this->amount, 0, ',', '.') . ' telah berhasil.',
+            'invoice_number' => $this->transaction->invoice_number,
+            'amount' => (float) $this->transaction->net_amount,
+            'message' => 'Pembayaran Anda dengan invoice ' . $this->transaction->invoice_number . ' sebesar Rp ' . number_format((float) $this->transaction->net_amount, 0, ',', '.') . ' telah berhasil.',
         ];
     }
 }

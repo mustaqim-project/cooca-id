@@ -1,290 +1,190 @@
-@extends('admin.layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Global Settings')
+@section('title', 'System Settings — COOCA.ID Admin')
 
 @section('content')
-    <div class="d-flex flex-column gap-4">
+<div class="page-header">
+    <div>
+        <div class="breadcrumb">
+            <a href="{{ route('admin.dashboard') }}">Admin</a>
+            <span>/</span>
+            <span>Settings</span>
+        </div>
+        <h1 class="page-title">System Settings & Configuration</h1>
+        <p class="page-subtitle">Platform branding, Light/Dark mode logos, support contacts, affiliate commission defaults, and SEO.</p>
+    </div>
+</div>
 
-        <!-- Page Header & Toolbar -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-                <h2 class="mb-1 fw-bold">Global Settings</h2>
-                <p class="text-secondary mb-0">Configure your application settings, integrations, and preferences.</p>
+<form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+    @method('PUT')
+
+    <div class="tabs">
+        <div class="tab-item active" onclick="switchTab('general', this)">General Branding</div>
+        <div class="tab-item" onclick="switchTab('contact', this)">Contact & Social</div>
+        <div class="tab-item" onclick="switchTab('affiliate', this)">Affiliate Rules</div>
+        <div class="tab-item" onclick="switchTab('seo', this)">Global SEO</div>
+    </div>
+
+    {{-- GENERAL TAB --}}
+    <div id="tab-general" class="tab-content">
+        <div class="card mb-6">
+            <div class="card-header">
+                <div class="card-title">Branding & Platform Logos</div>
+            </div>
+            <div class="card-body">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Platform Name</label>
+                        <input type="text" name="platform_name" class="form-input" value="{{ $settings['platform_name'] ?? 'COOCA.ID' }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Preloader Text</label>
+                        <input type="text" name="preloader_text" class="form-input" value="{{ $settings['preloader_text'] ?? 'COOCA' }}">
+                    </div>
+                </div>
+
+                <div class="grid-2 mt-4">
+                    <div class="form-group">
+                        <label class="form-label">Light Theme Logo</label>
+                        <input type="file" name="logo_light" class="form-input">
+                        @if(!empty($settings['logo_light_url']))
+                            <div class="mt-2 text-xs text-muted">Current: <code>{{ $settings['logo_light_url'] }}</code></div>
+                        @endif
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Dark Theme Logo</label>
+                        <input type="file" name="logo_dark" class="form-input">
+                        @if(!empty($settings['logo_dark_url']))
+                            <div class="mt-2 text-xs text-muted">Current: <code>{{ $settings['logo_dark_url'] }}</code></div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="grid-2 mt-4">
+                    <div class="form-group">
+                        <label class="form-label">Favicon (32x32 ICO / PNG)</label>
+                        <input type="file" name="favicon" class="form-input">
+                    </div>
+                </div>
             </div>
         </div>
-
-        <form id="settings-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-
-            <!-- Form Actions -->
-            <div class="d-flex justify-content-end mb-4">
-                <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
-                    <i class="bi bi-check2-circle me-2"></i> Save Changes
-                </button>
-            </div>
-
-            <div class="row g-4">
-
-                <!-- Left Sidebar Navigation for Settings -->
-                <div class="col-12 col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 glass position-sticky" style="top: 100px;">
-                        <div class="list-group list-group-flush rounded-4 overflow-hidden p-2">
-                            <a href="#general" data-bs-toggle="list"
-                                class="list-group-item list-group-item-action bg-transparent border-0 rounded-3 mb-1 active">
-                                <i class="bi bi-sliders me-2"></i> General
-                            </a>
-                            <a href="#payment" data-bs-toggle="list"
-                                class="list-group-item list-group-item-action bg-transparent border-0 rounded-3 mb-1">
-                                <i class="bi bi-credit-card me-2"></i> Payment Gateway
-                            </a>
-                            <a href="#mail" data-bs-toggle="list"
-                                class="list-group-item list-group-item-action bg-transparent border-0 rounded-3 mb-1">
-                                <i class="bi bi-envelope-at me-2"></i> SMTP & Mail
-                            </a>
-                            <a href="#company" data-bs-toggle="list"
-                                class="list-group-item list-group-item-action bg-transparent border-0 rounded-3 mb-1">
-                                <i class="bi bi-building me-2"></i> Company Profile
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Content Panels -->
-                <div class="col-12 col-md-9">
-                    <div class="tab-content">
-
-                        <!-- General Settings -->
-                        <div class="tab-pane fade show active" id="general">
-                            <div class="card border-0 shadow-sm rounded-4 glass p-4 mb-4">
-                                <h5 class="fw-bold mb-4">General Preferences</h5>
-
-                                <div class="row g-4">
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control rounded-3" id="app_name"
-                                                name="app_name" value="Cooca ID" placeholder="App Name" required>
-                                            <label for="app_name">Application Name</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-floating">
-                                            <select class="form-select rounded-3" id="app_timezone" name="app_timezone">
-                                                <option value="Asia/Jakarta" selected>Asia/Jakarta (UTC+7)</option>
-                                                <option value="UTC">UTC</option>
-                                            </select>
-                                            <label for="app_timezone">Timezone</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <label class="text-secondary fs-7 mb-2 d-block">Application Logo</label>
-                                        <div class="d-flex align-items-center gap-4 p-3 bg-light rounded-3 border">
-                                            <div class="bg-white p-2 rounded border" style="width: 80px; height: 80px;">
-                                                <img src="https://ui-avatars.com/api/?name=Cooca&background=primary&color=fff"
-                                                    class="w-100 h-100 object-fit-contain" alt="Logo">
-                                            </div>
-                                            <div>
-                                                <input type="file" class="form-control form-control-sm mb-2"
-                                                    id="app_logo" name="app_logo"
-                                                    accept="image/png, image/jpeg, image/svg+xml">
-                                                <span class="fs-8 text-secondary">Recommended: 512x512px, transparent PNG or
-                                                    SVG.</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div
-                                            class="form-check form-switch p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center m-0">
-                                            <div>
-                                                <label class="form-check-label fw-medium d-block"
-                                                    for="maintenance_mode">Maintenance Mode</label>
-                                                <span class="fs-8 text-secondary">Turn off application access for
-                                                    users.</span>
-                                            </div>
-                                            <input class="form-check-input fs-4 m-0" type="checkbox" role="switch"
-                                                id="maintenance_mode" name="maintenance_mode">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Payment Settings -->
-                        <div class="tab-pane fade" id="payment">
-                            <div class="card border-0 shadow-sm rounded-4 glass p-4 mb-4">
-                                <h5 class="fw-bold mb-4">Midtrans Integration</h5>
-
-                                <div
-                                    class="alert bg-primary-subtle text-primary border-primary-subtle rounded-3 d-flex gap-3 align-items-center mb-4">
-                                    <i class="bi bi-info-circle-fill fs-4"></i>
-                                    <div>
-                                        <h6 class="mb-1 fw-bold">Sandbox Mode</h6>
-                                        <p class="mb-0 fs-7">Payments are currently operating in test mode. No real cards
-                                            will be charged.</p>
-                                    </div>
-                                </div>
-
-                                <div class="row g-4">
-                                    <div class="col-12">
-                                        <div class="form-floating">
-                                            <select class="form-select rounded-3" id="midtrans_environment"
-                                                name="midtrans_environment">
-                                                <option value="sandbox" selected>Sandbox (Testing)</option>
-                                                <option value="production">Production (Live)</option>
-                                            </select>
-                                            <label for="midtrans_environment">Environment</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="form-floating">
-                                            <input type="password" class="form-control rounded-3 font-monospace fs-7"
-                                                id="midtrans_server_key" name="midtrans_server_key"
-                                                value="SB-Mid-server-xxxxxxxxxxxxxx" placeholder="Server Key">
-                                            <label for="midtrans_server_key">Server Key</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control rounded-3 font-monospace fs-7"
-                                                id="midtrans_client_key" name="midtrans_client_key"
-                                                value="SB-Mid-client-xxxxxxxxxxxxxx" placeholder="Client Key">
-                                            <label for="midtrans_client_key">Client Key</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Mail Settings -->
-                        <div class="tab-pane fade" id="mail">
-                            <div class="card border-0 shadow-sm rounded-4 glass p-4 mb-4">
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <h5 class="fw-bold mb-0">SMTP Configuration</h5>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-                                        <i class="bi bi-send me-1"></i> Send Test Mail
-                                    </button>
-                                </div>
-
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control rounded-3" id="mail_host"
-                                                name="mail_host" value="smtp.mailgun.org" placeholder="Host">
-                                            <label for="mail_host">Mail Host</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-3">
-                                        <div class="form-floating">
-                                            <input type="number" class="form-control rounded-3" id="mail_port"
-                                                name="mail_port" value="587" placeholder="Port">
-                                            <label for="mail_port">Port</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-3">
-                                        <div class="form-floating">
-                                            <select class="form-select rounded-3" id="mail_encryption"
-                                                name="mail_encryption">
-                                                <option value="tls" selected>TLS</option>
-                                                <option value="ssl">SSL</option>
-                                                <option value="">None</option>
-                                            </select>
-                                            <label for="mail_encryption">Encryption</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control rounded-3" id="mail_username"
-                                                name="mail_username" value="postmaster@cooca.id" placeholder="Username">
-                                            <label for="mail_username">Username</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-floating">
-                                            <input type="password" class="form-control rounded-3" id="mail_password"
-                                                name="mail_password" value="********" placeholder="Password">
-                                            <label for="mail_password">Password</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-floating">
-                                            <input type="email" class="form-control rounded-3" id="mail_from_address"
-                                                name="mail_from_address" value="hello@cooca.id"
-                                                placeholder="From Address">
-                                            <label for="mail_from_address">From Address</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control rounded-3" id="mail_from_name"
-                                                name="mail_from_name" value="Cooca Support" placeholder="From Name">
-                                            <label for="mail_from_name">From Name</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Company Profile -->
-                        <div class="tab-pane fade" id="company">
-                            <div class="card border-0 shadow-sm rounded-4 glass p-4 mb-4">
-                                <h5 class="fw-bold mb-4">Company Details</h5>
-
-                                <div class="row g-4">
-                                    <div class="col-12">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control rounded-3" id="company_name"
-                                                name="company_name" value="PT Cooca Teknologi Indonesia"
-                                                placeholder="Company Legal Name">
-                                            <label for="company_name">Company Legal Name</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-floating">
-                                            <input type="email" class="form-control rounded-3" id="company_email"
-                                                name="company_email" value="contact@cooca.id"
-                                                placeholder="Contact Email">
-                                            <label for="company_email">Contact Email</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-floating">
-                                            <input type="text" class="form-control rounded-3" id="company_phone"
-                                                name="company_phone" value="+62 812 3456 7890"
-                                                placeholder="Contact Phone">
-                                            <label for="company_phone">Contact Phone</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="form-floating">
-                                            <textarea class="form-control rounded-3" id="company_address" name="company_address" placeholder="Physical Address"
-                                                style="height: 100px;">Gedung Cyber 1 Lt. 2, Jl. Kuningan Barat Raya No.8, Jakarta Selatan 12710</textarea>
-                                            <label for="company_address">Physical Address</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Form Actions Footer -->
-            <div class="d-flex justify-content-end mt-4 pt-4 border-top">
-                <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
-                    <i class="bi bi-check2-circle me-2"></i> Save Changes
-                </button>
-            </div>
-        </form>
     </div>
+
+    {{-- CONTACT TAB --}}
+    <div id="tab-contact" class="tab-content" style="display: none;">
+        <div class="card mb-6">
+            <div class="card-header">
+                <div class="card-title">Support Channels & Floating WhatsApp</div>
+            </div>
+            <div class="card-body">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Support Email</label>
+                        <input type="email" name="email_support" class="form-input" value="{{ $settings['email_support'] ?? '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">WhatsApp Number (e.g. 6281234567890)</label>
+                        <input type="text" name="whatsapp_number" class="form-input" value="{{ $settings['whatsapp_number'] ?? '' }}">
+                    </div>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label class="form-label">WhatsApp Direct Link</label>
+                    <input type="text" name="whatsapp_link" class="form-input" value="{{ $settings['whatsapp_link'] ?? '' }}">
+                </div>
+
+                <div class="form-group mt-4">
+                    <label class="form-label">Office Address</label>
+                    <textarea name="contact_address" class="form-textarea" rows="3">{{ $settings['contact_address'] ?? '' }}</textarea>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <div class="card-title mb-4">Social Media Links</div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label class="form-label">Instagram</label>
+                        <input type="text" name="social_instagram" class="form-input" value="{{ $settings['social_instagram'] ?? '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Facebook</label>
+                        <input type="text" name="social_facebook" class="form-input" value="{{ $settings['social_facebook'] ?? '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">YouTube</label>
+                        <input type="text" name="social_youtube" class="form-input" value="{{ $settings['social_youtube'] ?? '' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- AFFILIATE TAB --}}
+    <div id="tab-affiliate" class="tab-content" style="display: none;">
+        <div class="card mb-6">
+            <div class="card-header">
+                <div class="card-title">Commission Rates & Payout Rules</div>
+            </div>
+            <div class="card-body">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Level 1 Commission Rate (%)</label>
+                        <input type="number" step="0.1" name="affiliate_commission_l1" class="form-input" value="{{ $settings['affiliate_commission_l1'] ?? 25 }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Level 2 Commission Rate (%)</label>
+                        <input type="number" step="0.1" name="affiliate_commission_l2" class="form-input" value="{{ $settings['affiliate_commission_l2'] ?? 5 }}">
+                    </div>
+                </div>
+
+                <div class="grid-2 mt-4">
+                    <div class="form-group">
+                        <label class="form-label">Minimum Withdrawal Amount (IDR)</label>
+                        <input type="number" name="minimum_withdrawal" class="form-input" value="{{ $settings['minimum_withdrawal'] ?? 50000 }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bank Payout Admin Fee (IDR)</label>
+                        <input type="number" name="withdrawal_fee_bank" class="form-input" value="{{ $settings['withdrawal_fee_bank'] ?? 2500 }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- SEO TAB --}}
+    <div id="tab-seo" class="tab-content" style="display: none;">
+        <div class="card mb-6">
+            <div class="card-header">
+                <div class="card-title">Search Engine Optimization</div>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="google_no_follow" value="1" {{ !empty($settings['google_no_follow']) ? 'checked' : '' }}>
+                        <span class="font-bold">Discourage search engines from indexing this site (NoIndex)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6">
+        <button type="submit" class="btn btn-primary btn-lg">
+            <span>💾</span> Save All Settings
+        </button>
+    </div>
+</form>
+
 @endsection
+
+@push('scripts')
+<script>
+function switchTab(name, el) {
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).style.display = 'block';
+    el.classList.add('active');
+}
+</script>
+@endpush

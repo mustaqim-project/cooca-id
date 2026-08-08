@@ -17,6 +17,7 @@ final class AffiliateCommission extends Model
 
     protected $fillable = [
         'referred_by_id',
+        'affiliator_id',
         'transaction_id',
         'user_id',
         'invoice_id',
@@ -192,4 +193,3 @@ final class AffiliateCommission extends Model
         return number_format($this->commission_percent, 1) . '%';
     }
 }
-

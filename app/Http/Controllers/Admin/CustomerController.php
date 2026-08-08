@@ -34,7 +34,8 @@ final class CustomerController extends Controller
      */
     public function create()
     {
-        return view('admin.customers.create');
+        $affiliators = \App\Models\Affiliator::orderBy('name')->get();
+        return view('admin.customers.create', compact('affiliators'));
     }
 
     /**
@@ -51,7 +52,8 @@ final class CustomerController extends Controller
         // Load relationships for the view
         $customer->load([
             'subscriptions' => fn($q) => $q->with('product', 'subscriptionPlan')->latest(),
-            'licenses' => fn($q) => $q->with('product')->latest()
+            'licenses' => fn($q) => $q->with('product')->latest(),
+            'affiliator'
         ]);
 
         return view('admin.customers.show', [
@@ -70,8 +72,11 @@ final class CustomerController extends Controller
             abort(404, 'Customer not found');
         }
 
+        $affiliators = \App\Models\Affiliator::orderBy('name')->get();
+
         return view('admin.customers.edit', [
             'customer' => $customer,
+            'affiliators' => $affiliators,
         ]);
     }
 
@@ -86,9 +91,17 @@ final class CustomerController extends Controller
             'password' => 'required|min:8',
             'phone' => 'nullable|string',
             'business_name' => 'nullable|string',
+            'domain' => 'nullable|string|max:255',
+            'affiliator_id' => 'nullable|uuid|exists:affiliators,id',
+            'logo_path' => 'nullable|image|mimes:jpeg,jpg,png,gif,svg,webp|max:2048',
         ]);
         
         $data['password'] = \Illuminate\Support\Facades\Hash::make($data['password']);
+
+        if ($request->hasFile('logo_path')) {
+            $path = $request->file('logo_path')->store('customers/logos', 'public');
+            $data['logo_path'] = '/storage/' . $path;
+        }
 
         $this->customerRepository->create($data);
 
@@ -111,6 +124,9 @@ final class CustomerController extends Controller
             'email' => 'required|email|unique:customers,email,' . $id,
             'phone' => 'nullable|string',
             'business_name' => 'nullable|string',
+            'domain' => 'nullable|string|max:255',
+            'affiliator_id' => 'nullable|uuid|exists:affiliators,id',
+            'logo_path' => 'nullable|image|mimes:jpeg,jpg,png,gif,svg,webp|max:2048',
         ];
 
         if ($request->filled('password')) {
@@ -123,6 +139,15 @@ final class CustomerController extends Controller
             $data['password'] = \Illuminate\Support\Facades\Hash::make($data['password']);
         } else {
             unset($data['password']);
+        }
+
+        if ($request->hasFile('logo_path')) {
+            if ($customer->logo_path) {
+                $oldPath = str_replace('/storage/', '', $customer->logo_path);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
+            $path = $request->file('logo_path')->store('customers/logos', 'public');
+            $data['logo_path'] = '/storage/' . $path;
         }
 
         $this->customerRepository->update($id, $data);
@@ -139,6 +164,11 @@ final class CustomerController extends Controller
 
         if (!$customer) {
             return redirect()->route('admin.customers.index')->with('error', 'Customer not found.');
+        }
+
+        if ($customer->logo_path) {
+            $oldPath = str_replace('/storage/', '', $customer->logo_path);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
         }
 
         $this->customerRepository->delete($id);

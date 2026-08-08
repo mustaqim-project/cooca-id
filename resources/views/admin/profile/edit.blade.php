@@ -1,94 +1,85 @@
-@extends('admin.layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Profile Settings')
+@section('title', 'Profil & Pengaturan Keamanan Admin — COOCA.ID')
 
 @section('content')
-    <div class="d-flex flex-column gap-4">
-
-        <!-- Page Header -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-                <h2 class="mb-1 fw-bold">Profile Settings</h2>
-                <p class="text-secondary mb-0">Manage your account information and password.</p>
-            </div>
+<div class="page-header">
+    <div>
+        <div class="breadcrumb">
+            <a href="{{ route('admin.dashboard') }}">Admin</a>
+            <span>/</span>
+            <span>Profil & Keamanan</span>
         </div>
+        <h1 class="page-title">Profil & Pengaturan Keamanan</h1>
+    </div>
+</div>
 
-        <div class="row g-4">
-            <!-- Left: Profile Info -->
-            <div class="col-12 col-lg-6">
-                <div class="card border-0 shadow-sm rounded-4 glass p-4">
-                    <h5 class="fw-bold mb-4"><i class="bi bi-person me-2"></i> Account Information</h5>
+@if ($errors->any())
+    <div style="background: var(--danger-soft); color: var(--danger); padding: 14px 18px; border-radius: var(--radius-sm); border: 1px solid var(--danger); margin-bottom: 24px;">
+        <div style="font-weight: 700; margin-bottom: 6px;"><i class="fa-solid fa-triangle-exclamation me-1"></i> Terdapat kesalahan input:</div>
+        <ul style="margin: 0; padding-left: 20px;">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
-                    <form action="{{ route('admin.profile.update') }}" method="POST">
-                        @csrf
-                        @method('PUT')
-
-                        <div class="mb-3">
-                            <label for="name" class="form-label fw-medium">Name</label>
-                            <input type="text" class="form-control rounded-3 @error('name') is-invalid @enderror"
-                                id="name" name="name" value="{{ old('name', $admin->name) }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="email" class="form-label fw-medium">Email</label>
-                            <input type="email" class="form-control rounded-3 @error('email') is-invalid @enderror"
-                                id="email" name="email" value="{{ old('email', $admin->email) }}" required>
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
-                            <i class="bi bi-check2-circle me-2"></i> Update Profile
-                        </button>
-                    </form>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; max-width: 1000px;">
+    {{-- Profile Details --}}
+    <div class="card">
+        <div class="card-header" style="border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 16px;">
+            <h3 class="card-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-user-pen" style="color: var(--primary);"></i> Informsi Profil Admin
+            </h3>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.profile.update') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="form-group mb-3">
+                    <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Nama Admin</label>
+                    <input type="text" name="name" class="form-input" value="{{ old('name', auth('admin')->user()->name ?? 'Administrator') }}" required style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text);">
                 </div>
-            </div>
-
-            <!-- Right: Change Password -->
-            <div class="col-12 col-lg-6">
-                <div class="card border-0 shadow-sm rounded-4 glass p-4">
-                    <h5 class="fw-bold mb-4"><i class="bi bi-shield-lock me-2"></i> Change Password</h5>
-
-                    <form action="{{ route('admin.profile.password.update') }}" method="POST">
-                        @csrf
-                        @method('PUT')
-
-                        <div class="mb-3">
-                            <label for="current_password" class="form-label fw-medium">Current Password</label>
-                            <input type="password"
-                                class="form-control rounded-3 @error('current_password') is-invalid @enderror"
-                                id="current_password" name="current_password" required>
-                            @error('current_password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="password" class="form-label fw-medium">New Password</label>
-                            <input type="password" class="form-control rounded-3 @error('password') is-invalid @enderror"
-                                id="password" name="password" required minlength="8">
-                            <div class="form-text">Minimum 8 characters.</div>
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="password_confirmation" class="form-label fw-medium">Confirm New Password</label>
-                            <input type="password" class="form-control rounded-3" id="password_confirmation"
-                                name="password_confirmation" required>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
-                            <i class="bi bi-check2-circle me-2"></i> Update Password
-                        </button>
-                    </form>
+                <div class="form-group mb-3">
+                    <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Alamat Email</label>
+                    <input type="email" name="email" class="form-input" value="{{ old('email', auth('admin')->user()->email ?? 'admin@cooca.id') }}" required style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text);">
                 </div>
-            </div>
+                <button type="submit" class="btn btn-primary w-full mt-3" style="width: 100%; padding: 10px; border-radius: var(--radius-sm); background: var(--primary); color: #fff; font-weight: 600; border: none; cursor: pointer;">
+                    <i class="fa-solid fa-floppy-disk me-1"></i> Simpan Perubahan Profil
+                </button>
+            </form>
         </div>
     </div>
+
+    {{-- Change Password --}}
+    <div class="card">
+        <div class="card-header" style="border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 16px;">
+            <h3 class="card-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-key" style="color: var(--warning);"></i> Ganti Password
+            </h3>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.profile.password.update') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="form-group mb-3">
+                    <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Password Saat Ini</label>
+                    <input type="password" name="current_password" class="form-input" required style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text);">
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Password Baru</label>
+                    <input type="password" name="password" class="form-input" minlength="8" required style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text);">
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Konfirmasi Password Baru</label>
+                    <input type="password" name="password_confirmation" class="form-input" minlength="8" required style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text);">
+                </div>
+                <button type="submit" class="btn btn-primary w-full mt-3" style="width: 100%; padding: 10px; border-radius: var(--radius-sm); background: var(--primary); color: #fff; font-weight: 600; border: none; cursor: pointer;">
+                    <i class="fa-solid fa-lock me-1"></i> Perbarui Password
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection

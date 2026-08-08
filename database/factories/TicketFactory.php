@@ -3,6 +3,9 @@
 namespace Database\Factories;
 
 use App\Models\Ticket;
+use App\Models\Customer;
+use App\Models\Affiliator;
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -20,79 +23,35 @@ class TicketFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
+            'customer_id' => Customer::inRandomOrder()->first()?->id ?? Customer::factory(),
+            'affiliator_id' => null,
+            'admin_id' => null,
             'ticket_number' => 'TKT-' . strtoupper(Str::random(8)),
-            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? null,
-            'referred_by_id' => \App\Models\User::inRandomOrder()->first()?->id ?? null,
-            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? null,
             'subject' => fake()->sentence(),
+            'description' => fake()->paragraphs(3, true),
             'priority' => fake()->randomElement(['low', 'medium', 'high', 'urgent']),
             'status' => fake()->randomElement(['open', 'in_progress', 'resolved', 'closed']),
-            'category' => fake()->randomElement(['technical', 'billing', 'sales', 'general', 'complaint']),
-            'resolved_at' => null,
-            'closed_at' => null,
+            'referred_by_id' => null,
         ];
     }
 
     /**
-     * Indicate that the ticket is open.
+     * Indicate that the ticket is for a customer.
      */
-    public function open(): static
+    public function forCustomer(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'open',
+        return $this->state(fn(array $attributes) => [
+            'customer_id' => Customer::factory(),
         ]);
     }
 
     /**
-     * Indicate that the ticket is in progress.
+     * Indicate that the ticket is for an affiliator.
      */
-    public function inProgress(): static
+    public function forAffiliator(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'in_progress',
-        ]);
-    }
-
-    /**
-     * Indicate that the ticket is resolved.
-     */
-    public function resolved(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'resolved',
-            'resolved_at' => now(),
-        ]);
-    }
-
-    /**
-     * Indicate that the ticket is closed.
-     */
-    public function closed(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'closed',
-            'resolved_at' => now()->subDays(5),
-            'closed_at' => now(),
-        ]);
-    }
-
-    /**
-     * Indicate that the ticket is from a customer.
-     */
-    public function fromCustomer(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'user_id' => \App\Models\User::factory(),
-        ]);
-    }
-
-    /**
-     * Indicate that the ticket is from an affiliator.
-     */
-    public function fromAffiliator(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'referred_by_id' => \App\Models\User::factory(),
+        return $this->state(fn(array $attributes) => [
+            'referred_by_id' => Affiliator::factory(),
         ]);
     }
 
@@ -101,8 +60,19 @@ class TicketFactory extends Factory
      */
     public function assignedToAdmin(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'user_id' => \App\Models\User::factory(),
+        return $this->state(fn(array $attributes) => [
+            'admin_id' => Admin::factory(),
+            'status' => 'in_progress',
+        ]);
+    }
+
+    /**
+     * Indicate that the ticket is published.
+     */
+    public function published(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'published_at' => now(),
         ]);
     }
 }

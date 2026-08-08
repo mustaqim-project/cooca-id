@@ -57,6 +57,20 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{ route('admin.deals.index') }}"
+                    class="nav-link d-flex align-items-center gap-3 rounded-3 px-3 py-2 text-decoration-none {{ request()->routeIs('admin.deals.*') || request()->routeIs('admin.pipelines.*') || request()->routeIs('admin.stages.*') ? 'bg-primary text-white fw-medium' : 'text-secondary hover-lift' }}">
+                    <i class="bi bi-funnel fs-5"></i>
+                    <span class="sidebar-text flex-grow-1">Deals (Kanban)</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.projects.index') }}"
+                    class="nav-link d-flex align-items-center gap-3 rounded-3 px-3 py-2 text-decoration-none {{ request()->routeIs('admin.projects.*') ? 'bg-primary text-white fw-medium' : 'text-secondary hover-lift' }}">
+                    <i class="bi bi-kanban fs-5"></i>
+                    <span class="sidebar-text">Custom Projects</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('admin.products.index') }}"
                     class="nav-link d-flex align-items-center gap-3 rounded-3 px-3 py-2 text-decoration-none {{ request()->routeIs('admin.products.*') ? 'bg-primary text-white fw-medium' : 'text-secondary hover-lift' }}">
                     <i class="bi bi-box-seam fs-5"></i>
@@ -233,6 +247,13 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{ route('admin.blocked-ips.index') }}"
+                    class="nav-link d-flex align-items-center gap-3 rounded-3 px-3 py-2 text-decoration-none {{ request()->routeIs('admin.blocked-ips.*') ? 'bg-primary text-white fw-medium' : 'text-secondary hover-lift' }}">
+                    <i class="bi bi-shield-lock fs-5"></i>
+                    <span class="sidebar-text">Blocked IPs</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('admin.profile.edit') }}"
                     class="nav-link d-flex align-items-center gap-3 rounded-3 px-3 py-2 text-decoration-none {{ request()->routeIs('admin.profile.*') ? 'bg-primary text-white fw-medium' : 'text-secondary hover-lift' }}">
                     <i class="bi bi-person fs-5"></i>
@@ -273,7 +294,8 @@
     }
 
     .sidebar-collapsed .sidebar-text,
-    .sidebar-collapsed #sidebar-menu-search {
+    .sidebar-collapsed #sidebar-menu-search,
+    .sidebar-collapsed .sidebar-heading {
         display: none !important;
     }
 
@@ -283,13 +305,29 @@
         padding-right: 0 !important;
     }
 
+    .sidebar-nav .nav-link {
+        transition: var(--transition-fast);
+        border: 1px solid transparent;
+    }
+
     .hover-lift:hover {
-        background: rgba(var(--color-primary-rgb), 0.05);
+        background: rgba(15, 23, 42, 0.04);
         color: var(--color-primary) !important;
+        transform: translateX(4px);
+    }
+    
+    .bg-primary.text-white {
+        background-color: var(--color-primary) !important;
+        box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1);
     }
 
     .fs-7 {
         font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+    
+    #sidebar {
+        background-color: var(--color-surface);
     }
 </style>
 

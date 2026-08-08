@@ -33,6 +33,7 @@ final class License extends Model
     protected $table = 'licenses';
 
     protected $fillable = [
+        'customer_id',
         'user_id',
         'product_id',
         'subscription_plan_id',

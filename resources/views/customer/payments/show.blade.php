@@ -1,96 +1,54 @@
-@extends('customer.layouts.app')
-
+@extends('layouts.customer')
 @section('title', 'Payment Details')
-
+@section('breadcrumb')
+    <a href="{{ route('customer.payments.index') }}" class="crumb-link">Payments</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <span class="crumb-current">Details</span>
+@endsection
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-12 col-xl-10">
-            <!-- Header -->
-            <div class="d-flex align-items-center mb-4">
-                <a href="{{ route('customer.payments.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-3">
-                    <i class="bi bi-arrow-left me-1"></i> Back
-                </a>
-                <div>
-                    <h2 class="mb-1 fw-bold">Payment Details</h2>
-                    <p class="text-secondary mb-0">View details for transaction {{ $payment->invoice_number ?? $payment->id }}</p>
-                </div>
-            </div>
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-receipt" style="color:var(--primary);margin-right:10px;"></i>Transaction Details</h1>
+        <p class="page-subtitle">ID: {{ $payment->order_id ?? $payment->id }}</p>
+    </div>
+    <a href="{{ route('customer.payments.index') }}" class="btn btn-outline">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+</div>
 
-            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden">
-                <!-- Status Header -->
-                <div class="card-header bg-transparent border-bottom border-light p-4 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-semibold"><i class="bi bi-shield-check me-2"></i> Transaction Status</h5>
-                    
-                    <div>
-                        @php
-                            $statusClass = match($payment->status) {
-                                'paid', 'settlement', 'capture' => 'success',
-                                'pending' => 'warning',
-                                'failed', 'deny', 'cancel', 'expire' => 'danger',
-                                'refunded' => 'info',
-                                default => 'secondary'
-                            };
-                        @endphp
-                        <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-4 py-2 fs-6">
-                            {{ strtoupper($payment->status) }}
-                        </span>
-                    </div>
-                </div>
-                
-                <!-- Details Body -->
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush border-0">
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Transaction ID</div>
-                            <div class="fw-semibold text-dark font-monospace">{{ $payment->id }}</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Order ID / Invoice</div>
-                            <div class="fw-semibold text-dark font-monospace">{{ $payment->invoice_number ?? '-' }}</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Gross Amount</div>
-                            <div class="fw-bolder text-primary fs-5">Rp {{ number_format($payment->gross_amount, 0, ',', '.') }}</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Payment Method</div>
-                            <div class="text-dark">
-                                {{ strtoupper($payment->payment_type ?? 'Waiting for payment') }}
-                                @if($payment->bank)
-                                    <span class="text-secondary ms-1">({{ $payment->bank }})</span>
-                                @endif
-                            </div>
-                        </li>
-                        @if($payment->payment_url && $payment->status == 'pending')
-                            <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                                <div class="fw-medium text-secondary" style="width: 250px;">Payment Link</div>
-                                <div class="text-dark">
-                                    <a href="{{ $payment->payment_url }}" target="_blank" class="text-primary hover-lift text-decoration-none">
-                                        {{ $payment->payment_url }}
-                                    </a>
-                                </div>
-                            </li>
-                        @endif
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Created At</div>
-                            <div class="text-dark">{{ $payment->created_at->format('F d, Y - H:i:s') }}</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Last Updated</div>
-                            <div class="text-dark">{{ $payment->updated_at->format('F d, Y - H:i:s') }}</div>
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Action Buttons -->
-                @if($payment->status == 'pending' && $payment->payment_url)
-                    <div class="card-footer bg-transparent border-top border-light p-4 d-flex justify-content-end">
-                        <a href="{{ $payment->payment_url }}" class="btn btn-primary rounded-pill px-4 py-2 hover-lift fw-medium">
-                            <i class="bi bi-credit-card me-2"></i> Complete Payment
-                        </a>
-                    </div>
-                @endif
-            </div>
+<div class="card" style="max-width:640px;margin:0 auto;">
+    <div class="card-header">
+        <div class="card-title">Transaction Summary</div>
+        @if(in_array($payment->status, ['paid', 'settlement', 'success'])) <span class="badge badge-success">SUCCESS</span>
+        @elseif($payment->status === 'pending') <span class="badge badge-warning">PENDING</span>
+        @else <span class="badge badge-danger">{{ strtoupper($payment->status) }}</span>
+        @endif
+    </div>
+    <div class="card-body">
+        <div class="stats-row">
+            <span class="text-sm text-muted">Order ID</span>
+            <span class="font-mono text-sm font-bold">{{ $payment->order_id ?? $payment->id }}</span>
+        </div>
+        <div class="stats-row">
+            <span class="text-sm text-muted">Gross Amount</span>
+            <span class="font-bold text-base" style="color:var(--primary);">Rp {{ number_format($payment->gross_amount ?? $payment->amount, 0, ',', '.') }}</span>
+        </div>
+        <div class="stats-row">
+            <span class="text-sm text-muted">Payment Type</span>
+            <span class="text-sm font-semibold">{{ strtoupper($payment->payment_type ?? 'Bank Transfer / QRIS') }}</span>
+        </div>
+        <div class="stats-row">
+            <span class="text-sm text-muted">Transaction Date</span>
+            <span class="text-sm">{{ $payment->created_at->format('d M Y H:i:s') }}</span>
         </div>
     </div>
+    @if($payment->status === 'failed' && $payment->created_at->diffInHours(now()) <= 24 && $payment->subscription_id)
+    <div class="card-footer" style="padding:15px 20px; border-top:1px solid var(--border-color); text-align:right;">
+        <p class="text-sm text-muted mb-3 text-left">Pembayaran gagal. Anda dapat mengulangi pembayaran dalam waktu 24 jam sejak transaksi dibuat.</p>
+        <a href="{{ route('customer.subscriptions.checkout', $payment->subscription_id) }}" class="btn btn-primary">
+            <i class="fa-solid fa-rotate-right"></i> Ulangi Pembayaran
+        </a>
+    </div>
+    @endif
+</div>
 @endsection

@@ -28,14 +28,14 @@
         <div class="content">
             <div class="warning-icon">⏰</div>
             <h2 style="text-align: center;">Subscription akan Berakhir</h2>
-            
+
             <p>Halo {{ $customerName }},</p>
             <p>Subscription Anda untuk <strong>{{ $productName }}</strong> akan segera berakhir.</p>
-            
+
             <div style="text-align: center; margin: 20px 0;">
                 <span class="days-badge">{{ $daysUntilExpiry }} Hari Lagi</span>
             </div>
-            
+
             <div class="info-box">
                 <div class="info-row">
                     <span class="label">Produk</span>
@@ -46,13 +46,13 @@
                     <span class="value">{{ $expiresAt }}</span>
                 </div>
             </div>
-            
+
             <p>Perpanjang subscription Anda sekarang untuk menghindari gangguan layanan.</p>
-            
+
             <p style="text-align: center;">
                 <a href="{{ $renewalUrl }}" class="btn">Perpanjang Sekarang</a>
             </p>
-            
+
             <div class="footer">
                 <p>Jika Anda memiliki pertanyaan, silakan hubungi tim support kami.</p>
                 <p>&copy; {{ date('Y') }} COOCA.ID. All rights reserved.</p>

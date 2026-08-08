@@ -1,327 +1,322 @@
-@extends('admin.layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Create Product')
+@section('title', 'Add New Product — COOCA.ID Admin')
 
 @section('content')
-    <div class="d-flex flex-column gap-4" style="max-width: 900px; margin: 0 auto;">
+<div class="page-header">
+    <div>
+        <div class="breadcrumb">
+            <a href="{{ route('admin.dashboard') }}">Admin</a>
+            <span>/</span>
+            <a href="{{ route('admin.products.index') }}">Products</a>
+            <span>/</span>
+            <span>Create</span>
+        </div>
+        <h1 class="page-title">Add New SaaS Product</h1>
+        <p class="page-subtitle">Configure software details, features, technology stack, and initial setup.</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ route('admin.products.index') }}" class="btn btn-outline">← Back to Products</a>
+    </div>
+</div>
 
-        <!-- Header -->
-        <div class="d-flex align-items-center gap-3">
-            <a href="{{ route('admin.products.index') }}"
-                class="btn btn-light border-0 rounded-circle p-2 shadow-sm hover-lift"><i class="bi bi-arrow-left"></i></a>
-            <div>
-                <h2 class="mb-1 fw-bold">Create Product</h2>
-                <p class="text-secondary mb-0">Fill in the details to create a new software product or service.</p>
+<form action="{{ route('admin.products.store') }}" method="POST" class="grid-31" enctype="multipart/form-data">
+    @csrf
+    
+    <div class="flex-col gap-5">
+        {{-- Main Info --}}
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Product Details</div>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label class="form-label">Product Name *</label>
+                <input type="text" name="name" class="form-input" placeholder="e.g. COOCA POS Pro" value="{{ old('name') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Category *</label>
+                <select name="product_category_id" class="form-select" required>
+                    <option value="">Select Category</option>
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}" {{ old('product_category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Product Type *</label>
+                    <select name="product_type" class="form-select" required>
+                        @foreach(\App\Models\Product::TYPES as $key => $val)
+                            <option value="{{ $key }}" {{ old('product_type', 'saas') == $key ? 'selected' : '' }}>{{ $val }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">License Type</label>
+                    <select name="license_type" class="form-select">
+                        <option value="">None / Default</option>
+                        @foreach(\App\Models\Product::LICENSE_TYPES as $key => $val)
+                            <option value="{{ $key }}" {{ old('license_type') == $key ? 'selected' : '' }}>{{ $val }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Current Version</label>
+                    <input type="text" name="version" class="form-input" placeholder="e.g. 1.0.0" value="{{ old('version') }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Max Domains allowed</label>
+                    <input type="number" name="max_domains" class="form-input" placeholder="1" value="{{ old('max_domains', 1) }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Short Description</label>
+                <input type="text" name="short_description" class="form-input" placeholder="Brief elevator pitch for product list..." value="{{ old('short_description') }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Full Specification & Overview</label>
+                <textarea name="description" class="form-textarea" rows="6" placeholder="Detailed product features, system capabilities, hardware specs...">{{ old('description') }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">System Requirements</label>
+                <textarea name="requirements" class="form-textarea" rows="3" placeholder="System requirements, e.g. PHP >= 8.2, MySQL >= 8.0">{{ old('requirements') }}</textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Base Price (IDR)</label>
+                    <input type="number" name="base_price" class="form-input" placeholder="0" value="{{ old('base_price', 0) }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Setup Fee (IDR)</label>
+                    <input type="number" name="setup_fee" class="form-input" placeholder="0" value="{{ old('setup_fee', 0) }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Maintenance Fee (IDR)</label>
+                    <input type="number" name="maintenance_fee" class="form-input" placeholder="0" value="{{ old('maintenance_fee', 0) }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Sort Order</label>
+                <input type="number" name="sort_order" class="form-input" value="{{ old('sort_order', 0) }}">
             </div>
         </div>
-
-        <form action="{{ route('admin.products.store') }}" method="POST" id="productForm" class="d-flex flex-column gap-4">
-            @csrf
-
-            <div class="row g-4">
-                <!-- Left Column -->
-                <div class="col-lg-8">
-                    <!-- Basic Info -->
-                    <div class="card border-0 shadow-sm rounded-4 glass">
-                        <div class="card-header bg-transparent border-bottom border-light p-4">
-                            <h5 class="fw-bold mb-0"><i class="bi bi-box me-2 text-primary"></i>Basic Info</h5>
-                        </div>
-                        <div class="card-body p-4">
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="text-secondary fs-7 mb-1 d-block">Product Name <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text"
-                                        class="form-control rounded-3 shadow-none border bg-transparent @error('name') is-invalid @enderror"
-                                        name="name" value="{{ old('name') }}" placeholder="e.g. Cooca Pro" required>
-                                    @error('name')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-12">
-                                    <label class="text-secondary fs-7 mb-1 d-block">Description <span
-                                            class="text-danger">*</span></label>
-                                    <textarea class="form-control rounded-3 shadow-none border bg-transparent @error('description') is-invalid @enderror"
-                                        name="description" rows="4" placeholder="Describe the product...">{{ old('description') }}</textarea>
-                                    @error('description')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="text-secondary fs-7 mb-1 d-block">Product Type <span
-                                            class="text-danger">*</span></label>
-                                    <select
-                                        class="form-select rounded-3 shadow-none border bg-transparent @error('product_type') is-invalid @enderror"
-                                        name="product_type" id="productType" required>
-                                        @foreach (\App\Models\Product::TYPES as $key => $label)
-                                            <option value="{{ $key }}"
-                                                {{ old('product_type', 'saas') === $key ? 'selected' : '' }}>
-                                                {{ $label }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('product_type')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="text-secondary fs-7 mb-1 d-block">Category</label>
-                                    <select
-                                        class="form-select rounded-3 shadow-none border bg-transparent @error('category_id') is-invalid @enderror"
-                                        name="category_id">
-                                        <option value="">— No Category —</option>
-                                        @foreach ($categories as $cat)
-                                            <option value="{{ $cat->id }}"
-                                                {{ old('category_id') == $cat->id ? 'selected' : '' }}>
-                                                {{ $cat->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('category_id')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="text-secondary fs-7 mb-1 d-block">Status</label>
-                                    <div class="d-flex align-items-center gap-3 mt-2">
-                                        <div class="form-check form-switch mb-0">
-                                            <input class="form-check-input" type="checkbox" name="is_active" value="1"
-                                                {{ old('is_active', '1') ? 'checked' : '' }}>
-                                        </div>
-                                        <span class="text-muted" style="font-size:.9rem;">Active</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Business Fields (conditional) -->
-                    <div class="card border-0 shadow-sm rounded-4 glass mt-4" id="businessFieldsCard">
-                        <div class="card-header bg-transparent border-bottom border-light p-4">
-                            <h5 class="fw-bold mb-0"><i class="bi bi-gear me-2 text-primary"></i>Business Configuration</h5>
-                        </div>
-                        <div class="card-body p-4">
-                            <div class="row g-3">
-                                {{-- License fields: shown for license, lifetime, saas --}}
-                                <div class="col-md-6 field-license">
-                                    <label class="text-secondary fs-7 mb-1 d-block">License Type</label>
-                                    <select
-                                        class="form-select rounded-3 shadow-none border bg-transparent @error('license_type') is-invalid @enderror"
-                                        name="license_type">
-                                        <option value="">— None —</option>
-                                        @foreach (\App\Models\Product::LICENSE_TYPES as $key => $label)
-                                            <option value="{{ $key }}"
-                                                {{ old('license_type') === $key ? 'selected' : '' }}>
-                                                {{ $label }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('license_type')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-3 field-license">
-                                    <label class="text-secondary fs-7 mb-1 d-block">Max Domains</label>
-                                    <input type="number" name="max_domains"
-                                        class="form-control rounded-3 shadow-none border bg-transparent"
-                                        value="{{ old('max_domains', 1) }}" min="1">
-                                </div>
-                                <div class="col-md-3 field-version">
-                                    <label class="text-secondary fs-7 mb-1 d-block">Version</label>
-                                    <input type="text" name="version"
-                                        class="form-control rounded-3 shadow-none border bg-transparent"
-                                        value="{{ old('version') }}" placeholder="e.g. 1.0.0">
-                                </div>
-                                {{-- Fees: shown for custom_dev, project, maintenance --}}
-                                <div class="col-md-6 field-fees">
-                                    <label class="text-secondary fs-7 mb-1 d-block">Setup Fee (Rp)</label>
-                                    <input type="number" name="setup_fee"
-                                        class="form-control rounded-3 shadow-none border bg-transparent"
-                                        value="{{ old('setup_fee', 0) }}" min="0" step="100">
-                                </div>
-                                <div class="col-md-6 field-fees">
-                                    <label class="text-secondary fs-7 mb-1 d-block">Maintenance Fee (Rp)</label>
-                                    <input type="number" name="maintenance_fee"
-                                        class="form-control rounded-3 shadow-none border bg-transparent"
-                                        value="{{ old('maintenance_fee', 0) }}" min="0" step="100">
-                                </div>
-                                {{-- Requirements: shown for custom_dev, project --}}
-                                <div class="col-12 field-requirements">
-                                    <label class="text-secondary fs-7 mb-1 d-block">Requirements</label>
-                                    <textarea class="form-control rounded-3 shadow-none border bg-transparent" name="requirements" rows="3"
-                                        placeholder="System or project requirements...">{{ old('requirements') }}</textarea>
-                                </div>
-                                {{-- Bundle flag --}}
-                                <div class="col-12 field-bundle">
-                                    <div class="form-check form-switch mb-0">
-                                        <input class="form-check-input" type="checkbox" name="is_bundleable"
-                                            value="1" {{ old('is_bundleable') ? 'checked' : '' }}>
-                                        <label class="text-muted" style="font-size:.85rem;">Can be bundled with other
-                                            products</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pricing Plans -->
-                    <div class="card border-0 shadow-sm rounded-4 glass mt-4">
-                        <div
-                            class="card-header bg-transparent border-bottom border-light p-4 d-flex justify-content-between align-items-center">
-                            <h5 class="fw-bold mb-0"><i class="bi bi-tags me-2 text-primary"></i>Pricing Plans</h5>
-                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" id="addPlanBtn">
-                                <i class="bi bi-plus me-1"></i>Add Plan
-                            </button>
-                        </div>
-                        <div class="card-body p-4">
-                            <div id="plansContainer"></div>
-                            <div id="plansEmpty" class="text-center text-secondary py-4">
-                                <i class="bi bi-tags fs-3 d-block mb-2 opacity-50"></i>
-                                <p class="fs-7 mb-0">No plans yet. Click "Add Plan" to create pricing tiers.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column -->
-                <div class="col-lg-4">
-                    <!-- Base Pricing -->
-                    <div class="card border-0 shadow-sm rounded-4 glass">
-                        <div class="card-header bg-transparent border-bottom border-light p-4">
-                            <h5 class="fw-bold mb-0"><i class="bi bi-currency-dollar me-2 text-primary"></i>Base Pricing
-                            </h5>
-                        </div>
-                        <div class="card-body p-4">
-                            <label class="text-secondary fs-7 mb-1 d-block">Base Price (Rp)</label>
-                            <input type="number" name="base_price"
-                                class="form-control rounded-3 shadow-none border bg-transparent @error('base_price') is-invalid @enderror"
-                                value="{{ old('base_price', 0) }}" min="0" step="100" placeholder="0">
-                            @error('base_price')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <!-- Integration -->
-                    <div class="card border-0 shadow-sm rounded-4 glass mt-4">
-                        <div class="card-header bg-transparent border-bottom border-light p-4">
-                            <h5 class="fw-bold mb-0"><i class="bi bi-link-45deg me-2 text-primary"></i>Integration</h5>
-                        </div>
-                        <div class="card-body p-4">
-                            <label class="text-secondary fs-7 mb-1 d-block">Demo URL</label>
-                            <input type="url" name="demo_url"
-                                class="form-control rounded-3 shadow-none border bg-transparent @error('demo_url') is-invalid @enderror"
-                                value="{{ old('demo_url') }}" placeholder="https://...">
-                            @error('demo_url')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-
-                            <label class="text-secondary fs-7 mb-1 d-block mt-3">Webhook URL</label>
-                            <input type="url" name="webhook_url"
-                                class="form-control rounded-3 shadow-none border bg-transparent @error('webhook_url') is-invalid @enderror"
-                                value="{{ old('webhook_url') }}" placeholder="https://...">
-                            @error('webhook_url')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift flex-fill">
-                            <i class="bi bi-check2 me-2"></i> Save Product
-                        </button>
-                        <a href="{{ route('admin.products.index') }}"
-                            class="btn btn-light border rounded-pill px-4">Cancel</a>
-                    </div>
-                </div>
-            </div>
-        </form>
+        </div>
     </div>
+
+    {{-- Product Features --}}
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Product Features</div>
+        </div>
+        <div class="card-body">
+            <div id="features-container" class="flex-col gap-3">
+                @if(old('features'))
+                    @foreach(old('features') as $index => $feature)
+                        <div class="feature-item grid-31" style="align-items: start; gap: 10px; background: var(--background); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                            <div class="flex-col gap-2">
+                                <input type="text" name="features[{{ $index }}][title]" class="form-input" placeholder="Feature Title" value="{{ $feature['title'] ?? '' }}" required>
+                                <input type="text" name="features[{{ $index }}][description]" class="form-input" placeholder="Feature Description" value="{{ $feature['description'] ?? '' }}">
+                            </div>
+                            <div class="flex-col gap-2 icon-picker-wrapper" style="position: relative;">
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <div class="icon-preview-box" style="width: 38px; height: 38px; border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; background: var(--surface); cursor: pointer;" title="Click to pick icon">
+                                        <i class="{{ $feature['icon'] ?? 'fa-solid fa-sparkles' }}"></i>
+                                    </div>
+                                    <input type="text" name="features[{{ $index }}][icon]" class="form-input icon-input" placeholder="Icon Class" value="{{ $feature['icon'] ?? 'fa-solid fa-sparkles' }}" style="flex: 1;">
+                                </div>
+                                <div class="icon-grid-dropdown" style="display: none; position: absolute; top: 44px; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; width: 240px; grid-template-columns: repeat(5, 1fr); gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 10;">
+                                </div>
+                                <button type="button" class="btn btn-outline btn-remove-feature w-full" style="color: var(--danger); border-color: var(--danger); padding: 6px 12px; font-size: 12px;">Remove</button>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="feature-item grid-31" style="align-items: start; gap: 10px; background: var(--background); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                        <div class="flex-col gap-2">
+                            <input type="text" name="features[0][title]" class="form-input" placeholder="Feature Title" required>
+                            <input type="text" name="features[0][description]" class="form-input" placeholder="Feature Description">
+                        </div>
+                        <div class="flex-col gap-2 icon-picker-wrapper" style="position: relative;">
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <div class="icon-preview-box" style="width: 38px; height: 38px; border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; background: var(--surface); cursor: pointer;" title="Click to pick icon">
+                                    <i class="fa-solid fa-sparkles"></i>
+                                </div>
+                                <input type="text" name="features[0][icon]" class="form-input icon-input" placeholder="Icon Class" value="fa-solid fa-sparkles" style="flex: 1;">
+                            </div>
+                            <div class="icon-grid-dropdown" style="display: none; position: absolute; top: 44px; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; width: 240px; grid-template-columns: repeat(5, 1fr); gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 10;">
+                            </div>
+                            <button type="button" class="btn btn-outline btn-remove-feature w-full" style="color: var(--danger); border-color: var(--danger); padding: 6px 12px; font-size: 12px;">Remove</button>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            <button type="button" id="btn-add-feature" class="btn btn-outline mt-3 w-full border-dashed" style="justify-content: center;">
+                <i class="fa-solid fa-plus"></i> Add Feature
+            </button>
+        </div>
+    </div>
+
+    </div> <!-- Close left column -->
+
+    {{-- Sidebar Config --}}
+    <div class="flex-col gap-5">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Publishing & Status</div>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select name="is_active" class="form-select">
+                        <option value="1" {{ old('is_active', '1') == '1' ? 'selected' : '' }}>Active (Visible on Landing)</option>
+                        <option value="0" {{ old('is_active') == '0' ? 'selected' : '' }}>Inactive / Draft</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Featured Badge</label>
+                    <select name="is_featured" class="form-select">
+                        <option value="0">Standard Product</option>
+                        <option value="1">Featured / Popular Product</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-top: 12px;">
+                    <label class="form-label">Bundle Options</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" name="is_bundleable" value="1" id="is_bundleable" {{ old('is_bundleable') ? 'checked' : '' }}>
+                        <label for="is_bundleable" style="cursor: pointer; font-size: 14px; color: var(--text);">Can be included in bundles</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Product Thumbnail</label>
+                    <input type="file" name="thumbnail" class="form-input" accept="image/*" style="padding: 10px;">
+                    <small style="color: var(--text-muted); font-size: 12px; margin-top: 4px; display: block;">Upload the main image for this product (Max 2MB).</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full mt-4">
+                    <span>💾</span> Save Product
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
 @endsection
 
 @push('scripts')
-    <script>
-        (function() {
-            // === Product Type conditional fields ===
-            const typeFieldMap = {
-                license: ['saas', 'lifetime', 'license'],
-                version: ['saas', 'lifetime', 'license', 'addon'],
-                fees: ['custom_dev', 'project', 'maintenance'],
-                requirements: ['custom_dev', 'project'],
-                bundle: ['saas', 'lifetime', 'license', 'addon', 'subscription'],
-            };
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('features-container');
+        const btnAdd = document.getElementById('btn-add-feature');
+        let featureIndex = container.children.length;
 
-            function toggleBusinessFields() {
-                const type = document.getElementById('productType').value;
-                Object.entries(typeFieldMap).forEach(([field, types]) => {
-                    const show = types.includes(type);
-                    document.querySelectorAll('.field-' + field).forEach(el => {
-                        el.style.display = show ? '' : 'none';
-                    });
-                });
-            }
+        const popularIcons = [
+            'fa-solid fa-sparkles', 'fa-solid fa-bolt', 'fa-solid fa-shield', 'fa-solid fa-star', 'fa-solid fa-check',
+            'fa-solid fa-rocket', 'fa-solid fa-chart-line', 'fa-solid fa-mobile-screen', 'fa-solid fa-users', 'fa-solid fa-headset',
+            'fa-solid fa-credit-card', 'fa-solid fa-globe', 'fa-solid fa-cloud', 'fa-solid fa-lock', 'fa-solid fa-server',
+            'fa-solid fa-code', 'fa-solid fa-bag-shopping', 'fa-solid fa-cart-shopping', 'fa-solid fa-bell', 'fa-solid fa-envelope',
+            'fa-solid fa-calendar', 'fa-solid fa-file-invoice', 'fa-solid fa-wallet', 'fa-solid fa-chart-pie', 'fa-solid fa-tags'
+        ];
 
-            document.getElementById('productType').addEventListener('change', toggleBusinessFields);
-            toggleBusinessFields();
+        function populateGrid(dropdown) {
+            if (dropdown.innerHTML.trim() !== '') return;
+            let html = '';
+            popularIcons.forEach(icon => {
+                html += `<div class="icon-option" data-icon="${icon}" style="display:flex; align-items:center; justify-content:center; padding:8px; border-radius:4px; cursor:pointer; background:rgba(0,0,0,0.05);" onmouseover="this.style.background='rgba(79,70,229,0.1)'" onmouseout="this.style.background='rgba(0,0,0,0.05)'"><i class="${icon}"></i></div>`;
+            });
+            dropdown.innerHTML = html;
+        }
 
-            // === Plans ===
-            let planCount = 0;
+        // Initialize existing dropdowns
+        document.querySelectorAll('.icon-grid-dropdown').forEach(populateGrid);
 
-            function updateEmpty() {
-                const container = document.getElementById('plansContainer');
-                const empty = document.getElementById('plansEmpty');
-                empty.style.display = container.children.length === 0 ? '' : 'none';
-            }
-
-            function addPlan() {
-                const idx = planCount++;
-                const container = document.getElementById('plansContainer');
-                const div = document.createElement('div');
-                div.className = 'p-3 mb-3 rounded-3 border';
-                div.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="fw-semibold" style="font-size:.9rem;color:var(--color-primary);">Plan #\${idx + 1}</span>
-                        <button type="button" class="btn btn-sm btn-light border-0 rounded-circle p-2" onclick="this.closest('[data-plan]').remove();updatePlanEmpty();" title="Remove">
-                            <i class="bi bi-trash3 text-danger"></i>
-                        </button>
+        btnAdd.addEventListener('click', function() {
+            const template = `
+                <div class="feature-item grid-31" style="align-items: start; gap: 10px; background: var(--background); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div class="flex-col gap-2">
+                        <input type="text" name="features[${featureIndex}][title]" class="form-input" placeholder="Feature Title" required>
+                        <input type="text" name="features[${featureIndex}][description]" class="form-input" placeholder="Feature Description">
                     </div>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="text-secondary fs-7 mb-1 d-block">Plan Name</label>
-                            <input type="text" name="plans[\${idx}][name]" class="form-control rounded-3 shadow-none border bg-transparent" placeholder="e.g. Starter" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-secondary fs-7 mb-1 d-block">Duration (months)</label>
-                            <input type="number" name="plans[\${idx}][duration_months]" class="form-control rounded-3 shadow-none border bg-transparent" value="1" min="1" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="text-secondary fs-7 mb-1 d-block">Price (Rp)</label>
-                            <input type="number" name="plans[\${idx}][price]" class="form-control rounded-3 shadow-none border bg-transparent" value="0" min="0" step="100" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="text-secondary fs-7 mb-1 d-block">Discount (%)</label>
-                            <input type="number" name="plans[\${idx}][discount_percent]" class="form-control rounded-3 shadow-none border bg-transparent" value="0" min="0" max="100" step="0.01">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="text-secondary fs-7 mb-1 d-block">Sort Order</label>
-                            <input type="number" name="plans[\${idx}][sort_order]" class="form-control rounded-3 shadow-none border bg-transparent" value="\${idx}">
-                        </div>
-                        <div class="col-12">
-                            <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" name="plans[\${idx}][is_active]" value="1" checked>
-                                <label class="text-muted" style="font-size:.85rem;">Active</label>
+                    <div class="flex-col gap-2 icon-picker-wrapper" style="position: relative;">
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div class="icon-preview-box" style="width: 38px; height: 38px; border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; background: var(--surface); cursor: pointer;" title="Click to pick icon">
+                                <i class="fa-solid fa-sparkles"></i>
                             </div>
+                            <input type="text" name="features[${featureIndex}][icon]" class="form-input icon-input" placeholder="Icon Class" value="fa-solid fa-sparkles" style="flex: 1;">
                         </div>
+                        <div class="icon-grid-dropdown" style="display: none; position: absolute; top: 44px; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; width: 240px; grid-template-columns: repeat(5, 1fr); gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 10;">
+                        </div>
+                        <button type="button" class="btn btn-outline btn-remove-feature w-full" style="color: var(--danger); border-color: var(--danger); padding: 6px 12px; font-size: 12px;">Remove</button>
                     </div>
-                `;
-                div.setAttribute('data-plan', idx);
-                container.appendChild(div);
-                updateEmpty();
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', template);
+            populateGrid(container.lastElementChild.querySelector('.icon-grid-dropdown'));
+            featureIndex++;
+        });
+
+        container.addEventListener('input', function(e) {
+            if (e.target.classList.contains('icon-input')) {
+                const wrapper = e.target.closest('.icon-picker-wrapper');
+                const previewIcon = wrapper.querySelector('.icon-preview-box i');
+                if (previewIcon) {
+                    previewIcon.className = e.target.value || 'fa-solid fa-sparkles';
+                }
+            }
+        });
+
+        container.addEventListener('click', function(e) {
+            // Remove button
+            if (e.target.closest('.btn-remove-feature')) {
+                e.target.closest('.feature-item').remove();
+                return;
             }
 
-            document.getElementById('addPlanBtn').addEventListener('click', addPlan);
-            window.updatePlanEmpty = updateEmpty;
-            updateEmpty();
-        })();
-    </script>
+            // Open Dropdown
+            const previewBox = e.target.closest('.icon-preview-box');
+            if (previewBox) {
+                const wrapper = previewBox.closest('.icon-picker-wrapper');
+                const dropdown = wrapper.querySelector('.icon-grid-dropdown');
+                
+                // Close all other dropdowns
+                document.querySelectorAll('.icon-grid-dropdown').forEach(d => {
+                    if (d !== dropdown) d.style.display = 'none';
+                });
+
+                dropdown.style.display = dropdown.style.display === 'grid' ? 'none' : 'grid';
+                return;
+            }
+
+            // Select Icon
+            const iconOption = e.target.closest('.icon-option');
+            if (iconOption) {
+                const iconClass = iconOption.getAttribute('data-icon');
+                const wrapper = iconOption.closest('.icon-picker-wrapper');
+                
+                wrapper.querySelector('.icon-input').value = iconClass;
+                wrapper.querySelector('.icon-preview-box i').className = iconClass;
+                wrapper.querySelector('.icon-grid-dropdown').style.display = 'none';
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.icon-picker-wrapper')) {
+                document.querySelectorAll('.icon-grid-dropdown').forEach(d => d.style.display = 'none');
+            }
+        });
+    });
+</script>
 @endpush

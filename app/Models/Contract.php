@@ -17,7 +17,7 @@ final class Contract extends Model
 
     protected $fillable = [
         'license_id',
-        'user_id',
+        'customer_id',
         'contract_number',
         'status',
         'pdf_path',
@@ -42,6 +42,16 @@ final class Contract extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function deals()
+    {
+        return $this->hasMany(Deal::class, 'contract_id');
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class, 'contract_id');
     }
 
     /**

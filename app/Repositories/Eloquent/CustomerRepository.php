@@ -56,12 +56,12 @@ final class CustomerRepository extends BaseRepository implements CustomerReposit
 
     public function getByAffiliator(string $affiliatorId): Collection
     {
-        return $this->model->where('referred_by_id', $affiliatorId)->get();
+        return $this->model->where('affiliator_id', $affiliatorId)->get();
     }
 
     public function countByAffiliator(string $affiliatorId): int
     {
-        return $this->model->where('referred_by_id', $affiliatorId)->count();
+        return $this->model->where('affiliator_id', $affiliatorId)->count();
     }
 
     public function getActiveCustomers(): Collection

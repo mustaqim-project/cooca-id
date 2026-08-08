@@ -2,114 +2,100 @@
 
 @section('title', 'Withdrawals')
 
+@section('breadcrumb')
+    <a href="{{ route('affiliator.dashboard') }}" class="crumb-link">Dashboard</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <span class="crumb-current">Withdrawals</span>
+@endsection
+
 @section('content')
-    <div class="d-flex flex-column gap-4">
-
-        <!-- Page Header & Toolbar -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-                <h2 class="mb-1 fw-bold">Withdrawals</h2>
-                <p class="text-secondary mb-0">Manage your payout requests and history.</p>
+<div class="portal-card mb-6">
+    <div class="portal-card-header" style="flex-wrap:wrap;gap:12px;">
+        <div>
+            <div class="portal-card-title">
+                <i class="fa-solid fa-building-columns" style="color:var(--primary);"></i>
+                Payout Requests & History
             </div>
-            <div class="d-flex gap-2">
-                <a href="{{ route('affiliator.withdrawals.create') }}" class="btn btn-primary rounded-pill px-4 hover-lift fw-medium">
-                    <i class="bi bi-wallet2 me-1"></i> Request Withdrawal
-                </a>
-            </div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Manage payout requests and track transfer statuses.</div>
         </div>
-
-        <!-- Withdrawals Table -->
-        <div class="card border-0 shadow-sm rounded-4 glass">
-            <div
-                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
-                    style="max-width: 320px; background: var(--color-bg);">
-                    <span class="input-group-text bg-transparent border-0 pe-1"><i
-                            class="bi bi-search text-secondary"></i></span>
-                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
-                        placeholder="Search withdrawals...">
-                </div>
-                
-                <div class="d-flex gap-2">
-                    <select class="form-select form-select-sm rounded-pill border-light bg-light text-secondary" style="width: 120px;">
-                        <option value="">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="completed">Completed</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
-                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
-                        <tr>
-                            <th class="py-3 px-4 border-0">Request ID</th>
-                            <th class="py-3 px-3 border-0">Date</th>
-                            <th class="py-3 px-3 border-0">Account</th>
-                            <th class="py-3 px-3 border-0 text-end">Amount</th>
-                            <th class="py-3 px-3 border-0 text-center">Status</th>
-                            <th class="py-3 px-4 border-0 text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="border-top-0">
-                        @forelse($withdrawals ?? [] as $withdrawal)
-                            <tr>
-                                <td class="py-3 px-4 fw-medium text-dark">
-                                    #{{ $withdrawal->id }}
-                                </td>
-                                <td class="py-3 px-3 text-secondary fs-7">
-                                    {{ $withdrawal->created_at->format('d M Y, H:i') }}
-                                </td>
-                                <td class="py-3 px-3">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="text-primary"><i class="bi bi-bank fs-5"></i></div>
-                                        <div>
-                                            <div class="fw-semibold text-dark" style="font-size: 0.8rem;">{{ strtoupper($withdrawal->withdrawal_method ?? 'BANK') }}</div>
-                                            <div class="text-secondary fs-7">{{ $withdrawal->account_number }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-3 fw-bold text-dark text-end">
-                                    Rp {{ number_format($withdrawal->amount, 0, ',', '.') }}
-                                </td>
-                                <td class="py-3 px-3 text-center">
-                                    @php
-                                        $statusClass = match($withdrawal->status) {
-                                            'completed', 'paid', 'approved' => 'success',
-                                            'pending' => 'warning',
-                                            'rejected', 'failed', 'cancelled' => 'danger',
-                                            default => 'secondary'
-                                        };
-                                    @endphp
-                                    <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-3 py-1">
-                                        {{ ucfirst($withdrawal->status) }}
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-end">
-                                    <a href="{{ route('affiliator.withdrawals.show', $withdrawal->id) }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift text-secondary">
-                                        Details
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="py-5 text-center text-secondary">
-                                    <div class="mb-3"><i class="bi bi-inbox fs-1"></i></div>
-                                    <h6 class="fw-medium">No Withdrawals Found</h6>
-                                    <p class="fs-7 mb-0">You don't have any withdrawal requests yet.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            @if (method_exists($withdrawals ?? [], 'hasPages') && ($withdrawals ?? [])->hasPages())
-                <div class="card-footer bg-transparent border-top border-light p-4">
-                    {{ $withdrawals->links() }}
-                </div>
-            @endif
+        <div style="display:flex;align-items:center;gap:10px;">
+            <a href="{{ route('affiliator.withdrawals.create') }}" class="btn btn-p btn-sm">
+                <i class="fa-solid fa-plus"></i> Request Withdrawal
+            </a>
         </div>
     </div>
+
+    <div class="portal-card-body p-0">
+        <div class="table-wrap">
+            <table class="portal-table">
+                <thead>
+                    <tr>
+                        <th class="portal-th">Request ID</th>
+                        <th class="portal-th">Requested Date</th>
+                        <th class="portal-th">Bank / Account</th>
+                        <th class="portal-th text-right">Amount</th>
+                        <th class="portal-th text-center">Status</th>
+                        <th class="portal-th text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($withdrawals ?? [] as $withdrawal)
+                        <tr>
+                            <td class="portal-td font-medium">
+                                #WD-{{ $withdrawal->id }}
+                            </td>
+                            <td class="portal-td text-muted" style="font-size:12px;">
+                                {{ $withdrawal->created_at?->format('d M Y, H:i') }}
+                            </td>
+                            <td class="portal-td">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <i class="fa-solid fa-building-columns" style="color:var(--primary);"></i>
+                                    <div>
+                                        <div style="font-weight:600;font-size:13px;">{{ strtoupper($withdrawal->withdrawal_method ?? 'BANK') }}</div>
+                                        <div style="font-size:11px;color:var(--text-muted);">{{ $withdrawal->account_number }} ({{ $withdrawal->account_name }})</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="portal-td text-right font-bold" style="font-size:14px;">
+                                Rp {{ number_format($withdrawal->amount, 0, ',', '.') }}
+                            </td>
+                            <td class="portal-td text-center">
+                                @php
+                                    $st = strtolower($withdrawal->status ?? 'pending');
+                                    $badgeClass = match($st) {
+                                        'completed', 'paid', 'approved' => 'status-paid',
+                                        'pending'                       => 'status-pending',
+                                        'rejected', 'failed', 'cancelled' => 'status-cancelled',
+                                        default                         => 'status-issued',
+                                    };
+                                @endphp
+                                <span class="badge-status {{ $badgeClass }}">
+                                    {{ ucfirst($st) }}
+                                </span>
+                            </td>
+                            <td class="portal-td text-center">
+                                <a href="{{ route('affiliator.withdrawals.show', $withdrawal->id) }}" class="btn btn-s btn-sm" style="padding:2px 8px;font-size:11px;">
+                                    Details
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="portal-td text-center py-6 text-muted">
+                                <i class="fa-solid fa-money-bill-transfer" style="font-size:28px;margin-bottom:8px;display:block;color:var(--text-faint);"></i>
+                                No withdrawal requests recorded yet.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if (method_exists($withdrawals ?? [], 'hasPages') && ($withdrawals ?? [])->hasPages())
+            <div style="padding:16px;border-top:1px solid var(--border);">
+                {{ $withdrawals->links() }}
+            </div>
+        @endif
+    </div>
+</div>
 @endsection

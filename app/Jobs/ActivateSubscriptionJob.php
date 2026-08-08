@@ -30,13 +30,13 @@ class ActivateSubscriptionJob implements ShouldQueue
     {
         Log::channel('payment')->info('Activating subscription', [
             'transaction_id' => $this->transaction->id,
-            'order_id' => $this->transaction->order_id,
+            'order_id'       => $this->transaction->order_id ?? null,
         ]);
 
         DB::transaction(function () use ($subscriptionService) {
-            // Cek ulang status transaksi untuk mencegah race condition
+            // Re-check transaction status to prevent race conditions
             $this->transaction->refresh();
-            
+
             if ($this->transaction->status !== 'paid') {
                 Log::channel('payment')->warning('Skipping activation, transaction not paid', [
                     'transaction_id' => $this->transaction->id,
@@ -45,7 +45,6 @@ class ActivateSubscriptionJob implements ShouldQueue
                 return;
             }
 
-            // Get the subscription associated with this transaction
             $subscription = $this->transaction->subscription;
 
             if (!$subscription) {
@@ -55,29 +54,49 @@ class ActivateSubscriptionJob implements ShouldQueue
                 return;
             }
 
-            if ($subscription->status === 'active') {
-                Log::channel('payment')->info('Subscription already active', [
+            $transactionType  = $this->transaction->type ?? 'new';
+            $durationMonths   = $subscription->subscriptionPlan?->duration_months ?? 1;
+
+            if ($transactionType === 'renewal') {
+                // Renewal: extend expiry date from current expires_at
+                if ($subscription->status === 'active' || $subscription->status === 'expired') {
+                    $subscriptionService->renewSubscription($subscription, $durationMonths);
+
+                    Log::channel('payment')->info('Subscription renewed via payment', [
+                        'subscription_id' => $subscription->id,
+                        'months'          => $durationMonths,
+                    ]);
+                } else {
+                    Log::channel('payment')->warning('Cannot renew subscription with status: ' . $subscription->status, [
+                        'subscription_id' => $subscription->id,
+                    ]);
+                }
+            } else {
+                // New activation
+                if ($subscription->status === 'active') {
+                    Log::channel('payment')->info('Subscription already active', [
+                        'subscription_id' => $subscription->id,
+                    ]);
+                    return;
+                }
+
+                $subscriptionService->activateSubscription($subscription, $durationMonths);
+
+                // Update ERP Request status if related via License
+                if ($subscription->license && $subscription->license->erpRequest) {
+                    $subscription->license->erpRequest->update([
+                        'status'      => 'active',
+                        'approved_at' => now(),
+                    ]);
+                }
+
+                Log::channel('payment')->info('Subscription activated via payment', [
                     'subscription_id' => $subscription->id,
-                ]);
-                return;
-            }
-
-            // Get plan duration (assuming 1 month if not specified)
-            $durationMonths = $subscription->subscriptionPlan?->duration_months ?? 1;
-
-            // Activate subscription (ini juga akan memperbarui license via SubscriptionService)
-            $subscriptionService->activateSubscription($subscription, $durationMonths);
-
-            // Update ERP Request status jika terkait via License
-            if ($subscription->license && $subscription->license->erpRequest) {
-                $subscription->license->erpRequest->update([
-                    'status' => 'active', 
-                    'approved_at' => now(),
                 ]);
             }
         });
 
-        Log::channel('payment')->info('Subscription activated successfully', [
+        Log::channel('payment')->info('ActivateSubscriptionJob completed', [
             'transaction_id' => $this->transaction->id,
         ]);
     }

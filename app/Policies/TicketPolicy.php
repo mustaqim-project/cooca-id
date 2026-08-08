@@ -15,7 +15,7 @@ final class TicketPolicy
         return true;
     }
 
-    public function view(Admin|Customer|Customer $user, Ticket $ticket): bool
+    public function view(Admin|Affiliator|Customer $user, Ticket $ticket): bool
     {
         if ($user instanceof Admin) {
             return true;
@@ -32,12 +32,12 @@ final class TicketPolicy
         return false;
     }
 
-    public function create(Customer|Customer $user): bool
+    public function create(Admin|Affiliator|Customer $user): bool
     {
         return true;
     }
 
-    public function update(Admin|Customer|Customer $user, Ticket $ticket): bool
+    public function update(Admin|Affiliator|Customer $user, Ticket $ticket): bool
     {
         if ($user instanceof Admin) {
             return true;

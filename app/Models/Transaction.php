@@ -36,7 +36,7 @@ final class Transaction extends Model
     protected $table = 'transactions';
 
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'subscription_id',
         'type',
         'invoice_number',
@@ -113,6 +113,11 @@ final class Transaction extends Model
         return $this->affiliateCommissions();
     }
 
+    public function midtransTransaction(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(MidtransTransaction::class, 'transaction_id');
+    }
+
     public function scopePaid($query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('status', self::STATUS_PAID);
@@ -138,4 +143,3 @@ final class Transaction extends Model
         return $this->customer?->name ?? 'Unknown';
     }
 }
-

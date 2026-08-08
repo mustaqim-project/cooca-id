@@ -1,80 +1,58 @@
-@extends('customer.layouts.app')
-
-@section('title', 'Trial Details')
-
+@extends('layouts.customer')
+@section('title', 'Trial Request Details')
+@section('breadcrumb')
+    <a href="{{ route('customer.trials.index') }}" class="crumb-link">Free Trials</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <span class="crumb-current">Details</span>
+@endsection
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-12 col-xl-10">
-            <!-- Header -->
-            <div class="d-flex align-items-center mb-4">
-                <a href="{{ route('customer.trials.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-3">
-                    <i class="bi bi-arrow-left me-1"></i> Back
-                </a>
-                <div>
-                    <h2 class="mb-1 fw-bold">Trial Details</h2>
-                    <p class="text-secondary mb-0">View trial status and information.</p>
-                </div>
-            </div>
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-flask" style="color:var(--accent);margin-right:10px;"></i>Trial Request Details</h1>
+        <p class="page-subtitle">ID: {{ $trial->id }}</p>
+    </div>
+    <a href="{{ route('customer.trials.index') }}" class="btn btn-outline">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+</div>
 
-            <!-- Details Card -->
-            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden">
-                <!-- Status Header -->
-                <div class="card-header bg-transparent border-bottom border-light p-4 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-semibold"><i class="bi bi-info-circle me-2"></i> Request Information</h5>
-                    
-                    <div>
-                        @php
-                            $statusConfig = [
-                                'submitted' => 'warning',
-                                'reviewing' => 'info',
-                                'approved' => 'success',
-                                'rejected' => 'danger',
-                                'provisioning' => 'primary',
-                                'trial_active' => 'success',
-                                'trial_expired' => 'secondary',
-                            ];
-                            $statusClass = $statusConfig[$trial->status] ?? 'secondary';
-                        @endphp
-                        <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-4 py-2 fs-6">
-                            {{ str_replace('_', ' ', ucfirst($trial->status)) }}
-                        </span>
-                    </div>
-                </div>
-                
-                <!-- Details Body -->
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush border-0">
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Product</div>
-                            <div class="fw-semibold text-dark">{{ $trial->product->name ?? 'N/A' }}</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-light border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Requested Subdomain</div>
-                            <div class="fw-semibold text-primary">{{ $trial->requested_subdomain }}.cooca.id</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Request Date</div>
-                            <div class="text-dark">{{ $trial->created_at->format('F d, Y - H:i') }}</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-light border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Last Updated</div>
-                            <div class="text-dark">{{ $trial->updated_at->format('F d, Y - H:i') }}</div>
-                        </li>
-                        @if ($trial->notes)
-                            <li class="list-group-item px-4 py-4 bg-transparent border-light">
-                                <div class="fw-medium text-secondary mb-2">Notes</div>
-                                <div class="bg-light p-3 rounded-3 text-secondary">{{ $trial->notes }}</div>
-                            </li>
-                        @endif
-                        @if ($trial->rejection_reason)
-                            <li class="list-group-item px-4 py-4 bg-transparent border-light">
-                                <div class="fw-medium text-danger mb-2">Rejection Reason</div>
-                                <div class="bg-danger-subtle text-danger p-3 rounded-3">{{ $trial->rejection_reason }}</div>
-                            </li>
-                        @endif
-                    </ul>
-                </div>
+<div class="grid-31">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Request Summary</div>
+            <span class="badge badge-accent">{{ ucfirst($trial->status) }}</span>
+        </div>
+        <div class="card-body">
+            <div class="stats-row">
+                <span class="text-sm text-muted">Requested Product</span>
+                <span class="font-bold text-sm">{{ $trial->product?->name ?? 'COOCA Module' }}</span>
+            </div>
+            <div class="stats-row">
+                <span class="text-sm text-muted">Requested Subdomain</span>
+                <span class="font-bold text-sm">{{ $trial->requested_subdomain }}.cooca.id</span>
+            </div>
+            <div class="stats-row">
+                <span class="text-sm text-muted">Submitted Date</span>
+                <span class="text-sm">{{ $trial->created_at->format('d M Y H:i') }}</span>
+            </div>
+            @if($trial->notes)
+            <div class="mt-4">
+                <div class="text-xs font-bold text-muted mb-1">Notes:</div>
+                <div class="text-xs text-muted background:var(--bg) padding:10px;border-radius:6px;">{{ $trial->notes }}</div>
+            </div>
+            @endif
+        </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Next Steps</div></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+                <a href="{{ route('customer.subscriptions.create') }}" class="btn btn-primary w-full" style="justify-content:center;">
+                    Upgrade to Paid Subscription
+                </a>
             </div>
         </div>
     </div>
+</div>
 @endsection

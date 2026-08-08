@@ -73,3 +73,19 @@ Route::middleware(['throttle:midtrans-webhook'])->group(function () {
 // License validation endpoint for ERP systems
 Route::post('/v1/license/validate', [\App\Http\Controllers\Api\V1\LicenseValidationController::class, 'validate'])
     ->name('api.license.validate');
+
+// Public Fonnte-style External WhatsApp API Endpoint (X-WA-API-KEY Auth)
+Route::post('/v1/wa/send', [\App\Http\Controllers\Api\WhatsAppPublicApiController::class, 'send'])
+    ->name('api.wa.send');
+
+// WhatsApp Gateway Webhook for Incoming & Outgoing WA Mobile Messages
+Route::post('/v1/wa/webhook', [\App\Http\Controllers\Api\WhatsAppWebhookController::class, 'handle'])
+    ->name('api.wa.webhook');
+
+// WA Worker Endpoints
+
+Route::prefix('wa/worker')->group(function () {
+    Route::get('/queue', [\App\Http\Controllers\Api\WhatsAppWorkerController::class, 'getQueue']);
+    Route::post('/update', [\App\Http\Controllers\Api\WhatsAppWorkerController::class, 'updateQueue']);
+});
+

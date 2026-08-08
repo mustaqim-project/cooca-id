@@ -26,10 +26,10 @@
         <div class="content">
             <div class="success-icon">🎉</div>
             <h2 style="text-align: center;">License Siap Digunakan!</h2>
-            
+
             <p>Halo {{ $customerName }},</p>
             <p>License untuk produk <strong>{{ $productName }}</strong> telah siap digunakan.</p>
-            
+
             <div class="credential-box">
                 <div class="credential-row">
                     <span class="credential-label">License Code:</span>
@@ -44,13 +44,13 @@
                     <span class="credential-value">{{ $domain }}</span>
                 </div>
             </div>
-            
+
             <p style="text-align: center;">
                 <a href="{{ $dashboardUrl }}" class="btn">Buka Dashboard</a>
             </p>
-            
+
             <p><strong>Penting:</strong> Simpan credential ini dengan baik. Anda akan membutuhkannya untuk mengaktifkan sistem ERP Anda.</p>
-            
+
             <div class="footer">
                 <p>Terima kasih telah menggunakan COOCA.ID</p>
                 <p>&copy; {{ date('Y') }} COOCA.ID. All rights reserved.</p>

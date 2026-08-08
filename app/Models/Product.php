@@ -89,6 +89,15 @@ final class Product extends Model
         return $this->license_type ? (self::LICENSE_TYPES[$this->license_type] ?? $this->license_type) : null;
     }
 
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        if (!$this->thumbnail) return null;
+        if (str_starts_with($this->thumbnail, 'http')) return $this->thumbnail;
+        if (str_starts_with($this->thumbnail, '/')) return $this->thumbnail;
+        
+        return '/' . ltrim($this->thumbnail, '/');
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class, 'category_id');

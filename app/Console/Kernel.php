@@ -1,5 +1,4 @@
-
-    <?php
+<?php
 
 namespace App\Console;
 
@@ -43,7 +42,11 @@ class Kernel extends ConsoleKernel
             ->dailyAt('10:00')
             ->timezone('Asia/Jakarta');
 
+        // Auto end inactive live chat sessions (2-minute timeout)
+        $schedule->command('live-chats:auto-end')->everyMinute();
+
         // Database backups
         $schedule->command('backup:clean')->daily()->at('01:00');
         $schedule->command('backup:run')->daily()->at('01:30');
     }
+}

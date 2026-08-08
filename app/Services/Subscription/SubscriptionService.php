@@ -45,11 +45,12 @@ final class SubscriptionService
             $expiresAt = $durationMonths >= 999 ? null : now()->addMonths($durationMonths);
 
             $fromStatus = $subscription->status;
-            $subscription = $this->subscriptionRepository->update($subscription->id, [
+            $this->subscriptionRepository->update($subscription->id, [
                 'status'     => 'active',
                 'started_at' => $startedAt,
                 'expires_at' => $expiresAt,
             ]);
+            $subscription->refresh();
 
             // Record status history
             $this->recordStatusChange(
@@ -87,9 +88,10 @@ final class SubscriptionService
         return DB::transaction(function () use ($subscription) {
             $fromStatus = $subscription->status;
             
-            $subscription = $this->subscriptionRepository->update($subscription->id, [
+            $this->subscriptionRepository->update($subscription->id, [
                 'status' => 'expired',
             ]);
+            $subscription->refresh();
 
             // Record status history
             $this->recordStatusChange(
@@ -122,10 +124,11 @@ final class SubscriptionService
         return DB::transaction(function () use ($subscription) {
             $fromStatus = $subscription->status;
             
-            $subscription = $this->subscriptionRepository->update($subscription->id, [
-                'status' => 'cancelled',
+            $this->subscriptionRepository->update($subscription->id, [
+                'status'       => 'cancelled',
                 'cancelled_at' => now(),
             ]);
+            $subscription->refresh();
 
             // Record status history
             $this->recordStatusChange(
@@ -149,9 +152,10 @@ final class SubscriptionService
         return DB::transaction(function () use ($subscription, $reason) {
             $fromStatus = $subscription->status;
             
-            $subscription = $this->subscriptionRepository->update($subscription->id, [
+            $this->subscriptionRepository->update($subscription->id, [
                 'status' => 'suspended',
             ]);
+            $subscription->refresh();
 
             // Record status history
             $this->recordStatusChange(
@@ -186,9 +190,10 @@ final class SubscriptionService
 
             $fromStatus = $subscription->status;
             
-            $subscription = $this->subscriptionRepository->update($subscription->id, [
+            $this->subscriptionRepository->update($subscription->id, [
                 'status' => 'active',
             ]);
+            $subscription->refresh();
 
             // Record status history
             $this->recordStatusChange(
@@ -222,9 +227,10 @@ final class SubscriptionService
 
             $oldPlanId = $subscription->subscription_plan_id;
             
-            $subscription = $this->subscriptionRepository->update($subscription->id, [
+            $this->subscriptionRepository->update($subscription->id, [
                 'subscription_plan_id' => $newPlanId,
             ]);
+            $subscription->refresh();
 
             Log::info("Subscription upgraded", [
                 'subscription_id' => $subscription->id,
@@ -257,9 +263,10 @@ final class SubscriptionService
 
             // Downgrade effective at next renewal
             // Store pending downgrade info
-            $subscription = $this->subscriptionRepository->update($subscription->id, [
+            $this->subscriptionRepository->update($subscription->id, [
                 'subscription_plan_id' => $newPlanId,
             ]);
+            $subscription->refresh();
 
             Log::info("Subscription downgraded", [
                 'subscription_id' => $subscription->id,
@@ -309,10 +316,11 @@ final class SubscriptionService
         
         $newExpiresAt = now()->addMonths($durationMonths);
 
-        $subscription = $this->subscriptionRepository->update($subscription->id, [
-            'status' => 'active',
+        $this->subscriptionRepository->update($subscription->id, [
+            'status'     => 'active',
             'expires_at' => $newExpiresAt,
         ]);
+        $subscription->refresh();
 
         // Record status history
         $this->recordStatusChange(
@@ -349,9 +357,10 @@ final class SubscriptionService
         $baseDate = $subscription->expires_at ?? now();
         $newExpiresAt = $baseDate->addMonths($durationMonths);
 
-        $subscription = $this->subscriptionRepository->update($subscription->id, [
+        $this->subscriptionRepository->update($subscription->id, [
             'expires_at' => $newExpiresAt,
         ]);
+        $subscription->refresh();
 
         // Record extension
         $subscription->recordStatusChange(
@@ -435,10 +444,12 @@ final class SubscriptionService
                 ? $subscription->expires_at->addMonths($durationMonths)
                 : now()->addMonths($durationMonths);
 
-            $subscription = $this->subscriptionRepository->update($subscription->id, [
-                'status' => 'active',
+            $this->subscriptionRepository->update($subscription->id, [
+                'status'     => 'active',
                 'expires_at' => $newExpiresAt,
             ]);
+
+            $subscription->refresh();
 
             // Record status history if status changed
             if ($fromStatus !== 'active') {

@@ -1,9 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Services\Notification;
 
-use App\Models\Customer;\nuse App\Models\Affiliator;
+use App\Models\Customer;
+use App\Models\Affiliator;
 use App\Models\Notification as NotificationModel;
 use App\Models\NotificationTemplate;
 use Illuminate\Support\Collection;
@@ -196,9 +198,9 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Pembayaran Berhasil!\n\n" .
-                "Invoice: %s\n" .
-                "Jumlah: Rp %s\n\n" .
-                "Terima kasih telah menggunakan COOCA.ID",
+                    "Invoice: %s\n" .
+                    "Jumlah: Rp %s\n\n" .
+                    "Terima kasih telah menggunakan COOCA.ID",
                 $data['invoice_number'] ?? '-',
                 number_format($data['amount'] ?? 0, 0, ',', '.')
             ),
@@ -211,10 +213,10 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "License Siap Digunakan!\n\n" .
-                "Produk: %s\n" .
-                "License Code: %s\n" .
-                "Token Code: %s\n" .
-                "Domain: %s",
+                    "Produk: %s\n" .
+                    "License Code: %s\n" .
+                    "Token Code: %s\n" .
+                    "Domain: %s",
                 $data['product_name'] ?? '-',
                 $data['license_code'] ?? '-',
                 $data['token_code'] ?? '-',
@@ -229,9 +231,9 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Peringatan Subscription akan Berakhir!\n\n" .
-                "Produk: %s\n" .
-                "Berakhir dalam: %d hari\n" .
-                "Tanggal: %s",
+                    "Produk: %s\n" .
+                    "Berakhir dalam: %d hari\n" .
+                    "Tanggal: %s",
                 $data['product_name'] ?? '-',
                 $data['days_until_expiry'] ?? 0,
                 $data['expires_at'] ?? '-'
@@ -245,8 +247,8 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Selamat Bergabung di COOCA.ID!\n\n" .
-                "Halo %s,\n" .
-                "Terima kasih telah bergabung dengan COOCA.ID.",
+                    "Halo %s,\n" .
+                    "Terima kasih telah bergabung dengan COOCA.ID.",
                 $data['name'] ?? 'Customer'
             ),
             default => null,
@@ -258,9 +260,9 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Komisi Diterima!\n\n" .
-                "Jumlah: Rp %s\n" .
-                "Level: %d\n" .
-                "Saldo Anda: Rp %s",
+                    "Jumlah: Rp %s\n" .
+                    "Level: %d\n" .
+                    "Saldo Anda: Rp %s",
                 number_format($data['commission_amount'] ?? 0, 0, ',', '.'),
                 $data['level'] ?? 1,
                 number_format($data['balance'] ?? 0, 0, ',', '.')
@@ -274,10 +276,10 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Withdrawal Disetujui!\n\n" .
-                "Jumlah: Rp %s\n" .
-                "Fee: Rp %s\n" .
-                "Diterima: Rp %s\n\n" .
-                "Estimasi transfer: 1-3 hari kerja",
+                    "Jumlah: Rp %s\n" .
+                    "Fee: Rp %s\n" .
+                    "Diterima: Rp %s\n\n" .
+                    "Estimasi transfer: 1-3 hari kerja",
                 number_format($data['amount'] ?? 0, 0, ',', '.'),
                 number_format($data['fee'] ?? 0, 0, ',', '.'),
                 number_format($data['net_amount'] ?? 0, 0, ',', '.')
@@ -291,8 +293,8 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Withdrawal Ditolak\n\n" .
-                "Alasan: %s\n\n" .
-                "Silakan hubungi support untuk informasi lebih lanjut.",
+                    "Alasan: %s\n\n" .
+                    "Silakan hubungi support untuk informasi lebih lanjut.",
                 $data['rejection_reason'] ?? 'Tidak diketahui'
             ),
             default => null,
@@ -304,9 +306,9 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Permintaan Trial Disubmit\n\n" .
-                "Produk: %s\n" .
-                "ID Trial: %s\n" .
-                "Status: Menunggu persetujuan admin",
+                    "Produk: %s\n" .
+                    "ID Trial: %s\n" .
+                    "Status: Menunggu persetujuan admin",
                 $data['product_name'] ?? '-',
                 $data['trial_id'] ?? '-'
             ),
@@ -319,10 +321,10 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Trial Disetujui!\n\n" .
-                "Produk: %s\n" .
-                "Domain: %s\n" .
-                "Periode trial: %d hari\n\n" .
-                "Silakan akses panel customer Anda untuk memulai testing.",
+                    "Produk: %s\n" .
+                    "Domain: %s\n" .
+                    "Periode trial: %d hari\n\n" .
+                    "Silakan akses panel customer Anda untuk memulai testing.",
                 $data['product_name'] ?? '-',
                 $data['domain'] ?? '-',
                 $data['trial_days'] ?? 14
@@ -336,9 +338,9 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Trial Ditolak\n\n" .
-                "Produk: %s\n" .
-                "Alasan: %s\n\n" .
-                "Silakan hubungi support untuk informasi lebih lanjut.",
+                    "Produk: %s\n" .
+                    "Alasan: %s\n\n" .
+                    "Silakan hubungi support untuk informasi lebih lanjut.",
                 $data['product_name'] ?? '-',
                 $data['rejection_reason'] ?? 'Tidak diketahui'
             ),
@@ -351,10 +353,10 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Trial Dimulai!\n\n" .
-                "Produk: %s\n" .
-                "Domain: %s\n" .
-                "Berakhir pada: %s\n\n" .
-                "Selamat melakukan testing!",
+                    "Produk: %s\n" .
+                    "Domain: %s\n" .
+                    "Berakhir pada: %s\n\n" .
+                    "Selamat melakukan testing!",
                 $data['product_name'] ?? '-',
                 $data['domain'] ?? '-',
                 $data['expires_at'] ?? '-'
@@ -368,10 +370,10 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Trial Segera Berakhir!\n\n" .
-                "Produk: %s\n" .
-                "Sisa waktu: %d hari\n" .
-                "Tanggal berakhir: %s\n\n" .
-                "Konversi ke subscription sekarang untuk melanjutkan penggunaan.",
+                    "Produk: %s\n" .
+                    "Sisa waktu: %d hari\n" .
+                    "Tanggal berakhir: %s\n\n" .
+                    "Konversi ke subscription sekarang untuk melanjutkan penggunaan.",
                 $data['product_name'] ?? '-',
                 $data['days_until_expiry'] ?? 0,
                 $data['expires_at'] ?? '-'
@@ -385,9 +387,9 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Trial Telah Berakhir\n\n" .
-                "Produk: %s\n" .
-                "Tanggal berakhir: %s\n\n" .
-                "Subscribe sekarang untuk terus menikmati layanan kami.",
+                    "Produk: %s\n" .
+                    "Tanggal berakhir: %s\n\n" .
+                    "Subscribe sekarang untuk terus menikmati layanan kami.",
                 $data['product_name'] ?? '-',
                 $data['expired_at'] ?? '-'
             ),
@@ -400,10 +402,10 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Trial Berhasil Dikonversi!\n\n" .
-                "Produk: %s\n" .
-                "Subscription ID: %s\n" .
-                "Invoice: %s\n\n" .
-                "Terima kasih telah berlangganan!",
+                    "Produk: %s\n" .
+                    "Subscription ID: %s\n" .
+                    "Invoice: %s\n\n" .
+                    "Terima kasih telah berlangganan!",
                 $data['product_name'] ?? '-',
                 $data['subscription_id'] ?? '-',
                 $data['invoice_number'] ?? '-'
@@ -417,9 +419,9 @@ final class NotificationService
         return match ($channel) {
             'whatsapp' => sprintf(
                 "Komisi Tersedia untuk Withdrawal!\n\n" .
-                "Jumlah: Rp %s\n" .
-                "Saldo tersedia: Rp %s\n\n" .
-                "Silakan ajukan withdrawal dari panel affiliator Anda.",
+                    "Jumlah: Rp %s\n" .
+                    "Saldo tersedia: Rp %s\n\n" .
+                    "Silakan ajukan withdrawal dari panel affiliator Anda.",
                 number_format($data['commission_amount'] ?? 0, 0, ',', '.'),
                 number_format($data['available_balance'] ?? 0, 0, ',', '.')
             ),

@@ -1,31 +1,15 @@
-@extends('customer.layouts.app')
-
+@extends('layouts.customer')
 @section('title', 'Payment Failed')
-
 @section('content')
-    <div class="row justify-content-center mt-5">
-        <div class="col-12 col-md-8 col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden text-center p-5">
-                <div class="d-flex justify-content-center mb-4">
-                    <div class="bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
-                        <i class="bi bi-x-lg" style="font-size: 3rem;"></i>
-                    </div>
-                </div>
-                
-                <h2 class="fw-bolder mb-3">Payment Failed</h2>
-                <p class="text-secondary mb-5 fs-6">
-                    Unfortunately, your payment could not be processed. This might be due to insufficient funds, an expired link, or network issues.
-                </p>
-                
-                <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
-                    <a href="{{ route('customer.payments.index') }}" class="btn btn-primary rounded-pill px-4 py-2 hover-lift fw-medium">
-                        View My Payments
-                    </a>
-                    <a href="{{ route('customer.products.index') }}" class="btn btn-light border rounded-pill px-4 py-2 hover-lift text-secondary fw-medium">
-                        Try Again
-                    </a>
-                </div>
-            </div>
-        </div>
+<div class="card" style="max-width:540px;margin:40px auto;text-align:center;padding:40px 24px;">
+    <div style="width:72px;height:72px;border-radius:50%;background:rgba(var(--danger-rgb),.15);color:var(--danger);font-size:36px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
     </div>
+    <h2 class="font-bold text-2xl mb-2">Payment Failed or Cancelled</h2>
+    <p class="text-sm text-muted mb-6">Your payment could not be processed. Please try again or choose a different payment method.</p>
+    <div class="flex gap-3 justify-center">
+        <a href="{{ route('customer.invoices.index') }}" class="btn btn-primary">Try Again</a>
+        <a href="{{ route('customer.tickets.create') }}" class="btn btn-outline">Contact Support</a>
+    </div>
+</div>
 @endsection

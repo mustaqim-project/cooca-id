@@ -1,107 +1,62 @@
-@extends('customer.layouts.app')
-
+@extends('layouts.customer')
 @section('title', 'License Details')
-
+@section('breadcrumb')
+    <a href="{{ route('customer.licenses.index') }}" class="crumb-link">Licenses</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <span class="crumb-current">Details</span>
+@endsection
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-12 col-xl-10">
-            <!-- Header -->
-            <div class="d-flex align-items-center mb-4">
-                <a href="{{ route('customer.licenses.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-3">
-                    <i class="bi bi-arrow-left me-1"></i> Back
-                </a>
-                <div>
-                    <h2 class="mb-1 fw-bold">License Details</h2>
-                    <p class="text-secondary mb-0">View your license information and status</p>
-                </div>
-            </div>
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-key" style="color:var(--primary);margin-right:10px;"></i>License Details</h1>
+        <p class="page-subtitle">ID: {{ $license->id ?? $license['id'] }}</p>
+    </div>
+    <a href="{{ route('customer.licenses.index') }}" class="btn btn-outline">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+</div>
 
-            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden">
-                <!-- Status Header -->
-                <div class="card-header bg-transparent border-bottom border-light p-4 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-semibold"><i class="bi bi-shield-check me-2"></i> License Information</h5>
-                    
-                    <div>
-                        @if($license->status == 'active')
-                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-4 py-2 fs-6">
-                                <i class="bi bi-check-circle me-1"></i> Active
-                            </span>
-                        @elseif($license->status == 'suspended')
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-4 py-2 fs-6">
-                                <i class="bi bi-x-circle me-1"></i> Suspended
-                            </span>
-                        @elseif($license->status == 'expired')
-                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-4 py-2 fs-6">
-                                <i class="bi bi-exclamation-triangle me-1"></i> Expired
-                            </span>
-                        @else
-                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-4 py-2 fs-6">
-                                <i class="bi bi-hourglass-split me-1"></i> {{ ucfirst($license->status) }}
-                            </span>
-                        @endif
-                    </div>
-                </div>
-                
-                <!-- Details Body -->
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush border-0">
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Product Name</div>
-                            <div class="fw-semibold text-dark">{{ $license->product->name ?? 'Unknown Product' }}</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-light border-light d-flex flex-column flex-md-row align-items-md-center">
-                            <div class="fw-medium text-secondary" style="width: 250px;">License Key</div>
-                            <div class="d-flex align-items-center">
-                                <code class="bg-white px-3 py-1 rounded border border-light font-monospace text-primary me-3">
-                                    {{ $license->license_key }}
-                                </code>
-                                <button onclick="navigator.clipboard.writeText('{{ $license->license_key }}')" class="btn btn-sm btn-link text-secondary hover-lift p-0" title="Copy to clipboard">
-                                    <i class="bi bi-clipboard"></i>
-                                </button>
-                            </div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Current Domain</div>
-                            <div class="text-dark">
-                                @if($license->domain)
-                                    <span class="text-dark">{{ $license->domain }}</span>
-                                @else
-                                    <span class="text-secondary fst-italic">Not set (Unrestricted or pending activation)</span>
-                                @endif
-                            </div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-light border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Activated At</div>
-                            <div class="text-dark">
-                                {{ $license->activated_at ? \Carbon\Carbon::parse($license->activated_at)->format('F d, Y - H:i') : 'Not activated yet' }}
-                            </div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Created At</div>
-                            <div class="text-dark">{{ \Carbon\Carbon::parse($license->created_at)->format('F d, Y - H:i') }}</div>
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="card-footer bg-transparent border-top border-light p-4 d-flex justify-content-end gap-2">
-                    @if($license->status == 'active')
-                        <a href="{{ route('customer.licenses.credentials', $license->id) }}" class="btn btn-primary rounded-pill px-4 py-2 hover-lift fw-medium">
-                            <i class="bi bi-shield-lock me-2"></i> View API Credentials
-                        </a>
-                    @elseif($license->status == 'pending' || $license->status == 'inactive')
-                        <form action="{{ route('customer.licenses.activate', $license->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-success rounded-pill px-4 py-2 hover-lift fw-medium">
-                                <i class="bi bi-play-circle me-2"></i> Activate License
-                            </button>
-                        </form>
-                    @endif
-                    <a href="{{ route('customer.subscriptions.create', ['license_id' => $license->id]) }}" class="btn btn-light border rounded-pill px-4 py-2 hover-lift fw-medium text-secondary">
-                        <i class="bi bi-arrow-repeat me-2"></i> Extend via Subscription
-                    </a>
-                </div>
+<div class="grid-31">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">License Summary</div>
+            <span class="badge badge-success">{{ ucfirst($license->status ?? $license['status'] ?? 'active') }}</span>
+        </div>
+        <div class="card-body">
+            <div class="stats-row">
+                <span class="text-sm text-muted">License Code</span>
+                <code style="font-size:13px;background:var(--bg);padding:4px 8px;border-radius:4px;border:1px solid var(--border);">
+                    {{ $license->license_code ?? $license['license_code'] }}
+                </code>
+            </div>
+            <div class="stats-row">
+                <span class="text-sm text-muted">Product</span>
+                <span class="font-bold text-sm">{{ $license->product->name ?? $license['product']['name'] ?? 'SaaS Module' }}</span>
+            </div>
+            <div class="stats-row">
+                <span class="text-sm text-muted">Domain</span>
+                <span class="font-bold text-sm">{{ $license->domain ?? $license['domain'] ?? 'Unassigned' }}</span>
+            </div>
+            <div class="stats-row">
+                <span class="text-sm text-muted">Activated At</span>
+                <span class="text-sm">{{ $license->activated_at ? $license->activated_at->format('d M Y') : 'Not activated' }}</span>
+            </div>
+            <div class="stats-row">
+                <span class="text-sm text-muted">Expires At</span>
+                <span class="text-sm font-bold">{{ $license->expires_at ? $license->expires_at->format('d M Y') : 'Lifetime' }}</span>
             </div>
         </div>
     </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Actions</div></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+                <a href="{{ route('customer.licenses.credentials', $license->id ?? $license['id']) }}" class="btn btn-primary w-full" style="justify-content:center;">
+                    <i class="fa-solid fa-shield-key"></i> View Credentials
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

@@ -1,118 +1,87 @@
-@extends('customer.layouts.app')
-
-@section('title', 'My Domains')
-
+@extends('layouts.customer')
+@section('title', 'Domain Management')
+@section('breadcrumb')
+    <span class="crumb-current">Domains</span>
+@endsection
 @section('content')
-    <div class="d-flex flex-column gap-4">
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-globe" style="color:var(--primary);margin-right:10px;"></i>Domain Management</h1>
+        <p class="page-subtitle">Configure custom domains and subdomains for your COOCA.ID instances.</p>
+    </div>
+</div>
 
-        <!-- Page Header & Toolbar -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-                <h2 class="mb-1 fw-bold">My Domains</h2>
-                <p class="text-secondary mb-0">Manage custom domains for your deployed products.</p>
-            </div>
-        </div>
-
-        <!-- Domains Table -->
-        <div class="card border-0 shadow-sm rounded-4 glass">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
-                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
-                        <tr>
-                            <th class="py-3 px-4 border-0">Product</th>
-                            <th class="py-3 px-3 border-0">Current Subdomain</th>
-                            <th class="py-3 px-3 border-0">Custom Domain</th>
-                            <th class="py-3 px-3 border-0">Status</th>
-                            <th class="py-3 px-4 border-0 text-end">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="border-top-0">
-                        @forelse($tenants as $tenant)
-                            <tr>
-                                <td class="py-3 px-4">
-                                    <div class="fw-semibold">{{ $tenant->product->name ?? 'N/A' }}</div>
-                                </td>
-                                <td class="py-3 px-3 text-secondary">
-                                    {{ $tenant->subdomain }}.cooca.id
-                                </td>
-                                <td class="py-3 px-3 text-secondary">
-                                    @if($tenant->custom_domain)
-                                        <span class="text-dark">{{ $tenant->custom_domain }}</span>
-                                    @else
-                                        <span class="text-secondary fst-italic">Not Set</span>
-                                    @endif
-                                </td>
-                                <td class="py-3 px-3">
-                                    @if ($tenant->status === 'active')
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">
-                                            Active
-                                        </span>
-                                    @else
-                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1">
-                                            {{ ucfirst($tenant->status) }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="py-3 px-4 text-end">
-                                    <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-2" data-bs-toggle="modal" data-bs-target="#editDomainModal-{{ $tenant->id }}">
-                                        Edit Domain
-                                    </button>
-                                    @if ($tenant->custom_domain)
-                                        <form action="{{ route('customer.domains.verify', $tenant) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3 hover-lift">
-                                                Verify
-                                            </button>
-                                        </form>
-                                    @endif
-                                </td>
-                            </tr>
-
-                            <!-- Edit Domain Modal -->
-                            <div class="modal fade" id="editDomainModal-{{ $tenant->id }}" tabindex="-1" aria-labelledby="editDomainModalLabel-{{ $tenant->id }}" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content border-0 shadow-sm rounded-4 glass">
-                                        <div class="modal-header border-bottom border-light p-4">
-                                            <h5 class="modal-title fw-bold" id="editDomainModalLabel-{{ $tenant->id }}">Edit Custom Domain</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <form action="{{ route('customer.domains.update', $tenant) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <div class="modal-body p-4">
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-medium text-secondary">Custom Domain</label>
-                                                    <input type="text" name="custom_domain" value="{{ $tenant->custom_domain }}" placeholder="e.g. erp.mycompany.com" required class="form-control bg-light border-light text-secondary py-2">
-                                                    <div class="form-text mt-2 text-secondary fs-7">
-                                                        Please point your domain's CNAME record to <span class="fw-semibold">{{ $tenant->subdomain }}.cooca.id</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer border-top border-light bg-transparent p-4">
-                                                <button type="button" class="btn btn-light border rounded-pill px-4 hover-lift" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift fw-medium">Save Changes</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+<div class="card mb-6">
+    <div class="card-header">
+        <div class="card-title">Assigned Subdomains & Custom Domains</div>
+    </div>
+    <div class="card-body" style="padding:0;">
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Domain / Subdomain</th>
+                        <th>Product / Instance</th>
+                        <th>DNS Status</th>
+                        <th>SSL Certificate</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($domains ?? $tenants ?? [] as $domain)
+                    <tr>
+                        <td class="font-bold">
+                            <a href="https://{{ $domain->domain ?? $domain->id . '.cooca.id' }}" target="_blank" class="text-primary">
+                                {{ $domain->domain ?? $domain->id . '.cooca.id' }}
+                                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px;"></i>
+                            </a>
+                        </td>
+                        <td class="text-sm">{{ $domain->product?->name ?? 'COOCA Instance' }}</td>
+                        <td>
+                            @if(($domain->is_verified ?? true))
+                                <span class="badge badge-success"><i class="fa-solid fa-check"></i> Verified</span>
+                            @else
+                                <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> Pending DNS</span>
+                            @endif
+                        </td>
+                        <td><span class="badge badge-success"><i class="fa-solid fa-lock"></i> Active (Auto SSL)</span></td>
+                        <td>
+                            <form method="POST" action="{{ route('customer.domains.verify', $domain->id) }}" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-outline btn-sm">Verify DNS</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🌐</div>
+                                <div class="empty-state-title">No Custom Domains</div>
+                                <div class="empty-state-text">Custom domains will be created automatically when your license is activated.</div>
                             </div>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="py-5 text-center text-secondary">
-                                    <div class="mb-3"><i class="bi bi-globe fs-1"></i></div>
-                                    <h6 class="fw-medium">No Custom Domains Found</h6>
-                                    <p class="fs-7">You don't have any active products to manage domains for.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            @if (method_exists($tenants, 'hasPages') && $tenants->hasPages())
-                <div class="card-footer bg-transparent border-top border-light p-4">
-                    {{ $tenants->links() }}
-                </div>
-            @endif
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">📌 DNS Setup Guide for Custom Domains</div>
+    </div>
+    <div class="card-body" style="line-height:1.6;font-size:13.5px;">
+        <p class="mb-3">To point your own domain (e.g., <code>erp.yourcompany.com</code>) to your COOCA.ID instance, add the following CNAME record in your domain registrar DNS settings:</p>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px;" class="font-mono text-xs mb-3">
+            <div><strong>Type:</strong> CNAME</div>
+            <div><strong>Host / Name:</strong> erp (or @ for root domain)</div>
+            <div><strong>Value / Target:</strong> app.cooca.id</div>
+            <div><strong>TTL:</strong> Automatic / 3600</div>
+        </div>
+        <p class="text-xs text-muted">DNS propagation may take up to 24 hours. Free SSL certificates are automatically issued once CNAME verification passes.</p>
+    </div>
+</div>
 @endsection

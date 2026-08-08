@@ -1,107 +1,74 @@
-@extends('customer.layouts.app')
-
-@section('title', 'My Payments')
-
+@extends('layouts.customer')
+@section('title', 'Payment History')
+@section('breadcrumb')
+    <span class="crumb-current">Payments</span>
+@endsection
 @section('content')
-    <div class="d-flex flex-column gap-4">
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-credit-card" style="color:var(--primary);margin-right:10px;"></i>Payment Transactions</h1>
+        <p class="page-subtitle">View your payment history and gateway status logs.</p>
+    </div>
+</div>
 
-        <!-- Page Header & Toolbar -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-                <h2 class="mb-1 fw-bold">My Payments</h2>
-                <p class="text-secondary mb-0">History of all your transactions and payments.</p>
-            </div>
-            <div class="d-flex gap-2">
-            </div>
-        </div>
-
-        <!-- Payments Table -->
-        <div class="card border-0 shadow-sm rounded-4 glass">
-            <div
-                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
-                    style="max-width: 320px; background: var(--color-bg);">
-                    <span class="input-group-text bg-transparent border-0 pe-1"><i
-                            class="bi bi-search text-secondary"></i></span>
-                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
-                        placeholder="Search payments...">
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
-                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
-                        <tr>
-                            <th class="py-3 px-4 border-0">Transaction ID</th>
-                            <th class="py-3 px-3 border-0">Date</th>
-                            <th class="py-3 px-3 border-0">Amount</th>
-                            <th class="py-3 px-3 border-0">Method</th>
-                            <th class="py-3 px-3 border-0">Status</th>
-                            <th class="py-3 px-4 border-0 text-end">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="border-top-0">
-                        @forelse($payments as $payment)
-                            <tr>
-                                <td class="py-3 px-4">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center fw-bold"
-                                            style="width: 40px; height: 40px;">
-                                            <i class="bi bi-credit-card"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-semibold">{{ $payment->invoice_number ?? $payment->id }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-3 text-secondary">
-                                    {{ $payment->created_at->format('M d, Y H:i') }}
-                                </td>
-                                <td class="py-3 px-3">
-                                    <span class="fw-semibold">Rp {{ number_format($payment->gross_amount, 0, ',', '.') }}</span>
-                                </td>
-                                <td class="py-3 px-3 text-secondary">
-                                    {{ strtoupper($payment->payment_type ?? '-') }}
-                                </td>
-                                <td class="py-3 px-3">
-                                    @php
-                                        $statusClass = match($payment->status) {
-                                            'paid', 'settlement', 'capture' => 'success',
-                                            'pending' => 'warning',
-                                            'failed', 'deny', 'cancel', 'expire' => 'danger',
-                                            'refunded' => 'info',
-                                            default => 'secondary'
-                                        };
-                                    @endphp
-                                    <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-3 py-1">
-                                        {{ ucfirst($payment->status) }}
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-end">
-                                    <a href="{{ route('customer.payments.show', $payment->id) }}"
-                                        class="btn btn-sm btn-light border rounded-pill px-3 hover-lift">
-                                        View <i class="bi bi-arrow-right ms-1"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="py-5 text-center text-secondary">
-                                    <div class="mb-3"><i class="bi bi-inbox fs-1"></i></div>
-                                    <h6 class="fw-medium">No Payment Records Found</h6>
-                                    <p class="fs-7">You don't have any payment history.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            @if (method_exists($payments, 'hasPages') && $payments->hasPages())
-                <div class="card-footer bg-transparent border-top border-light p-4">
-                    {{ $payments->links() }}
-                </div>
-            @endif
+<div class="card">
+    <div class="card-body" style="padding:0;">
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order / Tx ID</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($payments as $payment)
+                    <tr>
+                        <td class="font-bold text-sm">{{ $payment->order_id ?? substr($payment->id, 0, 12) }}</td>
+                        <td class="text-xs text-muted">{{ $payment->created_at->format('d M Y H:i') }}</td>
+                        <td class="font-bold">Rp {{ number_format($payment->gross_amount ?? $payment->amount, 0, ',', '.') }}</td>
+                        <td class="text-xs text-muted">{{ strtoupper($payment->payment_type ?? 'Midtrans') }}</td>
+                        <td>
+                            @if(in_array($payment->status, ['paid', 'settlement', 'success']))
+                                <span class="badge badge-success">Paid</span>
+                            @elseif(in_array($payment->status, ['pending']))
+                                <span class="badge badge-warning">Pending</span>
+                            @else
+                                <span class="badge badge-danger">{{ ucfirst($payment->status) }}</span>
+                            @endif
+                        </td>
+                        <td>
+                            <a href="{{ route('customer.payments.show', $payment->id) }}" class="btn btn-ghost btn-sm" title="View Detail">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            @if($payment->status === 'failed' && $payment->created_at->diffInHours(now()) <= 24 && $payment->subscription_id)
+                                <a href="{{ route('customer.subscriptions.checkout', $payment->subscription_id) }}" class="btn btn-primary btn-sm ml-2" title="Ulangi Pembayaran">
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                </a>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">💳</div>
+                                <div class="empty-state-title">No Payments Recorded</div>
+                                <div class="empty-state-text">Transactions will appear here after paying invoices or subscriptions.</div>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
+    @if(method_exists($payments, 'hasPages') && $payments->hasPages())
+        <div class="card-footer">{{ $payments->links() }}</div>
+    @endif
+</div>
 @endsection

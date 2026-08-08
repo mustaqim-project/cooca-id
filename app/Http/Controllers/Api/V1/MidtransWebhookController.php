@@ -84,6 +84,23 @@ final class MidtransWebhookController extends Controller
                 return response()->json(['message' => 'Transaction not found'], 404);
             }
 
+            // Security: Verify that the amount paid matches the transaction net amount
+            $webhookAmount = (float) ($payload['gross_amount'] ?? 0);
+            $transactionAmount = (float) $transaction->net_amount;
+
+            // Allow up to 1 unit variance to account for potential float/integer rounding
+            if (abs($webhookAmount - $transactionAmount) > 1.0) {
+                Log::channel('security')->critical('MidtransWebhookController: Amount mismatch detected', [
+                    'order_id' => $orderId,
+                    'webhook_amount' => $webhookAmount,
+                    'transaction_amount' => $transactionAmount,
+                    'ip' => $request->ip(),
+                ]);
+                return response()->json([
+                    'message' => 'Amount mismatch. Tampering detected.',
+                ], 400);
+            }
+
             // Check if transaction already has final status (prevent re-processing)
             if (in_array($transaction->status, ['paid', 'refunded'])) {
                 Log::info('MidtransWebhookController: Transaction already in final status', [

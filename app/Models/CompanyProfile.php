@@ -13,7 +13,7 @@ final class CompanyProfile extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'company_name',
         'industry',
         'company_size',

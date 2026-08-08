@@ -5,102 +5,109 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use function App\Helpers\setting;
-use App\Models\Product;
-use App\Models\BlogPost;
-use Illuminate\Http\Request;
+use App\Models\CompanyProfile;
+use App\Models\Faq;
 use App\Models\NewsletterSubscriber;
-use Illuminate\Support\Facades\Redirect;
-use App\Services\Auth\AuthService;
-use App\Http\Requests\Customer\RegisterCustomerRequest;
-use App\Http\Requests\Customer\LoginCustomerRequest;
-use App\Http\Requests\Affiliator\RegisterAffiliatorRequest;
-use App\Http\Requests\Affiliator\LoginAffiliatorRequest;
-use App\Http\Requests\Admin\LoginAdminRequest;
+use App\Models\Page;
+use App\Models\Product;
+use App\Models\ProductCategory;
+use App\Models\Testimonial;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
-use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
-
-
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-
 /**
- * Landing Controller (Unified)
+ * Landing Controller (Public Pages)
  *
- * Handles public-facing landing pages, blog, product catalog, newsletter, auth, and password resets.
+ * Handles public-facing landing pages, product catalog showcase, and newsletter subscriptions.
  */
 class LandingController extends Controller
 {
     /**
      * Display the homepage.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
+        // All active products for showcase section
         $products = Product::where('is_active', true)
             ->with(['category', 'subscriptionPlans'])
             ->ordered()
             ->get();
-        return view('pages.home.index', compact('products'));
+
+        // Featured products (max 6) for hero product cards
+        $featuredProducts = Product::where('is_active', true)
+            ->where('is_featured', true)
+            ->with(['category', 'subscriptionPlans'])
+            ->ordered()
+            ->take(6)
+            ->get();
+
+        // Testimonials for social proof section
+        $testimonials = Testimonial::where('is_active', true)
+            ->ordered()
+            ->take(9)
+            ->get();
+
+        // Clients for trust marquee
+        $clients = CompanyProfile::inRandomOrder()
+            ->take(15)
+            ->get();
+
+        // FAQs for the accordion section
+        $faqs = Faq::where('is_active', true)
+            ->ordered()
+            ->get();
+
+        // Latest blog posts for blog preview
+        $latestPosts = \App\Models\BlogPost::where('is_published', true)
+            ->with(['author'])
+            ->latest('published_at')
+            ->take(3)
+            ->get();
+
+        return view('public.pages.home.index', compact(
+            'products',
+            'featuredProducts',
+            'testimonials',
+            'faqs',
+            'latestPosts',
+            'clients'
+        ));
     }
 
     /**
      * Display the about page.
      */
-    public function about()
+    public function about(): View
     {
-        return view('pages.about.index');
-    }
-
-    /**
-     * Display the pricing page.
-     */
-    public function pricing()
-    {
-        $products = Product::where('is_active', true)
-            ->with(['category', 'subscriptionPlans' => function ($query) {
-                $query->where('is_active', true)->orderBy('price');
-            }])
-            ->get();
-        return view('pages.pricing.index', compact('products'));
+        $testimonials = Testimonial::where('is_active', true)->ordered()->take(6)->get();
+        return view('public.pages.about.index', compact('testimonials'));
     }
 
     /**
      * Display the contact page.
      */
-    public function contact()
+    public function contact(): View
     {
-        return view('pages.contact.index');
+        return view('public.pages.contact.index');
     }
 
     /**
      * Display the affiliate program page.
      */
-    public function affiliate()
+    public function affiliate(): View
     {
-        return view('pages.affiliate.index');
-    }
-
-    /**
-     * Display the solutions page.
-     */
-    public function solution()
-    {
-        $products = Product::where('is_active', true)
-            ->with(['category', 'subscriptionPlans' => function ($query) {
-                $query->where('is_active', true)->orderBy('price');
-            }])
-            ->get();
-        return view('pages.solutions.index', compact('products'));
+        $testimonials = Testimonial::where('is_active', true)->ordered()->take(3)->get();
+        return view('public.pages.affiliate.index', compact('testimonials'));
     }
 
     /**
      * Switch session language/locale.
      */
-    public function switchLang(string $locale)
+    public function switchLang(string $locale): RedirectResponse
     {
         if (in_array($locale, ['id', 'en'])) {
             session()->put('locale', $locale);
@@ -111,133 +118,169 @@ class LandingController extends Controller
     /**
      * Display the FAQ page.
      */
-    public function faq()
+    public function faq(): View
     {
-        return view('pages.faq.index');
+        $faqs = Faq::where('is_active', true)->ordered()->get();
+        $categories = $faqs->pluck('category')->filter()->unique()->values();
+        return view('public.pages.faq.index', compact('faqs', 'categories'));
     }
 
     /**
-     * Display the documentation page.
+     * Display the documentation page list.
      */
-    public function docs()
+    public function docs(): View
     {
-        return view('pages.docs.index');
+        $files = File::files(base_path('panduan sistem cooca'));
+        $sidebarDocs = [];
+        foreach ($files as $file) {
+            if ($file->getExtension() === 'md') {
+                $filename = $file->getFilenameWithoutExtension();
+                $title = ucwords(str_replace('-', ' ', $filename));
+                $sidebarDocs[] = [
+                    'slug' => $filename,
+                    'title' => $title
+                ];
+            }
+        }
+        usort($sidebarDocs, fn($a, $b) => strcmp($a['slug'], $b['slug']));
+
+        return view('public.pages.docs.index', ['docs' => $sidebarDocs]);
+    }
+
+    /**
+     * Display a specific documentation item.
+     */
+    public function showDoc(string $slug): View
+    {
+        $filePath = base_path('panduan sistem cooca/' . $slug . '.md');
+
+        if (!file_exists($filePath)) {
+            abort(404, 'Dokumentasi tidak ditemukan.');
+        }
+
+        $content = file_get_contents($filePath);
+        $htmlContent = Str::markdown($content);
+
+        $files = File::files(base_path('panduan sistem cooca'));
+        $sidebarDocs = [];
+        foreach ($files as $file) {
+            if ($file->getExtension() === 'md') {
+                $filename = $file->getFilenameWithoutExtension();
+                $title = ucwords(str_replace('-', ' ', $filename));
+                $sidebarDocs[] = [
+                    'slug' => $filename,
+                    'title' => $title
+                ];
+            }
+        }
+        usort($sidebarDocs, fn($a, $b) => strcmp($a['slug'], $b['slug']));
+
+        $pageTitle = ucwords(str_replace('-', ' ', $slug));
+        if (preg_match('/^#\s+(.+)$/m', $content, $matches)) {
+            $pageTitle = trim($matches[1]);
+        }
+
+        return view('public.pages.docs.show', [
+            'content' => $htmlContent,
+            'sidebarDocs' => $sidebarDocs,
+            'currentSlug' => $slug,
+            'pageTitle' => $pageTitle
+        ]);
+    }
+
+    /**
+     * Display the Affiliate Terms of Service page.
+     */
+    public function affiliateTerms(): View
+    {
+        $page = Page::where('slug', 'affiliate-terms')->firstOrFail();
+        return view('public.pages.legal.terms', compact('page'));
     }
 
     /**
      * Display the Terms of Service page.
      */
-    public function terms()
+    public function terms(): View
     {
-        return view('pages.legal.terms');
+        $page = Page::where('slug', 'terms-of-service')->firstOrFail();
+        return view('public.pages.legal.terms', compact('page'));
     }
 
     /**
      * Display the Privacy Policy page.
      */
-    public function privacy()
+    public function privacy(): View
     {
-        return view('pages.legal.privacy');
+        $page = Page::where('slug', 'privacy-policy')->firstOrFail();
+        return view('public.pages.legal.privacy', compact('page'));
     }
 
     /**
      * Display the products catalog page.
      */
-    public function products()
+    public function products(Request $request)
     {
-        $products = Product::where('is_active', true)
-            ->with(['category', 'subscriptionPlans'])
-            ->get();
-        return view('pages.products.index', compact('products'));
+        $query = Product::where('is_active', true)->with(['category', 'subscriptionPlans']);
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+        if ($request->filled('category')) {
+            $slug = $request->category;
+            $query->whereHas('category', fn($q) => $q->where('slug', $slug));
+        } elseif ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        if ($request->filled('product_type')) {
+            $query->where('product_type', $request->product_type);
+        }
+        if ($request->filled('min_price')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('base_price', '>=', $request->min_price)
+                    ->orWhereHas('subscriptionPlans', fn($q2) => $q2->where('price', '>=', $request->min_price));
+            });
+        }
+        if ($request->filled('max_price')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('base_price', '<=', $request->max_price)
+                    ->orWhereHas('subscriptionPlans', fn($q2) => $q2->where('price', '<=', $request->max_price));
+            });
+        }
+
+        $products = $query->ordered()->paginate(12)->withQueryString();
+        $categories = ProductCategory::where('is_active', true)->orderBy('name')->get();
+        $productTypes = Product::TYPES;
+
+        if ($request->ajax()) {
+            return view('public.pages.products.partials.grid', compact('products'))->render();
+        }
+
+        return view('public.pages.products.index', compact('products', 'categories', 'productTypes'));
     }
 
-
-    /* ========================================== */
-
-
     /**
-     * Display a listing of blog posts.
+     * Show a single product detail.
      */
-    public function blogIndex(Request $request)
+    public function productShow(string $slug, Request $request): View
     {
-        $posts = BlogPost::where('is_published', true)
-            ->with(['author'])
-            ->latest('published_at')
-            ->paginate(9);
-
-        $categories = BlogPost::select('category')
-            ->distinct()
-            ->whereNotNull('category')
-            ->where('is_published', true)
-            ->pluck('category');
-
-        $featuredPosts = BlogPost::where('is_published', true)
-            ->with(['author'])
-            ->latest('published_at')
-            ->limit(3)
-            ->get();
-
-        return view('pages.blog.index', compact('posts', 'categories', 'featuredPosts'));
-    }
-
-    /**
-     * Display the specified blog post.
-     */
-    public function blogShow(string $slug)
-    {
-        $post = BlogPost::where('slug', $slug)
-            ->where('is_published', true)
-            ->with(['author'])
-            ->firstOrFail();
-
-        // Increment view count
-        $post->incrementViews();
-
-        // Get related posts
-        $relatedPosts = BlogPost::where('is_published', true)
-            ->where('id', '!=', $post->id)
-            ->where(function ($query) use ($post) {
-                $query->where('category', $post->category)
-                    ->orWhereJsonContains('tags', $post->tags);
-            })
-            ->latest('published_at')
-            ->limit(4)
-            ->get();
-
-        return view('pages.blog.detail', compact('post', 'relatedPosts'));
-    }
-
-    /* ========================================== */
-
-    /**
-     * Show a single product.
-     *
-     * URL: /products/{slug}
-     */
-    public function productShow(string $slug, Request $request)
-    {
-        // Load product with related data (category & subscription plans)
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
             ->with(['category', 'subscriptionPlans'])
             ->firstOrFail();
 
-        // Optional view counter – you can add a column `views` to the products table if desired.
         if (method_exists($product, 'increment')) {
             $product->increment('views');
         }
 
         $canonical = url()->current();
 
-        return view('pages.products.detail', compact('product', 'canonical'));
+        return view('public.pages.products.detail', compact('product', 'canonical'));
     }
-
-    /* ========================================== */
 
     /**
      * Handle newsletter subscription form submission.
      */
-    public function subscribe(Request $request)
+    public function subscribe(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'email' => ['required', 'email', 'unique:newsletter_subscribers,email'],
@@ -249,395 +292,4 @@ class LandingController extends Controller
 
         return Redirect::back()->with('status', 'Terima kasih! Anda telah berlangganan newsletter.');
     }
-
-    /* ========================================== */
-
-    public function __construct(
-        private readonly AuthService $authService
-    ) {}
-
-    /* ==================== CUSTOMER AUTH ==================== */
-
-    public function showCustomerVerificationNotice(Request $request)
-    {
-        return $request->user()->hasVerifiedEmail()
-            ? redirect()->intended(route('customer.dashboard'))
-            : view('auth.customer.verify-email');
-    }
-
-    public function verifyCustomerEmail(Request $request, $id, $hash)
-    {
-        $customer = \App\Models\Customer::findOrFail($id);
-
-        if (! hash_equals((string) $hash, sha1($customer->getEmailForVerification()))) {
-            abort(403);
-        }
-
-        if ($customer->hasVerifiedEmail()) {
-            return redirect()->route('customer.dashboard');
-        }
-
-        if ($customer->markEmailAsVerified()) {
-            event(new \Illuminate\Auth\Events\Verified($customer));
-        }
-
-        return redirect()->intended(route('customer.dashboard'))
-            ->with('success', 'Email berhasil diverifikasi.');
-    }
-
-    public function resendCustomerVerificationEmail(Request $request)
-    {
-        if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(route('customer.dashboard'));
-        }
-
-        $request->user()->sendEmailVerificationNotification();
-
-        return back()->with('success', 'Link verifikasi telah dikirim ulang ke email Anda.');
-    }
-
-    public function customerRegister(RegisterCustomerRequest $request)
-    {
-        $customer = $this->authService->registerCustomer($request->validated());
-
-        Auth::guard('customer')->login($customer);
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('customer.dashboard'))
-            ->with('success', 'Registrasi berhasil! Selamat datang di Cooca.id');
-    }
-
-    public function customerLogin(LoginCustomerRequest $request)
-    {
-        if (!Auth::guard('customer')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
-            return back()
-                ->withErrors(['email' => 'Kredensial tidak valid.'])
-                ->withInput($request->only('email'));
-        }
-
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('customer.dashboard'));
-    }
-
-    public function customerLogout(Request $request)
-    {
-        Auth::guard('customer')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('home')->with('success', 'Anda telah logout.');
-    }
-
-    public function redirectToGoogleCustomer()
-    {
-        return Socialite::driver('google')->redirect();
-    }
-
-    public function handleGoogleCallbackCustomer()
-    {
-        try {
-            $customer = $this->authService->handleGoogleCallback('customer');
-            Auth::guard('customer')->login($customer);
-            
-            return redirect()->intended(route('customer.dashboard'))
-                ->with('success', 'Login dengan Google berhasil!');
-        } catch (\Exception $e) {
-            return redirect()->route('customer.login')
-                ->withErrors(['email' => 'Gagal login dengan Google: ' . $e->getMessage()]);
-        }
-    }
-
-    /* ==================== AFFILIATOR AUTH ==================== */
-
-    public function affiliatorRegister(RegisterAffiliatorRequest $request)
-    {
-        $affiliator = $this->authService->registerAffiliator($request->validated());
-
-        Auth::guard('affiliator')->login($affiliator);
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('affiliator.dashboard'))
-            ->with('success', 'Registrasi affiliator berhasil!');
-    }
-
-    public function affiliatorLogin(LoginAffiliatorRequest $request)
-    {
-        if (!Auth::guard('affiliator')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
-            return back()
-                ->withErrors(['email' => 'Kredensial tidak valid.'])
-                ->withInput($request->only('email'));
-        }
-
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('affiliator.dashboard'));
-    }
-
-    public function affiliatorLogout(Request $request)
-    {
-        Auth::guard('affiliator')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('home')->with('success', 'Anda telah logout.');
-    }
-
-    /* ==================== ADMIN AUTH ==================== */
-
-    public function adminLogin(LoginAdminRequest $request)
-    {
-        if (!Auth::guard('admin')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
-            return back()
-                ->withErrors(['email' => 'Kredensial tidak valid.'])
-                ->withInput($request->only('email'));
-        }
-
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('admin.dashboard'));
-    }
-
-    public function adminLogout(Request $request)
-    {
-        Auth::guard('admin')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('admin.login')->with('success', 'Admin telah logout.');
-    }
-
-
-    public function showAdminLogin()
-    {
-        return view('auth.admin.login');
-    }
-
-    public function showCustomerLogin()
-    {
-        return view('auth.customer.login');
-    }
-
-    public function showCustomerRegister()
-    {
-        return view('auth.customer.register');
-    }
-
-    public function showAffiliatorLogin()
-    {
-        return view('auth.affiliator.login');
-    }
-
-    public function showAffiliatorRegister()
-    {
-        return view('auth.affiliator.register');
-    }
-
-    /* ========================================== */
-
-    /**
-     * Display the password reset link request view for customers.
-     */
-    public function showCustomerForgotPassword()
-    {
-        return view('auth.customer.forgot-password');
-    }
-
-    /**
-     * Handle sending password reset email for customers.
-     */
-    public function sendCustomerResetLink(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email|exists:customers,email',
-        ], [
-            'email.exists' => 'Email tidak terdaftar dalam sistem kami.',
-        ]);
-
-        $status = Password::broker()->sendResetLink(
-            $request->only('email')
-        );
-
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('success', 'Link reset password telah dikirim ke email Anda.')
-            : back()->withErrors(['email' => 'Gagal mengirim link reset. Silakan coba lagi.']);
-    }
-
-    /**
-     * Display the password reset view for customers.
-     */
-    public function showCustomerReset(Request $request, string $token)
-    {
-        return view('auth.customer.reset-password', [
-            'email' => $request->email,
-            'token' => $token,
-        ]);
-    }
-
-    /**
-     * Handle password reset for customers.
-     */
-    public function resetCustomerPassword(Request $request)
-    {
-        $request->validate([
-            'token' => 'required',
-            'email' => 'required|email|exists:customers,email',
-            'password' => 'required|min:8|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
-        ], [
-            'password.regex' => 'Password harus mengandung minimal 1 huruf besar, 1 huruf kecil, dan 1 angka.',
-            'email.exists' => 'Email tidak terdaftar.',
-        ]);
-
-        $status = Password::broker()->reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, string $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                    'remember_token' => Str::random(60),
-                ])->save();
-            }
-        );
-
-        return $status === Password::PASSWORD_RESET
-            ? redirect()->route('customer.login')->with('success', 'Password berhasil direset. Silakan login dengan password baru.')
-            : back()->withErrors(['email' => ['Gagal mereset password. Link mungkin sudah kadaluarsa.']]);
-    }
-
-    /**
-     * Display the password reset link request view for affiliators.
-     */
-    public function showAffiliatorForgotPassword()
-    {
-        return view('auth.affiliator.forgot-password');
-    }
-
-    /**
-     * Handle sending password reset email for affiliators.
-     */
-    public function sendAffiliatorResetLink(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email|exists:affiliators,email',
-        ], [
-            'email.exists' => 'Email affiliator tidak terdaftar.',
-        ]);
-
-        $status = Password::broker()->sendResetLink(
-            $request->only('email')
-        );
-
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('success', 'Link reset password telah dikirim ke email Anda.')
-            : back()->withErrors(['email' => 'Gagal mengirim link reset. Silakan coba lagi.']);
-    }
-
-    /**
-     * Display the password reset view for affiliators.
-     */
-    public function showAffiliatorReset(Request $request, string $token)
-    {
-        return view('auth.affiliator.reset-password', [
-            'email' => $request->email,
-            'token' => $token,
-        ]);
-    }
-
-    /**
-     * Handle password reset for affiliators.
-     */
-    public function resetAffiliatorPassword(Request $request)
-    {
-        $request->validate([
-            'token' => 'required',
-            'email' => 'required|email|exists:affiliators,email',
-            'password' => 'required|min:8|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
-        ], [
-            'password.regex' => 'Password harus mengandung minimal 1 huruf besar, 1 huruf kecil, dan 1 angka.',
-            'email.exists' => 'Email affiliator tidak terdaftar.',
-        ]);
-
-        $status = Password::broker()->reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, string $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                    'remember_token' => Str::random(60),
-                ])->save();
-            }
-        );
-
-        return $status === Password::PASSWORD_RESET
-            ? redirect()->route('affiliator.login')->with('success', 'Password berhasil direset. Silakan login dengan password baru.')
-            : back()->withErrors(['email' => ['Gagal mereset password. Link mungkin sudah kadaluarsa.']]);
-    }
-
-    /**
-     * Display the password reset link request view for admins.
-     */
-    public function showAdminForgotPassword()
-    {
-        return view('auth.admin.forgot-password');
-    }
-
-    /**
-     * Handle sending password reset email for admins.
-     */
-    public function sendAdminResetLink(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email|exists:admins,email',
-        ], [
-            'email.exists' => 'Email admin tidak terdaftar.',
-        ]);
-
-        $status = Password::broker()->sendResetLink(
-            $request->only('email')
-        );
-
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('success', 'Link reset password telah dikirim ke email Anda.')
-            : back()->withErrors(['email' => 'Gagal mengirim link reset. Silakan coba lagi.']);
-    }
-
-    /**
-     * Display the password reset view for admins.
-     */
-    public function showAdminReset(Request $request, string $token)
-    {
-        return view('auth.admin.reset-password', [
-            'email' => $request->email,
-            'token' => $token,
-        ]);
-    }
-
-    /**
-     * Handle password reset for admins.
-     */
-    public function resetAdminPassword(Request $request)
-    {
-        $request->validate([
-            'token' => 'required',
-            'email' => 'required|email|exists:admins,email',
-            'password' => 'required|min:8|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
-        ], [
-            'password.regex' => 'Password harus mengandung minimal 1 huruf besar, 1 huruf kecil, dan 1 angka.',
-            'email.exists' => 'Email admin tidak terdaftar.',
-        ]);
-
-        $status = Password::broker()->reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, string $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                    'remember_token' => Str::random(60),
-                ])->save();
-            }
-        );
-
-        return $status === Password::PASSWORD_RESET
-            ? redirect()->route('admin.login')->with('success', 'Password berhasil direset. Silakan login dengan password baru.')
-            : back()->withErrors(['email' => ['Gagal mereset password. Link mungkin sudah kadaluarsa.']]);
-    }
 }
-
-

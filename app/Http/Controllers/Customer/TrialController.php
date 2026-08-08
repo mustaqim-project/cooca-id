@@ -23,8 +23,40 @@ class TrialController extends Controller
         return view('customer.trials.index', compact('trials'));
     }
 
-    public function create(): View
+    public function checkSubdomain(Request $request): \Illuminate\Http\JsonResponse
     {
+        $subdomain = $request->input('subdomain');
+        if (!$subdomain) {
+            return response()->json(['available' => false, 'message' => 'Subdomain is required.']);
+        }
+        
+        if (!preg_match('/^[a-zA-Z0-9-]+$/', $subdomain)) {
+            return response()->json(['available' => false, 'message' => 'Hanya huruf, angka, dan strip yang diperbolehkan.']);
+        }
+
+        $existsInRequests = ErpRequest::where('requested_subdomain', $subdomain)
+            ->whereNotIn('status', [ErpRequest::STATUS_REJECTED, ErpRequest::STATUS_TRIAL_EXPIRED])
+            ->exists();
+            
+        $domainStr = $subdomain . '.cooca.id';
+        $existsInLicenses = \App\Models\License::where('domain', $domainStr)->exists();
+
+        $exists = $existsInRequests || $existsInLicenses;
+            
+        return response()->json([
+            'available' => !$exists,
+            'message' => $exists ? 'Subdomain tidak tersedia.' : 'Subdomain tersedia.'
+        ]);
+    }
+
+    public function create(Request $request): View|\Illuminate\Http\RedirectResponse
+    {
+        $customer = $request->user();
+        if (!$customer->isCompanyProfileComplete()) {
+            return redirect()->route('customer.company-profile.edit')
+                ->with('error', 'Silakan lengkapi Profil Perusahaan Anda terlebih dahulu sebelum request trial.');
+        }
+
         $products = Product::active()->get();
 
         return view('customer.trials.create', compact('products'));
@@ -32,6 +64,12 @@ class TrialController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $customer = $request->user();
+        if (!$customer->isCompanyProfileComplete()) {
+            return redirect()->route('customer.company-profile.edit')
+                ->with('error', 'Silakan lengkapi Profil Perusahaan Anda terlebih dahulu sebelum request trial.');
+        }
+
         $validated = $request->validate([
             'product_id' => 'required|uuid|exists:products,id',
             'requested_subdomain' => 'required|string|max:63|alpha_dash|unique:erp_requests,requested_subdomain',
@@ -47,13 +85,19 @@ class TrialController extends Controller
             return redirect()->back()->withErrors(['product_id' => 'You already have an active trial for this product.']);
         }
 
+        // Make sure the affiliator actually exists in customers table before assigning
+        $affiliatorId = $request->user()->affiliator_id;
+        if ($affiliatorId && !\App\Models\Customer::where('id', $affiliatorId)->exists()) {
+            $affiliatorId = null;
+        }
+
         $trial = ErpRequest::create([
             'customer_id' => $request->user()->id,
             'product_id' => $validated['product_id'],
             'requested_subdomain' => $validated['requested_subdomain'],
             'status' => ErpRequest::STATUS_SUBMITTED,
             'notes' => $validated['notes'] ?? null,
-            'affiliate_id' => $request->user()->referred_by_id,
+            'affiliate_id' => $affiliatorId,
         ]);
 
         event(new \App\Events\Trial\TrialSubmitted($trial));

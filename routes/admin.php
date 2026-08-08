@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\FinanceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AffiliatorController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -34,6 +36,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Live Chat Support Management
+    Route::prefix('live-chats')->name('live-chats.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminLiveChatController::class, 'index'])->name('index');
+        Route::get('/sessions-data', [\App\Http\Controllers\Admin\AdminLiveChatController::class, 'getSessions'])->name('sessions-data');
+        Route::get('/{id}/messages', [\App\Http\Controllers\Admin\AdminLiveChatController::class, 'getMessages'])->name('messages');
+        Route::post('/{id}/reply', [\App\Http\Controllers\Admin\AdminLiveChatController::class, 'reply'])->name('reply');
+        Route::post('/{id}/end', [\App\Http\Controllers\Admin\AdminLiveChatController::class, 'endChat'])->name('end');
+    });
+
 
     // ERP Requests Management
     Route::get('/erp-requests', [ErpRequestController::class, 'index'])->name('erp-requests.index');
@@ -92,6 +104,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::post('/licenses/{license}/appeals/{appeal}/approve', [LicenseController::class, 'approveAppeal'])->name('licenses.appeals.approve');
     Route::post('/licenses/{license}/appeals/{appeal}/reject', [LicenseController::class, 'rejectAppeal'])->name('licenses.appeals.reject');
 
+    // Finance & Reporting
+    Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
+    Route::get('/finance/export', [FinanceController::class, 'export'])->name('finance.export');
+
+    // Full Accounting (ERP Port)
+    Route::get('/accounting/coa', [App\Http\Controllers\Admin\AccountingController::class, 'coaIndex'])->name('accounting.coa.index');
+    Route::post('/accounting/coa', [App\Http\Controllers\Admin\AccountingController::class, 'coaStore'])->name('accounting.coa.store');
+    Route::get('/accounting/journal', [App\Http\Controllers\Admin\AccountingController::class, 'journalIndex'])->name('accounting.journal.index');
+    Route::get('/accounting/journal/create', [App\Http\Controllers\Admin\AccountingController::class, 'journalCreate'])->name('accounting.journal.create');
+    Route::post('/accounting/journal', [App\Http\Controllers\Admin\AccountingController::class, 'journalStore'])->name('accounting.journal.store');
+    Route::get('/accounting/ledger', [App\Http\Controllers\Admin\AccountingController::class, 'reportLedger'])->name('accounting.reports.ledger');
+    Route::get('/accounting/profit-loss', [App\Http\Controllers\Admin\AccountingController::class, 'reportProfitLoss'])->name('accounting.reports.profit-loss');
+
     // Subscriptions Management
     Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
@@ -133,7 +158,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::put('/cms/pages/{page}', [CmsController::class, 'update'])->name('cms.pages.update');
     Route::delete('/cms/pages/{page}', [CmsController::class, 'destroy'])->name('cms.pages.destroy');
 
-    // CMS - Blog
+    // CMS - Blog Categories & Posts
+    Route::resource('blog-categories', BlogCategoryController::class);
     Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
     Route::get('/blog/create', [BlogController::class, 'create'])->name('blog.create');
     Route::post('/blog', [BlogController::class, 'store'])->name('blog.store');
@@ -170,6 +196,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::resource('audit-logs', AuditLogController::class)->only(['index', 'show']);
     Route::get('error-logs', [ErrorLogController::class, 'index'])->name('error-logs.index');
     Route::delete('error-logs/clear', [ErrorLogController::class, 'clear'])->name('error-logs.clear');
+    
+    // Blocked IPs
+    Route::resource('blocked-ips', \App\Http\Controllers\Admin\BlockedIpController::class)->only(['index', 'store', 'destroy']);
 
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
@@ -232,4 +261,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::put('/api-integrations/{provider}', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'update'])->name('api-integrations.update');
     Route::post('/api-integrations/{provider}/toggle', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'toggle'])->name('api-integrations.toggle');
     Route::post('/api-integrations/{provider}/test', [\App\Http\Controllers\Admin\ApiIntegrationController::class, 'test'])->name('api-integrations.test');
+
+    // Deal & Project Management
+    Route::resource('pipelines', \App\Http\Controllers\Admin\PipelineController::class);
+    Route::resource('stages', \App\Http\Controllers\Admin\StageController::class);
+    Route::resource('deals', \App\Http\Controllers\Admin\DealController::class);
+    Route::resource('projects', \App\Http\Controllers\Admin\ProjectController::class);
+    Route::resource('project-tasks', \App\Http\Controllers\Admin\ProjectTaskController::class);
+
+    // WhatsApp API Device Generator Management
+    Route::resource('whatsapp-devices', \App\Http\Controllers\Admin\WhatsAppDeviceController::class);
+    Route::get('/whatsapp-devices/{id}/status-ajax', [\App\Http\Controllers\Admin\WhatsAppDeviceController::class, 'statusAjax'])->name('whatsapp-devices.status-ajax');
+    Route::post('/whatsapp-devices/{id}/test-send', [\App\Http\Controllers\Admin\WhatsAppDeviceController::class, 'testSend'])->name('whatsapp-devices.test-send');
+
+    // Live Chat Quick Templates Management
+    Route::resource('live-chat-templates', \App\Http\Controllers\Admin\LiveChatTemplateController::class);
 });
+
+
+

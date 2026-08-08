@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
@@ -46,7 +46,7 @@
                     <i data-lucide="check-circle" class="w-5 h-5 mr-3 flex-shrink-0 mt-0.5"></i>
                     <div>
                         <h4 class="text-sm font-semibold">Appeal Submitted</h4>
-                        <p class="text-sm mt-1">{{ session('success') }}</p>
+                        <p class="text-sm mt-1">{{ session('success") }}</p>
                     </div>
                 </div>
             @endif
@@ -57,8 +57,8 @@
                         <i data-lucide="clock" class="w-6 h-6"></i>
                     </div>
                     <h3 class="text-lg font-medium text-gray-900">Appeal Under Review</h3>
-                    <p class="text-sm text-gray-500 mt-1">You submitted your appeal on {{ \Carbon\Carbon::parse($affiliator->appealed_at)->format('d M Y, H:i') }}. Please wait for the admin to review it.</p>
-                    
+                    <p class="text-sm text-gray-500 mt-1">You submitted your appeal on {{ \Carbon\Carbon::parse($affiliator->appealed_at)->format('d M Y, H:i") }}. Please wait for the admin to review it.</p>
+
                     <form action="{{ route('affiliator.logout') }}" method="POST" class="mt-6">
                         @csrf
                         <button type="submit" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
@@ -69,7 +69,7 @@
             @else
                 <form action="{{ route('affiliator.appeal.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    
+
                     <div class="space-y-4">
                         <div>
                             <label for="appeal_reason" class="block text-sm font-medium text-gray-700">Why should your account be reactivated? <span class="text-red-500">*</span></label>
@@ -78,7 +78,7 @@
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Upload Proof (Optional)</label>
                             <p class="text-xs text-gray-500 mb-2">You can attach an image (JPG, PNG) as proof.</p>
@@ -99,7 +99,7 @@
                             @enderror
                         </div>
                     </div>
-                    
+
                     <div class="mt-6 flex items-center justify-between">
                         <a href="{{ route('affiliator.logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-sm text-gray-600 hover:text-gray-900">
                             Log out instead
@@ -116,7 +116,7 @@
             @endif
         </div>
     </div>
-    
+
     <script>
         lucide.createIcons();
     </script>

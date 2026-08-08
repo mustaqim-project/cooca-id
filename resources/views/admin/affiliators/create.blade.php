@@ -1,111 +1,88 @@
-@extends('admin.layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Create Affiliators')
+@section('title', 'Register Affiliator — COOCA.ID Admin')
 
 @section('content')
-    <div class="d-flex flex-column gap-4" style="max-width: 800px; margin: 0 auto;">
-
-        <!-- Header -->
-        <div class="d-flex align-items-center gap-3">
-            <a href="{{ route('admin.affiliators.index') }}"
-                class="btn btn-light border-0 rounded-circle p-2 shadow-sm hover-lift"><i class="bi bi-arrow-left"></i></a>
-            <div>
-                <h2 class="mb-1 fw-bold text-capitalize">Create Affiliator</h2>
-                <p class="text-secondary mb-0">Select a user to become an affiliator and configure their code.</p>
-            </div>
+<div class="page-header">
+    <div>
+        <div class="breadcrumb">
+            <a href="{{ route('admin.dashboard') }}">Admin</a>
+            <span>/</span>
+            <a href="{{ route('admin.affiliators.index') }}">Affiliators</a>
+            <span>/</span>
+            <span>Register</span>
         </div>
-
-        <!-- Form Card -->
-        <div class="card border-0 shadow-sm rounded-4 glass p-4 p-md-5">
-            <form action="{{ route('admin.affiliators.store') }}" method="POST" class="d-flex flex-column gap-4">
-                @csrf
-
-                <div class="row g-4">
-                    <div class="col-12">
-                        <div class="form-floating">
-                            <select
-                                class="form-select rounded-3 shadow-none border bg-transparent @error('user_id') is-invalid @enderror"
-                                id="user_id" name="user_id" required>
-                                <option value="">Select a user...</option>
-                                @foreach ($users ?? [] as $user)
-                                    <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }} ({{ $user->email }})</option>
-                                @endforeach
-                            </select>
-                            <label for="user_id">User *</label>
-                            @error('user_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <div class="form-floating">
-                            <input type="text"
-                                class="form-control rounded-3 shadow-none border bg-transparent @error('affiliate_code') is-invalid @enderror"
-                                id="affiliate_code" name="affiliate_code" value="{{ old('affiliate_code') }}"
-                                placeholder="Affiliate Code" required>
-                            <label for="affiliate_code">Affiliate Code *</label>
-                            @error('affiliate_code')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text text-secondary mt-2"><i class="bi bi-info-circle me-1"></i> Custom unique
-                                code for this affiliator (e.g. USERNAME20).</div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <div class="form-floating">
-                            <select
-                                class="form-select rounded-3 shadow-none border bg-transparent @error('is_active') is-invalid @enderror"
-                                id="is_active" name="is_active" required>
-                                <option value="1" {{ old('is_active') == '1' ? 'selected' : '' }}>Active</option>
-                                <option value="0" {{ old('is_active') == '0' ? 'selected' : '' }}>Inactive</option>
-                            </select>
-                            <label for="is_active">Status *</label>
-                            @error('is_active')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <div class="form-floating">
-                            <input type="number" step="0.01"
-                                class="form-control rounded-3 shadow-none border bg-transparent @error('discount_percent') is-invalid @enderror"
-                                id="discount_percent" name="discount_percent" value="{{ old('discount_percent', 0) }}"
-                                placeholder="Discount Percent">
-                            <label for="discount_percent">Discount Percent (%)</label>
-                            @error('discount_percent')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <div class="form-floating">
-                            <input type="number" step="0.01"
-                                class="form-control rounded-3 shadow-none border bg-transparent @error('discount_amount') is-invalid @enderror"
-                                id="discount_amount" name="discount_amount" value="{{ old('discount_amount', 0) }}"
-                                placeholder="Discount Amount">
-                            <label for="discount_amount">Discount Amount (Fixed)</label>
-                            @error('discount_amount')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="border-light my-2">
-
-                <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('admin.affiliators.index') }}"
-                        class="btn btn-light border rounded-pill px-4">Cancel</a>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift">
-                        <i class="bi bi-check2 me-2"></i> Save Affiliator
-                    </button>
-                </div>
-            </form>
-        </div>
+        <h1 class="page-title">Register Affiliate Partner</h1>
+        <p class="page-subtitle">Add a new partner account and configure initial referral parameters.</p>
     </div>
+    <div class="page-actions">
+        <a href="{{ route('admin.affiliators.index') }}" class="btn btn-outline">← Back</a>
+    </div>
+</div>
+
+<div class="card" style="max-width: 600px;">
+    <div class="card-body">
+        <form action="{{ route('admin.affiliators.store') }}" method="POST">
+            @csrf
+
+            <p class="text-xs text-muted font-bold uppercase mb-3" style="border-bottom: 1px solid var(--border); padding-bottom: 8px;">Account Info</p>
+
+            <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" name="name" class="form-input" required value="{{ old('name') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email Address *</label>
+                <input type="email" name="email" class="form-input" required value="{{ old('email') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password *</label>
+                <input type="password" name="password" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="text" name="phone" class="form-input" value="{{ old('phone') }}">
+            </div>
+
+            <p class="text-xs text-muted font-bold uppercase mb-3 mt-4" style="border-bottom: 1px solid var(--border); padding-bottom: 8px;">Referral Settings</p>
+
+            <div class="form-group">
+                <label class="form-label">Referral Code <span class="text-muted" style="font-weight: normal;">(leave blank to auto-generate)</span></label>
+                <input type="text" name="referral_code" class="form-input" placeholder="e.g. PARTNER2024" value="{{ old('referral_code') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Commission Rate (%)</label>
+                <input type="number" step="0.1" min="0" max="100" name="commission_rate" class="form-input" value="{{ old('commission_rate', 25) }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Upline Partner (if referred by another affiliator)</label>
+                <select name="parent_affiliator_id" class="form-select">
+                    <option value="">No Upline (Top-level Partner)</option>
+                    @foreach($allAffiliators as $aff)
+                        <option value="{{ $aff->id }}" {{ old('parent_affiliator_id') == $aff->id ? 'selected' : '' }}>{{ $aff->name }} ({{ $aff->referral_code }})</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <p class="text-xs text-muted font-bold uppercase mb-3 mt-4" style="border-bottom: 1px solid var(--border); padding-bottom: 8px;">Bank / Payment Details</p>
+
+            <div class="form-group">
+                <label class="form-label">Bank Name</label>
+                <input type="text" name="bank_name" class="form-input" placeholder="e.g. BCA, Mandiri, BRI" value="{{ old('bank_name') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Bank Account Number</label>
+                <input type="text" name="bank_account" class="form-input" placeholder="Account number" value="{{ old('bank_account') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Initial Balance (Rp)</label>
+                <input type="number" name="balance" class="form-input" min="0" value="{{ old('balance', 0) }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full mt-4">
+                <span>🤝</span> Create Affiliator Account
+            </button>
+        </form>
+    </div>
+</div>
 @endsection

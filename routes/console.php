@@ -41,28 +41,3 @@ Schedule::command('affiliates:calculate-monthly')->monthlyOn(1, '00:00')->name('
 Schedule::command('backup:clean')->dailyAt('01:00');
 Schedule::command('backup:run')->dailyAt('01:30');
 
-// Custom Artisan Commands (to be created)
-Artisan::command('licenses:expire', function () {
-    $this->info('Expiring licenses...');
-})->purpose('Expire licenses that have passed their expiration date');
-
-Artisan::command('vouchers:deactivate', function () {
-    $this->info('Deactivating expired vouchers...');
-})->purpose('Deactivate vouchers that have passed their validity period');
-
-Artisan::command('notifications:send-reminders', function () {
-    $this->info('Sending notification reminders...');
-})->purpose('Send scheduled notification reminders to users');
-
-Artisan::command('audit:cleanup-old-logs', function () {
-    $this->info('Cleaning up old audit logs...');
-})->purpose('Remove audit logs older than retention period');
-
-Artisan::command('reports:generate-weekly', function () {
-    $this->info('Generating weekly reports...');
-})->purpose('Generate weekly business intelligence reports');
-
-Artisan::command('affiliates:calculate-monthly', function () {
-    $this->info('Calculating monthly affiliate statistics...');
-})->purpose('Calculate and store monthly affiliate performance metrics');
-

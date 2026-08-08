@@ -3,6 +3,10 @@
 namespace Database\Factories;
 
 use App\Models\Review;
+use App\Models\Customer;
+use App\Models\Affiliator;
+use App\Models\Product;
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -20,14 +24,14 @@ class ReviewFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'reviewable_type' => \App\Models\Product::class,
-            'reviewable_id' => \App\Models\Product::inRandomOrder()->first()?->id ?? \App\Models\Product::factory(),
-            'reviewer_type' => fake()->randomElement(['customer', 'affiliator']),
-            'reviewer_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
+            'reviewer_id' => Customer::inRandomOrder()->first()?->id ?? Customer::factory(),
+            'reviewer_type' => 'customer',
+            'product_id' => Product::inRandomOrder()->first()?->id ?? Product::factory(),
             'rating' => fake()->numberBetween(1, 5),
-            'title' => fake()->optional(0.8)->sentence(4),
-            'comment' => fake()->paragraphs(2, true),
+            'content' => fake()->paragraphs(2, true),
+            'status' => fake()->randomElement(['pending', 'approved', 'rejected']),
             'is_approved' => fake()->boolean(70),
+            'user_type' => fake()->randomElement(['customer', 'affiliator', 'admin']),
             'approved_by' => null,
             'approved_at' => null,
         ];
@@ -38,9 +42,9 @@ class ReviewFactory extends Factory
      */
     public function fromCustomer(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
+            'reviewer_id' => Customer::factory(),
             'reviewer_type' => 'customer',
-            'reviewer_id' => \App\Models\User::factory(),
         ]);
     }
 
@@ -49,9 +53,9 @@ class ReviewFactory extends Factory
      */
     public function fromAffiliator(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
+            'reviewer_id' => Affiliator::factory(),
             'reviewer_type' => 'affiliator',
-            'reviewer_id' => \App\Models\User::factory(),
         ]);
     }
 
@@ -60,40 +64,11 @@ class ReviewFactory extends Factory
      */
     public function approved(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
+            'status' => 'approved',
             'is_approved' => true,
-            'approved_by' => \App\Models\User::factory(),
+            'approved_by' => Admin::inRandomOrder()->first()?->id ?? Admin::factory(),
             'approved_at' => now(),
-        ]);
-    }
-
-    /**
-     * Indicate that the review is pending approval.
-     */
-    public function pending(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'is_approved' => false,
-        ]);
-    }
-
-    /**
-     * Indicate that the review has a 5-star rating.
-     */
-    public function fiveStars(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'rating' => 5,
-        ]);
-    }
-
-    /**
-     * Indicate that the review has a low rating (1-2 stars).
-     */
-    public function lowRating(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'rating' => fake()->numberBetween(1, 2),
         ]);
     }
 }

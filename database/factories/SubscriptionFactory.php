@@ -3,6 +3,9 @@
 namespace Database\Factories;
 
 use App\Models\Subscription;
+use App\Models\Customer;
+use App\Models\License;
+use App\Models\SubscriptionPlan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -20,12 +23,12 @@ class SubscriptionFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
-            'license_id' => \App\Models\License::inRandomOrder()->first()?->id ?? \App\Models\License::factory(),
-            'subscription_plan_id' => \App\Models\SubscriptionPlan::inRandomOrder()->first()?->id ?? \App\Models\SubscriptionPlan::factory(),
+            'customer_id' => Customer::inRandomOrder()->first()?->id ?? Customer::factory(),
+            'license_id' => License::inRandomOrder()->first()?->id ?? License::factory(),
+            'subscription_plan_id' => SubscriptionPlan::inRandomOrder()->first()?->id ?? SubscriptionPlan::factory(),
             'status' => fake()->randomElement(['trial', 'active', 'expired', 'cancelled']),
-            'started_at' => fake()->dateTimeBetween('-1 year', 'now'),
-            'expires_at' => fake()->optional(0.8)->dateTimeBetween('now', '+1 year'),
+            'started_at' => fake()->optional(0.8)->dateTimeBetween('-6 months', 'now'),
+            'expires_at' => fake()->optional(0.8)->dateTimeBetween('now', '+6 months'),
             'cancelled_at' => null,
         ];
     }
@@ -35,46 +38,22 @@ class SubscriptionFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'active',
-            'started_at' => now()->subMonths(3),
-            'expires_at' => now()->addMonths(9),
+            'started_at' => now()->subMonth(),
+            'expires_at' => now()->addYear(),
         ]);
     }
 
     /**
-     * Indicate that the subscription is expired.
-     */
-    public function expired(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'expired',
-            'started_at' => now()->subYears(2),
-            'expires_at' => now()->subMonth(),
-        ]);
-    }
-
-    /**
-     * Indicate that the subscription is cancelled.
-     */
-    public function cancelled(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'cancelled',
-            'started_at' => now()->subMonths(6),
-            'cancelled_at' => now()->subMonth(),
-        ]);
-    }
-
-    /**
-     * Indicate that the subscription is on trial.
+     * Indicate that the subscription is a trial.
      */
     public function trial(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'trial',
-            'started_at' => now()->subDays(7),
-            'expires_at' => now()->addDays(7),
+            'started_at' => now(),
+            'expires_at' => now()->addDays(14),
         ]);
     }
 }

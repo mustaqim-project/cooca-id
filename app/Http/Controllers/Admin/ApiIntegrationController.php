@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ApiIntegration;
+use App\Models\WhatsAppDevice;
+use App\Services\WhatsAppGatewayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -14,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 /**
  * Admin API Integration Controller
  *
- * Manages API integrations (Midtrans, Google OAuth, SMTP, WhatsApp)
+ * Manages API integrations (Midtrans, Google OAuth, SMTP, WhatsApp Gateway)
  * with encrypted config storage via the api_integrations table.
  */
 final class ApiIntegrationController extends Controller
@@ -22,13 +24,14 @@ final class ApiIntegrationController extends Controller
     /**
      * Known provider definitions with field schemas.
      */
-    private const PROVIDER_SCHEMAS = [
+    public const PROVIDER_SCHEMAS = [
         'midtrans' => [
             'name' => 'Midtrans Payment Gateway',
             'fields' => [
-                'server_key' => ['label' => 'Server Key', 'type' => 'password', 'required' => true],
-                'client_key' => ['label' => 'Client Key', 'type' => 'password', 'required' => true],
-                'sandbox'    => ['label' => 'Sandbox Mode', 'type' => 'boolean', 'required' => false],
+                'merchant_id' => ['label' => 'Merchant ID', 'type' => 'text', 'required' => true],
+                'server_key'  => ['label' => 'Server Key', 'type' => 'password', 'required' => true],
+                'client_key'  => ['label' => 'Client Key', 'type' => 'password', 'required' => true],
+                'sandbox'     => ['label' => 'Sandbox Mode', 'type' => 'boolean', 'required' => false],
             ],
         ],
         'google_oauth' => [
@@ -88,10 +91,10 @@ final class ApiIntegrationController extends Controller
             ],
         ],
         'whatsapp' => [
-            'name' => 'WhatsApp (whatsapp-web.js)',
+            'name' => 'WhatsApp API Gateway (Fonnte-Style)',
             'fields' => [
-                'server_url' => ['label' => 'WA Server URL', 'type' => 'text', 'required' => true],
-                'api_token'  => ['label' => 'API Token (opsional)', 'type' => 'password', 'required' => false],
+                'server_url' => ['label' => 'Node Gateway Server URL (misal: http://127.0.0.1:3000)', 'type' => 'text', 'required' => true],
+                'api_key'    => ['label' => 'Default Secret X-WA-API-KEY (Dapatkan dari Admin > WhatsApp Devices)', 'type' => 'password', 'required' => false],
             ],
         ],
     ];
@@ -238,15 +241,32 @@ final class ApiIntegrationController extends Controller
                     return back()->with('success', 'Koneksi SMTP berhasil dikonfigurasi.');
 
                 case 'whatsapp':
-                    $response = Http::timeout(5)->get(($config['server_url'] ?? 'http://localhost:3000') . '/qr');
-                    $data = $response->json();
-                    $statusMsg = match ($data['status'] ?? 'unknown') {
-                        'ready'   => 'WhatsApp sudah terautentikasi dan siap digunakan.',
-                        'pending' => 'QR Code tersedia. Silakan scan di Admin Panel.',
-                        'loading' => 'WhatsApp sedang memuat, tunggu beberapa detik.',
-                        default   => 'Status tidak diketahui.',
-                    };
-                    return back()->with('success', "WhatsApp Status: {$statusMsg}");
+                    $apiKey = $config['api_key'] ?? null;
+                    
+                    $device = null;
+                    if ($apiKey) {
+                        $device = WhatsAppDevice::where('api_key', $apiKey)->first();
+                    }
+                    if (!$device) {
+                        $device = WhatsAppDevice::where('owner_type', 'admin')->latest()->first();
+                    }
+
+                    if (!$device) {
+                        return back()->with('info', 'Belum ada WhatsApp Device yang dibuat. Silakan buat device baru di menu Admin > WhatsApp Devices.');
+                    }
+
+                    $gatewayService = app(WhatsAppGatewayService::class);
+                    $statusRes = $gatewayService->getStatus($device->session_id);
+                    $status = strtolower($statusRes['status'] ?? 'disconnected');
+
+                    if ($status === 'connected') {
+                        $phone = $device->phone_number ? "+{$device->phone_number}" : 'Aktif';
+                        return back()->with('success', "WhatsApp Gateway Terhubung! Device: '{$device->name}' ({$phone}). API Pengiriman Siap Digunakan.");
+                    } elseif ($status === 'scan_qr' || $status === 'connecting') {
+                        return back()->with('info', "WhatsApp Gateway Server Aktif. Device '{$device->name}' memerlukan Scan QR Code di menu Admin > WhatsApp Devices.");
+                    } else {
+                        return back()->with('error', "WhatsApp Gateway Server Aktif, tetapi Device '{$device->name}' terputus (Status: {$status}). Silakan hubungkan kembali di WhatsApp Devices.");
+                    }
 
                 case 'midtrans':
                     return back()->with('success', 'Konfigurasi Midtrans tersimpan. Gunakan Midtrans Simulator untuk tes.');

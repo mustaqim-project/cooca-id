@@ -40,7 +40,7 @@ final class WithdrawalRejectedMail extends Mailable implements ShouldQueue
             view: 'mail.affiliator.withdrawal-rejected',
             with: [
                 'affiliatorName' => $this->withdrawal->affiliator->name,
-                'amount' => number_format($this->withdrawal->amount, 0, ',', '.'),
+                'amount' => number_format((float) $this->withdrawal->amount, 0, ',', '.'),
                 'rejectionReason' => $this->withdrawal->rejection_reason ?? 'Tidak ada alasan yang diberikan',
             ],
         );

@@ -6,8 +6,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class LandingCmsController extends Controller
 {
@@ -59,17 +59,16 @@ class LandingCmsController extends Controller
         ]);
 
         // Handle File Uploads
+        $imageService = app(ImageService::class);
+        $uploadDir    = public_path('uploads/settings');
+
         if ($request->hasFile('site_logo')) {
-            $file = $request->file('site_logo');
-            $filename = time() . '_logo.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/settings'), $filename);
+            $filename = $imageService->saveToPublic($request->file('site_logo'), $uploadDir, time() . '_logo');
             Setting::set('site.logo', '/uploads/settings/' . $filename, 'string');
         }
 
         if ($request->hasFile('site_favicon')) {
-            $file = $request->file('site_favicon');
-            $filename = time() . '_favicon.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/settings'), $filename);
+            $filename = $imageService->saveToPublic($request->file('site_favicon'), $uploadDir, time() . '_favicon');
             Setting::set('site.favicon', '/uploads/settings/' . $filename, 'string');
         }
 

@@ -1,124 +1,56 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
-use App\Models\Testimonial;
 use Illuminate\Database\Seeder;
+use App\Models\Testimonial;
 
-class TestimonialSeeder extends Seeder
+final class TestimonialSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
-        Testimonial::truncate();
-        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
-
         $testimonials = [
             [
-                'name' => 'Ahmad Rizki',
-                'company' => 'Padang Sari Rasa Restaurant',
-                'position' => 'Owner',
-                'content' => 'Sistem ERP yang sangat membantu operasional restoran kami. Trial langsung aktif dan tim support sangat responsif. Saya sangat merekomendasikan COOCA kepada pemilik bisnis lainnya.',
+                'name' => 'Budi Hendrawan',
+                'position' => 'Owner Resto Dapur Nusantara',
+                'company' => 'Resto Dapur Nusantara (3 Cabang)',
+                'content' => 'Sejak beralih ke Cooca Resto ERP, pemesanan QR meja dan stok bahan dapur kami terkontrol 100%. Laporan HPP real-time sangat membantu menekan waste bahan baku!',
                 'rating' => 5,
-                'avatar' => 'https://ui-avatars.com/api/?name=Ahmad+Rizki&background=random',
-                'product_type' => 'restoran',
+                'avatar' => null,
                 'is_featured' => true,
                 'is_active' => true,
-                'order' => 1,
             ],
             [
-                'name' => 'Dr. Siti Nurhaliza',
-                'company' => 'Klinik Sehat Mandiri',
-                'position' => 'Dokter & Direktur',
-                'content' => 'Management pasien dan rekam medis jadi lebih teratur. Worth it banget untuk klinik kecil seperti kami. Sistem ini sangat user-friendly dan tidak perlu training yang panjang.',
+                'name' => 'dr. Anisa Rahmawati',
+                'position' => 'Kepala Klinik Utama Medika',
+                'company' => 'Klinik Medika Sejahtera',
+                'content' => 'Sistem Rekam Medis Elektronik Cooca Medika sangat sesuai dengan regulasi Kemenkes. Dokter dan perawat kami bisa menangani pasien 2 kali lebih cepat.',
                 'rating' => 5,
-                'avatar' => 'https://ui-avatars.com/api/?name=Siti+Nurhaliza&background=random',
-                'product_type' => 'klinik',
+                'avatar' => null,
                 'is_featured' => true,
                 'is_active' => true,
-                'order' => 2,
             ],
             [
-                'name' => 'Budi Santoso',
-                'company' => 'Bengkel Auto Care',
-                'position' => 'Manager',
-                'content' => 'Fitur booking dan tracking servis sangat berguna. Customer juga senang bisa monitor progress online. Produktivitas bengkel kami meningkat 40% setelah menggunakan COOCA.',
-                'rating' => 4,
-                'avatar' => 'https://ui-avatars.com/api/?name=Budi+Santoso&background=random',
-                'product_type' => 'bengkel',
+                'name' => 'Hendra Setiawan',
+                'position' => 'Managing Director Bengkel Setia Motor',
+                'company' => 'Setia Motor Otomotif',
+                'content' => 'Manajemen PKB Work Order dan komisi mekanik kini otomatis. Pelanggan sangat menyukai estimasi biaya yang kami kirim langsung via WhatsApp.',
+                'rating' => 5,
+                'avatar' => null,
                 'is_featured' => true,
                 'is_active' => true,
-                'order' => 3,
-            ],
-            [
-                'name' => 'Yani Wijaya',
-                'company' => 'Toko Elektronik Maju Jaya',
-                'position' => 'Pemilik',
-                'content' => 'Inventory management jadi lebih efisien. Saya bisa melihat stok real-time dari mana saja. Sangat membantu dalam mengambil keputusan bisnis yang lebih baik.',
-                'rating' => 5,
-                'avatar' => 'https://ui-avatars.com/api/?name=Yani+Wijaya&background=random',
-                'product_type' => 'retail',
-                'is_featured' => false,
-                'is_active' => true,
-                'order' => 4,
-            ],
-            [
-                'name' => 'Prof. Bambang Sutrisno',
-                'company' => 'SMK Teknologi Digital',
-                'position' => 'Kepala Sekolah',
-                'content' => 'Sistem manajemen sekolah yang sangat komprehensif. Data siswa dan nilai dapat diakses dengan mudah. Implementasi sangat cepat dan support team-nya responsif.',
-                'rating' => 5,
-                'avatar' => 'https://ui-avatars.com/api/?name=Bambang+Sutrisno&background=random',
-                'product_type' => 'pendidikan',
-                'is_featured' => false,
-                'is_active' => true,
-                'order' => 5,
-            ],
-            [
-                'name' => 'Sinta Kusuma',
-                'company' => 'Hotel Pantai Resort',
-                'position' => 'General Manager',
-                'content' => 'Booking management dan guest relations menjadi sangat mudah. Revenue management tools membantu kami maksimalkan occupancy rate. ROI-nya tercapai dalam 3 bulan pertama.',
-                'rating' => 5,
-                'avatar' => 'https://ui-avatars.com/api/?name=Sinta+Kusuma&background=random',
-                'product_type' => 'hotel',
-                'is_featured' => true,
-                'is_active' => true,
-                'order' => 6,
-            ],
-            [
-                'name' => 'Rudi Hermawan',
-                'company' => 'PT Manufaktur Jaya',
-                'position' => 'Production Manager',
-                'content' => 'Production planning dan quality control jadi lebih terstruktur. Kami bisa track setiap tahap produksi dengan detail. Waste berkurang dan efficiency meningkat signifikan.',
-                'rating' => 4,
-                'avatar' => 'https://ui-avatars.com/api/?name=Rudi+Hermawan&background=random',
-                'product_type' => 'manufaktur',
-                'is_featured' => false,
-                'is_active' => true,
-                'order' => 7,
-            ],
-            [
-                'name' => 'Eka Prasetya',
-                'company' => 'Konsultan Bisnis Mitra',
-                'position' => 'Founding Partner',
-                'content' => 'Platform COOCA sangat flexible untuk berbagai industri. Saya sudah merekomendasikan ke puluhan klien dan semua puas. Sistem ini benar-benar game changer untuk UMKM.',
-                'rating' => 5,
-                'avatar' => 'https://ui-avatars.com/api/?name=Eka+Prasetya&background=random',
-                'product_type' => 'konsultasi',
-                'is_featured' => true,
-                'is_active' => true,
-                'order' => 8,
             ],
         ];
 
-        foreach ($testimonials as $testimonial) {
-            Testimonial::create($testimonial);
+        foreach ($testimonials as $t) {
+            Testimonial::firstOrCreate(
+                ['name' => $t['name']],
+                $t
+            );
         }
 
-        $this->command->info('Testimonials seeded successfully.');
+        echo "✅ Testimonials successfully seeded.\n";
     }
 }

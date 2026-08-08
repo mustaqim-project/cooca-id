@@ -1,101 +1,98 @@
-@extends('customer.layouts.app')
-
-@section('title', 'My Subscriptions')
-
+@extends('layouts.customer')
+@section('title', 'Subscriptions')
+@section('breadcrumb')
+    <span class="crumb-current">Subscriptions</span>
+@endsection
 @section('content')
-    <div class="d-flex flex-column gap-4">
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-repeat" style="color:var(--primary);margin-right:10px;"></i>Subscriptions</h1>
+        <p class="page-subtitle">Manage your active plans, recurring billing, and renewal dates.</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ route('customer.subscriptions.create') }}" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> New Subscription
+        </a>
+    </div>
+</div>
 
-        <!-- Page Header & Toolbar -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-                <h2 class="mb-1 fw-bold">My Subscriptions</h2>
-                <p class="text-secondary mb-0">Manage your active and past subscriptions.</p>
-            </div>
-            <div class="d-flex gap-2">
-            </div>
-        </div>
+@if(session('success'))
+    <div class="alert alert-success mb-4"><i class="fa-solid fa-check-circle"></i> {{ session('success') }}</div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger mb-4"><i class="fa-solid fa-circle-xmark"></i> {{ session('error') }}</div>
+@endif
 
-        <!-- Subscriptions Table -->
-        <div class="card border-0 shadow-sm rounded-4 glass">
-            <div
-                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
-                    style="max-width: 320px; background: var(--color-bg);">
-                    <span class="input-group-text bg-transparent border-0 pe-1"><i
-                            class="bi bi-search text-secondary"></i></span>
-                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
-                        placeholder="Search subscriptions...">
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
-                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
-                        <tr>
-                            <th class="py-3 px-4 border-0">Product / Plan</th>
-                            <th class="py-3 px-3 border-0">Status</th>
-                            <th class="py-3 px-3 border-0">Started At</th>
-                            <th class="py-3 px-3 border-0">Expires At</th>
-                            <th class="py-3 px-4 border-0 text-end">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="border-top-0">
-                        @forelse($subscriptions as $subscription)
-                            <tr>
-                                <td class="py-3 px-4">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center fw-bold"
-                                            style="width: 40px; height: 40px;">
-                                            <i class="bi bi-arrow-repeat"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-semibold">{{ $subscription->plan->product->name ?? 'Unknown Product' }}</div>
-                                            <div class="text-secondary fs-7">{{ $subscription->plan->name ?? 'Unknown Plan' }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-3">
-                                    @if($subscription->is_active)
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">Active</span>
-                                    @elseif($subscription->is_cancelled)
-                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1">Cancelled</span>
-                                    @elseif($subscription->expires_at && $subscription->expires_at->isPast())
-                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1">Expired</span>
-                                    @else
-                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-1">Pending</span>
-                                    @endif
-                                </td>
-                                <td class="py-3 px-3 text-secondary fs-7">
-                                    {{ $subscription->started_at ? $subscription->started_at->format('M d, Y') : '-' }}
-                                </td>
-                                <td class="py-3 px-3 text-secondary fs-7">
-                                    {{ $subscription->expires_at ? $subscription->expires_at->format('M d, Y') : 'Lifetime' }}
-                                </td>
-                                <td class="py-3 px-4 text-end">
-                                    <a href="{{ route('customer.subscriptions.show', $subscription->id) }}"
-                                        class="btn btn-sm btn-light border rounded-pill px-3 hover-lift">
-                                        View Details <i class="bi bi-arrow-right ms-1"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="py-5 text-center text-secondary">
-                                    <div class="mb-3"><i class="bi bi-inbox fs-1"></i></div>
-                                    <h6 class="fw-medium">No Subscriptions Found</h6>
-                                    <p class="fs-7">You don't have any subscriptions yet.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            
-            @if (method_exists($subscriptions, 'hasPages') && $subscriptions->hasPages())
-                <div class="card-footer bg-transparent border-top border-light p-4">
-                    {{ $subscriptions->links() }}
-                </div>
-            @endif
+<div class="card">
+    <div class="card-body" style="padding:0;">
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Plan Name</th>
+                        <th>Billing Cycle</th>
+                        <th>Price</th>
+                        <th>Start Date</th>
+                        <th>Expiration Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($subscriptions as $sub)
+                    @php $plan = $sub->subscriptionPlan; @endphp
+                    <tr>
+                        <td class="font-bold text-sm">{{ $plan?->name ?? 'Subscription' }}</td>
+                        <td><span class="badge badge-primary">{{ ucfirst($plan?->billing_cycle ?? 'monthly') }}</span></td>
+                        <td class="font-bold text-sm">Rp {{ number_format($plan?->price ?? 0, 0, ',', '.') }}</td>
+                        <td class="text-xs text-muted">{{ $sub->started_at?->format('d M Y') ?? '—' }}</td>
+                        <td class="text-xs text-muted">
+                            {{ $sub->expires_at?->format('d M Y') ?? '—' }}
+                            @if($sub->expires_at && $sub->expires_at->isPast())
+                                <span class="badge badge-danger" style="font-size:10px;">Expired</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($sub->status === 'active')   <span class="badge badge-success">Active</span>
+                            @elseif($sub->status === 'trial')  <span class="badge badge-accent">Trial</span>
+                            @elseif($sub->status === 'expired')<span class="badge badge-danger">Expired</span>
+                            @else <span class="badge badge-muted">{{ ucfirst($sub->status) }}</span>
+                            @endif
+                        </td>
+                        <td>
+                            <div class="flex gap-1">
+                                <a href="{{ route('customer.subscriptions.show', $sub->id) }}" class="btn btn-ghost btn-sm">
+                                    <i class="fa-solid fa-eye"></i> Details
+                                </a>
+                                @if($sub->status === 'active')
+                                    <form method="POST" action="{{ route('customer.subscriptions.renew', $sub->id) }}" style="display:inline;">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="fa-solid fa-rotate"></i> Renew
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔄</div>
+                                <div class="empty-state-title">No Active Subscriptions</div>
+                                <div class="empty-state-text">Choose a plan to activate COOCA.ID software modules.</div>
+                                <a href="{{ route('customer.subscriptions.create') }}" class="btn btn-primary">Subscribe Now</a>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
+    @if(method_exists($subscriptions, 'hasPages') && $subscriptions->hasPages())
+        <div class="card-footer">{{ $subscriptions->links() }}</div>
+    @endif
+</div>
 @endsection

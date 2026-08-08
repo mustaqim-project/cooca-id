@@ -7,6 +7,12 @@
             'route' => 'customer.dashboard',
         ],
         [
+            'name' => 'My Projects',
+            'href' => route('customer.projects.index'),
+            'icon' => 'bi-kanban',
+            'route' => 'customer.projects.*',
+        ],
+        [
             'name' => 'Produk',
             'href' => route('customer.products.index'),
             'icon' => 'bi-box-seam',

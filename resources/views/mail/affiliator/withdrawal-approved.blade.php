@@ -30,10 +30,10 @@
         <div class="content">
             <div class="success-icon">✓</div>
             <h2 style="text-align: center;">Withdrawal Disetujui!</h2>
-            
+
             <p>Halo {{ $affiliatorName }},</p>
             <p>Request withdrawal Anda telah disetujui dan sedang diproses untuk transfer.</p>
-            
+
             <div class="info-box">
                 <div class="info-row">
                     <span class="label">Jumlah Withdrawal</span>
@@ -60,7 +60,7 @@
                     <span class="value">{{ $accountName }}</span>
                 </div>
             </div>
-            
+
             <div class="timeline">
                 <div class="timeline-item">
                     <div class="timeline-icon">✓</div>
@@ -77,7 +77,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="footer">
                 <p>Terima kasih atas partisipasi Anda dalam program affiliate COOCA.ID</p>
                 <p>&copy; {{ date('Y') }} COOCA.ID. All rights reserved.</p>

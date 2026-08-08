@@ -1,95 +1,65 @@
-@extends('admin.layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Create Customers')
+@section('title', 'Create Customer Account — COOCA.ID Admin')
 
 @section('content')
-    <div class="d-flex flex-column gap-4" style="max-width: 800px; margin: 0 auto;">
-
-        <!-- Header -->
-        <div class="d-flex align-items-center gap-3">
-            <a href="{{ route('admin.customers.index') }}"
-                class="btn btn-light border-0 rounded-circle p-2 shadow-sm hover-lift"><i class="bi bi-arrow-left"></i></a>
-            <div>
-                <h2 class="mb-1 fw-bold text-capitalize">Create Customer</h2>
-                <p class="text-secondary mb-0">Fill in the details to create a new customer.</p>
-            </div>
+<div class="page-header">
+    <div>
+        <div class="breadcrumb">
+            <a href="{{ route('admin.dashboard') }}">Admin</a>
+            <span>/</span>
+            <a href="{{ route('admin.customers.index') }}">Customers</a>
+            <span>/</span>
+            <span>Create</span>
         </div>
-
-        <!-- Form Card -->
-        <div class="card border-0 shadow-sm rounded-4 glass p-4 p-md-5">
-            <form action="{{ route('admin.customers.store') }}" method="POST" class="d-flex flex-column gap-4">
-                @csrf
-
-                <div class="row g-4">
-                    <div class="col-12 col-md-6">
-                        <div class="form-floating">
-                            <input type="text"
-                                class="form-control rounded-3 shadow-none border bg-transparent @error('name') is-invalid @enderror"
-                                id="name" name="name" value="{{ old('name') }}" placeholder="Full Name" required>
-                            <label for="name">Full Name *</label>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <div class="form-floating">
-                            <input type="email"
-                                class="form-control rounded-3 shadow-none border bg-transparent @error('email') is-invalid @enderror"
-                                id="email" name="email" value="{{ old('email') }}" placeholder="Email Address"
-                                required>
-                            <label for="email">Email Address *</label>
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <div class="form-floating">
-                            <input type="password"
-                                class="form-control rounded-3 shadow-none border bg-transparent @error('password') is-invalid @enderror"
-                                id="password" name="password" placeholder="Password" required>
-                            <label for="password">Password (Min. 8 characters) *</label>
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <div class="form-floating">
-                            <input type="text"
-                                class="form-control rounded-3 shadow-none border bg-transparent @error('phone') is-invalid @enderror"
-                                id="phone" name="phone" value="{{ old('phone') }}" placeholder="Phone Number">
-                            <label for="phone">Phone Number</label>
-                            @error('phone')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="form-floating">
-                            <input type="text"
-                                class="form-control rounded-3 shadow-none border bg-transparent @error('business_name') is-invalid @enderror"
-                                id="business_name" name="business_name" value="{{ old('business_name') }}"
-                                placeholder="Business Name">
-                            <label for="business_name">Business Name</label>
-                            @error('business_name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="border-light my-2">
-
-                <div class="d-flex justify-content-end gap-2">
-                    <a href="{{ route('admin.customers.index') }}"
-                        class="btn btn-light border rounded-pill px-4">Cancel</a>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift">
-                        <i class="bi bi-check2 me-2"></i> Save Customer
-                    </button>
-                </div>
-            </form>
-        </div>
+        <h1 class="page-title">Create Customer Account</h1>
     </div>
+</div>
+
+<div class="card" style="max-width: 600px;">
+    <div class="card-body">
+        <form action="{{ route('admin.customers.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" name="name" class="form-input" required value="{{ old('name') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email Address *</label>
+                <input type="email" name="email" class="form-input" required value="{{ old('email') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password *</label>
+                <input type="password" name="password" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Business / Company Name</label>
+                <input type="text" name="business_name" class="form-input" value="{{ old('business_name') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Company Domain</label>
+                <input type="text" name="domain" class="form-input" placeholder="e.g. clientdomain.com" value="{{ old('domain') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="text" name="phone" class="form-input" value="{{ old('phone') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Assigned Affiliate Partner</label>
+                <select name="affiliator_id" class="form-select">
+                    <option value="">No Affiliate Partner</option>
+                    @foreach($affiliators as $aff)
+                        <option value="{{ $aff->id }}" {{ old('affiliator_id') == $aff->id ? 'selected' : '' }}>{{ $aff->name }} ({{ $aff->referral_code }})</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Company Logo</label>
+                <input type="file" name="logo_path" class="form-input" accept="image/*" style="padding: 10px;">
+                <small style="color: var(--text-muted); font-size: 12px; margin-top: 4px; display: block;">Upload company logo image (Max 2MB).</small>
+            </div>
+            <button type="submit" class="btn btn-primary w-full mt-4">👤 Create Customer</button>
+        </form>
+    </div>
+</div>
 @endsection

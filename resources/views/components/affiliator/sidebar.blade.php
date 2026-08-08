@@ -83,7 +83,7 @@
         </div>
         <ul class="nav flex-column gap-1 mb-3">
             <li class="nav-item">
-                <a href="{{ route('affiliator.marketing.index') }}"
+                <a href="{{ route('affiliator.marketing_materials.index') }}"
                     class="nav-link d-flex align-items-center gap-3 rounded-3 px-3 py-2 text-decoration-none {{ request()->routeIs('affiliator.marketing.*') ? 'bg-primary text-white fw-medium' : 'text-secondary hover-lift' }}">
                     <i class="bi bi-megaphone fs-5"></i>
                     <span class="sidebar-text">Marketing Assets</span>

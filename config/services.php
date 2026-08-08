@@ -52,4 +52,9 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', '/customer/auth/google/callback'),
     ],
 
+    'whatsapp_gateway' => [
+        'url' => env('WA_SERVER_URL', 'http://127.0.0.1:3000'),
+    ],
+
 ];
+

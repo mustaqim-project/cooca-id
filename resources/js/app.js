@@ -1,204 +1,89 @@
 import "./bootstrap";
 import "../css/app.css";
+import "../css/public.css";
 
 import Alpine from "alpinejs";
 import Swal from "sweetalert2";
-import { initTheme, toggleTheme } from "./ui/theme.js";
-import { initAlerts } from "./ui/alerts.js";
-import { initFormConfirmations } from "./ui/forms.js";
 
 window.Alpine = Alpine;
 Alpine.start();
 
-// Configure SweetAlert2 with modern styles
+// Configure SweetAlert2 with Pristine Light Enterprise Theme
 window.Swal = Swal.mixin({
     customClass: {
-        popup: "rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 shadow-xl",
-        title: "text-lg font-heading font-semibold text-surface-900 dark:text-white",
-        htmlContainer: "text-sm text-surface-600 dark:text-surface-300",
+        popup: "rounded-3xl border border-slate-200 bg-white shadow-2xl p-6 text-slate-900",
+        title: "text-xl font-bold text-slate-900 tracking-tight",
+        htmlContainer: "text-sm text-slate-600 font-medium mt-2",
         confirmButton:
-            "inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors",
+            "inline-flex justify-center items-center px-5 py-2.5 text-sm font-extrabold rounded-xl shadow-lg text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all",
         cancelButton:
-            "inline-flex justify-center items-center px-4 py-2 border border-surface-300 dark:border-surface-600 text-sm font-medium rounded-lg text-surface-700 dark:text-surface-300 bg-white dark:bg-surface-800 hover:bg-surface-50 dark:hover:bg-surface-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors",
-        actions: "gap-3",
+            "inline-flex justify-center items-center px-5 py-2.5 text-sm font-bold rounded-xl border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 focus:outline-none transition-all",
+        actions: "gap-3 mt-4",
     },
     buttonsStyling: false,
 });
 
 // Toast Notification Helper
-window.showToast = function (message, type = "info", duration = 5000) {
+window.showToast = function (message, type = "info", duration = 4000) {
     const container = document.getElementById("toastContainer");
     if (!container) return;
 
     const toast = document.createElement("div");
-    toast.className = `toast align-items-center text-white bg-${type} border-0 show`;
-    toast.setAttribute("role", "alert");
+    const bgClass =
+        type === "success"
+            ? "bg-emerald-600 text-white"
+            : type === "error"
+            ? "bg-rose-600 text-white"
+            : type === "warning"
+            ? "bg-amber-500 text-white"
+            : "bg-indigo-600 text-white";
+
+    toast.className = `flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl ${bgClass} font-semibold text-sm transition-all transform translate-y-2 opacity-0 duration-300 z-50`;
     toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">
-                <i class="bi bi-${type === "success" ? "check-circle" : type === "error" ? "exclamation-triangle" : type === "warning" ? "exclamation-circle" : "info-circle"} me-2"></i>
-                ${message}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
+        <i class="fa-solid fa-${
+            type === "success"
+                ? "circle-check"
+                : type === "error"
+                ? "circle-exclamation"
+                : type === "warning"
+                ? "triangle-exclamation"
+                : "circle-info"
+        } text-lg"></i>
+        <span>${message}</span>
     `;
+
     container.appendChild(toast);
 
+    requestAnimationFrame(() => {
+        toast.classList.remove("translate-y-2", "opacity-0");
+    });
+
     setTimeout(() => {
-        toast.classList.remove("show");
+        toast.classList.add("opacity-0", "-translate-y-2");
         setTimeout(() => toast.remove(), 300);
     }, duration);
 };
 
-// Initialize App
+// Initialize App Features & Smooth Interactivity
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Initialize UI modules
-    initTheme();
-    initAlerts();
-    initFormConfirmations();
+    // 1. FontAwesome / Icon helper auto check
+    console.log("Cooca.id Pristine Light Theme Assets Loaded.");
 
-    // Auto-initialize Lucide if loaded via CDN
-    if (typeof lucide !== "undefined") {
-        lucide.createIcons();
-    }
-
-    // 2. Page Loader
-    const loader = document.getElementById("pageLoader");
-    if (loader) {
-        setTimeout(() => {
-            loader.classList.add("loaded");
-            setTimeout(() => loader.remove(), 300);
-        }, 500);
-    }
-
-    // 3. Fullscreen Toggle
-    document
-        .getElementById("fullscreenToggle")
-        ?.addEventListener("click", function () {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch((err) => {
-                    console.log("Fullscreen request failed:", err);
-                });
-                this.querySelector("i")?.classList.replace(
-                    "bi-fullscreen",
-                    "bi-fullscreen-exit",
-                );
-            } else {
-                document.exitFullscreen();
-                this.querySelector("i")?.classList.replace(
-                    "bi-fullscreen-exit",
-                    "bi-fullscreen",
-                );
-            }
-        });
-
-    // 4. Sidebar Toggle & Collapse
-    const sidebar = document.getElementById("appSidebar");
-    const main = document.getElementById("appMain");
-    const backdrop = document.getElementById("sidebarBackdrop");
-    const toggle = document.getElementById("sidebarToggle");
-    const collapseBtn = document.getElementById("sidebarCollapseBtn");
-
-    function openSidebar() {
-        sidebar?.classList.add("open");
-        backdrop?.classList.add("show");
-        toggle?.setAttribute("aria-expanded", "true");
-    }
-
-    function closeSidebar() {
-        sidebar?.classList.remove("open");
-        backdrop?.classList.remove("show");
-        toggle?.setAttribute("aria-expanded", "false");
-    }
-
-    function toggleSidebar() {
-        if (window.innerWidth >= 992) {
-            sidebar?.classList.toggle("collapsed");
-            main?.classList.toggle("sidebar-collapsed");
-            localStorage.setItem(
-                "sidebarCollapsed",
-                sidebar?.classList.contains("collapsed"),
-            );
-
-            // Update collapse button icon
-            const icon = collapseBtn?.querySelector("i");
-            if (sidebar?.classList.contains("collapsed")) {
-                icon?.classList.replace("bi-chevron-left", "bi-chevron-right");
-            } else {
-                icon?.classList.replace("bi-chevron-right", "bi-chevron-left");
-            }
-        } else {
-            sidebar?.classList.contains("open")
-                ? closeSidebar()
-                : openSidebar();
-        }
-    }
-
-    toggle?.addEventListener("click", toggleSidebar);
-    collapseBtn?.addEventListener("click", toggleSidebar);
-    backdrop?.addEventListener("click", closeSidebar);
-
-    // Restore collapsed state on desktop
-    if (
-        window.innerWidth >= 992 &&
-        localStorage.getItem("sidebarCollapsed") === "true"
-    ) {
-        sidebar?.classList.add("collapsed");
-        main?.classList.add("sidebar-collapsed");
-        collapseBtn
-            ?.querySelector("i")
-            ?.classList.replace("bi-chevron-left", "bi-chevron-right");
-    }
-
-    // 5. Menu Search
-    document
-        .getElementById("menuSearchInput")
-        ?.addEventListener("input", function (e) {
-            const query = e.target.value.toLowerCase();
-            const navItems = document.querySelectorAll(".sidebar-nav-item");
-
-            navItems.forEach((item) => {
-                const text = item.textContent.toLowerCase();
-                item.style.display = text.includes(query) ? "" : "none";
+    // 2. Smooth reveal animation for Bento cards
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("opacity-100", "translate-y-0");
+                    entry.target.classList.remove("opacity-0", "translate-y-4");
+                }
             });
-        });
+        },
+        { threshold: 0.1 }
+    );
 
-    // 6. Animate Elements on Scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px",
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add("fade-in-up");
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    document.querySelectorAll(".card-saas, .stat-card").forEach((el) => {
-        el.style.opacity = "0"; // Initial state before animation
-        observer.observe(el);
+    document.querySelectorAll(".bento-card").forEach((card) => {
+        card.classList.add("transition-all", "duration-500");
+        observer.observe(card);
     });
-});
-
-// Global Keyboard Shortcuts
-document.addEventListener("keydown", function (e) {
-    // Ctrl+K for global search
-    if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-        e.preventDefault();
-        document.getElementById("globalSearchInput")?.focus();
-    }
-    // Escape to close sidebar on mobile
-    if (e.key === "Escape") {
-        const sidebar = document.getElementById("appSidebar");
-        const backdrop = document.getElementById("sidebarBackdrop");
-        const toggle = document.getElementById("sidebarToggle");
-
-        sidebar?.classList.remove("open");
-        backdrop?.classList.remove("show");
-        toggle?.setAttribute("aria-expanded", "false");
-    }
 });

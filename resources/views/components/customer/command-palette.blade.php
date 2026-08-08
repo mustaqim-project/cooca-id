@@ -34,7 +34,7 @@
                     <div class="text-secondary" style="font-size: 0.75rem;">View products and pricing plans</div>
                 </div>
             </a>
-            
+
             <a href="{{ route('customer.subscriptions.index') }}"
                 class="d-flex align-items-center gap-3 p-3 rounded-3 text-decoration-none text-body hover-lift cmd-item mt-1">
                 <div class="bg-light rounded p-2 text-secondary"><i class="bi bi-card-checklist"></i></div>

@@ -2,33 +2,36 @@
 
 @section('title', 'Downlines Statistics')
 
+@section('breadcrumb')
+    <a href="{{ route('affiliator.dashboard') }}" class="crumb-link">Dashboard</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <a href="{{ route('affiliator.downlines.index') }}" class="crumb-link">Downlines</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <span class="crumb-current">Statistics</span>
+@endsection
+
 @section('content')
-    <div class="d-flex flex-column gap-4">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div>
+        <h2 style="font-size:20px;font-weight:800;color:var(--text);">Downlines Network Statistics</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-top:2px;">Performance analytics of sub-affiliates in your multi-tier network.</p>
+    </div>
+    <a href="{{ route('affiliator.downlines.index') }}" class="btn btn-s btn-sm">
+        <i class="fa-solid fa-arrow-left"></i> Back to Downlines
+    </a>
+</div>
 
-        <!-- Page Header & Toolbar -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <a href="{{ route('affiliator.downlines.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift">
-                    <i class="bi bi-arrow-left me-1"></i> Back
-                </a>
-                <div>
-                    <h2 class="mb-1 fw-bold">Downlines Statistics</h2>
-                    <p class="text-secondary mb-0">Detailed statistics for your affiliate network.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Coming Soon -->
-        <div class="card border-0 shadow-sm rounded-4 glass">
-            <div class="card-body py-5 text-center text-secondary">
-                <div class="mb-3 d-inline-flex bg-light rounded-circle p-4">
-                    <i class="bi bi-bar-chart-fill fs-1 text-secondary"></i>
-                </div>
-                <h5 class="fw-bold mb-2 text-dark">Detailed Statistics coming soon</h5>
-                <p class="mb-0 mx-auto" style="max-width: 500px;">
-                    Advanced metrics and charts for your network performance are being prepared.
-                </p>
-            </div>
+<div class="portal-card">
+    <div class="portal-card-header">
+        <div class="portal-card-title">
+            <i class="fa-solid fa-chart-line" style="color:var(--primary);"></i>
+            Network Analytics
         </div>
     </div>
+    <div class="portal-card-body text-center py-6">
+        <i class="fa-solid fa-sitemap" style="font-size:48px;color:var(--text-faint);margin-bottom:12px;display:block;"></i>
+        <h4 style="font-size:16px;font-weight:700;color:var(--text);">Tier 2 Network Analytics</h4>
+        <p style="font-size:13px;color:var(--text-muted);max-width:480px;margin:6px auto 0;">Detailed breakdowns of multi-level commissions earned through your downline sub-affiliates will appear here.</p>
+    </div>
+</div>
 @endsection

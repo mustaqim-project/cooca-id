@@ -132,7 +132,8 @@ final class AffiliateService
         float $commissionAmount,
     ): AffiliateCommission {
         return $this->commissionRepository->create([
-            'referred_by_id'        => $affiliatorId,
+            'affiliator_id'        => $affiliatorId,
+            'referred_by_id'       => $affiliatorId,
             'transaction_id'       => $transactionId,
             'customer_id'          => $customerId,
             'subscription_plan_id' => $subscriptionPlanId,

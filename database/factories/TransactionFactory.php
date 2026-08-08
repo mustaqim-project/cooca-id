@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Transaction;
+use App\Models\Customer;
+use App\Models\Subscription;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -18,29 +20,22 @@ class TransactionFactory extends Factory
      */
     public function definition(): array
     {
-        $grossAmount = fake()->randomElement([250000, 500000, 750000, 1500000, 2500000, 5000000, 7500000, 12500000]);
-        $voucherDiscount = fake()->optional(0.3)->randomElement([50000, 100000, 150000, 250000]) ?? 0;
-        if ($voucherDiscount >= $grossAmount) {
-            $voucherDiscount = 0;
-        }
-        
         return [
             'id' => (string) Str::uuid(),
-            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
-            'subscription_id' => \App\Models\Subscription::inRandomOrder()->first()?->id ?? \App\Models\Subscription::factory(),
-            'type' => fake()->randomElement(['subscription_new', 'subscription_renewal']),
+            'customer_id' => Customer::inRandomOrder()->first()?->id ?? Customer::factory(),
+            'subscription_id' => Subscription::inRandomOrder()->first()?->id ?? Subscription::factory(),
             'invoice_number' => 'INV-' . strtoupper(Str::random(10)),
-            'gross_amount' => $grossAmount,
-            'voucher_discount' => $voucherDiscount,
-            'net_amount' => $grossAmount - $voucherDiscount,
-            'voucher_id' => null,
-            'payment_method' => fake()->randomElement(['credit_card', 'bank_transfer', 'ewallet', 'qris']),
-            'payment_gateway' => fake()->randomElement(['midtrans', 'xendit', 'stripe']),
-            'midtrans_order_id' => fake()->optional(0.7)->uuid(),
-            'midtrans_transaction_id' => fake()->optional(0.7)->uuid(),
-            'midtrans_status' => fake()->optional(0.7)->randomElement(['pending', 'capture', 'settlement', 'deny', 'cancel']),
+            'type' => fake()->randomElement(['subscription_new', 'subscription_renewal', 'upgrade']),
             'status' => fake()->randomElement(['pending', 'paid', 'failed', 'refunded']),
-            'paid_at' => fake()->optional(0.7)->dateTimeBetween('-1 year', 'now'),
+            'gross_amount' => fake()->randomElement([500000, 750000, 1000000, 1500000, 2500000]),
+            'voucher_discount' => 0,
+            'net_amount' => fake()->randomElement([500000, 750000, 1000000, 1500000, 2500000]),
+            'payment_method' => fake()->randomElement(['bank_transfer', 'credit_card', 'e_wallet']),
+            'payment_gateway' => 'midtrans',
+            'midtrans_order_id' => 'ORDER-' . strtoupper(Str::random(8)),
+            'midtrans_transaction_id' => fake()->optional()->numerify('##########'),
+            'midtrans_status' => fake()->optional()->randomElement(['capture', 'settlement']),
+            'paid_at' => fake()->optional(0.7)->dateTimeBetween('-3 months', 'now'),
             'failed_at' => null,
             'refunded_at' => null,
         ];
@@ -51,53 +46,9 @@ class TransactionFactory extends Factory
      */
     public function paid(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'paid',
             'paid_at' => now(),
-        ]);
-    }
-
-    /**
-     * Indicate that the transaction is pending.
-     */
-    public function pending(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'pending',
-        ]);
-    }
-
-    /**
-     * Indicate that the transaction is failed.
-     */
-    public function failed(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'failed',
-            'failed_at' => now(),
-        ]);
-    }
-
-    /**
-     * Indicate that the transaction is refunded.
-     */
-    public function refunded(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'refunded',
-            'paid_at' => now()->subDays(10),
-            'refunded_at' => now(),
-        ]);
-    }
-
-    /**
-     * Indicate that the transaction used a voucher.
-     */
-    public function withVoucher(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'voucher_id' => \App\Models\Voucher::factory(),
-            'voucher_discount' => fake()->randomElement([50000, 100000, 200000]),
         ]);
     }
 }

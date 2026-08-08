@@ -21,10 +21,12 @@ return Application::configure(basePath: dirname(__DIR__))
             SecurityHeadersMiddleware::class,
             \App\Http\Middleware\ActivityLogger::class,
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\CheckBlockedIp::class,
         ]);
 
         $middleware->api(append: [
             SecurityHeadersMiddleware::class,
+            \App\Http\Middleware\CheckBlockedIp::class,
         ]);
 
         // Alias untuk multi-guard
@@ -33,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'customer' => \App\Http\Middleware\Customer\CustomerAuth::class,
             'affiliator' => \App\Http\Middleware\Affiliator\AffiliatorAuth::class,
             'check.affiliator.suspension' => \App\Http\Middleware\CheckAffiliatorSuspension::class,
+            'phone.verified' => \App\Http\Middleware\EnsurePhoneIsVerified::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -67,11 +67,11 @@ final class DashboardController extends Controller
         // INVOICE KPIs
         // ─────────────────────────────────────────────
         $pendingInvoices = Invoice::where('customer_id', $customer->id)
-            ->where('status', 'pending')
+            ->where('status', 'issued')
             ->count();
 
         $unpaidInvoicesAmount = Invoice::where('customer_id', $customer->id)
-            ->where('status', 'pending')
+            ->where('status', 'issued')
             ->sum('amount');
 
         // ─────────────────────────────────────────────

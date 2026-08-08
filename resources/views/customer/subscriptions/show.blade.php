@@ -1,93 +1,117 @@
-@extends('customer.layouts.app')
-
+@extends('layouts.customer')
 @section('title', 'Subscription Details')
-
+@section('breadcrumb')
+    <a href="{{ route('customer.subscriptions.index') }}" class="crumb-link">Subscriptions</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <span class="crumb-current">Details</span>
+@endsection
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-12 col-xl-10">
-            <!-- Header -->
-            <div class="d-flex align-items-center mb-4">
-                <a href="{{ route('customer.subscriptions.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-3">
-                    <i class="bi bi-arrow-left me-1"></i> Back
-                </a>
-                <div>
-                    <h2 class="mb-1 fw-bold">Subscription Details</h2>
-                    <p class="text-secondary mb-0">View and manage your subscription.</p>
-                </div>
-            </div>
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-repeat" style="color:var(--primary);margin-right:10px;"></i>Subscription Details</h1>
+        <p class="page-subtitle">ID: {{ $subscription->id }}</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ route('customer.subscriptions.index') }}" class="btn btn-outline">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
 
-            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden">
-                <div class="card-header bg-transparent border-bottom border-light p-4 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-semibold"><i class="bi bi-info-circle me-2"></i> Subscription Information</h5>
-                    
+@php
+    $plan = $subscription->subscriptionPlan;
+    $lic  = $subscription->license;
+    $prod = $lic?->product ?? $plan?->product;
+@endphp
+
+<div class="grid-31">
+    <div style="display:flex;flex-direction:column;gap:24px;">
+
+        {{-- Overview Card --}}
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Subscription Overview</div>
+                @if($subscription->status === 'active') <span class="badge badge-success">Active</span>
+                @elseif($subscription->status === 'expired') <span class="badge badge-danger">Expired</span>
+                @else <span class="badge badge-muted">{{ ucfirst($subscription->status) }}</span>
+                @endif
+            </div>
+            <div class="card-body">
+                <div class="flex items-center gap-4 mb-4">
+                    @if($prod?->logo)
+                        <img src="{{ asset($prod->logo) }}" alt="{{ $prod->name }}" style="width:60px;height:60px;border-radius:12px;object-fit:contain;border:1px solid var(--border);padding:4px;">
+                    @else
+                        <div class="product-logo-placeholder" style="width:60px;height:60px;font-size:24px;border-radius:12px;">
+                            {{ strtoupper(substr($prod?->name ?? 'P', 0, 1)) }}
+                        </div>
+                    @endif
                     <div>
-                        @if($subscription->is_active)
-                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2">
-                                <i class="bi bi-check-circle me-1"></i> Active
-                            </span>
-                        @elseif($subscription->is_cancelled)
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2">
-                                <i class="bi bi-x-circle me-1"></i> Cancelled
-                            </span>
-                        @elseif($subscription->expires_at && $subscription->expires_at->isPast())
-                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2">
-                                <i class="bi bi-exclamation-triangle me-1"></i> Expired
-                            </span>
-                        @else
-                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-2">
-                                <i class="bi bi-hourglass-split me-1"></i> Pending
-                            </span>
-                        @endif
+                        <div class="font-bold text-xl">{{ $prod?->name ?? 'Product Subscription' }}</div>
+                        <div class="text-sm text-muted">{{ $plan?->name ?? 'Subscription Plan' }}</div>
                     </div>
                 </div>
-                
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush border-0">
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Product</div>
-                            <div class="fw-semibold text-dark">{{ $subscription->plan->product->name ?? 'N/A' }}</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Plan</div>
-                            <div class="text-dark">{{ $subscription->plan->name ?? 'N/A' }}</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Subscription ID</div>
-                            <div class="text-dark font-monospace">{{ $subscription->id }}</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Started At</div>
-                            <div class="text-dark">{{ $subscription->started_at ? $subscription->started_at->format('F d, Y - H:i') : '-' }}</div>
-                        </li>
-                        <li class="list-group-item px-4 py-3 bg-transparent border-light d-flex flex-column flex-md-row">
-                            <div class="fw-medium text-secondary" style="width: 250px;">Expires At</div>
-                            <div class="text-dark">
-                                {{ $subscription->expires_at ? $subscription->expires_at->format('F d, Y - H:i') : 'Lifetime' }}
-                                @if($subscription->expires_at && $subscription->is_active && $subscription->expires_at->isFuture())
-                                    <span class="text-secondary fs-7 ms-2">
-                                        ({{ $subscription->expires_at->diffForHumans() }})
-                                    </span>
-                                @endif
-                            </div>
-                        </li>
-                    </ul>
+
+                <div class="grid-3 mb-4">
+                    <div style="background:var(--bg);padding:14px;border-radius:var(--radius);text-align:center;">
+                        <div class="text-xs text-muted">Billing Cycle</div>
+                        <div class="font-bold text-base mt-1">{{ ucfirst($plan?->billing_cycle ?? 'Monthly') }}</div>
+                    </div>
+                    <div style="background:var(--bg);padding:14px;border-radius:var(--radius);text-align:center;">
+                        <div class="text-xs text-muted">Price</div>
+                        <div class="font-bold text-base mt-1">Rp {{ number_format($plan?->price ?? 0, 0, ',', '.') }}</div>
+                    </div>
+                    <div style="background:var(--bg);padding:14px;border-radius:var(--radius);text-align:center;">
+                        <div class="text-xs text-muted">Expires At</div>
+                        <div class="font-bold text-base mt-1">{{ $subscription->expires_at?->format('d M Y') ?? 'Lifetime' }}</div>
+                    </div>
                 </div>
-                
-                <div class="card-footer bg-transparent border-top border-light p-4 d-flex justify-content-end gap-3">
-                    @if($subscription->is_active)
-                        <button type="button" onclick="renewSubscription('{{ $subscription->id }}')" class="btn btn-primary rounded-pill px-4 hover-lift">
-                            <i class="bi bi-arrow-repeat me-1"></i> Renew
-                        </button>
-                        <button type="button" onclick="cancelSubscription('{{ $subscription->id }}')" class="btn btn-outline-danger rounded-pill px-4 hover-lift">
-                            <i class="bi bi-x me-1"></i> Cancel Subscription
-                        </button>
-                    @else
-                        <a href="{{ route('customer.products.show', $subscription->plan->product->slug ?? '') }}" class="btn btn-primary rounded-pill px-4 hover-lift">
-                            <i class="bi bi-cart-plus me-1"></i> Subscribe Again
-                        </a>
-                    @endif
+
+                @if($lic)
+                <div class="divider"></div>
+                <div class="font-bold text-sm mb-2">Associated License & Access</div>
+                <div class="stats-row">
+                    <span class="text-sm text-muted">License Key</span>
+                    <code style="font-size:12px;background:var(--bg);padding:4px 8px;border-radius:4px;border:1px solid var(--border);">
+                        {{ $lic->license_code }}
+                    </code>
                 </div>
+                <div class="stats-row">
+                    <span class="text-sm text-muted">Domain</span>
+                    <span class="font-bold text-sm">{{ $lic->domain ?? 'Not set' }}</span>
+                </div>
+                @endif
             </div>
         </div>
     </div>
+
+    {{-- Actions Sidebar --}}
+    <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Management Actions</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+                @if($subscription->status === 'active')
+                    <form method="POST" action="{{ route('customer.subscriptions.renew', $subscription->id) }}">
+                        @csrf
+                        <button type="submit" class="btn btn-primary w-full" style="justify-content:center;">
+                            <i class="fa-solid fa-rotate"></i> Renew Subscription
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ route('customer.subscriptions.cancel', $subscription->id) }}" onsubmit="return confirm('Are you sure you want to cancel this subscription?')">
+                        @csrf
+                        <button type="submit" class="btn btn-danger-outline w-full" style="justify-content:center;">
+                            <i class="fa-solid fa-ban"></i> Cancel Subscription
+                        </button>
+                    </form>
+                @endif
+                @if($lic?->domain)
+                    <a href="https://{{ $lic->domain }}" target="_blank" class="btn btn-outline w-full" style="justify-content:center;">
+                        <i class="fa-solid fa-rocket"></i> Launch Application
+                    </a>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

@@ -11,6 +11,7 @@ use App\Models\Invoice;
 use App\Models\Subscription;
 use App\Jobs\Notification\SendPaymentConfirmationJob;
 use App\Jobs\Payment\ProcessCommissionJob;
+use App\Jobs\Finance\AutoJournalPaymentJob;
 use App\Jobs\ActivateSubscriptionJob;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
@@ -47,15 +48,15 @@ final class PaymentService
         $payload = [
             'transaction_details' => [
                 'order_id' => $transaction->invoice_number,
-                'gross_amount' => (int) round($transaction->net_amount),
+                'gross_amount' => (int) round((float) $transaction->net_amount),
             ],
             'customer_details' => [
                 'email' => $transaction->customer->email,
                 'first_name' => $transaction->customer->name,
             ],
             'callbacks' => [
-                'finish' => route('customer.payment.success'),
-                'error' => route('customer.payment.error'),
+                'finish' => route('customer.payments.success'),
+                'error' => route('customer.payments.failed'),
             ],
         ];
 
@@ -136,6 +137,21 @@ final class PaymentService
                 ActivateSubscriptionJob::dispatch($transaction);
             }
 
+            // Record voucher usage if applicable
+            if ($transaction->voucher_id) {
+                $voucher = \App\Models\Voucher::find($transaction->voucher_id);
+                $customer = \App\Models\Customer::find($transaction->customer_id);
+                if ($voucher && $customer) {
+                    $uuid = \Ramsey\Uuid\Uuid::fromString((string) $transaction->id);
+                    app(\App\Services\Voucher\VoucherService::class)->recordUsage(
+                        $voucher,
+                        $customer,
+                        $uuid,
+                        (float) $transaction->voucher_discount
+                    );
+                }
+            }
+
             DB::commit();
 
             // Queue notifications (async to avoid blocking webhook response)
@@ -143,6 +159,9 @@ final class PaymentService
 
             // Queue commission calculation for affiliate payouts
             ProcessCommissionJob::dispatch($transaction);
+
+            // Queue auto-journaling to Finance/ERP
+            AutoJournalPaymentJob::dispatch($transaction);
 
             Log::info('PaymentService: Transaction marked as paid', [
                 'transaction_id' => (string) $transaction->id,

@@ -35,7 +35,8 @@ final class AffiliatorController extends Controller
      */
     public function create()
     {
-        return view('admin.affiliators.create');
+        $allAffiliators = \App\Models\Affiliator::orderBy('name')->get();
+        return view('admin.affiliators.create', compact('allAffiliators'));
     }
 
     /**
@@ -47,6 +48,13 @@ final class AffiliatorController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:affiliators',
             'password' => 'required|string|min:8',
+            'phone' => 'nullable|string|max:50',
+            'referral_code' => 'nullable|string|max:50|unique:affiliators,referral_code',
+            'parent_affiliator_id' => 'nullable|uuid|exists:affiliators,id',
+            'bank_name' => 'nullable|string|max:100',
+            'bank_account' => 'nullable|string|max:100',
+            'commission_rate' => 'nullable|numeric|min:0|max:100',
+            'balance' => 'nullable|numeric|min:0',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -110,8 +118,11 @@ final class AffiliatorController extends Controller
             abort(404, 'Affiliator not found');
         }
 
+        $allAffiliators = \App\Models\Affiliator::where('id', '!=', $id)->orderBy('name')->get();
+
         return view('admin.affiliators.edit', [
             'affiliator' => new AffiliatorResource($affiliator),
+            'allAffiliators' => $allAffiliators,
         ]);
     }
 
@@ -130,9 +141,19 @@ final class AffiliatorController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:affiliators,email,' . $id,
             'phone' => 'nullable|string|max:50',
+            'referral_code' => 'nullable|string|max:50|unique:affiliators,referral_code,' . $id,
+            'parent_affiliator_id' => 'nullable|uuid|exists:affiliators,id',
+            'bank_name' => 'nullable|string|max:100',
+            'bank_account' => 'nullable|string|max:100',
             'commission_rate' => 'nullable|numeric|min:0|max:100',
+            'balance' => 'nullable|numeric|min:0',
             'status' => 'nullable|in:active,suspended',
         ]);
+
+        if ($request->filled('password')) {
+            $request->validate(['password' => 'min:8']);
+            $validated['password'] = Hash::make($request->password);
+        }
 
         $this->affiliatorRepository->update($id, $validated);
 

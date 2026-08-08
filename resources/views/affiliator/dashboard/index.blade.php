@@ -1,152 +1,175 @@
 @extends('affiliator.layouts.app')
 
-@section('title', 'Affiliator Dashboard')
+@section('title', 'Dashboard')
+
+@section('breadcrumb')
+    <span class="crumb-current">Dashboard</span>
+@endsection
 
 @section('content')
-    <div class="d-flex flex-column gap-4">
+@php
+    $affiliator   = auth('affiliator')->user() ?? auth()->user();
+    $userName     = $affiliator?->name ?? 'Partner';
+    $referralCode = $affiliator?->referral_code ?? '';
+    $referralUrl  = url('/register?ref=' . $referralCode);
 
-        <!-- Page Header & Toolbar -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-                <h2 class="mb-1 fw-bold">Dashboard</h2>
-                <p class="text-secondary mb-0">Welcome back, {{ auth()->user()->name }}!</p>
-            </div>
-            <div class="d-flex gap-2">
-            </div>
-        </div>
+    $hour       = now()->hour;
+    $greeting   = match(true) {
+        $hour < 12 => 'Good morning',
+        $hour < 17 => 'Good afternoon',
+        default    => 'Good evening',
+    };
+    $greetEmoji = $hour < 12 ? '☀️' : ($hour < 17 ? '🌤️' : '🌙');
 
-        <!-- Metrics Row -->
-        <div class="row g-4 mb-2">
-            <!-- Total Earnings -->
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm rounded-4 glass h-100 hover-lift cursor-pointer">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="bg-success-subtle text-success rounded-circle p-2 d-flex align-items-center justify-content-center"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-wallet2 fs-4"></i>
-                            </div>
-                            <span class="badge bg-success-subtle text-success rounded-pill border border-success-subtle px-2 py-1"><i
-                                    class="bi bi-arrow-up-short"></i> 12%</span>
-                        </div>
-                        <div>
-                            <h3 class="fw-bold mb-1">Rp 1.2M</h3>
-                            <p class="text-secondary fs-7 mb-0">Total Earnings</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    $totalEarned        = $stats['totalEarned'] ?? 0;
+    $availableBalance   = $stats['availableBalance'] ?? 0;
+    $pendingCommissions = $stats['pendingCommissions'] ?? 0;
+    $activeReferrals    = $stats['activeReferrals'] ?? 0;
+    $totalReferrals     = $stats['totalReferrals'] ?? 0;
+    $conversionRate     = $stats['conversionRate'] ?? 0;
+@endphp
 
-            <!-- Active Referrals -->
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm rounded-4 glass h-100 hover-lift cursor-pointer">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-people fs-4"></i>
-                            </div>
-                            <span class="badge bg-primary-subtle text-primary rounded-pill border border-primary-subtle px-2 py-1"><i
-                                    class="bi bi-arrow-up-short"></i> 5%</span>
-                        </div>
-                        <div>
-                            <h3 class="fw-bold mb-1">45</h3>
-                            <p class="text-secondary fs-7 mb-0">Active Referrals</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+{{-- ══════════════ HERO BANNER ══════════════ --}}
+<div class="hero-banner mb-6">
+    <div style="position:relative;z-index:1;">
+        <div class="hero-greeting">{{ $greetEmoji }} {{ $greeting }}, {{ $userName }}!</div>
+        <div class="hero-sub">Welcome back to your COOCA.ID Affiliate Portal. Share your referral link & earn commissions.</div>
 
-            <!-- Pending Commissions -->
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm rounded-4 glass h-100 hover-lift cursor-pointer">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="bg-warning-subtle text-warning rounded-circle p-2 d-flex align-items-center justify-content-center"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-hourglass-split fs-4"></i>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="fw-bold mb-1">Rp 450K</h3>
-                            <p class="text-secondary fs-7 mb-0">Pending Commissions</p>
-                        </div>
-                    </div>
-                </div>
+        <div class="hero-meta">
+            <div class="hero-chip">
+                <div class="chip-label">Available Balance</div>
+                <div class="chip-value">Rp {{ number_format($availableBalance, 0, ',', '.') }}</div>
             </div>
-
-            <!-- Conversion Rate -->
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm rounded-4 glass h-100 hover-lift cursor-pointer">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="bg-info-subtle text-info rounded-circle p-2 d-flex align-items-center justify-content-center"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-graph-up fs-4"></i>
-                            </div>
-                            <span class="badge bg-info-subtle text-info rounded-pill border border-info-subtle px-2 py-1"><i
-                                    class="bi bi-arrow-up-short"></i> 2.4%</span>
-                        </div>
-                        <div>
-                            <h3 class="fw-bold mb-1">8.5%</h3>
-                            <p class="text-secondary fs-7 mb-0">Conversion Rate</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="hero-chip">
+                <div class="chip-label">Total Earned</div>
+                <div class="chip-value">Rp {{ number_format($totalEarned, 0, ',', '.') }}</div>
+            </div>
+            <div class="hero-chip">
+                <div class="chip-label">Active Referrals</div>
+                <div class="chip-value">{{ $activeReferrals }}</div>
+            </div>
+            <div class="hero-chip">
+                <div class="chip-label">Conversion Rate</div>
+                <div class="chip-value">{{ $conversionRate }}%</div>
             </div>
         </div>
 
-        <!-- Recent Commissions -->
-        <h5 class="fw-bold mt-2 mb-0">Recent Commissions</h5>
-        <div class="card border-0 shadow-sm rounded-4 glass">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
-                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
+        {{-- Referral Link Quick Copy Box --}}
+        <div style="margin-top:20px;max-width:560px;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px;">
+            <i class="fa-solid fa-link" style="color:#fff;font-size:14px;"></i>
+            <input type="text" readonly value="{{ $referralUrl }}" id="refLinkInput" style="border:none;background:none;outline:none;color:#fff;font-size:13px;font-weight:600;flex:1;">
+            <button onclick="copyToClipboard('{{ $referralUrl }}', 'Referral Link')" class="btn btn-white btn-sm" style="padding:4px 12px;font-size:12px;">
+                <i class="fa-solid fa-copy"></i> Copy Link
+            </button>
+        </div>
+    </div>
+
+    <div class="hero-actions">
+        <a href="{{ route('affiliator.withdrawals.index') }}" class="btn btn-white">
+            <i class="fa-solid fa-building-columns"></i> Request Payout
+        </a>
+        <a href="{{ route('affiliator.marketing_materials.index') }}" class="btn">
+            <i class="fa-solid fa-bullhorn"></i> Marketing Assets
+        </a>
+    </div>
+</div>
+
+{{-- ══════════════ KPI CARDS ══════════════ --}}
+<div class="kpi-grid mb-6">
+    <div class="kpi-card kpi-success">
+        <div class="kpi-icon success"><i class="fa-solid fa-sack-dollar"></i></div>
+        <div class="kpi-value">Rp {{ number_format($totalEarned, 0, ',', '.') }}</div>
+        <div class="kpi-label">Total Earnings</div>
+        <div class="kpi-trend up"><i class="fa-solid fa-arrow-trend-up"></i> Cleared & Paid</div>
+    </div>
+
+    <div class="kpi-card kpi-primary">
+        <div class="kpi-icon primary"><i class="fa-solid fa-wallet"></i></div>
+        <div class="kpi-value">Rp {{ number_format($availableBalance, 0, ',', '.') }}</div>
+        <div class="kpi-label">Available Balance</div>
+        <div class="kpi-trend up"><i class="fa-solid fa-check-circle"></i> Ready to Withdraw</div>
+    </div>
+
+    <div class="kpi-card kpi-warning">
+        <div class="kpi-icon warning"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <div class="kpi-value">Rp {{ number_format($pendingCommissions, 0, ',', '.') }}</div>
+        <div class="kpi-label">Pending Commissions</div>
+        <div class="kpi-trend"><i class="fa-solid fa-spinner"></i> Awaiting Clearing</div>
+    </div>
+
+    <div class="kpi-card kpi-accent">
+        <div class="kpi-icon accent"><i class="fa-solid fa-users"></i></div>
+        <div class="kpi-value">{{ $totalReferrals }}</div>
+        <div class="kpi-label">Total Referrals</div>
+        <div class="kpi-trend up"><i class="fa-solid fa-user-check"></i> {{ $activeReferrals }} Active Customers</div>
+    </div>
+</div>
+
+{{-- ══════════════ RECENT COMMISSIONS & DOWNLINES ══════════════ --}}
+<div style="display:grid;grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));gap:24px;" class="mb-6">
+
+    {{-- Recent Commissions Table --}}
+    <div class="portal-card" style="grid-column: span 2;">
+        <div class="portal-card-header">
+            <div class="portal-card-title">
+                <i class="fa-solid fa-wallet" style="color:var(--primary);"></i>
+                Recent Commissions
+            </div>
+            <a href="{{ route('affiliator.commissions.index') }}" class="btn btn-s btn-sm">View All</a>
+        </div>
+        <div class="portal-card-body p-0">
+            <div class="table-wrap">
+                <table class="portal-table">
+                    <thead>
                         <tr>
-                            <th class="py-3 px-4 border-0">Transaction ID</th>
-                            <th class="py-3 px-3 border-0">Type</th>
-                            <th class="py-3 px-3 border-0 text-end">Amount</th>
-                            <th class="py-3 px-3 border-0 text-center">Status</th>
-                            <th class="py-3 px-4 border-0 text-end">Date</th>
+                            <th class="portal-th">Invoice</th>
+                            <th class="portal-th">Customer</th>
+                            <th class="portal-th">Tier Level</th>
+                            <th class="portal-th text-right">Commission Amount</th>
+                            <th class="portal-th text-center">Status</th>
+                            <th class="portal-th text-right">Date</th>
                         </tr>
                     </thead>
-                    <tbody class="border-top-0">
-                        @forelse($recentCommissions ?? [] as $commission)
+                    <tbody>
+                        @forelse($recentCommissions as $commission)
                             <tr>
-                                <td class="py-3 px-4 fw-medium text-dark">
-                                    {{ $commission->transaction->invoice_number ?? '-' }}
+                                <td class="portal-td font-medium">
+                                    {{ $commission->transaction?->invoice_number ?? $commission->invoice_number ?? '#COMM-'.$commission->id }}
                                 </td>
-                                <td class="py-3 px-3">
-                                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-3 py-1 fs-7">
+                                <td class="portal-td">
+                                    {{ $commission->customer?->name ?? $commission->customer?->business_name ?? 'Direct Customer' }}
+                                </td>
+                                <td class="portal-td">
+                                    <span class="badge-status status-info">
                                         Level {{ $commission->level ?? 1 }}
                                     </span>
                                 </td>
-                                <td class="py-3 px-3 fw-bold text-success text-end">
-                                    + Rp {{ number_format($commission->amount, 0, ',', '.') }}
+                                <td class="portal-td text-right font-bold text-success">
+                                    + Rp {{ number_format($commission->commission_amount ?? $commission->amount ?? 0, 0, ',', '.') }}
                                 </td>
-                                <td class="py-3 px-3 text-center">
+                                <td class="portal-td text-center">
                                     @php
-                                        $statusClass = match($commission->status ?? 'pending') {
-                                            'paid' => 'success',
-                                            'pending' => 'warning',
-                                            'failed' => 'danger',
-                                            default => 'secondary'
+                                        $st = $commission->status ?? 'pending';
+                                        $badgeClass = match($st) {
+                                            'paid', 'cleared' => 'status-paid',
+                                            'pending'          => 'status-pending',
+                                            'rejected', 'failed' => 'status-cancelled',
+                                            default            => 'status-issued',
                                         };
                                     @endphp
-                                    <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-3 py-1">
-                                        {{ ucfirst($commission->status ?? 'pending') }}
+                                    <span class="badge-status {{ $badgeClass }}">
+                                        {{ ucfirst($st) }}
                                     </span>
                                 </td>
-                                <td class="py-3 px-4 text-end text-secondary fs-7">
-                                    {{ $commission->created_at->format('d M Y') }}
+                                <td class="portal-td text-right text-muted" style="font-size:12px;">
+                                    {{ $commission->created_at?->format('d M Y') }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="py-5 text-center text-secondary">
-                                    <div class="mb-3"><i class="bi bi-inbox fs-1"></i></div>
-                                    <h6 class="fw-medium">No Recent Commissions</h6>
-                                    <p class="fs-7 mb-0">Your recent commission history will appear here.</p>
+                                <td colspan="6" class="portal-td text-center py-6 text-muted">
+                                    <i class="fa-solid fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;color:var(--text-faint);"></i>
+                                    No commissions recorded yet. Share your referral link to earn!
                                 </td>
                             </tr>
                         @endforelse
@@ -155,4 +178,47 @@
             </div>
         </div>
     </div>
+
+    {{-- Downline Summary / Quick Links --}}
+    <div class="portal-card">
+        <div class="portal-card-header">
+            <div class="portal-card-title">
+                <i class="fa-solid fa-sitemap" style="color:var(--accent);"></i>
+                Top Downlines
+            </div>
+            <a href="{{ route('affiliator.downlines.index') }}" class="btn btn-s btn-sm">Manage</a>
+        </div>
+        <div class="portal-card-body">
+            @forelse($downlines as $downline)
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div class="user-avatar" style="width:32px;height:32px;font-size:11px;">
+                            {{ strtoupper(substr($downline->name, 0, 2)) }}
+                        </div>
+                        <div>
+                            <div style="font-size:13px;font-weight:600;">{{ $downline->name }}</div>
+                            <div style="font-size:11px;color:var(--text-muted);">{{ $downline->referrals_count }} Direct Referrals</div>
+                        </div>
+                    </div>
+                    <span class="badge-status status-active">Level 2</span>
+                </div>
+            @empty
+                <div class="text-center py-4 text-muted" style="font-size:13px;">
+                    No downlines registered under you yet.
+                </div>
+            @endforelse
+
+            <div style="margin-top:16px;padding-top:12px;border-top:1px dashed var(--border);">
+                <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;">Your Referral Code</div>
+                <div style="display:flex;align-items:center;gap:8px;background:var(--bg);padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);">
+                    <code style="font-size:14px;font-weight:700;color:var(--primary);flex:1;">{{ $referralCode }}</code>
+                    <button onclick="copyToClipboard('{{ $referralCode }}', 'Referral Code')" class="btn btn-s btn-sm" style="padding:2px 8px;font-size:11px;">
+                        Copy Code
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
 @endsection

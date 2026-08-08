@@ -1,2 +1,11 @@
 User-agent: *
-Disallow:
+Disallow: /admin/
+Disallow: /customer/
+Disallow: /affiliator/
+Disallow: /login
+Disallow: /register
+Disallow: /password/reset
+Disallow: /storage/
+Disallow: /api/
+
+Sitemap: https://cooca.id/sitemap.xml

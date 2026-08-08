@@ -1,369 +1,350 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="light">
-
+<html lang="id" data-theme="light">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Affiliator Dashboard') - {{ config('app.name', 'Cooca ID') }}</title>
+    @php
+        $siteName     = setting('site.name', 'COOCA.ID');
+        $favicon      = setting('site.favicon') ? asset(setting('site.favicon')) : asset('favicon.svg');
+        $affiliator   = auth('affiliator')->user() ?? auth()->user();
+        $userName     = $affiliator?->name ?? 'Partner';
+        $initials     = strtoupper(substr($userName, 0, 2));
+        $referralCode = $affiliator?->referral_code ?? '';
+        $unread       = $affiliator ? $affiliator->notifications()->whereNull('read_at')->count() : 0;
+        $balance      = number_format((float) ($affiliator?->balance ?? 0), 0, ',', '.');
+    @endphp
 
-    <!-- Google Fonts -->
+    <title>@yield('title', 'Affiliate Portal') — {{ $siteName }}</title>
+    <link rel="icon" href="{{ $favicon }}">
+
+    {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    {{-- Font Awesome --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
-    <!-- AOS -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-    <!-- Custom CSS Variables and Base Styles -->
-    <style>
-        :root {
-            /* Apple HIG / Stripe / Linear / Vercel / Notion Blend */
-            --bs-body-font-family: 'Inter', system-ui, -apple-system, sans-serif;
-
-            /* Light Theme Palette */
-            --color-bg: #f8f9fa;
-            --color-surface: #ffffff;
-            --color-border: rgba(0, 0, 0, 0.08);
-            --color-text-primary: #111827;
-            --color-text-secondary: #6b7280;
-
-            --color-primary: #0f172a;
-            --color-primary-rgb: 15, 23, 42;
-            --color-accent: #3b82f6;
-
-            --color-success: #10b981;
-            --color-warning: #f59e0b;
-            --color-danger: #ef4444;
-            --color-info: #0ea5e9;
-
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-
-            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-            --sidebar-width: 260px;
-            --sidebar-collapsed-width: 80px;
-        }
-
-        [data-theme="dark"] {
-            --color-bg: #0f172a;
-            --color-surface: #1e293b;
-            --color-border: rgba(255, 255, 255, 0.1);
-            --color-text-primary: #f8fafc;
-            --color-text-secondary: #94a3b8;
-            --color-primary: #ffffff;
-            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-
-            /* Override bootstrap vars */
-            --bs-body-bg: var(--color-bg);
-            --bs-body-color: var(--color-text-primary);
-        }
-
-        body {
-            background-color: var(--color-bg);
-            color: var(--color-text-primary);
-            font-family: var(--bs-body-font-family);
-            transition: var(--transition-smooth);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Glassmorphism */
-        .glass {
-            background: rgba(var(--color-surface), 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--color-border);
-        }
-
-        /* Layout */
-        #app-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        #main-content {
-            flex-grow: 1;
-            margin-left: var(--sidebar-width);
-            transition: var(--transition-smooth);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .sidebar-collapsed #main-content {
-            margin-left: var(--sidebar-collapsed-width);
-        }
-
-        @media (max-width: 991.98px) {
-            #main-content {
-                margin-left: 0;
-            }
-
-            .sidebar-collapsed #main-content {
-                margin-left: 0;
-            }
-        }
-
-        /* Typography */
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-weight: 600;
-            letter-spacing: -0.025em;
-        }
-
-        /* Global scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--color-border);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--color-text-secondary);
-        }
-
-        /* Command Palette overlay */
-        .cmd-palette-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            z-index: 1060;
-            display: none;
-            align-items: flex-start;
-            justify-content: center;
-            padding-top: 10vh;
-        }
-
-        /* Skeleton */
-        .skeleton {
-            background: linear-gradient(90deg, var(--color-border) 25%, var(--color-bg) 50%, var(--color-border) 75%);
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s infinite;
-            border-radius: 4px;
-        }
-
-        @keyframes skeleton-loading {
-            0% {
-                background-position: 200% 0;
-            }
-
-            100% {
-                background-position: -200% 0;
-            }
-        }
-    </style>
+    {{-- Customer Design System CSS --}}
+    <link rel="stylesheet" href="{{ asset('css/customer.css') }}">
     @stack('styles')
 </head>
-
 <body>
+<div class="portal-wrap">
 
-    <div id="app-wrapper">
-        <x-affiliator.sidebar />
-
-        <main id="main-content">
-            <x-affiliator.topbar />
-
-            <div class="container-fluid p-0 animate__animated animate__fadeIn">
-                @yield('content')
+    {{-- ════════════ SIDEBAR ════════════ --}}
+    <aside class="portal-sidebar" id="portalSidebar">
+        {{-- Header / Logo --}}
+        <div class="sidebar-header">
+            <div class="sidebar-logo-icon">
+                <i class="fa-solid fa-handshake"></i>
             </div>
-        </main>
-    </div>
+            <div class="sidebar-brand">
+                <div class="brand-name">{{ $siteName }}</div>
+                <div class="brand-sub">Affiliate Portal</div>
+            </div>
+        </div>
 
-    <!-- Command Palette -->
-    <x-affiliator.command-palette />
+        {{-- Navigation --}}
+        <nav class="sidebar-nav">
 
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastPlacement">
-        <!-- Toasts injected here -->
-    </div>
+            {{-- OVERVIEW --}}
+            <div class="sidebar-section">
+                <div class="sidebar-section-label">Overview</div>
 
-    <!-- Core JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+                <a href="{{ route('affiliator.dashboard') }}"
+                   class="sidebar-item {{ request()->routeIs('affiliator.dashboard') ? 'active' : '' }}"
+                   data-tooltip="Dashboard">
+                    <span class="s-icon"><i class="fa-solid fa-house"></i></span>
+                    <span class="s-label">Dashboard</span>
+                </a>
+            </div>
 
-    <!-- Theme & Global Logic -->
-    <script>
-        // Init AOS
-        AOS.init({
-            once: true,
-            duration: 600
-        });
+            {{-- NETWORK & EARNINGS --}}
+            <div class="sidebar-section">
+                <div class="sidebar-section-label">Network & Earnings</div>
 
-        // Theme logic
-        const themeToggle = document.getElementById('theme-toggle');
-        const root = document.documentElement;
+                <a href="{{ route('affiliator.referrals.index') }}"
+                   class="sidebar-item {{ request()->routeIs('affiliator.referrals.*') ? 'active' : '' }}"
+                   data-tooltip="My Referrals">
+                    <span class="s-icon"><i class="fa-solid fa-users"></i></span>
+                    <span class="s-label">My Referrals</span>
+                </a>
 
-        const storedTheme = localStorage.getItem('theme');
-        if (storedTheme) {
-            root.setAttribute('data-theme', storedTheme);
-        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            root.setAttribute('data-theme', 'dark');
-        }
+                <a href="{{ route('affiliator.downlines.index') }}"
+                   class="sidebar-item {{ request()->routeIs('affiliator.downlines.*') ? 'active' : '' }}"
+                   data-tooltip="Downlines">
+                    <span class="s-icon"><i class="fa-solid fa-sitemap"></i></span>
+                    <span class="s-label">Downlines</span>
+                </a>
 
-        if (themeToggle) {
-            themeToggle.addEventListener('click', () => {
-                let currentTheme = root.getAttribute('data-theme');
-                let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                root.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-            });
-        }
+                <a href="{{ route('affiliator.commissions.index') }}"
+                   class="sidebar-item {{ request()->routeIs('affiliator.commissions.*') ? 'active' : '' }}"
+                   data-tooltip="Commissions">
+                    <span class="s-icon"><i class="fa-solid fa-wallet"></i></span>
+                    <span class="s-label">Commissions</span>
+                </a>
 
-        // Sidebar Toggle
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', () => {
-                document.body.classList.toggle('sidebar-collapsed');
-            });
-        }
+                <a href="{{ route('affiliator.withdrawals.index') }}"
+                   class="sidebar-item {{ request()->routeIs('affiliator.withdrawals.*') ? 'active' : '' }}"
+                   data-tooltip="Withdrawals">
+                    <span class="s-icon"><i class="fa-solid fa-building-columns"></i></span>
+                    <span class="s-label">Withdrawals</span>
+                </a>
+            </div>
 
-        // Command Palette (Ctrl + K)
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                document.getElementById('cmdPalette').style.display = 'flex';
-                document.getElementById('cmdSearchInput').focus();
-            }
-            if (e.key === 'Escape') {
-                const cmd = document.getElementById('cmdPalette');
-                if (cmd.style.display === 'flex') {
-                    cmd.style.display = 'none';
-                }
-            }
-        });
+            {{-- MARKETING & TOOLS --}}
+            <div class="sidebar-section">
+                <div class="sidebar-section-label">Marketing & Tools</div>
 
-        const closeCmdPalette = () => {
-            document.getElementById('cmdPalette').style.display = 'none';
-        };
+                <a href="{{ route('affiliator.marketing_materials.index') }}"
+                   class="sidebar-item {{ request()->routeIs('affiliator.marketing.*', 'affiliator.marketing_materials.*') ? 'active' : '' }}"
+                   data-tooltip="Marketing Assets">
+                    <span class="s-icon"><i class="fa-solid fa-bullhorn"></i></span>
+                    <span class="s-label">Marketing Assets</span>
+                </a>
 
-        // Utility: Toast
-        window.showToast = (title, message, type = 'info') => {
-            const container = document.getElementById('toastPlacement');
-            const icons = {
-                success: 'check-circle',
-                danger: 'exclamation-circle',
-                warning: 'exclamation-triangle',
-                info: 'info-circle'
-            };
-            const colors = {
-                success: 'text-success',
-                danger: 'text-danger',
-                warning: 'text-warning',
-                info: 'text-info'
-            };
+                <a href="{{ route('affiliator.reviews.index') }}"
+                   class="sidebar-item {{ request()->routeIs('affiliator.reviews.*') ? 'active' : '' }}"
+                   data-tooltip="My Reviews">
+                    <span class="s-icon"><i class="fa-solid fa-star"></i></span>
+                    <span class="s-label">My Reviews</span>
+                </a>
+            </div>
 
-            const toastEl = document.createElement('div');
-            toastEl.className = 'toast animate__animated animate__fadeInUp';
-            toastEl.setAttribute('role', 'alert');
-            toastEl.setAttribute('aria-live', 'assertive');
-            toastEl.setAttribute('aria-atomic', 'true');
+            {{-- ACCOUNT --}}
+            <div class="sidebar-section">
+                <div class="sidebar-section-label">Account</div>
 
-            toastEl.innerHTML = `
-                <div class="toast-header border-0 pb-0">
-                    <i class="bi bi-${icons[type]} ${colors[type]} me-2 fs-5"></i>
-                    <strong class="me-auto">${title}</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                <a href="{{ route('affiliator.profile.edit') }}"
+                   class="sidebar-item {{ request()->routeIs('affiliator.profile.*') ? 'active' : '' }}"
+                   data-tooltip="Profile & Bank">
+                    <span class="s-icon"><i class="fa-solid fa-user-gear"></i></span>
+                    <span class="s-label">Profile & Bank</span>
+                </a>
+            </div>
+
+        </nav>
+
+        {{-- Footer / User --}}
+        <div class="sidebar-footer">
+            <div class="sidebar-user" id="sidebarUserMenu">
+                <div class="user-avatar">
+                    {{ $initials }}
                 </div>
-                <div class="toast-body text-secondary">
-                    ${message}
+                <div class="user-info">
+                    <div class="user-name">{{ $userName }}</div>
+                    <div class="user-plan">Balance: Rp {{ $balance }}</div>
                 </div>
-            `;
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggleBtn">
+                <i id="sidebarToggleIcon" class="fa-solid fa-chevrons-left"></i>
+            </button>
+        </div>
+    </aside>
 
-            container.appendChild(toastEl);
-            const toast = new bootstrap.Toast(toastEl, {
-                autohide: true,
-                delay: 5000
-            });
-            toast.show();
+    {{-- ════════════ MAIN ════════════ --}}
+    <main class="portal-main" id="portalMain">
 
-            toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
-        };
-    </script>
+        {{-- ── TOPBAR ── --}}
+        <header class="portal-topbar">
+            {{-- Breadcrumb --}}
+            <div class="topbar-breadcrumb">
+                <a href="{{ route('affiliator.dashboard') }}" class="crumb-link">
+                    <i class="fa-solid fa-house" style="font-size:12px;"></i>
+                </a>
+                @hasSection('breadcrumb')
+                    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+                    @yield('breadcrumb')
+                @endif
+            </div>
 
-    <!-- Shared admin table tools: client-side search, filter, and CSV export -->
-    <script src="{{ asset('js/admin-table-tools.js') }}"></script>
+            {{-- Search --}}
+            <div class="topbar-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search referrals, commissions…" id="globalSearch">
+                <span style="font-size:11px;color:var(--text-faint);background:var(--border);padding:2px 6px;border-radius:4px;">⌘K</span>
+            </div>
 
-    <!-- TinyMCE Initialization for Textareas -->
-    <script src="https://cdn.tiny.cloud/1/24k0c573h901jvrr06jiqwo75byzannzhejp9zlo610wriru/tinymce/8/tinymce.min.js"
-        referrerpolicy="origin" crossorigin="anonymous"></script>
-    <script>
-        tinymce.init({
-            selector: 'textarea',
-            plugins: [
-                'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media',
-                'searchreplace', 'table', 'visualblocks', 'wordcount',
-                'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker',
-                'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'advtemplate',
-                'tinymceai', 'uploadcare', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes',
-                'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown', 'importword', 'exportword',
-                'exportpdf'
-            ],
-            toolbar: 'undo redo | tinymceai-chat tinymceai-quickactions tinymceai-review | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-            tinycomments_mode: 'embedded',
-            tinycomments_author: 'Author name',
-            mergetags_list: [{
-                    value: 'First.Name',
-                    title: 'First Name'
-                },
-                {
-                    value: 'Email',
-                    title: 'Email'
-                },
-            ],
-            tinymceai_token_provider: async () => {
-                await fetch(
-                    `https://demo.api.tiny.cloud/1/24k0c573h901jvrr06jiqwo75byzannzhejp9zlo610wriru/auth/random`, {
-                        method: "POST",
-                        credentials: "include"
-                    });
-                return {
-                    token: await fetch(
-                        `https://demo.api.tiny.cloud/1/24k0c573h901jvrr06jiqwo75byzannzhejp9zlo610wriru/jwt/tinymceai`, {
-                            credentials: "include"
-                        }).then(r => r.text())
-                };
-            },
-            uploadcare_public_key: '21be699352b39be17fbf',
+            <div class="topbar-actions">
+                {{-- Theme Toggle --}}
+                <button class="topbar-btn" id="themeToggle" title="Toggle theme">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+
+                {{-- Notifications --}}
+                <button class="topbar-btn" title="Notifications">
+                    <i class="fa-solid fa-bell"></i>
+                    @if($unread > 0)
+                        <span class="notif-badge">{{ $unread > 9 ? '9+' : $unread }}</span>
+                    @endif
+                </button>
+
+                {{-- Profile Dropdown --}}
+                <div class="topbar-profile" id="profileDropdownBtn">
+                    <div class="user-avatar" style="width:30px;height:30px;font-size:12px;">
+                        {{ $initials }}
+                    </div>
+                    <div class="prof-info">
+                        <div class="prof-name">{{ $userName }}</div>
+                        <div class="prof-plan">Rp {{ $balance }}</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down prof-chevron" style="font-size:10px;color:var(--text-faint);"></i>
+
+                    <div class="topbar-dropdown" id="profileDropdown">
+                        <a href="{{ route('affiliator.dashboard') }}" class="dropdown-item">
+                            <i class="fa-solid fa-house"></i> Dashboard
+                        </a>
+                        <a href="{{ route('affiliator.profile.edit') }}" class="dropdown-item">
+                            <i class="fa-solid fa-user-gear"></i> Profile & Bank
+                        </a>
+                        <a href="{{ route('affiliator.marketing_materials.index') }}" class="dropdown-item">
+                            <i class="fa-solid fa-bullhorn"></i> Marketing Materials
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <form method="POST" action="{{ route('affiliator.logout') }}" style="display:contents;">
+                            @csrf
+                            <button type="submit" class="dropdown-item danger" style="width:100%;border:none;background:none;cursor:pointer;text-align:left;">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        {{-- ── SESSION FLASH ── --}}
+        @if(session('success'))
+            <div class="toast-wrap" id="toastWrap">
+                <div class="toast toast-success">
+                    <span class="toast-icon"><i class="fa-solid fa-circle-check" style="color:var(--success);"></i></span>
+                    <div>
+                        <div class="toast-title">Success</div>
+                        <div class="toast-msg">{{ session('success') }}</div>
+                    </div>
+                </div>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="toast-wrap" id="toastWrap">
+                <div class="toast toast-error">
+                    <span class="toast-icon"><i class="fa-solid fa-circle-xmark" style="color:var(--danger);"></i></span>
+                    <div>
+                        <div class="toast-title">Error</div>
+                        <div class="toast-msg">{{ session('error') }}</div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- ── PAGE CONTENT ── --}}
+        <div class="portal-content">
+            @yield('content')
+        </div>
+
+    </main>
+</div>
+
+{{-- ── MOBILE BOTTOM NAV ── --}}
+<nav class="mobile-nav">
+    <div class="mobile-nav-inner">
+        <a href="{{ route('affiliator.dashboard') }}" class="mobile-nav-item {{ request()->routeIs('affiliator.dashboard') ? 'active' : '' }}">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="{{ route('affiliator.referrals.index') }}" class="mobile-nav-item {{ request()->routeIs('affiliator.referrals.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-users"></i>
+            <span>Referrals</span>
+        </a>
+        <a href="{{ route('affiliator.commissions.index') }}" class="mobile-nav-item {{ request()->routeIs('affiliator.commissions.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Earnings</span>
+        </a>
+        <a href="{{ route('affiliator.withdrawals.index') }}" class="mobile-nav-item {{ request()->routeIs('affiliator.withdrawals.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-building-columns"></i>
+            <span>Payouts</span>
+        </a>
+        <a href="{{ route('affiliator.profile.edit') }}" class="mobile-nav-item {{ request()->routeIs('affiliator.profile.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </div>
+</nav>
+
+{{-- Chart.js --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // ── Theme Toggle ──
+    const html       = document.documentElement;
+    const themeBtn   = document.getElementById('themeToggle');
+    const themeIcon  = document.getElementById('themeIcon');
+    const savedTheme = localStorage.getItem('cooca-affiliator-theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    themeIcon.className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+
+    themeBtn?.addEventListener('click', () => {
+        const current = html.getAttribute('data-theme');
+        const next    = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('cooca-affiliator-theme', next);
+        themeIcon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    });
+
+    // ── Sidebar Collapse ──
+    const sidebar     = document.getElementById('portalSidebar');
+    const main        = document.getElementById('portalMain');
+    const toggleBtn   = document.getElementById('sidebarToggleBtn');
+    const toggleIcon  = document.getElementById('sidebarToggleIcon');
+
+    if (localStorage.getItem('cooca-affiliator-sidebar') === 'collapsed') {
+        sidebar?.classList.add('collapsed');
+        main?.classList.add('sidebar-collapsed');
+        if (toggleIcon) toggleIcon.className = 'fa-solid fa-chevrons-right';
+    }
+
+    toggleBtn?.addEventListener('click', () => {
+        sidebar?.classList.toggle('collapsed');
+        main?.classList.toggle('sidebar-collapsed');
+        const isCollapsed = sidebar?.classList.contains('collapsed');
+        localStorage.setItem('cooca-affiliator-sidebar', isCollapsed ? 'collapsed' : '');
+        if (toggleIcon) toggleIcon.className = isCollapsed ? 'fa-solid fa-chevrons-right' : 'fa-solid fa-chevrons-left';
+    });
+
+    // ── Profile Dropdown ──
+    const profileBtn      = document.getElementById('profileDropdownBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+    profileBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profileDropdown?.classList.toggle('open');
+    });
+    document.addEventListener('click', () => profileDropdown?.classList.remove('open'));
+
+    // ── Toast Auto-hide ──
+    setTimeout(() => {
+        const toast = document.getElementById('toastWrap');
+        if (toast) { toast.style.opacity = '0'; toast.style.transition = 'opacity .5s'; setTimeout(() => toast.remove(), 500); }
+    }, 4000);
+
+    // ── ⌘K Search shortcut ──
+    document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            document.getElementById('globalSearch')?.focus();
+        }
+    });
+
+    // ── Copy text utility ──
+    window.copyToClipboard = function(text, label = 'Referral Link') {
+        navigator.clipboard.writeText(text).then(() => {
+            alert(label + ' copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
         });
-    </script>
-
-    @stack('scripts')
+    };
+</script>
+@stack('scripts')
 </body>
-
 </html>

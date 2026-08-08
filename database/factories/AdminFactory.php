@@ -29,7 +29,6 @@ class AdminFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'password' => static::$password ??= Hash::make('password'),
-            'permissions' => ['dashboard', 'users', 'products', 'orders'],
         ];
     }
 
@@ -39,7 +38,7 @@ class AdminFactory extends Factory
     public function superAdmin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'permissions' => ['*'],
+            // permissions are now handled via Spatie\Permission
         ]);
     }
 }

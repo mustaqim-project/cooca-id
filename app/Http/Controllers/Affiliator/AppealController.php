@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Affiliator;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class AppealController extends Controller
 {
@@ -46,12 +45,7 @@ class AppealController extends Controller
         $proofPath = $affiliator->appeal_proof_path;
 
         if ($request->hasFile('appeal_proof')) {
-            $file = $request->file('appeal_proof');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            
-            // As requested, store in public folder
-            $file->move(public_path('uploads/appeals'), $filename);
-            $proofPath = 'uploads/appeals/' . $filename;
+            $proofPath = $request->file('appeal_proof')->store('appeals', 'public_uploads');
         }
 
         $affiliator->update([

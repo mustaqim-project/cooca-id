@@ -26,10 +26,10 @@
         <div class="content">
             <div class="success-icon">✓</div>
             <h2 style="text-align: center;">Pembayaran Berhasil!</h2>
-            
+
             <p>Halo {{ $customerName }},</p>
             <p>Terima kasih atas pembayaran Anda. Pembayaran untuk invoice berikut telah berhasil diproses:</p>
-            
+
             <div class="info-box">
                 <div class="info-row">
                     <span class="label">Nomor Invoice</span>
@@ -44,9 +44,9 @@
                     <span class="value">Rp {{ $amount }}</span>
                 </div>
             </div>
-            
+
             <p>Anda dapat mengakses layanan Anda melalui dashboard customer.</p>
-            
+
             <div class="footer">
                 <p>Terima kasih telah menggunakan COOCA.ID</p>
                 <p>&copy; {{ date('Y') }} COOCA.ID. All rights reserved.</p>

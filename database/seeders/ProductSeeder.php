@@ -1,181 +1,136 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 
-class ProductSeeder extends Seeder
+final class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $categories = ProductCategory::all();
-        if ($categories->isEmpty()) {
-            $this->call(ProductCategorySeeder::class);
-            $categories = ProductCategory::all();
-        }
-
-        Schema::disableForeignKeyConstraints();
-        Product::truncate();
-        Schema::enableForeignKeyConstraints();
-
-        $commerce = $categories->where('slug', 'commerce-retail')->first() ?? $categories->first();
-        $hospitality = $categories->where('slug', 'hospitality-services')->first() ?? $categories->first();
-        $health = $categories->where('slug', 'health-professional')->first() ?? $categories->first();
+        $restoCat = ProductCategory::where('slug', 'restoran-fnb')->first();
+        $medisCat = ProductCategory::where('slug', 'klinik-medis')->first();
+        $autoCat  = ProductCategory::where('slug', 'bengkel-otomotif')->first();
+        $legalCat = ProductCategory::where('slug', 'notaris-legal')->first();
+        $bookCat  = ProductCategory::where('slug', 'booking-reservasi')->first();
+        $retailCat= ProductCategory::where('slug', 'retail-minimarket')->first();
 
         $products = [
             [
-                'category_id' => $commerce->id,
-                'name' => 'COOCA POS Enterprise',
-                'slug' => 'cooca-pos-enterprise',
-                'icon' => 'bi-cart3',
-                'short_description' => 'Multi-outlet cloud POS system with real-time inventory and loyalty program.',
-                'description' => 'Unified cloud system that tracks every transaction across every outlet in real time.',
-                'base_price' => 6900000,
+                'name' => 'Cooca Resto ERP & POS Kasir',
+                'slug' => 'cooca-resto-erp',
+                'category_id' => $restoCat?->id,
                 'product_type' => 'saas',
-                'features' => json_encode(['Multi-Outlet POS', 'Real-Time Inventory', 'Customer Loyalty Program', 'Sales Analytics', 'Supplier Management', 'Barcode & QR Support']),
-                'specifications' => json_encode(['Users' => 'Up to 50', 'Outlets' => '10 Branches', 'Uptime SLA' => '99.9%']),
+                'license_type' => 'monthly',
+                'icon' => 'fa-utensils',
+                'short_description' => 'Solusi lengkap kasir POS, Kitchen Display System (KDS), pesanan meja via QR Code, dan inventaris bahan dapur.',
+                'description' => 'Cooca Resto ERP adalah platform SaaS manajemen restoran terpadu. Dilengkapi fitur kasir touchscreen multi-terminal, cetak struk otomatis, integrasi mesin EDC, laporan HPP stok dapur waktu nyata, dan pemesanan mandiri oleh pelanggan menggunakan Scan QR Code di meja.',
+                'base_price' => 250000.00,
+                'setup_fee' => 0.00,
+                'maintenance_fee' => 0.00,
+                'version' => '3.4.0',
+                'max_domains' => 5,
                 'is_active' => true,
                 'is_featured' => true,
-                'sort_order' => 1,
-                'demo_url' => 'https://demo.cooca.id/retail',
             ],
             [
-                'category_id' => $commerce->id,
-                'name' => 'COOCA Salon Cloud',
-                'slug' => 'cooca-salon-cloud',
-                'icon' => 'bi-scissors',
-                'short_description' => 'Appointment booking, stylist scheduling, and customer management.',
-                'description' => 'Manage schedules, track services, and grow your salon business.',
-                'base_price' => 5900000,
+                'name' => 'Cooca Medika EMR & Klinik',
+                'slug' => 'cooca-medika-emr',
+                'category_id' => $medisCat?->id,
                 'product_type' => 'saas',
-                'features' => json_encode(['Online Booking', 'Stylist Scheduling', 'Membership & Loyalty', 'Service Revenue Tracking', 'Customer History', 'SMS/WA Reminder']),
-                'specifications' => json_encode(['Users' => 'Up to 20', 'Branches' => 'Unlimited', 'Uptime SLA' => '99.9%']),
+                'license_type' => 'monthly',
+                'icon' => 'fa-hospital-user',
+                'short_description' => 'Sistem Rekam Medis Elektronik (RME) terakreditasi, stok farmasi obat, antrean antarmuka layar TV, & cetak resep.',
+                'description' => 'Cooca Medika EMR menyediakan manajemen pendaftaran pasien, pencatatan rekam medis standar ICD-10, kontrol racikan obat farmasi, manajemen klaim asuransi, dan laporan rekam medis pasien terenkripsi sesuai standar Kemenkes RI.',
+                'base_price' => 450000.00,
+                'setup_fee' => 0.00,
+                'maintenance_fee' => 0.00,
+                'version' => '2.8.1',
+                'max_domains' => 3,
                 'is_active' => true,
-                'is_featured' => false,
-                'sort_order' => 2,
-                'demo_url' => 'https://demo.cooca.id/salon',
+                'is_featured' => true,
             ],
             [
-                'category_id' => $hospitality->id,
-                'name' => 'COOCA Resto & Kitchen Display',
-                'slug' => 'cooca-restaurant-suite',
-                'icon' => 'bi-cup-hot',
-                'short_description' => 'Table management, kitchen display system, and automated split billing.',
-                'description' => 'From ordering to billing, every step is automated and synchronized.',
-                'base_price' => 7900000,
+                'name' => 'Cooca Auto Bengkel & Sparepart',
+                'slug' => 'cooca-auto-bengkel',
+                'category_id' => $autoCat?->id,
                 'product_type' => 'saas',
-                'features' => json_encode(['Table & Reservation Management', 'Kitchen Display System', 'Multi-Outlet Dashboard', 'Menu Management', 'Split Bill', 'Food Cost Analysis']),
-                'specifications' => json_encode(['Users' => 'Unlimited', 'Outlets' => 'Unlimited', 'Uptime SLA' => '99.9%']),
+                'license_type' => 'monthly',
+                'icon' => 'fa-wrench',
+                'short_description' => 'Sistem Surat Perintah Kerja (PKB/Work Order), inventaris suku cadang otomotif, & kalkulasi komisi mekanik.',
+                'description' => 'Cooca Auto mendigitalkan operasional bengkel mobil & motor. Pengelola dapat membuat estimasi biaya perbaikan, melacak status pengerjaan servis mekanik, mengelola ribuan nomor part sparepart, dan mengirim laporan estimasi otomatis via WhatsApp.',
+                'base_price' => 350000.00,
+                'setup_fee' => 0.00,
+                'maintenance_fee' => 0.00,
+                'version' => '2.1.0',
+                'max_domains' => 5,
                 'is_active' => true,
                 'is_featured' => true,
-                'sort_order' => 3,
-                'demo_url' => 'https://demo.cooca.id/restaurant',
             ],
             [
-                'category_id' => $commerce->id,
-                'name' => 'COOCA Retail Desktop (Perpetual)',
-                'slug' => 'cooca-retail-desktop-perpetual',
-                'icon' => 'bi-pc-display',
-                'short_description' => 'Standalone desktop POS with lifetime license key and local database.',
-                'description' => 'No monthly fees. Install on your local Windows terminal.',
-                'base_price' => 12500000,
-                'product_type' => 'lifetime',
-                'features' => json_encode(['Lifetime License Key', 'Offline Local Database', 'Barcode Scanner & Cash Drawer Ready', 'Receipt Customization', 'Excel Data Export/Import']),
-                'specifications' => json_encode(['Platform' => 'Windows 10/11', 'License' => '1 PC / Terminal Key', 'Support' => '1 Year Free Updates']),
-                'is_active' => true,
-                'is_featured' => true,
-                'sort_order' => 4,
-                'demo_url' => 'https://demo.cooca.id/desktop',
-            ],
-            [
-                'category_id' => $health->id,
-                'name' => 'COOCA Clinic EMR Lifetime Edition',
-                'slug' => 'cooca-clinic-emr-lifetime',
-                'icon' => 'bi-hospital',
-                'short_description' => 'Complete patient records, pharmacy inventory, and medical billing.',
-                'description' => 'Fully integrated medical management software with perpetual licensing.',
-                'base_price' => 24900000,
-                'product_type' => 'lifetime',
-                'features' => json_encode(['Perpetual License Code', 'Electronic Medical Records (EMR)', 'Pharmacy & Stock Alerts', 'Insurance & BPJS Export', 'Doctor Fee Computation']),
-                'specifications' => json_encode(['License' => '3 Terminals Included', 'Database' => 'MySQL/PostgreSQL Local', 'Support' => '1 Year Technical Support']),
+                'name' => 'Cooca Legal Notaris & Akta',
+                'slug' => 'cooca-legal-notaris',
+                'category_id' => $legalCat?->id,
+                'product_type' => 'saas',
+                'license_type' => 'monthly',
+                'icon' => 'fa-scale-balanced',
+                'short_description' => 'Manajemen proses pengurusan akta tanah/PT, repositori sertifikat digital, invoice biaya legal, & reminder Klien.',
+                'description' => 'Dirancang khusus untuk Kantor Notaris & Pejabat Pembuat Akta Tanah (PPAT). Memudahkan penjejakan berkas perkara Klien dari BPN hingga SK Kemenkumham, penyimpanan dokumen digital aman, dan tagihan honorarium transparansi.',
+                'base_price' => 500000.00,
+                'setup_fee' => 0.00,
+                'maintenance_fee' => 0.00,
+                'version' => '1.9.0',
+                'max_domains' => 2,
                 'is_active' => true,
                 'is_featured' => false,
-                'sort_order' => 5,
-                'demo_url' => 'https://demo.cooca.id/clinic',
             ],
             [
-                'category_id' => $hospitality->id,
-                'name' => 'COOCA Hotel Connector API Key',
-                'slug' => 'cooca-hotel-connector-key',
-                'icon' => 'bi-key-fill',
-                'short_description' => 'Instant digital license key for connecting PMS with OTA channel managers.',
-                'description' => 'Activation license key for real-time two-way synchronization.',
-                'base_price' => 3500000,
-                'product_type' => 'license',
-                'features' => json_encode(['Instant Digital Key Delivery', 'Two-Way OTA Synchronization', 'Real-Time Rate & Availability Update', 'Automated Reservation Import', 'Zero Booking Commission']),
-                'specifications' => json_encode(['Delivery' => 'Instant Email Key', 'Validity' => '365 Days Activation', 'Support' => '24/7 API Support']),
+                'name' => 'Cooca Booking & Salon Services',
+                'slug' => 'cooca-booking-services',
+                'category_id' => $bookCat?->id,
+                'product_type' => 'saas',
+                'license_type' => 'monthly',
+                'icon' => 'fa-calendar-check',
+                'short_description' => 'Reservasi jadwal online, pembayaran DP Midtrans, pengingat janji temu WA otomatis, & komisi kapster/terapis.',
+                'description' => 'Sistem booking mandiri untuk bisnis Salon Kecantikan, Barbershop, Spa, Petshop, dan Jasa Konsultasi. Pelanggan memilih tanggal, jam, & staf favorit secara online dengan integrasi pembayaran otomatis.',
+                'base_price' => 200000.00,
+                'setup_fee' => 0.00,
+                'maintenance_fee' => 0.00,
+                'version' => '4.0.2',
+                'max_domains' => 5,
                 'is_active' => true,
                 'is_featured' => false,
-                'sort_order' => 6,
-                'demo_url' => null,
             ],
             [
-                'category_id' => $hospitality->id,
-                'name' => 'Enterprise ERP Custom Integration',
-                'slug' => 'enterprise-erp-custom-integration',
-                'icon' => 'bi-boxes',
-                'short_description' => 'Bespoke custom software development for complex enterprise workflows.',
-                'description' => 'End-to-end custom development with dedicated project management.',
-                'base_price' => 75000000,
-                'product_type' => 'custom_dev',
-                'features' => json_encode(['Dedicated Project Manager & Tech Lead', 'Custom System Architecture Design', 'Milestone-Based Billing & Delivery', 'Full Source Code & IP Transfer', 'SLA Dedicated 24/7 Support']),
-                'specifications' => json_encode(['Timeline' => '8-16 Weeks Project', 'Methodology' => 'Agile Scrum Delivery', 'Warranty' => '6 Months Post-Launch Warranty']),
-                'is_active' => true,
-                'is_featured' => true,
-                'sort_order' => 7,
-                'demo_url' => null,
-            ],
-            [
-                'category_id' => $commerce->id,
-                'name' => 'COOCA WhatsApp AI Bot Addon',
-                'slug' => 'cooca-whatsapp-ai-bot-addon',
-                'icon' => 'bi-whatsapp',
-                'short_description' => 'Automate order taking, reservation confirmation, and customer FAQ via WhatsApp.',
-                'description' => 'AI-powered WhatsApp chatbot for any COOCA product.',
-                'base_price' => 1500000,
-                'product_type' => 'addon',
-                'features' => json_encode(['Automated WhatsApp AI Auto-Responder', 'One-Click Integration to COOCA POS/Resto', 'Custom Flow & Template Builder', 'Broadcast & Marketing Campaign Ready']),
-                'specifications' => json_encode(['Compatibility' => 'All COOCA Products', 'Setup Time' => 'Instant / 1 Business Day']),
+                'name' => 'Cooca Retail Cloud POS',
+                'slug' => 'cooca-retail-cloud-pos',
+                'category_id' => $retailCat?->id,
+                'product_type' => 'saas',
+                'license_type' => 'monthly',
+                'icon' => 'fa-store',
+                'short_description' => 'POS kasir toko fisik & online multi-cabang, pencetakan label barcode, stok opname, & laporan rugi laba.',
+                'description' => 'Sistem penjualan retail terpusat. Cocok untuk toko pakaian, minimarket, toko elektronik, dan distributor barang konsumsi dengan sinkronisasi stok riil antar gudang.',
+                'base_price' => 300000.00,
+                'setup_fee' => 0.00,
+                'maintenance_fee' => 0.00,
+                'version' => '3.1.5',
+                'max_domains' => 10,
                 'is_active' => true,
                 'is_featured' => false,
-                'sort_order' => 8,
-                'demo_url' => null,
-            ],
-            [
-                'category_id' => $health->id,
-                'name' => 'Annual Priority Support SLA & Maintenance',
-                'slug' => 'annual-priority-support-sla',
-                'icon' => 'bi-headset',
-                'short_description' => 'Dedicated priority phone/remote support with 1-hour response guarantee.',
-                'description' => 'Direct hotline access to senior engineers and proactive monthly health checks.',
-                'base_price' => 12000000,
-                'product_type' => 'service',
-                'features' => json_encode(['1-Hour Maximum Response Guarantee', 'Dedicated Technical Account Manager', 'Monthly Database Backup Audit & Optimization', 'Free Version Upgrades & Patching']),
-                'specifications' => json_encode(['Coverage' => '24/7/365 Support', 'Contract' => '12 Months SLA']),
-                'is_active' => true,
-                'is_featured' => false,
-                'sort_order' => 9,
-                'demo_url' => null,
             ],
         ];
 
-        foreach ($products as $product) {
-            Product::create($product);
+        foreach ($products as $prod) {
+            Product::firstOrCreate(
+                ['slug' => $prod['slug']],
+                $prod
+            );
         }
 
-        $this->command->info('Products seeded successfully.');
+        echo "✅ Products successfully seeded.\n";
     }
 }

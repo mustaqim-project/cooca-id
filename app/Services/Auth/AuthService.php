@@ -45,25 +45,56 @@ final class AuthService
 
     public function registerCustomer(array $data): Customer
     {
+        $logoPath = $data['logo_path'] ?? null;
+
         $customer = Customer::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'phone' => $data['phone'],
             'password' => Hash::make($data['password']),
+            'business_name' => $data['business_name'] ?? null,
+            'logo_path' => $logoPath,
         ]);
         
         $customer->companyProfile()->create([
             'company_name' => $data['business_name'] ?? $data['name'],
+            'logo_path' => $logoPath,
         ]);
 
-        if (isset($data['referral_code'])) {
-            $affiliatorProfile = AffiliatorProfile::where('referral_code', $data['referral_code'])->first();
-            if ($affiliatorProfile) {
-                // Update referred_by_id in some place (maybe update the model logic if it exists)
-                // Note: The original code updated referred_by_id, we just leave it for now if it exists on Customer
+        if (!empty($data['referral_code'])) {
+            $affiliator = Affiliator::where('referral_code', $data['referral_code'])->first();
+            if (!$affiliator) {
+                $affiliatorProfile = AffiliatorProfile::where('referral_code', $data['referral_code'])->first();
+                if ($affiliatorProfile) {
+                    $affiliator = Affiliator::find($affiliatorProfile->user_id) ?? $affiliatorProfile->affiliator;
+                }
+            }
+
+            if ($affiliator) {
+                $customer->update(['affiliator_id' => $affiliator->id]);
             }
         }
 
         $customer->assignRole('customer');
+
+        // Generate and send WA OTP
+        $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $customer->update([
+            'wa_otp_code' => $otp,
+            'wa_otp_expires_at' => now()->addMinutes(10),
+        ]);
+
+        try {
+            app(\App\Services\Notification\WhatsAppService::class)->sendMessage(
+                $customer->phone, 
+                "Halo {$customer->name}, kode verifikasi Cooca.id Anda adalah: *{$otp}*\n\nKode ini berlaku selama 10 menit. Jangan berikan kode ini kepada siapapun."
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send WA OTP', ['error' => $e->getMessage()]);
+        }
+
+        // Send Email Verification
+        $customer->sendEmailVerificationNotification();
 
         return $customer;
     }
@@ -79,9 +110,9 @@ final class AuthService
         return Auth::guard('customer')->user()->createToken('customer-token')->plainTextToken;
     }
 
-    public function handleGoogleCallback(string $userType)
+    public function handleGoogleCallback(string $userType, $googleUser = null)
     {
-        $googleUser = Socialite::driver('google')->user();
+        $googleUser = $googleUser ?? Socialite::driver('google')->user();
 
         if ($userType === 'customer') {
             $user = Customer::where('google_id', $googleUser->getId())->orWhere('email', $googleUser->getEmail())->first();

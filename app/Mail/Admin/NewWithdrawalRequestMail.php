@@ -25,7 +25,7 @@ final class NewWithdrawalRequestMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Request Withdrawal Baru - Rp ' . number_format($this->withdrawal->amount, 0, ',', '.'),
+            subject: 'Request Withdrawal Baru - Rp ' . number_format((float) $this->withdrawal->amount, 0, ',', '.'),
             tags: ['admin', 'withdrawal', 'request'],
             metadata: [
                 'withdrawal_id' => $this->withdrawal->id,
@@ -41,14 +41,14 @@ final class NewWithdrawalRequestMail extends Mailable implements ShouldQueue
             with: [
                 'affiliatorName' => $this->withdrawal->affiliator->name,
                 'affiliatorEmail' => $this->withdrawal->affiliator->email,
-                'amount' => number_format($this->withdrawal->amount, 0, ',', '.'),
-                'fee' => number_format($this->withdrawal->fee, 0, ',', '.'),
-                'netAmount' => number_format($this->withdrawal->net_amount, 0, ',', '.'),
-                'withdrawalMethod' => ucfirst($this->withdrawal->withdrawal_method),
+                'amount' => number_format((float) $this->withdrawal->amount, 0, ',', '.'),
+                'fee' => number_format((float) $this->withdrawal->fee, 0, ',', '.'),
+                'netAmount' => number_format((float) $this->withdrawal->net_amount, 0, ',', '.'),
+                'withdrawalMethod' => ucfirst((string) $this->withdrawal->withdrawal_method),
                 'accountNumber' => $this->withdrawal->account_number,
                 'accountName' => $this->withdrawal->account_name,
-                'requestedAt' => $this->withdrawal->created_at->format('d F Y H:i'),
-                'approvalUrl' => route('admin.withdrawals.show', $this->withdrawal->id),
+                'requestedAt' => ($this->withdrawal->created_at ? \Illuminate\Support\Carbon::parse($this->withdrawal->created_at) : now())->format('d F Y H:i'),
+                'approvalUrl' => route('admin.settlements.show', $this->withdrawal->id),
             ],
         );
     }

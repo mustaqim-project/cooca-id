@@ -32,10 +32,7 @@ final class SendPaymentConfirmationJob implements ShouldQueue
 
             // Dispatch email notification
             $customer->notify(
-                new \App\Notifications\Customer\PaymentConfirmedNotification(
-                    $this->transaction->invoice_number,
-                    (float) $this->transaction->net_amount
-                )
+                new \App\Notifications\Customer\PaymentConfirmedNotification($this->transaction)
             );
 
             // Dispatch WhatsApp notification via service

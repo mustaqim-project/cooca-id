@@ -1,154 +1,114 @@
-@extends('admin.layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Products')
+@section('title', 'Product Catalog — COOCA.ID Admin')
 
 @section('content')
-    <div class="d-flex flex-column gap-4">
-
-        <!-- Page Header & Toolbar -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-                <h2 class="mb-1 fw-bold">Products</h2>
-                <p class="text-secondary mb-0">Manage services, features, and subscription pricing.</p>
-            </div>
-            <div class="d-flex gap-2">
-                <a href="{{ route('admin.products.create') }}" class="btn btn-primary rounded-pill px-3 hover-lift shadow-sm">
-                    <i class="bi bi-plus-lg me-2"></i> Create Product
-                </a>
-            </div>
+<div class="page-header">
+    <div>
+        <div class="breadcrumb">
+            <a href="{{ route('admin.dashboard') }}">Admin</a>
+            <span>/</span>
+            <span>Products</span>
         </div>
+        <h1 class="page-title">Products Management</h1>
+        <p class="page-subtitle">Manage SaaS software products, modules, pricing tiers, and licensing specifications.</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+            <span>➕</span> Add New Product
+        </a>
+    </div>
+</div>
 
-        <!-- Data Table -->
-        <div class="card border-0 shadow-sm rounded-4 glass">
-            <div
-                class="card-header bg-transparent border-bottom border-light p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                <div class="input-group input-group-sm rounded-pill overflow-hidden border"
-                    style="max-width: 320px; background: var(--color-bg);">
-                    <span class="input-group-text bg-transparent border-0 pe-1"><i
-                            class="bi bi-search text-secondary"></i></span>
-                    <input type="text" class="form-control border-0 bg-transparent shadow-none text-secondary"
-                        placeholder="Search products...">
-                </div>
+<div class="filter-bar">
+    <div class="filter-search">
+        <span class="filter-search-icon">🔍</span>
+        <input type="text" placeholder="Filter by product name, slug, or tech stack...">
+    </div>
+    <select class="form-select" style="width: 180px;">
+        <option value="">All Categories</option>
+        @foreach($categories as $cat)
+            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+        @endforeach
+    </select>
+    <select class="form-select" style="width: 150px;">
+        <option value="">All Statuses</option>
+        <option value="1">Active</option>
+        <option value="0">Inactive</option>
+    </select>
+</div>
 
-                <div class="d-flex align-items-center gap-2">
-                    <button class="btn btn-sm btn-light border rounded-circle p-2" title="Export CSV"><i
-                            class="bi bi-download"></i></button>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
-                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Product Details</th>
+                        <th>Category</th>
+                        <th>Base Price</th>
+                        <th>Plans</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($products as $product)
                         <tr>
-                            <th class="py-3 px-4 border-0">#</th>
-                            <th class="py-3 px-3 border-0">Product</th>
-                            <th class="py-3 px-3 border-0">Type</th>
-                            <th class="py-3 px-3 border-0">Category</th>
-                            <th class="py-3 px-3 border-0">Price From</th>
-                            <th class="py-3 px-3 border-0">Plans</th>
-                            <th class="py-3 px-3 border-0">Status</th>
-                            <th class="py-3 px-4 border-0 text-end">Action</th>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="avatar avatar-md" style="background: linear-gradient(135deg, #4F46E5, #06B6D4); font-size: 16px;">
+                                        💻
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-base">{{ $product->name }}</div>
+                                        <div class="text-xs text-muted">{{ Str::limit($product->short_description ?? $product->description, 60) }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge badge-purple">{{ $product->category->name ?? 'General' }}</span>
+                            </td>
+                            <td class="font-bold text-primary">
+                                Rp {{ number_format($product->base_price ?? $product->price ?? 0, 0, ',', '.') }}
+                            </td>
+                            <td>
+                                <span class="badge badge-accent">{{ $product->subscription_plans_count ?? $product->subscriptionPlans->count() }} Tiers</span>
+                            </td>
+                            <td>
+                                @if($product->is_active ?? true)
+                                    <span class="badge badge-success"><span class="status-dot active"></span> Active</span>
+                                @else
+                                    <span class="badge badge-muted"><span class="status-dot inactive"></span> Inactive</span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="td-actions">
+                                    <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-ghost btn-sm" title="Edit Product">✏️ Edit</a>
+                                    <a href="{{ route('admin.products.plans.index', $product->id) }}" class="btn btn-outline btn-sm" title="Manage Plans">🏷️ Plans</a>
+                                    <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Delete this product?');" style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-ghost btn-sm text-danger" title="Delete">🗑️</button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody class="border-top-0">
-                        @forelse($products as $product)
-                            <tr>
-                                <td class="py-3 px-4 text-secondary fs-7">{{ $loop->iteration }}</td>
-                                <td class="py-3 px-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        @if ($product->thumbnail)
-                                            <img src="{{ Storage::url($product->thumbnail) }}" alt="{{ $product->name }}"
-                                                class="rounded-3 shadow-sm object-fit-cover flex-shrink-0"
-                                                style="width:44px;height:44px;">
-                                        @else
-                                            <div class="bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                                                style="width:44px;height:44px;">
-                                                <i class="bi bi-box-seam fs-5"></i>
-                                            </div>
-                                        @endif
-                                        <div>
-                                            <div class="fw-medium">{{ $product->name }}</div>
-                                            @if ($product->slug)
-                                                <div class="text-secondary fs-7 font-monospace">{{ $product->slug }}</div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-3">
-                                    <span
-                                        class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1">{{ $product->product_type_label }}</span>
-                                </td>
-                                <td class="py-3 px-3">
-                                    <span
-                                        class="badge bg-light text-dark border">{{ $product->category->name ?? '-' }}</span>
-                                </td>
-                                <td class="py-3 px-3 fw-medium">
-                                    @php $minPrice = $product->subscriptionPlans->min('price'); @endphp
-                                    {{ $minPrice ? 'Rp ' . number_format($minPrice, 0, ',', '.') : 'Free' }}
-                                </td>
-                                <td class="py-3 px-3 text-secondary fs-7">
-                                    {{ $product->subscriptionPlans->count() }} Plans
-                                </td>
-                                <td class="py-3 px-3">
-                                    @if ($product->is_active)
-                                        <span
-                                            class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">Active</span>
-                                    @else
-                                        <span
-                                            class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-1">Inactive</span>
-                                    @endif
-                                </td>
-                                <td class="py-3 px-4 text-end">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-light border-0 rounded-circle p-2" type="button"
-                                            data-bs-toggle="dropdown">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 glass">
-                                            <li><a class="dropdown-item py-2"
-                                                    href="{{ route('admin.products.show', $product->id) }}"><i
-                                                        class="bi bi-eye me-2 text-primary"></i> View Details</a></li>
-                                            <li><a class="dropdown-item py-2"
-                                                    href="{{ route('admin.products.edit', $product->id) }}"><i
-                                                        class="bi bi-pencil me-2 text-warning"></i> Edit</a></li>
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li>
-                                                <form action="{{ route('admin.products.destroy', $product->id) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="dropdown-item py-2 text-danger"
-                                                        onclick="return confirm('Are you sure you want to delete this product?');">
-                                                        <i class="bi bi-trash me-2"></i> Delete
-                                                    </button>
-                                                </form>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="py-5 text-center text-secondary">
-                                    <div class="mb-3"><i class="bi bi-box-seam fs-1"></i></div>
-                                    <h6 class="fw-medium">No Products Found</h6>
-                                    <p class="fs-7">Start by creating your first product or service offering.</p>
-                                    <a href="{{ route('admin.products.create') }}"
-                                        class="btn btn-sm btn-primary rounded-pill px-3 mt-2">Create Product</a>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            @if (isset($products) && $products->hasPages())
-                <div class="card-footer bg-transparent border-top border-light p-4">
-                    {{ $products->links() }}
-                </div>
-            @endif
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-muted" style="padding: 40px;">
+                                No products found. <a href="{{ route('admin.products.create') }}" class="text-primary font-semibold">Create one now</a>.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
+    @if(method_exists($products, 'hasPages') && $products->hasPages())
+        <div class="card-footer">
+            {{ $products->links() }}
+        </div>
+    @endif
+</div>
 @endsection

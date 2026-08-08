@@ -79,6 +79,8 @@ final class StoreProductRequest extends FormRequest
     public function prepareForValidation(): void
     {
         $this->merge([
+            'category_id'   => $this->input('category_id') ?: $this->input('product_category_id'),
+            'product_type'  => $this->input('product_type') ?: ($this->route('product') ? (\App\Models\Product::find($this->route('product'))?->product_type ?? 'saas') : 'saas'),
             'is_active'     => $this->boolean('is_active'),
             'is_featured'   => $this->boolean('is_featured'),
             'is_bundleable' => $this->boolean('is_bundleable'),

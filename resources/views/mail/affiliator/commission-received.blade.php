@@ -29,10 +29,10 @@
         <div class="content">
             <div class="money-icon">💰</div>
             <h2 style="text-align: center;">Komisi Diterima!</h2>
-            
+
             <p>Halo {{ $affiliatorName }},</p>
             <p>Anda telah menerima komisi baru dari program affiliate COOCA.ID.</p>
-            
+
             <div class="info-box">
                 <div class="info-row">
                     <span class="label">Jumlah Komisi</span>
@@ -43,14 +43,14 @@
                     <span class="value">Level {{ $level }}</span>
                 </div>
             </div>
-            
+
             <div class="balance-box">
                 <div class="balance-label">Saldo Anda Sekarang</div>
                 <div class="balance-amount">Rp {{ $newBalance }}</div>
             </div>
-            
+
             <p>Terus kembangkan jaringan Anda untuk mendapatkan lebih banyak komisi!</p>
-            
+
             <div class="footer">
                 <p>Terima kasih atas partisipasi Anda dalam program affiliate COOCA.ID</p>
                 <p>&copy; {{ date('Y') }} COOCA.ID. All rights reserved.</p>

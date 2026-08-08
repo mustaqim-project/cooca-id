@@ -3,7 +3,7 @@
         <button class="header-hamburger d-lg-none" id="sidebar-toggle-mobile" aria-label="Toggle sidebar">
             <i class="bi bi-list"></i>
         </button>
-        
+
         <nav class="header-breadcrumb" aria-label="Breadcrumb">
             <ol class="breadcrumb-list">
                 <li class="breadcrumb-item">
@@ -25,7 +25,7 @@
                 <i class="bi bi-moon-stars-fill theme-icon-light"></i>
                 <i class="bi bi-sun-fill theme-icon-dark"></i>
             </button>
-            
+
             <button class="header-action-btn notification-btn" title="Notifications">
                 <i class="bi bi-bell"></i>
                 <span class="notification-badge">0</span>
@@ -93,13 +93,13 @@
         gap: 1rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .header-left, .header-right {
         display: flex;
         align-items: center;
         gap: 1rem;
     }
-    
+
     .header-hamburger {
         background: transparent;
         border: none;
@@ -109,11 +109,11 @@
         padding: 0.5rem;
         border-radius: 6px;
     }
-    
+
     .header-hamburger:hover {
         background: var(--color-bg);
     }
-    
+
     .breadcrumb-list {
         list-style: none;
         padding: 0;
@@ -123,27 +123,27 @@
         gap: 0.5rem;
         font-size: 0.875rem;
     }
-    
+
     .breadcrumb-link {
         color: var(--color-text-secondary);
         text-decoration: none;
     }
-    
+
     .breadcrumb-separator {
         color: var(--color-border);
     }
-    
+
     .breadcrumb-item.active {
         color: var(--color-text-primary);
         font-weight: 500;
     }
-    
+
     .header-actions {
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
-    
+
     .header-action-btn {
         background: transparent;
         border: none;
@@ -155,12 +155,12 @@
         position: relative;
         transition: var(--transition-smooth);
     }
-    
+
     .header-action-btn:hover {
         background: var(--color-bg);
         color: var(--color-primary);
     }
-    
+
     .notification-badge {
         position: absolute;
         top: 2px;
@@ -174,13 +174,13 @@
         min-width: 16px;
         text-align: center;
     }
-    
+
     .header-divider {
         width: 1px;
         height: 24px;
         background: var(--color-border);
     }
-    
+
     .profile-btn {
         background: transparent;
         border: none;
@@ -192,11 +192,11 @@
         border-radius: 8px;
         transition: var(--transition-smooth);
     }
-    
+
     .profile-btn:hover {
         background: var(--color-bg);
     }
-    
+
     .profile-avatar {
         width: 36px;
         height: 36px;
@@ -209,42 +209,42 @@
         font-weight: 600;
         font-size: 0.875rem;
     }
-    
+
     .profile-info {
         display: flex;
         flex-direction: column;
         text-align: left;
     }
-    
+
     .profile-name {
         font-size: 0.875rem;
         font-weight: 600;
         color: var(--color-text-primary);
     }
-    
+
     .profile-role {
         font-size: 0.75rem;
         color: var(--color-text-secondary);
     }
-    
+
     .profile-chevron {
         font-size: 0.75rem;
         color: var(--color-text-secondary);
     }
-    
+
     .profile-menu {
         min-width: 220px;
         border: 1px solid var(--color-border);
         border-radius: var(--radius-md);
     }
-    
+
     .dropdown-header {
         display: flex;
         align-items: center;
         gap: 0.75rem;
         padding: 0.75rem 1rem;
     }
-    
+
     .profile-avatar-sm {
         width: 40px;
         height: 40px;
@@ -256,7 +256,7 @@
         justify-content: center;
         font-weight: 600;
     }
-    
+
     .dropdown-item {
         padding: 0.625rem 1rem;
         color: var(--color-text-primary);
@@ -268,21 +268,21 @@
         text-align: left;
         cursor: pointer;
     }
-    
+
     .dropdown-item:hover {
         background: var(--color-bg);
     }
-    
+
     .dropdown-item.text-danger:hover {
         background: rgba(239, 68, 68, 0.1);
         color: var(--color-danger);
     }
-    
+
     .dropdown-divider {
         margin: 0.5rem 0;
         border-top: 1px solid var(--color-border);
     }
-    
+
     @media (max-width: 767.98px) {
         .profile-info {
             display: none;

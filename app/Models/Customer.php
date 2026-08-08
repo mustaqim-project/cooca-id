@@ -28,11 +28,22 @@ final class Customer extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'phone',
+        'phone_verified_at',
+        'wa_otp_code',
+        'wa_otp_expires_at',
         'password',
         'business_name',
+        'logo_path',
         'domain',
         'affiliator_id',
         'google_id',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'phone_verified_at' => 'datetime',
+        'wa_otp_expires_at' => 'datetime',
     ];
 
     protected $hidden = [
@@ -47,6 +58,32 @@ final class Customer extends Authenticatable implements MustVerifyEmail
                 $customer->password = Hash::make(Str::random(32));
             }
         });
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $notification = new \Illuminate\Auth\Notifications\VerifyEmail();
+        $notification->createUrlUsing(function ($notifiable) {
+            return \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'customer.verification.verify',
+                now()->addMinutes((int) config('auth.verification.expire', 60)),
+                [
+                    'id' => $notifiable->getKey(),
+                    'hash' => sha1($notifiable->getEmailForVerification()),
+                ]
+            );
+        });
+        $this->notify($notification);
+    }
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        $logo = $this->logo_path ?? $this->companyProfile?->logo_path;
+        if (!$logo) return null;
+        // If already a full URL, return as-is
+        if (str_starts_with($logo, 'http')) return $logo;
+        // Path is already absolute-like (/uploads/logos/...) or relative, serve from public
+        return asset(ltrim($logo, '/'));
     }
 
     public function companyProfile(): HasOne
@@ -64,6 +101,11 @@ final class Customer extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(ErpRequest::class);
     }
 
+    public function getReferredByIdAttribute(): ?string
+    {
+        return $this->affiliator_id;
+    }
+
     public function affiliator(): BelongsTo
     {
         return $this->belongsTo(Affiliator::class, 'affiliator_id');
@@ -77,6 +119,11 @@ final class Customer extends Authenticatable implements MustVerifyEmail
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class, 'customer_id');
+    }
+
+    public function trials(): HasMany
+    {
+        return $this->hasMany(Trial::class, 'customer_id');
     }
 
     public function transactions(): HasMany
@@ -119,5 +166,20 @@ final class Customer extends Authenticatable implements MustVerifyEmail
     public function activityLogs(): MorphMany
     {
         return $this->morphMany(ActivityLog::class, 'causer', 'causer_type', 'causer_id');
+    }
+
+    /**
+     * Check if customer has completed their company profile
+     */
+    public function isCompanyProfileComplete(): bool
+    {
+        $profile = $this->companyProfile;
+        if (!$profile) {
+            return false;
+        }
+
+        return !empty($profile->company_name) && 
+               !empty($profile->phone) && 
+               !empty($profile->address);
     }
 }

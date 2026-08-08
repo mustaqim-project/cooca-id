@@ -22,7 +22,7 @@ use App\Http\Controllers\Customer\ProfileController;
 |
 */
 
-Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'verified:customer.verification.notice', 'throttle:customer'])->group(function () {
+Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'verified:customer.verification.notice', 'phone.verified', 'throttle:customer'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -32,15 +32,26 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'veri
 
     // Subscriptions - Using scoped route model binding for IDOR prevention
     Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::get('/subscriptions/check-domain', [SubscriptionController::class, 'checkDomain'])->name('subscriptions.check-domain');
     Route::get('/subscriptions/create', [SubscriptionController::class, 'create'])->name('subscriptions.create');
     Route::post('/subscriptions', [SubscriptionController::class, 'store'])->name('subscriptions.store');
     Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
     Route::post('/subscriptions/{subscription}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
-    Route::post('/subscriptions/{subscription}/renew', [SubscriptionController::class, 'renew'])->name('subscriptions.renew');
+    Route::match(['get', 'post'], '/subscriptions/{subscription}/renew', [SubscriptionController::class, 'renew'])->name('subscriptions.renew');
+    Route::get('/subscriptions/{subscription}/checkout', [SubscriptionController::class, 'checkout'])->name('subscriptions.checkout');
+    Route::post('/subscriptions/{subscription}/checkout', [SubscriptionController::class, 'processCheckout'])->name('subscriptions.checkout.process');
+    Route::post('/subscriptions/{subscription}/apply-voucher', [SubscriptionController::class, 'applyVoucher'])->name('subscriptions.apply-voucher');
 
     // Payments - Using scoped route model binding for IDOR prevention
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+    
+    // Midtrans Redirect URLs
+    Route::get('/payments/success', [PaymentController::class, 'success'])->name('payments.success');
+    Route::get('/payments/pending', [PaymentController::class, 'pending'])->name('payments.pending');
+    Route::get('/payments/failed', [PaymentController::class, 'failed'])->name('payments.failed');
+    Route::get('/payments/callback/{order_id}', [PaymentController::class, 'callback'])->name('payments.callback');
+    
     Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
 
     // Invoices - Using scoped route model binding for IDOR prevention
@@ -67,6 +78,7 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'veri
 
     // Trials
     Route::get('/trials', [\App\Http\Controllers\Customer\TrialController::class, 'index'])->name('trials.index');
+    Route::get('/trials/check-subdomain', [\App\Http\Controllers\Customer\TrialController::class, 'checkSubdomain'])->name('trials.check-subdomain');
     Route::get('/trials/create', [\App\Http\Controllers\Customer\TrialController::class, 'create'])->name('trials.create');
     Route::post('/trials', [\App\Http\Controllers\Customer\TrialController::class, 'store'])->name('trials.store');
     Route::get('/trials/{trial}', [\App\Http\Controllers\Customer\TrialController::class, 'show'])->name('trials.show');
@@ -75,6 +87,8 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'veri
     Route::get('/domains', [\App\Http\Controllers\Customer\DomainController::class, 'index'])->name('domains.index');
     Route::put('/domains/{tenant}', [\App\Http\Controllers\Customer\DomainController::class, 'update'])->name('domains.update');
     Route::post('/domains/{tenant}/verify', [\App\Http\Controllers\Customer\DomainController::class, 'verify'])->name('domains.verify');
+
+
 
     // Tickets
     Route::get('/tickets', [\App\Http\Controllers\Customer\TicketController::class, 'index'])->name('tickets.index');
@@ -86,4 +100,14 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'veri
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+    // Projects
+    Route::resource('projects', \App\Http\Controllers\Customer\ProjectController::class)->only(['index', 'show']);
+
+    // WhatsApp API Device Generator Management for Customer
+    Route::resource('whatsapp-devices', \App\Http\Controllers\Customer\WhatsAppDeviceController::class);
+    Route::get('/whatsapp-devices/{id}/status-ajax', [\App\Http\Controllers\Customer\WhatsAppDeviceController::class, 'statusAjax'])->name('whatsapp-devices.status-ajax');
+    Route::post('/whatsapp-devices/{id}/test-send', [\App\Http\Controllers\Customer\WhatsAppDeviceController::class, 'testSend'])->name('whatsapp-devices.test-send');
 });
+
+

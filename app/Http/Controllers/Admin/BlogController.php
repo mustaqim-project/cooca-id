@@ -6,26 +6,31 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
+use App\Models\BlogCategory;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
-
 
 /**
  * Admin Blog Controller
- * 
- * Manages blog posts and articles.
+ *
+ * Manages blog posts with:
+ * - Image upload (filename based on post title slug)
+ * - Alt text for featured + OG images
+ * - Full SEO metadata management
+ * - Analytics field tracking
  */
 class BlogController extends Controller
 {
-    /**
-     * Display a listing of blog posts.
-     */
+    // -----------------------------------------------------------------------
+    // Index
+    // -----------------------------------------------------------------------
+
     public function index(Request $request)
     {
-        $query = BlogPost::with(['author'])->latest('created_at');
+        $query = BlogPost::with(['author', 'blogCategory'])->latest('created_at');
 
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
@@ -35,151 +40,244 @@ class BlogController extends Controller
         }
 
         if ($status = $request->get('status')) {
-            if ($status === 'published') {
-                $query->where('is_published', true);
-            } elseif ($status === 'draft') {
-                $query->where('is_published', false);
-            }
+            match ($status) {
+                'published' => $query->where('is_published', true),
+                'draft'     => $query->where('is_published', false),
+                'featured'  => $query->where('is_featured', true),
+                default     => null,
+            };
         }
 
-        if ($category = $request->get('category')) {
-            $query->where('category', $category);
+        if ($categoryId = $request->get('blog_category_id')) {
+            $query->where('blog_category_id', $categoryId);
         }
 
-        $posts = $query->paginate(20)->withQueryString();
-
-        $categories = BlogPost::select('category')
-            ->distinct()
-            ->whereNotNull('category')
-            ->pluck('category');
+        $posts      = $query->paginate(20)->withQueryString();
+        $categories = BlogCategory::where('is_active', true)->orderBy('name')->get();
 
         return view('admin.blog.index', [
-            'posts' => $posts,
+            'posts'      => $posts,
             'categories' => $categories,
-            'filters' => [
-                'search' => $request->get('search'),
-                'status' => $request->get('status'),
-                'category' => $request->get('category'),
+            'filters'    => [
+                'search'           => $request->get('search'),
+                'status'           => $request->get('status'),
+                'blog_category_id' => $request->get('blog_category_id'),
             ],
         ]);
     }
 
-    /**
-     * Show the form for creating a new post.
-     */
+    // -----------------------------------------------------------------------
+    // Create
+    // -----------------------------------------------------------------------
+
     public function create()
     {
         return view('admin.blog.create', [
-            'post' => null,
-            'categories' => BlogPost::select('category')
-                ->distinct()
-                ->whereNotNull('category')
-                ->pluck('category'),
+            'post'       => null,
+            'categories' => BlogCategory::where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 
-    /**
-     * Store a newly created post in storage.
-     */
+    // -----------------------------------------------------------------------
+    // Store
+    // -----------------------------------------------------------------------
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:blog_posts,slug',
-            'content' => 'required|string',
-            'excerpt' => 'nullable|string|max:500',
-            'category' => 'nullable|string|max:100',
-            'tags' => 'nullable|array',
-            'tags.*' => 'string|max:50',
-            'featured_image' => 'nullable|string|max:255',
-            'meta_title' => 'nullable|string|max:255',
-            'meta_description' => 'nullable|string|max:500',
-            'is_published' => 'boolean',
-            'is_featured' => 'boolean',
-            'published_at' => 'nullable|date',
+            'title'               => 'required|string|max:255',
+            'slug'                => 'nullable|string|max:255|unique:blog_posts,slug',
+            'content'             => 'required|string',
+            'excerpt'             => 'nullable|string|max:500',
+            'blog_category_id'    => 'nullable|exists:blog_categories,id',
+            'category'            => 'nullable|string|max:100',
+            'tags'                => 'nullable|array',
+            'tags.*'              => 'string|max:50',
+            // Image Upload
+            'featured_image'      => 'nullable|image|mimes:jpeg,jpg,png,webp|max:3072',
+            'featured_image_alt'  => 'nullable|string|max:255',
+            'og_image'            => 'nullable|image|mimes:jpeg,jpg,png,webp|max:3072',
+            'og_image_alt'        => 'nullable|string|max:255',
+            // SEO
+            'meta_title'          => 'nullable|string|max:255',
+            'meta_description'    => 'nullable|string|max:500',
+            'meta_keywords'       => 'nullable|string|max:255',
+            'canonical_url'       => 'nullable|url|max:255',
+            'og_title'            => 'nullable|string|max:255',
+            'og_description'      => 'nullable|string|max:500',
+            'focus_keyword'       => 'nullable|string|max:100',
+            'is_published'        => 'boolean',
+            'is_featured'         => 'boolean',
+            'published_at'        => 'nullable|date',
         ]);
 
-        // Auto-generate slug if not provided
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['title']);
+        // --- Generate slug ---
+        $slug = Str::slug($validated['slug'] ?? $validated['title']);
+        $validated['slug'] = $slug;
+
+        // --- Upload featured image (converted to WebP) ---
+        if ($request->hasFile('featured_image')) {
+            $validated['featured_image'] = app(ImageService::class)->saveToStorage(
+                $request->file('featured_image'), 'public', 'blog/images', $slug
+            );
+        } else {
+            unset($validated['featured_image']);
         }
 
-        $validated['author_id'] = Auth::id();
-        $validated['is_published'] = $request->boolean('is_published');
-        $validated['is_featured'] = $request->boolean('is_featured');
-        $validated['tags'] = $request->input('tags', []);
+        // --- Upload OG image (converted to WebP) ---
+        if ($request->hasFile('og_image')) {
+            $validated['og_image'] = app(ImageService::class)->saveToStorage(
+                $request->file('og_image'), 'public', 'blog/og', "{$slug}-og"
+            );
+        } else {
+            unset($validated['og_image']);
+        }
 
-        BlogPost::create($validated);
+        $validated['author_id']            = Auth::id();
+        $validated['is_published']         = $request->boolean('is_published');
+        $validated['is_featured']          = $request->boolean('is_featured');
+        $validated['tags']                 = $request->input('tags', []);
+
+        if ($validated['is_published'] && empty($validated['published_at'])) {
+            $validated['published_at'] = now();
+        }
+
+        // Calculate reading time
+        $words = str_word_count(strip_tags($validated['content']));
+        $validated['reading_time_minutes'] = (int) max(1, ceil($words / 200));
+
+        $post = BlogPost::create($validated);
+
+        // Compute and save SEO score
+        $post->seo_score = $post->computeSeoScore();
+        $post->saveQuietly();
 
         return redirect()->route('admin.blog.index')
             ->with('success', 'Blog post created successfully.');
     }
 
-    /**
-     * Display the specified post.
-     */
+    // -----------------------------------------------------------------------
+    // Show
+    // -----------------------------------------------------------------------
+
     public function show(BlogPost $post)
     {
         return view('admin.blog.show', [
-            'post' => $post->load('author'),
+            'post' => $post->load('author', 'blogCategory'),
         ]);
     }
 
-    /**
-     * Show the form for editing the specified post.
-     */
+    // -----------------------------------------------------------------------
+    // Edit
+    // -----------------------------------------------------------------------
+
     public function edit(BlogPost $post)
     {
         return view('admin.blog.edit', [
-            'post' => $post,
-            'categories' => BlogPost::select('category')
-                ->distinct()
-                ->whereNotNull('category')
-                ->pluck('category'),
+            'post'       => $post,
+            'categories' => BlogCategory::where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 
-    /**
-     * Update the specified post in storage.
-     */
+    // -----------------------------------------------------------------------
+    // Update
+    // -----------------------------------------------------------------------
+
     public function update(Request $request, BlogPost $post)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => "nullable|string|max:255|unique:blog_posts,slug,{$post->id}",
-            'content' => 'required|string',
-            'excerpt' => 'nullable|string|max:500',
-            'category' => 'nullable|string|max:100',
-            'tags' => 'nullable|array',
-            'tags.*' => 'string|max:50',
-            'featured_image' => 'nullable|string|max:255',
-            'meta_title' => 'nullable|string|max:255',
-            'meta_description' => 'nullable|string|max:500',
-            'is_published' => 'boolean',
-            'is_featured' => 'boolean',
-            'published_at' => 'nullable|date',
+            'title'               => 'required|string|max:255',
+            'slug'                => "nullable|string|max:255|unique:blog_posts,slug,{$post->id}",
+            'content'             => 'required|string',
+            'excerpt'             => 'nullable|string|max:500',
+            'blog_category_id'    => 'nullable|exists:blog_categories,id',
+            'category'            => 'nullable|string|max:100',
+            'tags'                => 'nullable|array',
+            'tags.*'              => 'string|max:50',
+            // Image Upload
+            'featured_image'      => 'nullable|image|mimes:jpeg,jpg,png,webp|max:3072',
+            'featured_image_alt'  => 'nullable|string|max:255',
+            'og_image'            => 'nullable|image|mimes:jpeg,jpg,png,webp|max:3072',
+            'og_image_alt'        => 'nullable|string|max:255',
+            // SEO
+            'meta_title'          => 'nullable|string|max:255',
+            'meta_description'    => 'nullable|string|max:500',
+            'meta_keywords'       => 'nullable|string|max:255',
+            'canonical_url'       => 'nullable|url|max:255',
+            'og_title'            => 'nullable|string|max:255',
+            'og_description'      => 'nullable|string|max:500',
+            'focus_keyword'       => 'nullable|string|max:100',
+            'is_published'        => 'boolean',
+            'is_featured'         => 'boolean',
+            'published_at'        => 'nullable|date',
         ]);
 
-        // Auto-generate slug if not provided
+        // --- Update slug ---
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['title']);
         }
+        $slug = $validated['slug'];
+
+        // --- Replace featured image (converted to WebP) ---
+        if ($request->hasFile('featured_image')) {
+            if ($post->featured_image) {
+                Storage::disk('public')->delete($post->featured_image);
+            }
+            $validated['featured_image'] = app(ImageService::class)->saveToStorage(
+                $request->file('featured_image'), 'public', 'blog/images', $slug
+            );
+        } else {
+            unset($validated['featured_image']);
+        }
+
+        // --- Replace OG image (converted to WebP) ---
+        if ($request->hasFile('og_image')) {
+            if ($post->og_image) {
+                Storage::disk('public')->delete($post->og_image);
+            }
+            $validated['og_image'] = app(ImageService::class)->saveToStorage(
+                $request->file('og_image'), 'public', 'blog/og', "{$slug}-og"
+            );
+        } else {
+            unset($validated['og_image']);
+        }
 
         $validated['is_published'] = $request->boolean('is_published');
-        $validated['is_featured'] = $request->boolean('is_featured');
-        $validated['tags'] = $request->input('tags', []);
+        $validated['is_featured']  = $request->boolean('is_featured');
+        $validated['tags']         = $request->input('tags', []);
+
+        if ($validated['is_published'] && empty($validated['published_at'])) {
+            $validated['published_at'] = now();
+        }
+
+        // Calculate reading time
+        $words = str_word_count(strip_tags($validated['content']));
+        $validated['reading_time_minutes'] = (int) max(1, ceil($words / 200));
 
         $post->update($validated);
+
+        // Refresh and recompute SEO score
+        $post->seo_score = $post->fresh()->computeSeoScore();
+        $post->saveQuietly();
 
         return redirect()->route('admin.blog.index')
             ->with('success', 'Blog post updated successfully.');
     }
 
-    /**
-     * Remove the specified post from storage.
-     */
+    // -----------------------------------------------------------------------
+    // Destroy
+    // -----------------------------------------------------------------------
+
     public function destroy(BlogPost $post)
     {
+        // Delete associated images from storage
+        if ($post->featured_image) {
+            Storage::disk('public')->delete($post->featured_image);
+        }
+        if ($post->og_image) {
+            Storage::disk('public')->delete($post->og_image);
+        }
+
         $post->delete();
 
         return back()->with('success', 'Blog post deleted successfully.');

@@ -19,6 +19,8 @@ final class SubscriptionExpiryReminderNotification extends Notification implemen
         private readonly string $productName,
         private readonly \DateTimeInterface $expiresAt,
         private readonly int $daysUntilExpiry,
+        private readonly string $paymentUrl,
+        private readonly float $nominal
     ) {}
 
     public function via(object $notifiable): array
@@ -34,7 +36,8 @@ final class SubscriptionExpiryReminderNotification extends Notification implemen
             ->line('Subscription Anda untuk ' . $this->productName . ' akan segera berakhir.')
             ->line('Tanggal berakhir: ' . $this->expiresAt->format('d F Y'))
             ->line('Sisa waktu: ' . $this->daysUntilExpiry . ' hari')
-            ->action('Perpanjang Sekarang', route('customer.subscriptions.index'))
+            ->line('Nominal Perpanjangan: Rp ' . number_format($this->nominal, 0, ',', '.'))
+            ->action('Bayar Tagihan (Rp ' . number_format($this->nominal, 0, ',', '.') . ')', $this->paymentUrl)
             ->line('Perpanjang sekarang untuk menghindari gangguan layanan.');
     }
 

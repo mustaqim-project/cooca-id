@@ -17,6 +17,16 @@ final class LoginAffiliatorRequest extends FormRequest
     }
 
     /**
+     * Prepare inputs for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'remember' => $this->boolean('remember'),
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
@@ -24,6 +34,7 @@ final class LoginAffiliatorRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:8'],
+            'captcha' => ['required', 'string'],
             'remember' => ['nullable', 'boolean'],
         ];
     }

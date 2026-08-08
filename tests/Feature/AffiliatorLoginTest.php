@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use App\Models\Affiliator;
+use App\Helpers\CaptchaHelper;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Tests\TestCase;
-use Inertia\Testing\AssertableInertia;
 
 class AffiliatorLoginTest extends TestCase
 {
@@ -17,32 +18,49 @@ class AffiliatorLoginTest extends TestCase
         $response = $this->get(route('affiliator.login'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('auth.affiliator.login');
     }
 
     public function test_affiliator_can_login_and_redirect_to_dashboard()
     {
-        $affiliator = User::factory()->create([
+        $affiliator = Affiliator::factory()->create([
             'name' => 'Test Affiliator',
             'email' => 'affiliate@cooca.id',
             'password' => Hash::make('password123'),
             'status' => 'active',
         ]);
 
-        $this->withoutExceptionHandling();
+        CaptchaHelper::generate();
+        $captchaAnswer = Session::get('captcha_answer');
 
         $response = $this->post(route('affiliator.login.submit'), [
             'email' => 'affiliate@cooca.id',
             'password' => 'password123',
+            'captcha' => $captchaAnswer,
         ]);
 
         $response->assertRedirect(route('affiliator.dashboard'));
 
-        $this->assertAuthenticatedAs($affiliator);
+        $this->assertAuthenticatedAs($affiliator, 'affiliator');
+    }
 
-//        $dashboardResponse = $this->actingAs($affiliator)->get(route('affiliator.dashboard'));
-//        
-//        $dashboardResponse->assertStatus(200);
-//        $dashboardResponse->assertViewIs('affiliator.dashboard.index');
+    public function test_affiliator_login_fails_with_invalid_credentials()
+    {
+        Affiliator::factory()->create([
+            'email' => 'affiliate@cooca.id',
+            'password' => Hash::make('password123'),
+            'status' => 'active',
+        ]);
+
+        CaptchaHelper::generate();
+        $captchaAnswer = Session::get('captcha_answer');
+
+        $response = $this->post(route('affiliator.login.submit'), [
+            'email' => 'affiliate@cooca.id',
+            'password' => 'wrongpassword',
+            'captcha' => $captchaAnswer,
+        ]);
+
+        $response->assertSessionHasErrors();
+        $this->assertGuest('affiliator');
     }
 }

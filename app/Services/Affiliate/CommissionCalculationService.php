@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Affiliate;
 
 use App\Models\Transaction;
-use App\Models\Affiliator;\nuse App\Models\Customer;
+use App\Models\Affiliator;
+use App\Models\Customer;
 use App\Models\AffiliateWallet;
 use App\Models\AffiliateCommission;
 use App\Models\Setting;
@@ -20,15 +21,15 @@ final class CommissionCalculationService
     {
         $key = $level === 1 ? 'affiliate.commission_rate_level_1' : 'affiliate.commission_rate_level_2';
         $defaultValue = $level === 1 ? 25 : 5;
-        
+
         // Try to get from database settings first
         $rate = Setting::get($key);
-        
+
         if ($rate === null) {
             // Fallback to config
             $rate = config('affiliate.commission_rate_level_' . $level, $defaultValue);
         }
-        
+
         // Convert percentage to decimal (e.g., 25% -> 0.25)
         return (float) $rate / 100;
     }
@@ -38,30 +39,30 @@ final class CommissionCalculationService
      */
     public function calculateForTransaction(Transaction $transaction): void
     {
-        if (!$transaction->customer?->referred_by_id) {
+        if (!$transaction->customer?->affiliator_id) {
             return;
         }
 
         DB::beginTransaction();
         try {
             $customer = $transaction->customer;
-            $affiliate = Customer::findOrFail($customer->referred_by_id);
-            
+            $affiliate = Affiliator::findOrFail($customer->affiliator_id);
+
             // Calculate based on gross revenue (before voucher discount)
             $grossAmount = $transaction->gross_amount;
-            
+
             // Level 1 commission (direct referral)
             $level1Rate = $this->getCommissionRate(1);
             $level1Commission = $grossAmount * $level1Rate;
-            
+
             $this->recordCommission($affiliate, $transaction, $level1Commission, 1, $level1Rate * 100);
 
             // Level 2 commission (upline)
-            if ($affiliate->parent_referred_by_id) {
-                $upline = Customer::findOrFail($affiliate->parent_referred_by_id);
+            if ($affiliate->parent_affiliator_id) {
+                $upline = Affiliator::findOrFail($affiliate->parent_affiliator_id);
                 $level2Rate = $this->getCommissionRate(2);
                 $level2Commission = $grossAmount * $level2Rate;
-                
+
                 $this->recordCommission($upline, $transaction, $level2Commission, 2, $level2Rate * 100);
             }
 
@@ -79,6 +80,7 @@ final class CommissionCalculationService
     {
         $commission = AffiliateCommission::create([
             'referred_by_id' => $affiliate->id,
+            'affiliator_id' => $affiliate->id,
             'transaction_id' => $transaction->id,
             'customer_id' => $transaction->customer_id,
             'level' => $level,
@@ -109,7 +111,7 @@ final class CommissionCalculationService
         $grossAmount = $transaction->gross_amount;
         $level1Rate = $this->getCommissionRate(1);
         $level2Rate = $this->getCommissionRate(2);
-        
+
         return [
             'gross_amount' => $grossAmount,
             'level_1' => [

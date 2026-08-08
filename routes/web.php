@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Auth\PasswordResetController;
-use App\Http\Controllers\Web\BlogController;
+use App\Http\Controllers\Web\AuthWebController;
+use App\Http\Controllers\Web\BlogWebController;
+use App\Http\Controllers\Web\CustomerOtpController;
+use App\Http\Controllers\Web\DirectPaymentController;
 use App\Http\Controllers\Web\LandingController;
-use App\Http\Controllers\Web\NewsletterController;
-use App\Http\Controllers\Web\ProductController;
+use App\Http\Controllers\Web\LiveChatController;
+use App\Http\Controllers\Web\SitemapController;
+use App\Http\Controllers\Web\WhatsAppChatbotController;
+use App\Http\Controllers\Customer\ContractController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,102 +24,126 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Landing Pages
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/', [LandingController::class, 'index'])->name('home');
 Route::get('/about', [LandingController::class, 'about'])->name('about');
-Route::get('/pricing', [LandingController::class, 'pricing'])->name('pricing');
 Route::get('/contact', [LandingController::class, 'contact'])->name('contact');
 Route::get('/affiliate', [LandingController::class, 'affiliate'])->name('affiliate');
-Route::get('/solutions', [LandingController::class, 'solution'])->name('solutions');
+Route::get('/affiliate-terms', [LandingController::class, 'affiliateTerms'])->name('affiliate.terms');
 Route::get('/faq', [LandingController::class, 'faq'])->name('faq');
-Route::get('/docs', [LandingController::class, 'docs'])->name('docs');
 Route::get('/terms', [LandingController::class, 'terms'])->name('terms');
 Route::get('/privacy', [LandingController::class, 'privacy'])->name('privacy');
 Route::get('/lang/{locale}', [LandingController::class, 'switchLang'])->name('lang.switch');
 Route::post('/newsletter/subscribe', [LandingController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::post('/wa-chat-send', [WhatsAppChatbotController::class, 'send'])->name('wa.chat.send');
+Route::get('/captcha/refresh', function () {
+    return response()->json(['question' => \App\Helpers\CaptchaHelper::generate()]);
+})->name('captcha.refresh');
+
+// Live Chat Widget Routes
+Route::prefix('live-chat')->name('live-chat.')->group(function () {
+    Route::get('/options', [LiveChatController::class, 'getOptions'])->name('options');
+    Route::post('/start', [LiveChatController::class, 'start'])->name('start');
+    Route::get('/messages', [LiveChatController::class, 'getMessages'])->name('messages');
+    Route::post('/send', [LiveChatController::class, 'sendMessage'])->name('send');
+    Route::post('/end', [LiveChatController::class, 'end'])->name('end');
+});
+
 // Product Catalog
 Route::prefix('products')->name('products.')->group(function () {
     Route::get('/', [LandingController::class, 'products'])->name('index');
-    // Show product detail page
     Route::get('/{slug}', [LandingController::class, 'productShow'])->name('show');
 });
 
 // Blog
-Route::get('/blog', [LandingController::class, 'blogIndex'])->name('blog.index');
-Route::get('/blog/{slug}', [LandingController::class, 'blogShow'])->name('blog.show');
+Route::get('/blog', [BlogWebController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogWebController::class, 'show'])->name('blog.show');
+
+// Direct Payment (No Login Required)
+Route::get('/pay/direct/{subscription}', [DirectPaymentController::class, 'checkout'])
+    ->name('payment.direct')
+    ->middleware('signed');
+
 // Customer Auth Routes
 Route::prefix('customer')->name('customer.')->group(function () {
     Route::middleware('guest:customer')->group(function () {
-        Route::get('login', [LandingController::class, 'showCustomerLogin'])->name('login');
-        Route::post('login', [LandingController::class, 'customerLogin'])->middleware('throttle:customer-login')->name('login.submit');
-        Route::get('register', [LandingController::class, 'showCustomerRegister'])->name('register');
-        Route::post('register', [LandingController::class, 'customerRegister'])->middleware('throttle:customer-register')->name('register.submit');
+        Route::get('login', [AuthWebController::class, 'showCustomerLogin'])->name('login');
+        Route::post('login', [AuthWebController::class, 'customerLogin'])->middleware('throttle:customer-login')->name('login.submit');
+        Route::get('register', [AuthWebController::class, 'showCustomerRegister'])->name('register');
+        Route::post('register', [AuthWebController::class, 'customerRegister'])->middleware('throttle:customer-register')->name('register.submit');
 
         // Google OAuth
-        Route::get('auth/google', [LandingController::class, 'redirectToGoogleCustomer'])->name('auth.google');
-        Route::get('auth/google/callback', [LandingController::class, 'handleGoogleCallbackCustomer']);
+        Route::get('auth/google', [AuthWebController::class, 'redirectToGoogleCustomer'])->name('auth.google');
+        Route::get('auth/google/callback', [AuthWebController::class, 'handleGoogleCallbackCustomer']);
 
         // Password Reset
-        Route::get('forgot-password', [LandingController::class, 'showCustomerForgotPassword'])->name('password.request');
-        Route::post('forgot-password', [LandingController::class, 'sendCustomerResetLink'])->middleware('throttle:customer-login');
-        Route::get('reset-password/{token}', [LandingController::class, 'showCustomerReset'])->name('password.reset');
-        Route::post('reset-password', [LandingController::class, 'resetCustomerPassword'])->middleware('throttle:customer-login');
+        Route::get('forgot-password', [AuthWebController::class, 'showCustomerForgotPassword'])->name('password.request');
+        Route::post('forgot-password', [AuthWebController::class, 'sendCustomerResetLink'])->middleware('throttle:customer-login');
+        Route::get('reset-password/{token}', [AuthWebController::class, 'showCustomerReset'])->name('password.reset');
+        Route::post('reset-password', [AuthWebController::class, 'resetCustomerPassword'])->middleware('throttle:customer-login');
     });
 
     Route::middleware('auth:customer')->group(function () {
-        Route::post('logout', [LandingController::class, 'customerLogout'])->name('logout');
+        Route::post('logout', [AuthWebController::class, 'customerLogout'])->name('logout');
 
         // Email Verification
-        Route::get('email/verify', [LandingController::class, 'showCustomerVerificationNotice'])->name('verification.notice');
-        Route::get('email/verify/{id}/{hash}', [LandingController::class, 'verifyCustomerEmail'])->middleware('signed')->name('verification.verify');
-        Route::post('email/verification-notification', [LandingController::class, 'resendCustomerVerificationEmail'])->middleware('throttle:6,1')->name('verification.send');
+        Route::get('email/verify', [AuthWebController::class, 'showCustomerVerificationNotice'])->name('verification.notice');
+        Route::get('email/verify/{id}/{hash}', [AuthWebController::class, 'verifyCustomerEmail'])->middleware('signed')->name('verification.verify');
+        Route::post('email/verification-notification', [AuthWebController::class, 'resendCustomerVerificationEmail'])->middleware('throttle:6,1')->name('verification.send');
+
+        // Phone Verification (OTP)
+        Route::get('phone/verify', [CustomerOtpController::class, 'showNotice'])->name('otp.notice');
+        Route::post('phone/verify', [CustomerOtpController::class, 'verify'])->name('otp.verify');
+        Route::post('phone/resend-otp', [CustomerOtpController::class, 'resend'])->middleware('throttle:6,1')->name('otp.resend');
+        Route::post('phone/update', [CustomerOtpController::class, 'updatePhone'])->name('otp.update_phone');
 
         // Contract Routes
-        Route::get('contracts/{licenseId}', [\App\Http\Controllers\Customer\ContractController::class, 'show'])->name('contracts.show');
-        Route::post('contracts/{licenseId}/sign', [\App\Http\Controllers\Customer\ContractController::class, 'sign'])->name('contracts.sign');
-        Route::get('contracts/{licenseId}/download', [\App\Http\Controllers\Customer\ContractController::class, 'download'])->name('contracts.download');
+        Route::get('contracts/{licenseId}', [ContractController::class, 'show'])->name('contracts.show');
+        Route::post('contracts/{licenseId}/sign', [ContractController::class, 'sign'])->name('contracts.sign');
+        Route::get('contracts/{licenseId}/download', [ContractController::class, 'download'])->name('contracts.download');
     });
 });
 
 // Affiliator Auth Routes
 Route::prefix('affiliator')->name('affiliator.')->group(function () {
     Route::middleware('guest:affiliator')->group(function () {
-        Route::get('login', [LandingController::class, 'showAffiliatorLogin'])->name('login');
-        Route::post('login', [LandingController::class, 'affiliatorLogin'])->name('login.submit');
-        Route::get('register', [LandingController::class, 'showAffiliatorRegister'])->name('register');
-        Route::post('register', [LandingController::class, 'affiliatorRegister'])->name('register.submit');
+        Route::get('login', [AuthWebController::class, 'showAffiliatorLogin'])->name('login');
+        Route::post('login', [AuthWebController::class, 'affiliatorLogin'])->middleware('throttle:affiliator-login')->name('login.submit');
+        Route::get('register', [AuthWebController::class, 'showAffiliatorRegister'])->name('register');
+        Route::post('register', [AuthWebController::class, 'affiliatorRegister'])->middleware('throttle:register')->name('register.submit');
+
+        // Google OAuth
+        Route::get('auth/google', [AuthWebController::class, 'redirectToGoogleAffiliator'])->name('auth.google');
+        Route::get('auth/google/callback', [AuthWebController::class, 'handleGoogleCallbackAffiliator'])->name('auth.google.callback');
 
         // Password Reset for Affiliator
-        Route::get('forgot-password', [LandingController::class, 'showAffiliatorForgotPassword'])->name('password.request');
-        Route::post('forgot-password', [LandingController::class, 'sendAffiliatorResetLink'])->name('password.email');
-        Route::get('reset-password/{token}', [LandingController::class, 'showAffiliatorReset'])->name('password.reset');
-        Route::post('reset-password', [LandingController::class, 'resetAffiliatorPassword'])->name('password.update');
+        Route::get('forgot-password', [AuthWebController::class, 'showAffiliatorForgotPassword'])->name('password.request');
+        Route::post('forgot-password', [AuthWebController::class, 'sendAffiliatorResetLink'])->name('password.email');
+        Route::get('reset-password/{token}', [AuthWebController::class, 'showAffiliatorReset'])->name('password.reset');
+        Route::post('reset-password', [AuthWebController::class, 'resetAffiliatorPassword'])->name('password.update');
     });
 
     Route::middleware('auth:affiliator')->group(function () {
-        Route::post('logout', [LandingController::class, 'affiliatorLogout'])->name('logout');
+        Route::post('logout', [AuthWebController::class, 'affiliatorLogout'])->name('logout');
     });
 });
 
 // Admin Auth Routes
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest:admin')->group(function () {
-        Route::get('login', [LandingController::class, 'showAdminLogin'])->name('login');
-        Route::post('login', [LandingController::class, 'adminLogin'])->name('login.submit');
+        Route::get('login', [AuthWebController::class, 'showAdminLogin'])->name('login');
+        Route::post('login', [AuthWebController::class, 'adminLogin'])->middleware('throttle:admin-login')->name('login.submit');
 
         // Password Reset for Admin
-        Route::get('forgot-password', [LandingController::class, 'showAdminForgotPassword'])->name('password.request');
-        Route::post('forgot-password', [LandingController::class, 'sendAdminResetLink'])->name('password.email');
-        Route::get('reset-password/{token}', [LandingController::class, 'showAdminReset'])->name('password.reset');
-        Route::post('reset-password', [LandingController::class, 'resetAdminPassword'])->name('password.update');
+        Route::get('forgot-password', [AuthWebController::class, 'showAdminForgotPassword'])->name('password.request');
+        Route::post('forgot-password', [AuthWebController::class, 'sendAdminResetLink'])->name('password.email');
+        Route::get('reset-password/{token}', [AuthWebController::class, 'showAdminReset'])->name('password.reset');
+        Route::post('reset-password', [AuthWebController::class, 'resetAdminPassword'])->name('password.update');
     });
 
     Route::middleware('auth:admin')->group(function () {
-        Route::post('logout', [LandingController::class, 'adminLogout'])->name('logout');
+        Route::post('logout', [AuthWebController::class, 'adminLogout'])->name('logout');
     });
 });
 
-Route::get('/login', [LandingController::class, 'showCustomerLogin'])->name('login');
-
-// Legal Pages Routes (CMS Managed)
-
-
+Route::get('/login', [AuthWebController::class, 'showCustomerLogin'])->name('login');

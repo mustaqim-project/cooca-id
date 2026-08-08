@@ -3,6 +3,10 @@
 namespace Database\Factories;
 
 use App\Models\TicketReply;
+use App\Models\Ticket;
+use App\Models\Customer;
+use App\Models\Affiliator;
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -20,11 +24,10 @@ class TicketReplyFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'ticket_id' => \App\Models\Ticket::inRandomOrder()->first()?->id ?? \App\Models\Ticket::factory(),
-            'user_type' => fake()->randomElement(['customer', 'affiliator', 'admin']),
-            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
+            'ticket_id' => Ticket::inRandomOrder()->first()?->id ?? Ticket::factory(),
+            'user_id' => Customer::inRandomOrder()->first()?->id ?? Customer::factory(),
+            'user_type' => 'customer',
             'message' => fake()->paragraphs(2, true),
-            'is_internal' => false,
         ];
     }
 
@@ -33,9 +36,9 @@ class TicketReplyFactory extends Factory
      */
     public function fromCustomer(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
+            'user_id' => Customer::factory(),
             'user_type' => 'customer',
-            'user_id' => \App\Models\User::factory(),
         ]);
     }
 
@@ -44,9 +47,9 @@ class TicketReplyFactory extends Factory
      */
     public function fromAffiliator(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
+            'user_id' => Affiliator::factory(),
             'user_type' => 'affiliator',
-            'user_id' => \App\Models\User::factory(),
         ]);
     }
 
@@ -55,21 +58,9 @@ class TicketReplyFactory extends Factory
      */
     public function fromAdmin(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
+            'user_id' => Admin::factory(),
             'user_type' => 'admin',
-            'user_id' => \App\Models\User::factory(),
-        ]);
-    }
-
-    /**
-     * Indicate that the reply is internal (admin only).
-     */
-    public function internal(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'is_internal' => true,
-            'user_type' => 'admin',
-            'user_id' => \App\Models\User::factory(),
         ]);
     }
 }

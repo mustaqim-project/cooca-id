@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/* ============================================================
+   COOCA.ID - Pristine Light Theme Enterprise SaaS Design System
+   Inspired by: Apple HIG, Stripe, Linear, Vercel
+   ============================================================ */
+
+@theme {
+    /* Brand Accent Colors (Indigo & Violet) */
+    --color-brand-50: #eef2ff;
+    --color-brand-100: #e0e7ff;
+    --color-brand-200: #c7d2fe;
+    --color-brand-300: #a5b4fc;
+    --color-brand-400: #818cf8;
+    --color-brand-500: #6366f1;
+    --color-brand-600: #4f46e5;
+    --color-brand-700: #4338ca;
+    --color-brand-800: #3730a3;
+    --color-brand-900: #312e81;
+
+    /* Semantic Light Surfaces */
+    --color-surface-50: #f8fafc;
+    --color-surface-100: #f1f5f9;
+    --color-surface-200: #e2e8f0;
+    --color-surface-300: #cbd5e1;
+    --color-surface-400: #94a3b8;
+    --color-surface-500: #64748b;
+    --color-surface-600: #475569;
+    --color-surface-700: #334155;
+    --color-surface-800: #1e293b;
+    --color-surface-900: #0f172a;
+
+    --font-sans: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "SF Mono", "Fira Code", monospace;
+}
+
+/* ============================================
+   BASE LIGHT SYSTEM STYLES
+   ============================================ */
+@layer base {
+    * {
+        border-color: #e2e8f0;
+    }
+
+    html, body {
+        background-color: #f8fafc;
+        color: #0f172a;
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: #0f172a;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+    }
+}
+
+/* ============================================
+   ENTERPRISE LIGHT UTILITY CLASSES
+   ============================================ */
+@layer utilities {
+    /* Glassmorphism Light Navbar & Panels */
+    .glass-panel-light {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.05);
+    }
+
+    /* Glass Auth Card Light */
+    .glass-auth-card-light {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 0 15px 0 rgba(79, 70, 229, 0.05);
+        border-radius: 1.5rem;
+    }
+
+    /* Bento Card Pristine Light */
+    .bento-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.5rem;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.03), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bento-card:hover {
+        border-color: #c7d2fe;
+        transform: translateY(-3px);
+        box-shadow: 0 20px 35px -10px rgba(79, 70, 229, 0.12), 0 8px 15px -6px rgba(79, 70, 229, 0.06);
+    }
+
+    /* Vibrant Text Gradient */
+    .text-gradient {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c084fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Luminous Glowing Shadow */
+    .glow-indigo-light {
+        box-shadow: 0 0 50px -10px rgba(79, 70, 229, 0.25);
+    }
+}
+
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Models\User;
+use App\Models\Customer;
 use App\Models\CompanyProfile;
 use App\Models\ErpRequest;
 use App\Models\Product;
@@ -24,7 +24,7 @@ class TrialEligibilityServiceTest extends TestCase
 
     public function test_customer_without_company_profile_cannot_trial()
     {
-        $customer = User::factory()->create();
+        $customer = Customer::factory()->create();
         $product = Product::factory()->create();
 
         $this->expectException(\Exception::class);
@@ -35,12 +35,12 @@ class TrialEligibilityServiceTest extends TestCase
 
     public function test_customer_with_existing_active_trial_cannot_trial_same_product()
     {
-        $customer = User::factory()->create();
-        CompanyProfile::create(['user_id' => $customer->id, 'company_name' => 'PT Test']);
+        $customer = Customer::factory()->create();
+        CompanyProfile::create(['customer_id' => $customer->id, 'company_name' => 'PT Test']);
         $product = Product::factory()->create();
 
         ErpRequest::create([
-            'user_id' => $customer->id,
+            'customer_id' => $customer->id,
             'product_id' => $product->id,
             'status' => 'active_trial',
             'requested_subdomain' => 'test'
@@ -54,8 +54,8 @@ class TrialEligibilityServiceTest extends TestCase
 
     public function test_customer_can_trial_if_eligible()
     {
-        $customer = User::factory()->create();
-        CompanyProfile::create(['user_id' => $customer->id, 'company_name' => 'PT Test']);
+        $customer = Customer::factory()->create();
+        CompanyProfile::create(['customer_id' => $customer->id, 'company_name' => 'PT Test']);
         $product = Product::factory()->create();
 
         $this->assertTrue($this->service->checkEligibility($customer, $product));

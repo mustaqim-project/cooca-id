@@ -28,19 +28,36 @@ final class Subscription extends Model
     protected $table = 'subscriptions';
 
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'license_id',
         'subscription_plan_id',
         'status',
         'started_at',
         'expires_at',
         'cancelled_at',
+        'auto_renew',
+        'grace_period_ends_at',
+        'suspended_at',
+        'cancellation_reason',
+        'previous_plan_id',
+        'prorated_amount',
+        'cycle_number',
+        'renewal_count',
+        'last_renewed_at',
+        'trial_id',
     ];
 
     protected $casts = [
         'started_at' => 'datetime',
         'expires_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'auto_renew' => 'boolean',
+        'grace_period_ends_at' => 'datetime',
+        'suspended_at' => 'datetime',
+        'prorated_amount' => 'decimal:2',
+        'cycle_number' => 'integer',
+        'renewal_count' => 'integer',
+        'last_renewed_at' => 'datetime',
     ];
 
     public const STATUS_TRIAL = 'trial';
@@ -95,4 +112,3 @@ final class Subscription extends Model
             });
     }
 }
-

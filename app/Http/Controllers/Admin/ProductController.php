@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\StoreProductRequest;
 use App\Models\Product;
 use App\Models\SubscriptionPlan;
 use App\Repositories\Contracts\ProductRepositoryInterface;
+use App\Services\ImageService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 
@@ -94,6 +95,14 @@ final class ProductController extends Controller
             $data['base_price'] = $data['price'];
         }
 
+        // Handle image upload (converted to WebP)
+        if ($request->hasFile('thumbnail')) {
+            $path = app(ImageService::class)->saveToStorage(
+                $request->file('thumbnail'), 'public', 'products', uniqid('product_')
+            );
+            $data['thumbnail'] = '/storage/' . $path;
+        }
+
         unset($data['plans'], $data['price']);
 
         $product = DB::transaction(function () use ($data, $plansData) {
@@ -131,9 +140,34 @@ final class ProductController extends Controller
             return redirect()->route('admin.products.index')->with('error', 'Product not found.');
         }
 
-        $this->productRepository->update($id, $request->validated());
+        $data = $request->validated();
+        
+        if (empty($data['category_id']) && $request->filled('product_category_id')) {
+            $data['category_id'] = $request->input('product_category_id');
+        }
 
-        return redirect()->route('admin.products.index')
+        if ($request->hasFile('thumbnail')) {
+            if ($product->thumbnail) {
+                $oldPath = str_replace('/storage/', '', $product->thumbnail);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
+            $path = app(ImageService::class)->saveToStorage(
+                $request->file('thumbnail'), 'public', 'products', uniqid('product_')
+            );
+            $data['thumbnail'] = '/storage/' . $path;
+        } else {
+            unset($data['thumbnail']);
+        }
+
+        if (isset($data['features']) && is_array($data['features'])) {
+            $data['features'] = array_values($data['features']);
+        }
+
+        unset($data['plans'], $data['price']);
+
+        $this->productRepository->update($id, $data);
+
+        return redirect()->route('admin.products.edit', $id)
             ->with('success', 'Product updated successfully.');
     }
 

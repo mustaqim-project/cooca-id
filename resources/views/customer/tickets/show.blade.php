@@ -1,99 +1,105 @@
-@extends('customer.layouts.app')
-
-@section('title', $ticket->subject)
-
+@extends('layouts.customer')
+@section('title', 'Ticket #' . $ticket->ticket_number)
+@section('breadcrumb')
+    <a href="{{ route('customer.tickets.index') }}" class="crumb-link">Tickets</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <span class="crumb-current">{{ $ticket->subject }}</span>
+@endsection
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-12 col-xl-10">
-            <!-- Header -->
-            <div class="d-flex align-items-center justify-content-between mb-4">
-                <div class="d-flex align-items-center">
-                    <a href="{{ route('customer.tickets.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-3">
-                        <i class="bi bi-arrow-left me-1"></i> Back
-                    </a>
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-headset" style="color:var(--primary);margin-right:10px;"></i>{{ $ticket->subject }}</h1>
+        <p class="page-subtitle">Ticket #{{ $ticket->ticket_number ?? $ticket->id }} · Created {{ $ticket->created_at->format('d M Y H:i') }}</p>
+    </div>
+    <a href="{{ route('customer.tickets.index') }}" class="btn btn-outline">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+</div>
+
+<div class="grid-31">
+    <div style="display:flex;flex-direction:column;gap:24px;">
+
+        {{-- Original Ticket Message --}}
+        <div class="card">
+            <div class="card-header">
+                <div class="flex items-center gap-3">
+                    <div class="user-avatar" style="width:34px;height:34px;font-size:12px;">
+                        {{ strtoupper(substr(auth('customer')->user()->name, 0, 2)) }}
+                    </div>
                     <div>
-                        <h2 class="mb-1 fw-bold text-truncate" style="max-width: 400px;">{{ $ticket->subject }}</h2>
-                        <p class="text-secondary mb-0">Ticket #{{ $ticket->id }}</p>
+                        <div class="font-bold text-sm">{{ auth('customer')->user()->name }} (You)</div>
+                        <div class="text-xs text-muted">{{ $ticket->created_at->diffForHumans() }}</div>
                     </div>
                 </div>
-                
-                <div>
-                    @php
-                        $statusClass = match($ticket->status) {
-                            'open' => 'warning',
-                            'in_progress' => 'info',
-                            'resolved' => 'success',
-                            'closed' => 'secondary',
-                            default => 'secondary'
-                        };
-                    @endphp
-                    <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-4 py-2 fs-6">
-                        {{ str_replace('_', ' ', ucfirst($ticket->status)) }}
-                    </span>
-                </div>
             </div>
+            <div class="card-body">
+                <div class="text-sm" style="line-height:1.7;white-space:pre-wrap;">{{ $ticket->message }}</div>
+            </div>
+        </div>
 
-            <!-- Ticket Message -->
-            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden mb-5">
-                <div class="card-header bg-transparent border-bottom border-light p-4 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-1 fw-semibold">{{ $ticket->subject }}</h5>
-                        <p class="text-secondary mb-0 fs-7">Submitted on {{ $ticket->created_at->format('F d, Y - H:i') }}</p>
+        {{-- Ticket Replies Timeline --}}
+        @foreach($ticket->replies as $reply)
+        <div class="card" style="{{ $reply->user_type === 'admin' ? 'border-left:4px solid var(--primary);' : '' }}">
+            <div class="card-header">
+                <div class="flex items-center gap-3">
+                    <div class="user-avatar" style="width:34px;height:34px;font-size:12px;{{ $reply->user_type === 'admin' ? 'background:linear-gradient(135deg,var(--primary),var(--accent));' : '' }}">
+                        {{ $reply->user_type === 'admin' ? 'CS' : strtoupper(substr(auth('customer')->user()->name, 0, 2)) }}
                     </div>
-                </div>
-                <div class="card-body p-4 p-md-5 text-secondary" style="white-space: pre-wrap; line-height: 1.6;">{{ $ticket->message }}</div>
-            </div>
-
-            <!-- Replies -->
-            <h5 class="fw-bold mb-4">Conversation</h5>
-            <div class="d-flex flex-column gap-4 mb-5">
-                @forelse($ticket->replies as $reply)
-                    <div class="card border-0 shadow-sm rounded-4 {{ $reply->user_type === 'admin' ? 'bg-primary-subtle border-start border-primary border-4' : 'glass' }}">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="fw-semibold {{ $reply->user_type === 'admin' ? 'text-primary' : 'text-dark' }}">
-                                    {{ $reply->user->name ?? ($reply->user_type === 'admin' ? 'Support Agent' : 'You') }}
-                                    @if ($reply->user_type === 'admin')
-                                        <span class="badge bg-primary rounded-pill ms-2">Support</span>
-                                    @endif
-                                </div>
-                                <div class="text-secondary fs-7">{{ $reply->created_at->format('M d, Y H:i') }}</div>
-                            </div>
-                            <div class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">{{ $reply->message }}</div>
+                    <div>
+                        <div class="font-bold text-sm">
+                            {{ $reply->user_type === 'admin' ? 'COOCA Support Team' : auth('customer')->user()->name }}
+                            @if($reply->user_type === 'admin')
+                                <span class="badge badge-primary" style="margin-left:6px;">Support Agent</span>
+                            @endif
                         </div>
+                        <div class="text-xs text-muted">{{ $reply->created_at->diffForHumans() }}</div>
                     </div>
-                @empty
-                    <div class="text-center text-secondary py-4 fst-italic">No replies yet.</div>
-                @endforelse
+                </div>
             </div>
+            <div class="card-body">
+                <div class="text-sm" style="line-height:1.7;white-space:pre-wrap;">{{ $reply->message }}</div>
+            </div>
+        </div>
+        @endforeach
 
-            <!-- Reply Form -->
-            @if (in_array($ticket->status, ['open', 'in_progress']))
-                <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden">
-                    <div class="card-header bg-transparent border-bottom border-light p-4">
-                        <h5 class="mb-0 fw-semibold"><i class="bi bi-reply me-2"></i> Add Reply</h5>
+        {{-- Reply Form --}}
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Add Reply</div>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ route('customer.tickets.show', $ticket->id) }}/reply">
+                    @csrf
+                    <div class="form-group">
+                        <textarea name="message" class="form-textarea" rows="4" required placeholder="Type your reply here…"></textarea>
                     </div>
-                    <div class="card-body p-4 p-md-5">
-                        <form action="{{ route('customer.tickets.reply', $ticket) }}" method="POST">
-                            @csrf
-                            <div class="mb-4">
-                                <textarea name="message" rows="4" class="form-control bg-light border-light py-3 text-secondary" placeholder="Type your reply here..." required></textarea>
-                            </div>
-                            <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 hover-lift fw-medium">
-                                    Send Reply <i class="bi bi-send ms-2"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            @else
-                <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden text-center p-4">
-                    <div class="text-secondary">
-                        <i class="bi bi-lock me-2"></i> This ticket is closed. If you have further questions, please create a new ticket.
-                    </div>
-                </div>
-            @endif
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-paper-plane"></i> Send Reply
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
+
+    {{-- Ticket Sidebar Meta --}}
+    <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="card">
+            <div class="card-header"><div class="card-title">Ticket Information</div></div>
+            <div class="card-body">
+                <div class="stats-row">
+                    <span class="text-sm text-muted">Status</span>
+                    <span class="badge badge-primary">{{ ucfirst($ticket->status) }}</span>
+                </div>
+                <div class="stats-row">
+                    <span class="text-sm text-muted">Priority</span>
+                    <span class="badge badge-warning">{{ ucfirst($ticket->priority) }}</span>
+                </div>
+                <div class="stats-row">
+                    <span class="text-sm text-muted">Department</span>
+                    <span class="text-sm font-semibold">{{ ucfirst($ticket->department ?? 'Support') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

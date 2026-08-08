@@ -1,22 +1,22 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AdminLayout.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import TextInput from '@/Components/TextInput.vue';
-import TextArea from '@/Components/TextArea.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import AuthenticatedLayout from "@/Layouts/AdminLayout.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import TextInput from "@/Components/TextInput.vue";
+import TextArea from "@/Components/TextArea.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
     testimonial: Object,
 });
 
 const form = useForm({
-    name: props.testimonial?.name || '',
-    role: props.testimonial?.role || '',
-    company: props.testimonial?.company || '',
-    content: props.testimonial?.content || '',
-    image_url: props.testimonial?.image_url || '',
+    name: props.testimonial?.name || "",
+    role: props.testimonial?.role || "",
+    company: props.testimonial?.company || "",
+    content: props.testimonial?.content || "",
+    image_url: props.testimonial?.image_url || "",
     order: props.testimonial?.order || 0,
     is_featured: props.testimonial?.is_featured ?? false,
     is_active: props.testimonial?.is_active ?? true,
@@ -24,9 +24,9 @@ const form = useForm({
 
 const submit = () => {
     if (props.testimonial) {
-        form.put(route('admin.testimonials.update', props.testimonial.id));
+        form.put(route("admin.testimonials.update", props.testimonial.id));
     } else {
-        form.post(route('admin.testimonials.store'));
+        form.post(route("admin.testimonials.store"));
     }
 };
 </script>
@@ -37,7 +37,9 @@ const submit = () => {
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ testimonial ? 'Edit Testimonial' : 'Create New Testimonial' }}
+                {{
+                    testimonial ? "Edit Testimonial" : "Create New Testimonial"
+                }}
             </h2>
         </template>
 
@@ -57,7 +59,10 @@ const submit = () => {
                                     required
                                     autofocus
                                 />
-                                <InputError class="mt-2" :message="form.errors.name" />
+                                <InputError
+                                    class="mt-2"
+                                    :message="form.errors.name"
+                                />
                             </div>
 
                             <!-- Role & Company -->
@@ -71,7 +76,10 @@ const submit = () => {
                                         class="mt-1 block w-full"
                                         placeholder="e.g., CEO, Manager"
                                     />
-                                    <InputError class="mt-2" :message="form.errors.role" />
+                                    <InputError
+                                        class="mt-2"
+                                        :message="form.errors.role"
+                                    />
                                 </div>
                                 <div>
                                     <InputLabel for="company" value="Company" />
@@ -82,13 +90,19 @@ const submit = () => {
                                         class="mt-1 block w-full"
                                         placeholder="e.g., Acme Corp"
                                     />
-                                    <InputError class="mt-2" :message="form.errors.company" />
+                                    <InputError
+                                        class="mt-2"
+                                        :message="form.errors.company"
+                                    />
                                 </div>
                             </div>
 
                             <!-- Content -->
                             <div>
-                                <InputLabel for="content" value="Testimonial Content" />
+                                <InputLabel
+                                    for="content"
+                                    value="Testimonial Content"
+                                />
                                 <TextArea
                                     id="content"
                                     v-model="form.content"
@@ -97,12 +111,18 @@ const submit = () => {
                                     required
                                     placeholder="Customer's testimonial text..."
                                 />
-                                <InputError class="mt-2" :message="form.errors.content" />
+                                <InputError
+                                    class="mt-2"
+                                    :message="form.errors.content"
+                                />
                             </div>
 
                             <!-- Image URL -->
                             <div>
-                                <InputLabel for="image_url" value="Customer Photo URL (Optional)" />
+                                <InputLabel
+                                    for="image_url"
+                                    value="Customer Photo URL (Optional)"
+                                />
                                 <TextInput
                                     id="image_url"
                                     v-model="form.image_url"
@@ -110,8 +130,13 @@ const submit = () => {
                                     class="mt-1 block w-full"
                                     placeholder="https://example.com/photo.jpg"
                                 />
-                                <InputError class="mt-2" :message="form.errors.image_url" />
-                                <p class="text-xs text-gray-500 mt-1">Leave empty for default avatar</p>
+                                <InputError
+                                    class="mt-2"
+                                    :message="form.errors.image_url"
+                                />
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Leave empty for default avatar
+                                </p>
                             </div>
 
                             <!-- Order -->
@@ -124,8 +149,13 @@ const submit = () => {
                                     class="mt-1 block w-full"
                                     min="0"
                                 />
-                                <InputError class="mt-2" :message="form.errors.order" />
-                                <p class="text-xs text-gray-500 mt-1">Lower numbers appear first</p>
+                                <InputError
+                                    class="mt-2"
+                                    :message="form.errors.order"
+                                />
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Lower numbers appear first
+                                </p>
                             </div>
 
                             <!-- Is Featured -->
@@ -136,9 +166,16 @@ const submit = () => {
                                     type="checkbox"
                                     class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                 />
-                                <label for="is_featured" class="text-sm text-gray-700">Featured (highlighted on homepage)</label>
+                                <label
+                                    for="is_featured"
+                                    class="text-sm text-gray-700"
+                                    >Featured (highlighted on homepage)</label
+                                >
                             </div>
-                            <InputError class="mt-2" :message="form.errors.is_featured" />
+                            <InputError
+                                class="mt-2"
+                                :message="form.errors.is_featured"
+                            />
 
                             <!-- Is Active -->
                             <div class="flex items-center gap-2">
@@ -148,16 +185,26 @@ const submit = () => {
                                     type="checkbox"
                                     class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                 />
-                                <label for="is_active" class="text-sm text-gray-700">Active (visible on website)</label>
+                                <label
+                                    for="is_active"
+                                    class="text-sm text-gray-700"
+                                    >Active (visible on website)</label
+                                >
                             </div>
-                            <InputError class="mt-2" :message="form.errors.is_active" />
+                            <InputError
+                                class="mt-2"
+                                :message="form.errors.is_active"
+                            />
 
                             <!-- Actions -->
                             <div class="flex items-center gap-4 pt-4">
                                 <PrimaryButton :disabled="form.processing">
-                                    {{ form.processing ? 'Saving...' : (testimonial ? 'Update Testimonial' : 'Create Testimonial') }}
+                                    {{ form.processing ? 'Saving...' : (testimonial ? 'Update Testimonial' : 'Create Testimonial") }}
                                 </PrimaryButton>
-                                <Link :href="route('admin.testimonials.index')" class="text-sm text-gray-600 hover:text-gray-900">
+                                <Link
+                                    :href="route('admin.testimonials.index')"
+                                    class="text-sm text-gray-600 hover:text-gray-900"
+                                >
                                     Cancel
                                 </Link>
                             </div>

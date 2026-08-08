@@ -144,13 +144,30 @@ final class AppServiceProvider extends ServiceProvider
      */
     private function bootRateLimiters(): void
     {
-        // Customer login rate limiter: 5 requests per minute (brute force protection)
+        // Customer login rate limiter: 5 attempts per 15 minutes window (brute force protection)
         RateLimiter::for('customer-login', function (Request $request) {
-            return Limit::perMinute(5)->by($request->ip())
+            $key = $request->ip() . '|' . strtolower((string) $request->input('email', ''));
+            return Limit::perMinutes(15, 5)->by($key)
                 ->response(function ($request, $headers) {
-                    return response()->json([
-                        'message' => 'Too Many Requests. Please try again later.',
-                    ], 429, $headers);
+                    \App\Models\BlockedIp::updateOrCreate(
+                        ['ip_address' => $request->ip()],
+                        [
+                            'reason' => 'Brute force attack on customer login',
+                            'blocked_until' => now()->addMinutes(15),
+                        ]
+                    );
+                    
+                    \Illuminate\Support\Facades\Cache::forget("blocked_ip_{$request->ip()}");
+
+                    if ($request->expectsJson()) {
+                        return response()->json([
+                            'message' => 'Terlalu banyak percobaan login yang gagal (5x salah password). Akses login dibatasi selama 15 menit.',
+                        ], 429, $headers);
+                    }
+
+                    return back()->withErrors([
+                        'email' => 'Terlalu banyak percobaan login yang salah (5x). Akses login Anda dibatasi sementara selama 15 menit.',
+                    ])->withInput($request->only('email'));
                 });
         });
 
@@ -169,9 +186,58 @@ final class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(120)->by($request->user()?->id ?? $request->ip());
         });
 
-        // Admin login rate limiter: 5 requests per minute (brute force protection)
+        // Admin login rate limiter: 5 attempts per 15 minutes window (brute force protection)
         RateLimiter::for('admin-login', function (Request $request) {
-            return Limit::perMinute(5)->by($request->ip());
+            $key = $request->ip() . '|' . strtolower((string) $request->input('email', ''));
+            return Limit::perMinutes(15, 5)->by($key)
+                ->response(function ($request, $headers) {
+                    \App\Models\BlockedIp::updateOrCreate(
+                        ['ip_address' => $request->ip()],
+                        [
+                            'reason' => 'Brute force attack on admin login',
+                            'blocked_until' => now()->addMinutes(15),
+                        ]
+                    );
+                    
+                    \Illuminate\Support\Facades\Cache::forget("blocked_ip_{$request->ip()}");
+
+                    if ($request->expectsJson()) {
+                        return response()->json([
+                            'message' => 'Terlalu banyak percobaan login yang gagal (5x salah password). Akses login dibatasi selama 15 menit.',
+                        ], 429, $headers);
+                    }
+
+                    return back()->withErrors([
+                        'email' => 'Terlalu banyak percobaan login yang salah (5x). Akses login Anda dibatasi sementara selama 15 menit.',
+                    ])->withInput($request->only('email'));
+                });
+        });
+
+        // Affiliator login rate limiter: 5 attempts per 15 minutes window
+        RateLimiter::for('affiliator-login', function (Request $request) {
+            $key = $request->ip() . '|' . strtolower((string) $request->input('email', ''));
+            return Limit::perMinutes(15, 5)->by($key)
+                ->response(function ($request, $headers) {
+                    \App\Models\BlockedIp::updateOrCreate(
+                        ['ip_address' => $request->ip()],
+                        [
+                            'reason' => 'Brute force attack on affiliator login',
+                            'blocked_until' => now()->addMinutes(15),
+                        ]
+                    );
+                    
+                    \Illuminate\Support\Facades\Cache::forget("blocked_ip_{$request->ip()}");
+
+                    if ($request->expectsJson()) {
+                        return response()->json([
+                            'message' => 'Terlalu banyak percobaan login yang gagal (5x salah password). Akses login dibatasi selama 15 menit.',
+                        ], 429, $headers);
+                    }
+
+                    return back()->withErrors([
+                        'email' => 'Terlalu banyak percobaan login yang salah (5x). Akses login Anda dibatasi sementara selama 15 menit.',
+                    ])->withInput($request->only('email'));
+                });
         });
 
         // General API rate limiter: 60 requests per minute
@@ -184,13 +250,16 @@ final class AppServiceProvider extends ServiceProvider
                 });
         });
 
-        // Login rate limiter: 5 requests per minute (brute force protection)
+        // Login rate limiter: 5 attempts per 15 minutes window
         RateLimiter::for('login', function (Request $request) {
-            return Limit::perMinute(5)->by($request->ip())
+            return Limit::perMinutes(15, 5)->by($request->ip())
                 ->response(function ($request, $headers) {
-                    return response()->json([
-                        'message' => 'Too Many Requests. Please try again later.',
-                    ], 429, $headers);
+                    if ($request->expectsJson()) {
+                        return response()->json([
+                            'message' => 'Too Many Requests. Lockout 15 minutes.',
+                        ], 429, $headers);
+                    }
+                    return back()->withErrors(['email' => 'Terlalu banyak percobaan login yang salah. Coba lagi dalam 15 menit.']);
                 });
         });
 

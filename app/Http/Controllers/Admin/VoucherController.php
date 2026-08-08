@@ -43,7 +43,16 @@ final class VoucherController extends Controller
         if (!$voucher) {
             abort(404, 'Voucher not found');
         }
-        return view('admin.vouchers.show', ['voucher' => new VoucherResource($voucher)]);
+        
+        $usages = \App\Models\VoucherUsage::where('voucher_id', $voucher->id)
+            ->with(['customer', 'transaction'])
+            ->orderBy('used_at', 'desc')
+            ->get();
+
+        return view('admin.vouchers.show', [
+            'voucher' => new VoucherResource($voucher),
+            'usages' => $usages
+        ]);
     }
 
     public function edit(string $id)

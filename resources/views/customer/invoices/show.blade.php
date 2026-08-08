@@ -1,168 +1,100 @@
-@extends('customer.layouts.app')
-
-@section('title', 'Invoice #' . $invoice->invoice_number)
-
+@extends('layouts.customer')
+@section('title', 'Invoice ' . $invoice->invoice_number)
+@section('breadcrumb')
+    <a href="{{ route('customer.invoices.index') }}" class="crumb-link">Invoices</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <span class="crumb-current">{{ $invoice->invoice_number }}</span>
+@endsection
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-12 col-xl-10">
-            <!-- Header -->
-            <div class="d-flex align-items-center mb-4">
-                <a href="{{ route('customer.invoices.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift me-3">
-                    <i class="bi bi-arrow-left me-1"></i> Back
-                </a>
-                <div>
-                    <h2 class="mb-1 fw-bold">Invoice Details</h2>
-                    <p class="text-secondary mb-0">View invoice details and payment status.</p>
-                </div>
-            </div>
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-file-invoice" style="color:var(--primary);margin-right:10px;"></i>Invoice #{{ $invoice->invoice_number }}</h1>
+        <p class="page-subtitle">Issued on {{ $invoice->issued_at?->format('d M Y') ?? $invoice->created_at->format('d M Y') }}</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ route('customer.invoices.download', $invoice->id) }}" class="btn btn-outline">
+            <i class="fa-solid fa-download"></i> Download PDF
+        </a>
+        <a href="{{ route('customer.invoices.index') }}" class="btn btn-outline">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
 
-            <div class="card border-0 shadow-sm rounded-4 glass overflow-hidden">
-                <!-- Invoice Header -->
-                <div class="card-header bg-transparent border-bottom border-light p-4 p-md-5">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-4">
-                        <div>
-                            <h2 class="fw-bold mb-1">INVOICE</h2>
-                            <p class="text-secondary mb-0">#{{ $invoice->invoice_number }}</p>
-                        </div>
-                        
-                        <div>
-                            @php
-                                $statusClass = match($invoice->status) {
-                                    'paid' => 'success',
-                                    'unpaid' => ($invoice->due_date && $invoice->due_date->isPast()) ? 'danger' : 'warning',
-                                    'cancelled' => 'secondary',
-                                    default => 'secondary'
-                                };
-                                
-                                $statusText = ($invoice->status == 'unpaid' && $invoice->due_date && $invoice->due_date->isPast()) 
-                                            ? 'OVERDUE' 
-                                            : strtoupper($invoice->status);
-                            @endphp
-                            <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} border border-{{ $statusClass }}-subtle rounded-pill px-4 py-2 fs-6">
-                                {{ $statusText }}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="row mt-5">
-                        <div class="col-md-6 mb-4 mb-md-0">
-                            <h6 class="text-secondary text-uppercase fw-semibold mb-3 fs-7 tracking-wider">Billed To</h6>
-                            <address class="mb-0">
-                                <strong class="d-block mb-1">{{ auth()->guard('customer')->user()->name }}</strong>
-                                @if(auth()->guard('customer')->user()->business_name)
-                                    <span class="d-block text-secondary">{{ auth()->guard('customer')->user()->business_name }}</span>
-                                @endif
-                                <span class="d-block text-secondary">{{ auth()->guard('customer')->user()->email }}</span>
-                                @if(auth()->guard('customer')->user()->phone)
-                                    <span class="d-block text-secondary">{{ auth()->guard('customer')->user()->phone }}</span>
-                                @endif
-                            </address>
-                        </div>
-                        
-                        <div class="col-md-6 text-md-end">
-                            <div class="mb-3">
-                                <h6 class="text-secondary text-uppercase fw-semibold mb-1 fs-7 tracking-wider">Date Issued</h6>
-                                <p class="mb-0 fw-medium">{{ $invoice->created_at->format('F d, Y') }}</p>
-                            </div>
-                            @if($invoice->status == 'unpaid' && $invoice->due_date)
-                            <div>
-                                <h6 class="text-secondary text-uppercase fw-semibold mb-1 fs-7 tracking-wider">Due Date</h6>
-                                <p class="mb-0 fw-medium {{ $invoice->due_date->isPast() ? 'text-danger' : '' }}">
-                                    {{ $invoice->due_date->format('F d, Y') }}
-                                </p>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Invoice Items -->
-                <div class="card-body p-4 p-md-5">
-                    <h6 class="text-secondary text-uppercase fw-semibold mb-4 fs-7 tracking-wider">Invoice Items</h6>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-borderless align-middle mb-0">
-                            <thead class="border-bottom border-light">
-                                <tr>
-                                    <th class="text-secondary text-uppercase fs-7 pb-3 px-0">Description</th>
-                                    <th class="text-secondary text-uppercase fs-7 pb-3 px-0 text-end">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody class="border-bottom border-light">
-                                <tr>
-                                    <td class="py-4 px-0">
-                                        <div class="fw-semibold">
-                                            {{ $invoice->subscription->plan->product->name ?? 'Subscription Plan' }}
-                                        </div>
-                                        @if($invoice->subscription && $invoice->subscription->plan)
-                                            <div class="text-secondary fs-7 mt-1">
-                                                {{ $invoice->subscription->plan->name }} ({{ $invoice->subscription->plan->billing_cycle ?? 'Monthly' }})
-                                            </div>
-                                        @endif
-                                    </td>
-                                    <td class="py-4 px-0 text-end fw-medium">
-                                        Rp {{ number_format($invoice->subtotal, 0, ',', '.') }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                @if($invoice->discount > 0)
-                                <tr>
-                                    <td class="pt-4 pb-2 px-0 text-end text-secondary fs-7">Discount</td>
-                                    <td class="pt-4 pb-2 px-0 text-end text-success fw-medium">
-                                        - Rp {{ number_format($invoice->discount, 0, ',', '.') }}
-                                    </td>
-                                </tr>
-                                @endif
-                                @if($invoice->tax > 0)
-                                <tr>
-                                    <td class="py-2 px-0 text-end text-secondary fs-7">Tax</td>
-                                    <td class="py-2 px-0 text-end fw-medium">
-                                        Rp {{ number_format($invoice->tax, 0, ',', '.') }}
-                                    </td>
-                                </tr>
-                                @endif
-                                <tr>
-                                    <td class="py-4 px-0 text-end fw-bold fs-6">Total</td>
-                                    <td class="py-4 px-0 text-end fw-bolder text-primary fs-5">
-                                        Rp {{ number_format($invoice->total, 0, ',', '.') }}
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Payment Information -->
-                @if($invoice->transaction)
-                <div class="card-body p-4 p-md-5 bg-light border-top border-bottom border-light">
-                    <h6 class="text-secondary text-uppercase fw-semibold mb-4 fs-7 tracking-wider">Payment Details</h6>
-                    <div class="row g-4">
-                        <div class="col-sm-6">
-                            <div class="text-secondary fs-7 mb-1">Payment Method</div>
-                            <div class="fw-semibold">{{ strtoupper($invoice->transaction->payment_type ?? '-') }}</div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="text-secondary fs-7 mb-1">Transaction ID</div>
-                            <div class="font-monospace text-dark">{{ $invoice->transaction->id }}</div>
-                        </div>
-                    </div>
-                </div>
-                @endif
-                
-                <!-- Action Buttons -->
-                <div class="card-footer bg-transparent border-top-0 p-4 p-md-5 d-flex justify-content-between align-items-center">
-                    <a href="{{ route('customer.invoices.download', $invoice->id) }}" class="btn btn-outline-secondary rounded-pill px-4 hover-lift">
-                        <i class="bi bi-download me-2"></i> Download PDF
-                    </a>
-                    
-                    @if($invoice->status == 'unpaid')
-                        <a href="{{ route('customer.payments.show', $invoice->transaction->id ?? 0) }}" class="btn btn-primary rounded-pill px-5 py-2 hover-lift fw-medium">
-                            Pay Now <i class="bi bi-credit-card ms-2"></i>
-                        </a>
+<div class="card" style="max-width:800px;margin:0 auto;">
+    <div class="card-body" style="padding:32px;">
+        {{-- Invoice Header --}}
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <div class="font-bold text-2xl" style="color:var(--primary);">COOCA.ID</div>
+                <div class="text-xs text-muted">PT COOCA TECHNOLOGIES INDONESIA</div>
+                <div class="text-xs text-muted">Jakarta, Indonesia</div>
+            </div>
+            <div class="text-right">
+                <div class="font-bold text-xl">{{ $invoice->invoice_number }}</div>
+                <div class="mt-2">
+                    @if($invoice->status === 'paid')    <span class="badge badge-success" style="font-size:14px;padding:6px 14px;">PAID</span>
+                    @elseif($invoice->status === 'overdue') <span class="badge badge-danger" style="font-size:14px;padding:6px 14px;">OVERDUE</span>
+                    @else <span class="badge badge-warning" style="font-size:14px;padding:6px 14px;">PENDING PAYMENT</span>
                     @endif
                 </div>
             </div>
         </div>
+
+        <div class="grid-2 mb-6" style="background:var(--bg);border-radius:var(--radius);padding:18px;">
+            <div>
+                <div class="text-xs text-muted font-bold uppercase mb-1">Billed To</div>
+                <div class="font-bold text-sm">{{ auth('customer')->user()->business_name ?? auth('customer')->user()->name }}</div>
+                <div class="text-xs text-muted">{{ auth('customer')->user()->email }}</div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-muted font-bold uppercase mb-1">Invoice Dates</div>
+                <div class="text-xs">Issued: <strong>{{ $invoice->issued_at?->format('d M Y') ?? '—' }}</strong></div>
+                <div class="text-xs">Due: <strong style="color:var(--danger);">{{ $invoice->due_at?->format('d M Y') ?? '—' }}</strong></div>
+            </div>
+        </div>
+
+        {{-- Table --}}
+        <table class="data-table mb-6">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="font-bold text-sm">{{ $invoice->subscription?->product?->name ?? 'COOCA SaaS Subscription' }}</div>
+                        <div class="text-xs text-muted">{{ $invoice->subscription?->subscriptionPlan?->name ?? 'Service Plan' }}</div>
+                    </td>
+                    <td class="text-right font-bold text-base">
+                        Rp {{ number_format($invoice->amount, 0, ',', '.') }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="flex justify-between items-center pt-4" style="border-top:2px solid var(--border);">
+            <div class="text-sm font-bold">Total Amount Due:</div>
+            <div class="text-2xl font-bold" style="color:var(--primary);">
+                Rp {{ number_format($invoice->amount, 0, ',', '.') }}
+            </div>
+        </div>
+
+        @if(in_array($invoice->status, ['issued', 'overdue', 'pending', 'unpaid']))
+        <div class="mt-6 text-center">
+            <form method="POST" action="{{ route('customer.payments.store') }}">
+                @csrf
+                <input type="hidden" name="invoice_id" value="{{ $invoice->id }}">
+                <input type="hidden" name="subscription_id" value="{{ $invoice->subscription_id }}">
+                <input type="hidden" name="gross_amount" value="{{ $invoice->amount }}">
+                <button type="submit" class="btn btn-primary btn-lg w-full" style="justify-content:center;">
+                    <i class="fa-solid fa-credit-card"></i> Pay Invoice Now via Midtrans
+                </button>
+            </form>
+        </div>
+        @endif
     </div>
+</div>
 @endsection

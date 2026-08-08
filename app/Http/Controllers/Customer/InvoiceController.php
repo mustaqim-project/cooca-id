@@ -44,10 +44,10 @@ class InvoiceController extends Controller
         $stats = [
             'total' => Invoice::where('customer_id', $customer->id)->count(),
             'paid' => Invoice::where('customer_id', $customer->id)->where('status', 'paid')->count(),
-            'unpaid' => Invoice::where('customer_id', $customer->id)->where('status', 'unpaid')->count(),
+            'unpaid' => Invoice::where('customer_id', $customer->id)->whereIn('status', ['unpaid', 'issued', 'overdue'])->count(),
             'overdue' => Invoice::where('customer_id', $customer->id)
-                ->where('status', 'unpaid')
-                ->where('due_date', '<', now())
+                ->whereIn('status', ['unpaid', 'issued', 'overdue'])
+                ->where('due_at', '<', now())
                 ->count(),
         ];
 

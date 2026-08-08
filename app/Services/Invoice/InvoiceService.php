@@ -22,11 +22,11 @@ final class InvoiceService
             $invoice = $this->invoiceRepository->create([
                 'invoice_number' => $invoiceNumber,
                 'transaction_id' => $transaction->id,
-                'customer_id' => $transaction->customer_id,
-                'gross_amount' => $transaction->gross_amount,
-                'net_amount' => $transaction->net_amount,
-                'status' => 'pending',
-                'due_date' => now()->addDays(7),
+                'customer_id'    => $transaction->customer_id,
+                'amount'         => $transaction->net_amount,
+                'status'         => 'issued',
+                'issued_at'      => now(),
+                'due_at'         => now()->addDays(7),
             ]);
 
             $pdfPath = $this->generateInvoicePdf($invoice);

@@ -2,77 +2,78 @@
 
 @section('title', 'Marketing Banners')
 
+@section('breadcrumb')
+    <a href="{{ route('affiliator.dashboard') }}" class="crumb-link">Dashboard</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <a href="{{ route('affiliator.marketing_materials.index') }}" class="crumb-link">Marketing Materials</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <span class="crumb-current">Banners</span>
+@endsection
+
 @section('content')
-    <div class="d-flex flex-column gap-4">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div>
+        <h2 style="font-size:20px;font-weight:800;color:var(--text);">Promotional Banners</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-top:2px;">Embeddable HTML banners for your website, blog, or email newsletters.</p>
+    </div>
+    <a href="{{ route('affiliator.marketing_materials.index') }}" class="btn btn-s btn-sm">
+        <i class="fa-solid fa-arrow-left"></i> Back to Materials
+    </a>
+</div>
 
-        <!-- Page Header & Toolbar -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <a href="{{ route('affiliator.marketing.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift">
-                    <i class="bi bi-arrow-left me-1"></i> Back
-                </a>
-                <div>
-                    <h2 class="mb-1 fw-bold">Marketing Banners</h2>
-                    <p class="text-secondary mb-0">Embeddable banners for your website or blog.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Banners Table -->
-        <div class="card border-0 shadow-sm rounded-4 glass">
-            <div class="card-header bg-transparent border-bottom border-light p-4">
-                <h5 class="fw-bold mb-0 text-dark">Available Banners</h5>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" style="color: var(--color-text-primary);">
-                    <thead class="bg-light text-secondary text-uppercase fs-7 border-bottom">
-                        <tr>
-                            <th class="py-3 px-4 border-0" style="width: 80px;">ID</th>
-                            <th class="py-3 px-3 border-0">Name / Size</th>
-                            <th class="py-3 px-3 border-0 text-center">Status</th>
-                            <th class="py-3 px-4 border-0 text-end">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="border-top-0">
-                        @forelse($banners ?? [] as $banner)
-                            <tr>
-                                <td class="py-3 px-4 fw-medium text-secondary">
-                                    #{{ $banner['id'] }}
-                                </td>
-                                <td class="py-3 px-3">
-                                    <div class="fw-semibold text-dark">{{ $banner['name'] }}</div>
-                                    <div class="text-secondary fs-7"><i class="bi bi-aspect-ratio me-1"></i> {{ $banner['size'] }}</div>
-                                </td>
-                                <td class="py-3 px-3 text-center">
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">
-                                        Ready
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-end">
-                                    <button onclick="navigator.clipboard.writeText('{{ addslashes($banner['html_code']) }}'); alert('Copied to clipboard!')" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift text-secondary">
-                                        <i class="bi bi-code-slash me-1"></i> Copy HTML
-                                    </button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="py-5 text-center text-secondary">
-                                    <div class="mb-3"><i class="bi bi-images fs-1"></i></div>
-                                    <h6 class="fw-medium">No Banners Found</h6>
-                                    <p class="fs-7 mb-0">There are currently no banners available to embed.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            @if (method_exists($banners ?? [], 'hasPages') && ($banners ?? [])->hasPages())
-                <div class="card-footer bg-transparent border-top border-light p-4">
-                    {{ $banners->links() }}
-                </div>
-            @endif
+<div class="portal-card mb-6">
+    <div class="portal-card-header">
+        <div class="portal-card-title">
+            <i class="fa-solid fa-images" style="color:var(--primary);"></i>
+            Available Banners
         </div>
     </div>
+
+    <div class="portal-card-body p-0">
+        <div class="table-wrap">
+            <table class="portal-table">
+                <thead>
+                    <tr>
+                        <th class="portal-th">Banner Name</th>
+                        <th class="portal-th">Dimensions</th>
+                        <th class="portal-th text-center">Status</th>
+                        <th class="portal-th text-right">HTML Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($banners ?? [] as $banner)
+                        <tr>
+                            <td class="portal-td font-medium">
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <div class="s-icon" style="width:32px;height:32px;background:var(--primary-light);color:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                                        <i class="fa-solid fa-image"></i>
+                                    </div>
+                                    <span style="font-weight:700;">{{ $banner['name'] ?? 'Banner' }}</span>
+                                </div>
+                            </td>
+                            <td class="portal-td text-muted">
+                                <i class="fa-solid fa-vector-square" style="margin-right:4px;"></i> {{ $banner['size'] ?? 'Responsive' }}
+                            </td>
+                            <td class="portal-td text-center">
+                                <span class="badge-status status-active">Ready</span>
+                            </td>
+                            <td class="portal-td text-right">
+                                <button onclick="copyToClipboard('{{ addslashes($banner['html_code'] ?? '') }}', 'Banner HTML Code')" class="btn btn-s btn-sm" style="padding:4px 12px;font-size:11px;">
+                                    <i class="fa-solid fa-code"></i> Copy HTML
+                                </button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="portal-td text-center py-6 text-muted">
+                                <i class="fa-solid fa-images" style="font-size:28px;margin-bottom:8px;display:block;color:var(--text-faint);"></i>
+                                No promotional banners available at the moment.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 @endsection

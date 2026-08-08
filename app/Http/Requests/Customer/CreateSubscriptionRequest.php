@@ -19,7 +19,33 @@ final class CreateSubscriptionRequest extends FormRequest
             'product_slug' => ['required', 'string', 'exists:products,slug'],
             'subscription_plan_id' => ['required', 'exists:subscription_plans,id'],
             'voucher_code' => ['nullable', 'string', 'max:50'],
-            'domain' => ['required', 'string', 'max:255'],
+            'domain' => [
+                'required', 
+                'string', 
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    $domainStr = str_contains($value, '.') ? $value : $value . '.cooca.id';
+                    
+                    if (!preg_match('/^[a-zA-Z0-9.-]+$/', $domainStr)) {
+                        $fail('Format domain tidak valid.');
+                        return;
+                    }
+
+                    $existsInLicenses = \App\Models\License::where('domain', $domainStr)
+                        ->where('customer_id', '!=', auth('customer')->id())
+                        ->exists();
+
+                    $subdomainOnly = str_replace('.cooca.id', '', $domainStr);
+                    $existsInRequests = \App\Models\ErpRequest::where('requested_subdomain', $subdomainOnly)
+                        ->where('customer_id', '!=', auth('customer')->id())
+                        ->whereNotIn('status', [\App\Models\ErpRequest::STATUS_REJECTED, \App\Models\ErpRequest::STATUS_TRIAL_EXPIRED])
+                        ->exists();
+
+                    if ($existsInLicenses || $existsInRequests) {
+                        $fail('Domain sudah digunakan oleh pengguna lain.');
+                    }
+                }
+            ],
         ];
     }
 

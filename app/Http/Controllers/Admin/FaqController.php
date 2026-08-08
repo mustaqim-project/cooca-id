@@ -47,7 +47,7 @@ class FaqController extends Controller
     public function edit(string $id)
     {
         $faq = Faq::findOrFail($id);
-        return view('admin.faqs.create', [
+        return view('admin.faqs.edit', [
             'faq' => $faq,
         ]);
     }
@@ -73,15 +73,21 @@ class FaqController extends Controller
     public function store(FaqRequest $request)
     {
         $data = $request->validated();
-        $data['created_by'] = auth()->id();
+        if (auth()->check()) {
+            $data['created_by'] = auth()->id();
+        }
 
         $faq = Faq::create($data);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'FAQ created successfully',
-            'data' => $faq,
-        ]);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'FAQ created successfully',
+                'data' => $faq,
+            ]);
+        }
+
+        return redirect()->route('admin.faqs.index')->with('success', 'FAQ berhasil dibuat.');
     }
 
     /**
@@ -91,15 +97,21 @@ class FaqController extends Controller
     {
         $faq = Faq::findOrFail($id);
         $data = $request->validated();
-        $data['updated_by'] = auth()->id();
+        if (auth()->check()) {
+            $data['updated_by'] = auth()->id();
+        }
 
         $faq->update($data);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'FAQ updated successfully',
-            'data' => $faq,
-        ]);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'FAQ updated successfully',
+                'data' => $faq,
+            ]);
+        }
+
+        return redirect()->route('admin.faqs.index')->with('success', 'FAQ berhasil diperbarui.');
     }
 
     /**
@@ -110,11 +122,16 @@ class FaqController extends Controller
         $faq = Faq::findOrFail($id);
         $faq->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'FAQ deleted successfully',
-        ]);
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'FAQ deleted successfully',
+            ]);
+        }
+
+        return redirect()->route('admin.faqs.index')->with('success', 'FAQ berhasil dihapus.');
     }
+
 
     /**
      * Reorder FAQs

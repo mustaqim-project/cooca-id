@@ -16,6 +16,7 @@ final class Domain extends Model
     protected $table = 'domains';
 
     protected $fillable = [
+        'customer_id',
         'user_id',
         'erp_request_id',
         'domain',

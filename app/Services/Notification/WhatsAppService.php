@@ -95,33 +95,19 @@ final class WhatsAppService
      */
     public function sendMessage(string $number, string $message): array
     {
-        if (!$this->configured) {
-            Log::warning('WhatsAppService: Attempted to send message but service is not configured.');
-            return ['success' => false, 'message' => 'WhatsApp service belum dikonfigurasi.'];
-        }
-
         $normalizedPhone = $this->normalizePhone($number);
         if (empty($normalizedPhone)) {
             return ['success' => false, 'message' => 'Nomor telepon tidak valid.'];
         }
 
         try {
-            $response = Http::timeout(15)
-                ->post("{$this->serverUrl}/send", [
-                    'number'  => $normalizedPhone,
-                    'message' => $message,
-                ]);
+            \App\Models\WhatsAppQueue::create([
+                'phone'   => $normalizedPhone,
+                'message' => $message,
+                'status'  => 'pending',
+            ]);
 
-            if ($response->successful()) {
-                Log::info('WhatsAppService: Message sent', [
-                    'number' => substr($normalizedPhone, 0, 6) . '***',
-                ]);
-                return ['success' => true, 'message' => 'Pesan berhasil dikirim.'];
-            }
-
-            $error = $response->json('error') ?? 'Unknown error';
-            Log::error('WhatsAppService: Send failed', ['error' => $error]);
-            return ['success' => false, 'message' => "Gagal mengirim pesan: {$error}"];
+            return ['success' => true, 'message' => 'Pesan berhasil dimasukkan ke antrean.'];
         } catch (\Exception $e) {
             Log::error('WhatsAppService: Exception', ['error' => $e->getMessage()]);
             return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];

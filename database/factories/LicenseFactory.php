@@ -3,6 +3,9 @@
 namespace Database\Factories;
 
 use App\Models\License;
+use App\Models\Customer;
+use App\Models\Product;
+use App\Models\SubscriptionPlan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -20,9 +23,9 @@ class LicenseFactory extends Factory
     {
         return [
             'id' => (string) Str::uuid(),
-            'user_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
-            'product_id' => \App\Models\Product::inRandomOrder()->first()?->id ?? \App\Models\Product::factory(),
-            'subscription_plan_id' => \App\Models\SubscriptionPlan::inRandomOrder()->first()?->id ?? \App\Models\SubscriptionPlan::factory(),
+            'customer_id' => Customer::inRandomOrder()->first()?->id ?? Customer::factory(),
+            'product_id' => Product::inRandomOrder()->first()?->id ?? Product::factory(),
+            'subscription_plan_id' => SubscriptionPlan::inRandomOrder()->first()?->id ?? SubscriptionPlan::factory(),
             'license_code' => strtoupper(Str::random(16)),
             'token_code' => strtoupper(Str::random(16)),
             'domain' => fake()->unique()->domainName(),
@@ -40,7 +43,7 @@ class LicenseFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'active',
             'activated_at' => now(),
             'expires_at' => now()->addYear(),
@@ -52,7 +55,7 @@ class LicenseFactory extends Factory
      */
     public function expired(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'expired',
             'activated_at' => now()->subYears(2),
             'expires_at' => now()->subMonth(),
@@ -64,10 +67,10 @@ class LicenseFactory extends Factory
      */
     public function revoked(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'revoked',
             'revoked_at' => now(),
-            'revoked_by' => \App\Models\User::factory(),
+            'revoked_by' => \App\Models\Admin::factory(),
             'revocation_reason' => fake()->sentence(),
         ]);
     }
@@ -77,7 +80,7 @@ class LicenseFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'inactive',
             'activated_at' => null,
         ]);

@@ -40,7 +40,7 @@ final class ContractController extends Controller
             ]);
         }
 
-        return view('pages.customer.contract', compact('license', 'contract', 'customer'));
+        return view('public.pages.customer.contract', compact('license', 'contract', 'customer'));
     }
 
     /**

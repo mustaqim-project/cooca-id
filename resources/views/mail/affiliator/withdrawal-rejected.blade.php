@@ -29,28 +29,28 @@
         <div class="content">
             <div class="error-icon">✕</div>
             <h2 style="text-align: center;">Withdrawal Ditolak</h2>
-            
+
             <p>Halo {{ $affiliatorName }},</p>
             <p>Maaf, request withdrawal Anda tidak dapat diproses.</p>
-            
+
             <div class="info-box">
                 <div class="info-row">
                     <span class="label">Jumlah Withdrawal</span>
                     <span class="value">Rp {{ $amount }}</span>
                 </div>
             </div>
-            
+
             <div class="reason-box">
                 <span class="reason-label">Alasan Penolakan:</span>
                 <p style="margin: 0;">{{ $rejectionReason }}</p>
             </div>
-            
+
             <p>Jika Anda memiliki pertanyaan atau ingin mengajukan withdrawal kembali, silakan hubungi tim support kami atau ajukan withdrawal baru setelah memperbaiki masalah yang disebutkan di atas.</p>
-            
+
             <p style="text-align: center;">
                 <a href="{{ route('affiliator.withdrawals.index') }}" class="btn">Ajukan Withdrawal Baru</a>
             </p>
-            
+
             <div class="footer">
                 <p>Terima kasih atas pengertian Anda</p>
                 <p>&copy; {{ date('Y') }} COOCA.ID. All rights reserved.</p>

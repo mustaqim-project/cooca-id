@@ -1,30 +1,30 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AdminLayout.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import TextInput from '@/Components/TextInput.vue';
-import TextArea from '@/Components/TextArea.vue';
-import SelectInput from '@/Components/forms/SelectInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import AuthenticatedLayout from "@/Layouts/AdminLayout.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import TextInput from "@/Components/TextInput.vue";
+import TextArea from "@/Components/TextArea.vue";
+import SelectInput from "@/Components/forms/SelectInput.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
     faq: Object,
 });
 
 const form = useForm({
-    question: props.faq?.question || '',
-    answer: props.faq?.answer || '',
+    question: props.faq?.question || "",
+    answer: props.faq?.answer || "",
     order: props.faq?.order || 0,
     is_active: props.faq?.is_active ?? true,
-    category: props.faq?.category || '',
+    category: props.faq?.category || "",
 });
 
 const submit = () => {
     if (props.faq) {
-        form.put(route('admin.faqs.update', props.faq.id));
+        form.put(route("admin.faqs.update", props.faq.id));
     } else {
-        form.post(route('admin.faqs.store'));
+        form.post(route("admin.faqs.store"));
     }
 };
 </script>
@@ -35,7 +35,7 @@ const submit = () => {
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ faq ? 'Edit FAQ' : 'Create New FAQ' }}
+                {{ faq ? "Edit FAQ" : "Create New FAQ" }}
             </h2>
         </template>
 
@@ -55,7 +55,10 @@ const submit = () => {
                                     required
                                     autofocus
                                 />
-                                <InputError class="mt-2" :message="form.errors.question" />
+                                <InputError
+                                    class="mt-2"
+                                    :message="form.errors.question"
+                                />
                             </div>
 
                             <!-- Answer -->
@@ -68,12 +71,18 @@ const submit = () => {
                                     class="mt-1 block w-full"
                                     required
                                 />
-                                <InputError class="mt-2" :message="form.errors.answer" />
+                                <InputError
+                                    class="mt-2"
+                                    :message="form.errors.answer"
+                                />
                             </div>
 
                             <!-- Category -->
                             <div>
-                                <InputLabel for="category" value="Category (Optional)" />
+                                <InputLabel
+                                    for="category"
+                                    value="Category (Optional)"
+                                />
                                 <TextInput
                                     id="category"
                                     v-model="form.category"
@@ -81,7 +90,10 @@ const submit = () => {
                                     class="mt-1 block w-full"
                                     placeholder="e.g., Billing, Technical, General"
                                 />
-                                <InputError class="mt-2" :message="form.errors.category" />
+                                <InputError
+                                    class="mt-2"
+                                    :message="form.errors.category"
+                                />
                             </div>
 
                             <!-- Order -->
@@ -94,8 +106,13 @@ const submit = () => {
                                     class="mt-1 block w-full"
                                     min="0"
                                 />
-                                <InputError class="mt-2" :message="form.errors.order" />
-                                <p class="text-xs text-gray-500 mt-1">Lower numbers appear first</p>
+                                <InputError
+                                    class="mt-2"
+                                    :message="form.errors.order"
+                                />
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Lower numbers appear first
+                                </p>
                             </div>
 
                             <!-- Is Active -->
@@ -106,16 +123,26 @@ const submit = () => {
                                     type="checkbox"
                                     class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                 />
-                                <label for="is_active" class="text-sm text-gray-700">Active (visible on website)</label>
+                                <label
+                                    for="is_active"
+                                    class="text-sm text-gray-700"
+                                    >Active (visible on website)</label
+                                >
                             </div>
-                            <InputError class="mt-2" :message="form.errors.is_active" />
+                            <InputError
+                                class="mt-2"
+                                :message="form.errors.is_active"
+                            />
 
                             <!-- Actions -->
                             <div class="flex items-center gap-4 pt-4">
                                 <PrimaryButton :disabled="form.processing">
-                                    {{ form.processing ? 'Saving...' : (faq ? 'Update FAQ' : 'Create FAQ') }}
+                                    {{ form.processing ? 'Saving...' : (faq ? 'Update FAQ' : 'Create FAQ") }}
                                 </PrimaryButton>
-                                <Link :href="route('admin.faqs.index')" class="text-sm text-gray-600 hover:text-gray-900">
+                                <Link
+                                    :href="route('admin.faqs.index')"
+                                    class="text-sm text-gray-600 hover:text-gray-900"
+                                >
                                     Cancel
                                 </Link>
                             </div>

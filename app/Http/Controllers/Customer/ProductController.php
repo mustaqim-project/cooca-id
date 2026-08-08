@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Admin\ProductResource;
 use App\Repositories\Contracts\ProductRepositoryInterface;
-use Illuminate\View\View;
 
 final class ProductController extends Controller
 {
@@ -16,11 +14,11 @@ final class ProductController extends Controller
     ) {}
 
     /**
-     * Display listing of available products.
+     * Display listing of available products (unified My Services hub).
      */
     public function index()
     {
-        $products = $this->productRepository->getActiveProducts();
+        $products = $this->productRepository->getActiveProducts()->load('subscriptionPlans', 'category');
 
         return view('customer.products.index', [
             'products' => $products,
@@ -28,7 +26,7 @@ final class ProductController extends Controller
     }
 
     /**
-     * Display the specified product.
+     * Display product detail with plan picker.
      */
     public function show(string $slug)
     {
@@ -38,9 +36,14 @@ final class ProductController extends Controller
             abort(404, 'Product not found');
         }
 
+        $plans = $product->subscriptionPlans()
+            ->where('is_active', true)
+            ->orderBy('price')
+            ->get();
+
         return view('customer.products.show', [
             'product' => $product,
-            'plans' => $product->subscriptionPlans()->where('is_active', true)->get(),
+            'plans'   => $plans,
         ]);
     }
 }

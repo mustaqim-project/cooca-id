@@ -2,179 +2,179 @@
 
 @section('title', 'Request Withdrawal')
 
-@section('content')
-    <div class="d-flex flex-column gap-4">
+@section('breadcrumb')
+    <a href="{{ route('affiliator.dashboard') }}" class="crumb-link">Dashboard</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <a href="{{ route('affiliator.withdrawals.index') }}" class="crumb-link">Withdrawals</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
+    <span class="crumb-current">Request Payout</span>
+@endsection
 
-        <!-- Page Header & Toolbar -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <a href="{{ route('affiliator.withdrawals.index') }}" class="btn btn-sm btn-light border rounded-pill px-3 hover-lift">
-                    <i class="bi bi-arrow-left me-1"></i> Back
-                </a>
+@section('content')
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div>
+        <h2 style="font-size:20px;font-weight:800;color:var(--text);">Request Payout Withdrawal</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-top:2px;">Transfer your available cleared balance directly to your bank account.</p>
+    </div>
+    <a href="{{ route('affiliator.withdrawals.index') }}" class="btn btn-s btn-sm">
+        <i class="fa-solid fa-arrow-left"></i> Back to Withdrawals
+    </a>
+</div>
+
+<form action="{{ route('affiliator.withdrawals.store') }}" method="POST">
+    @csrf
+
+    <div style="display:grid;grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));gap:24px;">
+
+        {{-- Left: Balance & Form inputs --}}
+        <div style="grid-column: span 2;">
+
+            {{-- Available Balance Banner --}}
+            <div style="background:linear-gradient(135deg, var(--primary), var(--accent));border-radius:var(--radius);padding:20px;color:#fff;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
                 <div>
-                    <h2 class="mb-1 fw-bold">Request Withdrawal</h2>
-                    <p class="text-secondary mb-0">Withdraw your cleared commissions to your bank account.</p>
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;opacity:.85;">Withdrawable Balance</div>
+                    <div style="font-size:28px;font-weight:900;margin-top:4px;">Rp {{ number_format($available_balance ?? 0, 0, ',', '.') }}</div>
+                </div>
+
+                @if(($available_balance ?? 0) < ($min_withdrawal ?? 50000))
+                    <div style="background:rgba(255,255,255,.2);backdrop-filter:blur(4px);padding:8px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;">
+                        <i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>
+                        Minimum payout: Rp {{ number_format($min_withdrawal ?? 50000, 0, ',', '.') }}
+                    </div>
+                @endif
+            </div>
+
+            {{-- Form Details Card --}}
+            <div class="portal-card">
+                <div class="portal-card-header">
+                    <div class="portal-card-title">
+                        <i class="fa-solid fa-file-signature" style="color:var(--primary);"></i>
+                        Payout Details
+                    </div>
+                </div>
+
+                <div class="portal-card-body">
+                    @if(session('error'))
+                        <div style="padding:12px 16px;background:rgba(239,68,68,.1);border:1px solid var(--danger);border-radius:var(--radius-sm);color:var(--danger);font-size:13px;margin-bottom:16px;font-weight:600;">
+                            <i class="fa-solid fa-circle-xmark" style="margin-right:6px;"></i> {{ session('error') }}
+                        </div>
+                    @endif
+
+                    <div style="display:flex;flex-direction:column;gap:16px;">
+
+                        {{-- Amount --}}
+                        <div class="form-group">
+                            <label class="form-label" for="amount">Withdrawal Amount (Rp)</label>
+                            <input type="number" name="amount" id="amount"
+                                   class="form-input @error('amount') is-invalid @enderror"
+                                   value="{{ old('amount', $available_balance ?? 0) }}"
+                                   min="{{ $min_withdrawal ?? 50000 }}"
+                                   max="{{ $available_balance ?? 0 }}"
+                                   placeholder="Enter withdrawal amount" required>
+                            @error('amount')
+                                <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ $message }}</div>
+                            @enderror
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+                                You may withdraw up to your total available balance.
+                            </div>
+                        </div>
+
+                        <hr style="border:none;border-top:1px solid var(--border);margin:8px 0;">
+
+                        {{-- Bank Details Header --}}
+                        <div>
+                            <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Bank Account Destination</h4>
+                            @if(empty($bankAccount))
+                                <div style="padding:12px;background:rgba(245,158,11,.1);border:1px solid var(--warning);border-radius:var(--radius-sm);color:var(--warning);font-size:12px;margin-top:8px;">
+                                    <i class="fa-solid fa-triangle-exclamation" style="margin-right:4px;"></i>
+                                    Please verify or configure your bank account details in your profile settings.
+                                </div>
+                            @endif
+                        </div>
+
+                        <div style="display:grid;grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));gap:16px;">
+                            {{-- Bank / Method --}}
+                            <div class="form-group">
+                                <label class="form-label" for="withdrawal_method">Bank Name</label>
+                                <select name="withdrawal_method" id="withdrawal_method" class="form-select @error('withdrawal_method') is-invalid @enderror" required>
+                                    <option value="">Select Bank</option>
+                                    <option value="BCA" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'BCA') ? 'selected' : '' }}>BCA</option>
+                                    <option value="Mandiri" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'Mandiri') ? 'selected' : '' }}>Mandiri</option>
+                                    <option value="BNI" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'BNI') ? 'selected' : '' }}>BNI</option>
+                                    <option value="BRI" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'BRI') ? 'selected' : '' }}>BRI</option>
+                                    <option value="BSI" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'BSI') ? 'selected' : '' }}>BSI</option>
+                                    <option value="OVO" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'OVO') ? 'selected' : '' }}>OVO</option>
+                                    <option value="GoPay" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'GoPay') ? 'selected' : '' }}>GoPay</option>
+                                    <option value="Dana" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'Dana') ? 'selected' : '' }}>Dana</option>
+                                </select>
+                                @error('withdrawal_method')
+                                    <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- Account Number --}}
+                            <div class="form-group">
+                                <label class="form-label" for="account_number">Account Number</label>
+                                <input type="text" name="account_number" id="account_number"
+                                       class="form-input @error('account_number') is-invalid @enderror"
+                                       value="{{ old('account_number', $bankAccount['account_number'] ?? '') }}"
+                                       placeholder="e.g. 1234567890" required>
+                                @error('account_number')
+                                    <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        {{-- Account Name --}}
+                        <div class="form-group">
+                            <label class="form-label" for="account_name">Account Holder Name</label>
+                            <input type="text" name="account_name" id="account_name"
+                                   class="form-input @error('account_name') is-invalid @enderror"
+                                   value="{{ old('account_name', $bankAccount['account_name'] ?? '') }}"
+                                   placeholder="Full name matching bank account" required>
+                            @error('account_name')
+                                <div style="color:var(--danger);font-size:12px;margin-top:4px;">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
 
-        <form action="{{ route('affiliator.withdrawals.store') }}" method="POST">
-            @csrf
-            
-            <div class="row g-4">
-                <div class="col-12 col-lg-8">
-                    <!-- Available Balance Card -->
-                    <div class="card border-0 shadow-sm rounded-4 glass mb-4" style="background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.1) 0%, rgba(var(--color-primary-rgb), 0.05) 100%); border: 1px solid rgba(var(--color-primary-rgb), 0.2) !important;">
-                        <div class="card-body p-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-4">
-                            <div class="d-flex align-items-center gap-4">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 64px; height: 64px;">
-                                    <i class="bi bi-wallet2 fs-2"></i>
-                                </div>
-                                <div>
-                                    <p class="text-secondary fs-7 text-uppercase fw-semibold mb-1">Available Balance</p>
-                                    <h2 class="fw-bold text-dark mb-0">Rp {{ number_format($available_balance ?? 0, 0, ',', '.') }}</h2>
-                                </div>
-                            </div>
-                            
-                            @if(($available_balance ?? 0) < ($min_withdrawal ?? 50000))
-                            <div class="alert bg-warning-subtle text-warning border-warning-subtle mb-0 py-2 px-3 fs-7 rounded-3 d-flex align-items-center gap-2">
-                                <i class="bi bi-exclamation-triangle"></i>
-                                Minimum withdrawal is Rp {{ number_format($min_withdrawal ?? 50000, 0, ',', '.') }}
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <!-- Withdrawal Form -->
-                    <div class="card border-0 shadow-sm rounded-4 glass">
-                        <div class="card-header bg-transparent border-bottom border-light p-4">
-                            <h5 class="fw-bold mb-0 text-dark">Withdrawal Details</h5>
-                        </div>
-                        <div class="card-body p-4">
-                            
-                            @if(session('error'))
-                                <div class="alert alert-danger rounded-3 fs-7 border-0 shadow-sm mb-4">
-                                    <i class="bi bi-x-circle me-2"></i>{{ session('error') }}
-                                </div>
-                            @endif
-
-                            <div class="row g-4">
-                                <!-- Amount -->
-                                <div class="col-12">
-                                    <label for="amount" class="form-label fw-medium text-dark">Withdrawal Amount</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light border-light text-secondary">Rp</span>
-                                        <input type="number" name="amount" id="amount" 
-                                            class="form-control bg-light border-light @error('amount') is-invalid @enderror" 
-                                            value="{{ old('amount', $available_balance ?? 0) }}" 
-                                            min="{{ $min_withdrawal ?? 50000 }}" 
-                                            max="{{ $available_balance ?? 0 }}"
-                                            placeholder="Enter amount" required>
-                                        @error('amount')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="form-text mt-2 text-secondary fs-7">
-                                        <i class="bi bi-info-circle me-1"></i> You can withdraw up to your total available balance.
-                                    </div>
-                                </div>
-
-                                <div class="col-12"><hr class="border-light my-2"></div>
-
-                                <!-- Bank Details Header -->
-                                <div class="col-12">
-                                    <h6 class="fw-bold text-dark mb-3">Destination Account</h6>
-                                    
-                                    @if(empty($bankAccount))
-                                    <div class="alert bg-warning-subtle text-warning border-0 rounded-3 p-3 fs-7 mb-4 d-flex gap-2">
-                                        <i class="bi bi-exclamation-circle-fill mt-1"></i>
-                                        <div>
-                                            <p class="fw-bold mb-1">Bank account not configured</p>
-                                            <p class="mb-0">Please set up your bank account details in your profile before requesting a withdrawal.</p>
-                                        </div>
-                                    </div>
-                                    @endif
-                                </div>
-
-                                <!-- Bank Name -->
-                                <div class="col-12 col-md-6">
-                                    <label for="withdrawal_method" class="form-label fw-medium text-dark">Bank / Method</label>
-                                    <select name="withdrawal_method" id="withdrawal_method" class="form-select bg-light border-light @error('withdrawal_method') is-invalid @enderror" required>
-                                        <option value="">Select Bank</option>
-                                        <option value="BCA" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'BCA') ? 'selected' : '' }}>BCA</option>
-                                        <option value="Mandiri" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'Mandiri') ? 'selected' : '' }}>Mandiri</option>
-                                        <option value="BNI" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'BNI') ? 'selected' : '' }}>BNI</option>
-                                        <option value="BRI" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'BRI') ? 'selected' : '' }}>BRI</option>
-                                        <option value="BSI" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'BSI') ? 'selected' : '' }}>BSI</option>
-                                        <option value="OVO" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'OVO') ? 'selected' : '' }}>OVO</option>
-                                        <option value="GoPay" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'GoPay') ? 'selected' : '' }}>GoPay</option>
-                                        <option value="Dana" {{ (old('withdrawal_method', $bankAccount['bank_name'] ?? '') == 'Dana') ? 'selected' : '' }}>Dana</option>
-                                    </select>
-                                    @error('withdrawal_method')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <!-- Account Number -->
-                                <div class="col-12 col-md-6">
-                                    <label for="account_number" class="form-label fw-medium text-dark">Account Number</label>
-                                    <input type="text" name="account_number" id="account_number" 
-                                        class="form-control bg-light border-light @error('account_number') is-invalid @enderror" 
-                                        value="{{ old('account_number', $bankAccount['account_number'] ?? '') }}" 
-                                        placeholder="e.g. 1234567890" required>
-                                    @error('account_number')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <!-- Account Name -->
-                                <div class="col-12">
-                                    <label for="account_name" class="form-label fw-medium text-dark">Account Holder Name</label>
-                                    <input type="text" name="account_name" id="account_name" 
-                                        class="form-control bg-light border-light @error('account_name') is-invalid @enderror" 
-                                        value="{{ old('account_name', $bankAccount['account_name'] ?? '') }}" 
-                                        placeholder="Name matching the bank account" required>
-                                    @error('account_name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <div class="form-text mt-2 text-secondary fs-7">
-                                        Transfers will fail if the name doesn't match the account holder.
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
+        {{-- Right: Actions & Rules --}}
+        <div>
+            <div class="portal-card mb-6">
+                <div class="portal-card-header">
+                    <div class="portal-card-title">
+                        <i class="fa-solid fa-paper-plane" style="color:var(--primary);"></i>
+                        Confirm Payout
                     </div>
                 </div>
 
-                <div class="col-12 col-lg-4">
-                    <div class="card border-0 shadow-sm rounded-4 glass h-100">
-                        <div class="card-header bg-transparent border-bottom border-light p-4">
-                            <h5 class="fw-bold mb-0 text-dark">Actions</h5>
-                        </div>
-                        <div class="card-body p-4 d-flex flex-column gap-3">
-                            <p class="text-secondary fs-7 mb-2">Review your withdrawal details carefully before submitting.</p>
-                            
-                            <button type="submit" class="btn btn-primary rounded-pill py-2 fw-medium hover-lift w-100" 
-                                {{ ($available_balance ?? 0) < ($min_withdrawal ?? 50000) ? 'disabled' : '' }}>
-                                Submit Request
-                            </button>
-                            
-                            <a href="javascript:history.back()" class="btn btn-light border rounded-pill py-2 fw-medium hover-lift w-100">
-                                Cancel
-                            </a>
-                            
-                            <div class="mt-4 p-3 bg-light rounded-3 border border-light d-flex gap-3">
-                                <i class="bi bi-clock-history text-primary fs-4 mt-1"></i>
-                                <div>
-                                    <h6 class="fw-bold text-dark mb-1 fs-7">Processing Time</h6>
-                                    <p class="fs-7 text-secondary mb-0">Withdrawals are typically processed within 1-2 business days.</p>
-                                </div>
-                            </div>
+                <div class="portal-card-body">
+                    <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px;">Double check your payout details before submitting.</p>
+
+                    <button type="submit" class="btn btn-p btn-lg" style="width:100%;justify-content:center;"
+                        {{ ($available_balance ?? 0) < ($min_withdrawal ?? 50000) ? 'disabled' : '' }}>
+                        <i class="fa-solid fa-paper-plane"></i> Submit Payout Request
+                    </button>
+
+                    <a href="{{ route('affiliator.withdrawals.index') }}" class="btn btn-s" style="width:100%;justify-content:center;margin-top:8px;">
+                        Cancel
+                    </a>
+
+                    <div style="margin-top:20px;padding:12px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;gap:10px;">
+                        <i class="fa-solid fa-clock-rotate-left" style="color:var(--primary);font-size:16px;margin-top:2px;"></i>
+                        <div>
+                            <div style="font-size:12px;font-weight:700;color:var(--text);">Processing Time</div>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Payout requests are audited and processed within 1-2 business days.</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
+
     </div>
+</form>
 @endsection

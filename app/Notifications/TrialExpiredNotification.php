@@ -33,10 +33,11 @@ class TrialExpiredNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $planName = $this->subscription->subscriptionPlan?->name ?? 'our service';
         return (new MailMessage)
             ->subject('Trial Period Expired')
             ->greeting('Hello!')
-            ->line("Your trial period for {$this->subscription->subscriptionPlan?->name ?? 'our service'} has expired.")
+            ->line("Your trial period for {$planName} has expired.")
             ->line("Your access to the service has been suspended.")
             ->action('Upgrade to Continue', config('app.url') . '/subscription/plans')
             ->line('Upgrade to a paid plan to restore your access and continue using all features.')

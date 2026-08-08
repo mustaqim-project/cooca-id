@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment'
+        description: "Target environment"
         required: true
-        default: 'production'
+        default: "production"
         type: choice
         options:
           - production
@@ -18,11 +18,11 @@ on:
 
 concurrency:
   group: deploy-${{ github.ref }}
-  cancel-in-progress: false  # Never cancel an in-progress deployment
+  cancel-in-progress: false # Never cancel an in-progress deployment
 
 env:
-  PHP_VERSION: '8.3'
-  NODE_VERSION: '20'
+  PHP_VERSION: "8.3"
+  NODE_VERSION: "20"
 
 jobs:
   # ──────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock") }}
           restore-keys: ${{ runner.os }}-composer-
 
       - name: 🔧 Install PHP dependencies
@@ -92,7 +92,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: "npm"
 
       - name: 📦 Install Node dependencies
         run: npm ci --ignore-scripts

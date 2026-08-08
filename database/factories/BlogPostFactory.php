@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\BlogPost;
+use App\Models\Admin;
+use App\Models\ProductCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -18,21 +20,18 @@ class BlogPostFactory extends Factory
      */
     public function definition(): array
     {
-        $title = fake()->unique()->sentence(6);
-        
+        $title = fake()->unique()->words(3, true);
+
         return [
             'id' => (string) Str::uuid(),
-            'title' => rtrim($title, '.'),
-            'slug' => Str::slug($title),
-            'excerpt' => fake()->sentence(20),
-            'content' => fake()->paragraphs(6, true),
-            'featured_image' => fake()->optional(0.7)->imageUrl(1200, 630, 'business', true),
-            'author_id' => \App\Models\User::inRandomOrder()->first()?->id ?? \App\Models\User::factory(),
+            'author_id' => Admin::inRandomOrder()->first()?->id ?? Admin::factory(),
             'category' => fake()->randomElement(['Retail', 'Restaurant', 'Hotel', 'Clinic', 'AI & Automation', 'Revenue Optimization', 'Case Studies']),
-            'tags' => ['SaaS', 'Business', 'Indonesia', 'Operations', 'Growth'],
-            'is_published' => fake()->boolean(85),
-            'published_at' => fake()->optional(0.85)->dateTimeBetween('-6 months', 'now'),
-            'views_count' => fake()->numberBetween(100, 15000),
+            'title' => $title,
+            'slug' => Str::slug($title),
+            'content' => fake()->paragraphs(5, true),
+            'featured_image' => fake()->optional(0.7)->imageUrl(1200, 630, 'business', true),
+            'is_published' => fake()->boolean(80),
+            'published_at' => fake()->optional(0.8)->dateTimeBetween('-3 months', 'now'),
         ];
     }
 
@@ -41,30 +40,9 @@ class BlogPostFactory extends Factory
      */
     public function published(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_published' => true,
-            'published_at' => now()->subDays(3),
-        ]);
-    }
-
-    /**
-     * Indicate that the blog post is a draft.
-     */
-    public function draft(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'is_published' => false,
-            'published_at' => null,
-        ]);
-    }
-
-    /**
-     * Indicate that the blog post has high views.
-     */
-    public function popular(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'views_count' => fake()->numberBetween(5000, 25000),
+            'published_at' => now()->subDays(fake()->numberBetween(1, 30)),
         ]);
     }
 }

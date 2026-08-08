@@ -36,11 +36,12 @@ class TrialExpiringSoonNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $days = $this->daysUntilExpiry;
+        $planName = $this->subscription->subscriptionPlan?->name ?? 'our service';
         
         return (new MailMessage)
             ->subject("Trial Ending Soon - {$days} Days Remaining")
             ->greeting('Hello!')
-            ->line("Your trial period for {$this->subscription->subscriptionPlan?->name ?? 'our service'} will expire in {$days} day(s).")
+            ->line("Your trial period for {$planName} will expire in {$days} day(s).")
             ->line("Don't lose access to all the features you've been enjoying!")
             ->action('Upgrade Now', config('app.url') . '/subscription/plans')
             ->line('Upgrade to a paid plan to continue using our services without interruption.')

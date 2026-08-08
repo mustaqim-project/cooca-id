@@ -1,442 +1,291 @@
-@extends('admin.layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Dashboard')
+@section('title', 'Executive Dashboard — COOCA.ID Admin')
 
 @section('content')
-    <div class="d-flex flex-column gap-4">
 
-        <!-- Welcome Header -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+{{-- PAGE HEADER --}}
+<div class="page-header">
+    <div>
+        <div class="breadcrumb">
+            <a href="#">Admin</a>
+            <span>/</span>
+            <span>Executive Dashboard</span>
+        </div>
+        <h1 class="page-title">Executive Dashboard</h1>
+        <p class="page-subtitle">Real-time SaaS operational metrics, revenue analytics, and performance intelligence.</p>
+    </div>
+    <div class="page-actions">
+        <button class="btn btn-outline btn-sm">
+            <span>📅</span> Last 30 Days
+        </button>
+        <button class="btn btn-primary btn-sm">
+            <span>⚡</span> Generate Report
+        </button>
+    </div>
+</div>
+
+{{-- KPI GRID --}}
+<div class="kpi-grid">
+    <div class="kpi-card" style="--kpi-color1: #4F46E5; --kpi-color2: #06B6D4;">
+        <div class="kpi-header">
+            <span class="kpi-label">Total Revenue</span>
+            <div class="kpi-icon" style="background: rgba(79,70,229,0.1); color: #4F46E5;">💰</div>
+        </div>
+        <div class="kpi-value">Rp {{ number_format($stats['totalRevenue'] ?? 0, 0, ',', '.') }}</div>
+        <div class="kpi-trend {{ ($stats['revenueGrowth'] ?? 0) >= 0 ? 'up' : 'down' }}">
+            <span>{{ ($stats['revenueGrowth'] ?? 0) >= 0 ? '↑' : '↓' }} {{ abs($stats['revenueGrowth'] ?? 0) }}%</span>
+            <span class="trend-label">vs last month</span>
+        </div>
+    </div>
+
+    <div class="kpi-card" style="--kpi-color1: #10B981; --kpi-color2: #34D399;">
+        <div class="kpi-header">
+            <span class="kpi-label">Monthly Revenue (MRR)</span>
+            <div class="kpi-icon" style="background: rgba(16,185,129,0.1); color: #10B981;">📈</div>
+        </div>
+        <div class="kpi-value">Rp {{ number_format($stats['monthlyRevenue'] ?? 0, 0, ',', '.') }}</div>
+        <div class="kpi-trend up">
+            <span>Today: Rp {{ number_format($stats['todayRevenue'] ?? 0, 0, ',', '.') }}</span>
+        </div>
+    </div>
+
+    <div class="kpi-card" style="--kpi-color1: #8B5CF6; --kpi-color2: #EC4899;">
+        <div class="kpi-header">
+            <span class="kpi-label">Active Customers</span>
+            <div class="kpi-icon" style="background: rgba(139,92,246,0.1); color: #8B5CF6;">👥</div>
+        </div>
+        <div class="kpi-value">{{ number_format($stats['totalCustomers'] ?? 0) }}</div>
+        <div class="kpi-trend {{ ($stats['customerGrowth'] ?? 0) >= 0 ? 'up' : 'down' }}">
+            <span>+{{ $stats['newCustomersThisMonth'] ?? 0 }} new</span>
+            <span class="trend-label">this month</span>
+        </div>
+    </div>
+
+    <div class="kpi-card" style="--kpi-color1: #F59E0B; --kpi-color2: #F97316;">
+        <div class="kpi-header">
+            <span class="kpi-label">Active Subscriptions</span>
+            <div class="kpi-icon" style="background: rgba(245,158,11,0.1); color: #F59E0B;">🔄</div>
+        </div>
+        <div class="kpi-value">{{ number_format($stats['activeSubscriptions'] ?? 0) }}</div>
+        <div class="kpi-trend up">
+            <span>{{ $stats['trialSubscriptions'] ?? 0 }} on trial</span>
+        </div>
+    </div>
+
+    <div class="kpi-card" style="--kpi-color1: #06B6D4; --kpi-color2: #3B82F6;">
+        <div class="kpi-header">
+            <span class="kpi-label">Active Licenses</span>
+            <div class="kpi-icon" style="background: rgba(6,182,212,0.1); color: #06B6D4;">🔑</div>
+        </div>
+        <div class="kpi-value">{{ number_format($stats['activeLicenses'] ?? 0) }}</div>
+        <div class="kpi-trend down">
+            <span>{{ $stats['expiredLicenses'] ?? 0 }} expired</span>
+        </div>
+    </div>
+</div>
+
+{{-- CHARTS ROW --}}
+<div class="grid-21 mb-6">
+    {{-- Revenue Growth Chart --}}
+    <div class="card">
+        <div class="card-header">
             <div>
-                <h2 class="mb-1 fw-bold">Welcome back, Admin 👋</h2>
-                <p class="text-secondary mb-0">Here's what's happening with Cooca ID today.</p>
+                <div class="card-title">Revenue Trajectory (12 Months)</div>
+                <div class="card-subtitle">Gross subscription and license transaction volume</div>
             </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-light bg-white border shadow-sm rounded-pill px-3 hover-lift text-secondary">
-                    <i class="bi bi-calendar3 me-2"></i> Last 30 Days
-                </button>
-                <button class="btn btn-primary rounded-pill px-3 hover-lift shadow-sm">
-                    <i class="bi bi-download me-2"></i> Report
-                </button>
-            </div>
+            <div class="badge badge-primary">Net Revenue</div>
         </div>
-
-        <!-- Bento Grid Stats -->
-        <div class="row g-4">
-            <!-- Stat 1 -->
-            <div class="col-12 col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="0">
-                <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift overflow-hidden position-relative glass">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="bg-primary-subtle text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-currency-dollar fs-4"></i>
-                            </div>
-                            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1"><i
-                                    class="bi bi-arrow-up-short"></i> {{ $stats['revenueGrowth'] ?? 0 }}%</span>
-                        </div>
-                        <div class="text-secondary mb-1 fw-medium">Total Revenue</div>
-                        <h3 class="fw-bold mb-0">Rp {{ number_format($stats['totalRevenue'] ?? 0, 0, ',', '.') }}</h3>
-                        <div class="text-secondary mt-1" style="font-size: 0.75rem;">
-                            {{ number_format($stats['todayRevenue'] ?? 0, 0, ',', '.') }} today</div>
-                    </div>
-                    <div class="position-absolute bottom-0 start-0 w-100"
-                        style="height: 40px; background: linear-gradient(to top, rgba(var(--color-primary-rgb), 0.05), transparent);">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stat 2 -->
-            <div class="col-12 col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="100">
-                <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift overflow-hidden position-relative glass">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="bg-success-subtle text-success rounded-circle p-2 d-flex align-items-center justify-content-center"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-arrow-repeat fs-4"></i>
-                            </div>
-                            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1"><i
-                                    class="bi bi-arrow-up-short"></i> {{ $stats['newSubscriptionsThisMonth'] ?? 0 }}
-                                New</span>
-                        </div>
-                        <div class="text-secondary mb-1 fw-medium">Active Subscriptions</div>
-                        <h3 class="fw-bold mb-0">{{ number_format($stats['activeSubscriptions'] ?? 0) }}</h3>
-                        <div class="text-secondary mt-1" style="font-size: 0.75rem;">{{ $stats['totalSubscriptions'] ?? 0 }}
-                            total · {{ $stats['expiredSubscriptions'] ?? 0 }} expired</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stat 3 -->
-            <div class="col-12 col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="200">
-                <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift overflow-hidden position-relative glass">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="bg-warning-subtle text-warning rounded-circle p-2 d-flex align-items-center justify-content-center"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-hdd-network fs-4"></i>
-                            </div>
-                            <span
-                                class="badge bg-{{ $stats['pendingTransactions'] > 0 ? 'danger' : 'success' }}-subtle text-{{ $stats['pendingTransactions'] > 0 ? 'danger' : 'success' }} rounded-pill px-2 py-1">{{ $stats['pendingTransactions'] ?? 0 }}
-                                Pending</span>
-                        </div>
-                        <div class="text-secondary mb-1 fw-medium">Active Licenses</div>
-                        <h3 class="fw-bold mb-0">{{ number_format($stats['activeLicenses'] ?? 0) }}</h3>
-                        <div class="text-secondary mt-1" style="font-size: 0.75rem;">{{ $stats['totalLicenses'] ?? 0 }}
-                            total · {{ $stats['expiredLicenses'] ?? 0 }} expired</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stat 4 -->
-            <div class="col-12 col-sm-6 col-xl-3" data-aos="fade-up" data-aos-delay="300">
-                <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift overflow-hidden position-relative glass">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="bg-info-subtle text-info rounded-circle p-2 d-flex align-items-center justify-content-center"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-people fs-4"></i>
-                            </div>
-                            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1"><i
-                                    class="bi bi-arrow-up-short"></i> {{ $stats['customerGrowth'] ?? 0 }}%</span>
-                        </div>
-                        <div class="text-secondary mb-1 fw-medium">Total Customers</div>
-                        <h3 class="fw-bold mb-0">{{ number_format($stats['totalCustomers'] ?? 0) }}</h3>
-                        <div class="text-secondary mt-1" style="font-size: 0.75rem;">
-                            {{ $stats['newCustomersThisMonth'] ?? 0 }} new this month</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="row g-4">
-            <div class="col-12 col-xl-8" data-aos="fade-up" data-aos-delay="400">
-                <div class="card border-0 shadow-sm rounded-4 h-100 glass">
-                    <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold">Revenue Overview</h5>
-                        <button class="btn btn-sm btn-light rounded-pill"><i class="bi bi-three-dots"></i></button>
-                    </div>
-                    <div class="card-body px-4 pb-4 pt-0">
-                        <div id="revenueChart" style="min-height: 300px;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 col-xl-4" data-aos="fade-up" data-aos-delay="500">
-                <div class="card border-0 shadow-sm rounded-4 h-100 glass">
-                    <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold">Products Traffic</h5>
-                    </div>
-                    <div class="card-body px-4 pb-4 pt-0 d-flex justify-content-center align-items-center">
-                        <div id="trafficChart" style="min-height: 300px;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Lists Section -->
-        <div class="row g-4 pb-4">
-            <!-- Recent ERP Requests -->
-            <div class="col-12 col-lg-6" data-aos="fade-up" data-aos-delay="600">
-                <div class="card border-0 shadow-sm rounded-4 h-100 glass overflow-hidden">
-                    <div
-                        class="card-header bg-transparent border-bottom border-light p-4 d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold">Recent ERP Requests</h5>
-                        <a href="{{ route('admin.erp-requests.index') }}"
-                            class="btn btn-sm btn-link text-decoration-none">View All</a>
-                    </div>
-                    <div class="list-group list-group-flush border-0">
-                        @forelse($recentErpRequests ?? [] as $req)
-                            @php
-                                $statusMap = [
-                                    'pending' => [
-                                        'class' => 'warning',
-                                        'text' => 'warning',
-                                        'icon' => 'hourglass-split',
-                                        'label' => 'Pending',
-                                    ],
-                                    'approved' => [
-                                        'class' => 'info',
-                                        'text' => 'info',
-                                        'icon' => 'check2-circle',
-                                        'label' => 'Approved',
-                                    ],
-                                    'rejected' => [
-                                        'class' => 'danger',
-                                        'text' => 'danger',
-                                        'icon' => 'x-circle',
-                                        'label' => 'Rejected',
-                                    ],
-                                    'waiting_setup' => [
-                                        'class' => 'primary',
-                                        'text' => 'primary',
-                                        'icon' => 'gear',
-                                        'label' => 'Waiting Setup',
-                                    ],
-                                    'in_setup' => [
-                                        'class' => 'primary',
-                                        'text' => 'primary',
-                                        'icon' => 'gear',
-                                        'label' => 'In Setup',
-                                    ],
-                                    'domain_setup' => [
-                                        'class' => 'info',
-                                        'text' => 'info',
-                                        'icon' => 'globe',
-                                        'label' => 'Domain Setup',
-                                    ],
-                                    'testing' => [
-                                        'class' => 'warning',
-                                        'text' => 'warning',
-                                        'icon' => 'bug',
-                                        'label' => 'Testing',
-                                    ],
-                                    'ready' => [
-                                        'class' => 'success',
-                                        'text' => 'success',
-                                        'icon' => 'check2-all',
-                                        'label' => 'Ready',
-                                    ],
-                                ];
-                                $s = $statusMap[$req->status] ?? [
-                                    'class' => 'secondary',
-                                    'text' => 'secondary',
-                                    'icon' => 'circle',
-                                    'label' => ucfirst($req->status),
-                                ];
-                            @endphp
-                            <div
-                                class="list-group-item bg-transparent p-4 border-light d-flex align-items-center gap-3 hover-lift">
-                                <div class="bg-{{ $s['class'] }}-subtle text-{{ $s['text'] }} rounded-circle p-2"
-                                    style="width: 40px; height: 40px; display: grid; place-items: center;"><i
-                                        class="bi bi-{{ $s['icon'] }}"></i></div>
-                                <div class="flex-grow-1">
-                                    <div class="fw-medium">
-                                        {{ $req->customer?->name ?? 'Customer #' . $req->customer_id }}</div>
-                                    <div class="text-secondary" style="font-size: 0.8rem;">
-                                        {{ $req->notes ?? 'ERP Request' }}</div>
-                                </div>
-                                <span
-                                    class="badge bg-{{ $s['class'] }} {{ $s['class'] === 'warning' || $s['class'] === 'light' ? 'text-dark' : '' }} rounded-pill">{{ $s['label'] }}</span>
-                            </div>
-                        @empty
-                            <div class="list-group-item bg-transparent p-4 border-light text-center text-secondary">
-                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                <span>No recent ERP requests</span>
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
-            </div>
-
-            <!-- System Status/Timeline -->
-            <div class="col-12 col-lg-6" data-aos="fade-up" data-aos-delay="700">
-                <div class="card border-0 shadow-sm rounded-4 h-100 glass">
-                    <div class="card-header bg-transparent border-bottom border-light p-4">
-                        <h5 class="mb-0 fw-semibold">Recent Activity</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        @forelse($recentTransactions ?? [] as $tx)
-                            @php
-                                $colorMap = [
-                                    'paid' => 'success',
-                                    'pending' => 'warning',
-                                    'failed' => 'danger',
-                                    'refunded' => 'info',
-                                ];
-                                $iconMap = [
-                                    'paid' => 'check2-all',
-                                    'pending' => 'hourglass-split',
-                                    'failed' => 'x-circle',
-                                    'refunded' => 'arrow-counterclockwise',
-                                ];
-                                $c = $colorMap[$tx->status] ?? 'primary';
-                                $i = $iconMap[$tx->status] ?? 'circle';
-                            @endphp
-                            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom border-light">
-                                <div class="bg-{{ $c }}-subtle text-{{ $c }} rounded-circle p-2"
-                                    style="width: 40px; height: 40px; display: grid; place-items: center; flex-shrink: 0;">
-                                    <i class="bi bi-{{ $i }}"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="fw-medium">{{ $tx->customer?->name ?? 'Customer #' . $tx->customer_id }}
-                                    </div>
-                                    <div class="text-secondary" style="font-size: 0.8rem;">
-                                        {{ ucfirst($tx->status) }} - Rp
-                                        {{ number_format($tx->net_amount ?? ($tx->gross_amount ?? 0), 0, ',', '.') }}
-                                    </div>
-                                </div>
-                                <div class="text-muted" style="font-size: 0.75rem;">
-                                    {{ $tx->created_at ? $tx->created_at->diffForHumans() : '' }}</div>
-                            </div>
-                        @empty
-                            <div class="text-center text-secondary py-4">
-                                <i class="bi bi-activity fs-2 d-block mb-2"></i>
-                                <span>No recent activity</span>
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
+        <div class="card-body">
+            <div class="chart-container">
+                <canvas id="revenueChart" height="240"></canvas>
             </div>
         </div>
     </div>
+
+    {{-- Subscription Plan Distribution --}}
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <div class="card-title">Plan Distribution</div>
+                <div class="card-subtitle">Active subscriptions by tier</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="chart-container">
+                <canvas id="planChart" height="240"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- TABLES ROW --}}
+<div class="grid-21 mb-6">
+    {{-- Recent Transactions --}}
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <div class="card-title">Recent Transactions</div>
+                <div class="card-subtitle">Latest payments processed across payment gateways</div>
+            </div>
+            <a href="{{ route('admin.transactions.index') }}" class="btn btn-ghost btn-sm">View All →</a>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Invoice / Customer</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($recentTransactions as $tx)
+                            <tr>
+                                <td>
+                                    <div class="font-semibold">{{ $tx->reference ?? ('TX-'.$tx->id) }}</div>
+                                    <div class="text-xs text-muted">{{ $tx->customer->name ?? $tx->customer->email ?? 'Guest' }}</div>
+                                </td>
+                                <td class="font-bold">Rp {{ number_format($tx->amount ?? $tx->net_amount ?? 0, 0, ',', '.') }}</td>
+                                <td>
+                                    @if(($tx->status ?? '') === 'paid')
+                                        <span class="badge badge-success">PAID</span>
+                                    @elseif(($tx->status ?? '') === 'pending')
+                                        <span class="badge badge-warning">PENDING</span>
+                                    @else
+                                        <span class="badge badge-danger">{{ strtoupper($tx->status ?? 'FAILED') }}</span>
+                                    @endif
+                                </td>
+                                <td class="text-xs text-muted">{{ optional($tx->created_at)->format('d M H:i') }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center text-muted" style="padding: 24px;">No transactions recorded yet.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {{-- Affiliate Withdrawals --}}
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <div class="card-title">Withdrawal Requests</div>
+                <div class="card-subtitle">Pending partner settlements</div>
+            </div>
+            <a href="{{ route('admin.settlements.index') }}" class="btn btn-ghost btn-sm">Manage →</a>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Partner</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($recentWithdrawals as $withdrawal)
+                            <tr>
+                                <td>
+                                    <div class="font-semibold text-sm">{{ $withdrawal->affiliator->name ?? 'Partner' }}</div>
+                                    <div class="text-xs text-muted">{{ $withdrawal->bank_name }}</div>
+                                </td>
+                                <td class="font-bold text-sm">Rp {{ number_format($withdrawal->amount ?? 0, 0, ',', '.') }}</td>
+                                <td>
+                                    @if($withdrawal->status === 'approved')
+                                        <span class="badge badge-success">Approved</span>
+                                    @elseif($withdrawal->status === 'pending')
+                                        <span class="badge badge-warning">Pending</span>
+                                    @else
+                                        <span class="badge badge-danger">Rejected</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="text-center text-muted" style="padding: 20px;">No withdrawal requests.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary')
-                .trim();
-            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent')
-                .trim();
-            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-secondary')
-                .trim();
-            const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim();
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Revenue Line Chart
+    const revCtx = document.getElementById('revenueChart').getContext('2d');
+    const revenueData = @json($revenueChartData);
 
-            // Revenue Chart (Area) - Real data from controller
-            const revenueMonths = @json(array_column($revenueChartData ?? [], 'month'));
-            const revenueValues = @json(array_column($revenueChartData ?? [], 'revenue'));
-
-            const revenueOptions = {
-                series: [{
-                    name: 'Revenue',
-                    data: revenueValues
-                }],
-                chart: {
-                    type: 'area',
-                    height: 300,
-                    toolbar: {
-                        show: false
-                    },
-                    background: 'transparent',
-                    fontFamily: 'inherit',
-                    animations: {
-                        enabled: true,
-                        easing: 'easeinout',
-                        speed: 800
-                    }
-                },
-                colors: [accentColor],
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.4,
-                        opacityTo: 0.05,
-                        stops: [0, 100]
-                    }
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    curve: 'smooth',
-                    width: 3
-                },
-                xaxis: {
-                    categories: revenueMonths,
-                    axisBorder: {
-                        show: false
-                    },
-                    axisTicks: {
-                        show: false
-                    },
-                    labels: {
-                        style: {
-                            colors: textColor
+    new Chart(revCtx, {
+        type: 'line',
+        data: {
+            labels: revenueData.map(d => d.month),
+            datasets: [{
+                label: 'Revenue (IDR)',
+                data: revenueData.map(d => d.revenue),
+                borderColor: '#4F46E5',
+                backgroundColor: 'rgba(79, 70, 229, 0.08)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#4F46E5',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: {
+                    grid: { color: 'rgba(226, 232, 240, 0.5)' },
+                    ticks: {
+                        callback: function(val) {
+                            return 'Rp ' + (val / 1000000).toFixed(1) + 'M';
                         }
                     }
-                },
-                yaxis: {
-                    labels: {
-                        style: {
-                            colors: textColor
-                        },
-                        formatter: (value) => 'Rp ' + (value / 1000).toFixed(0) + 'k'
-                    }
-                },
-                grid: {
-                    borderColor: gridColor,
-                    strokeDashArray: 4,
-                    yaxis: {
-                        lines: {
-                            show: true
-                        }
-                    }
-                },
-                theme: {
-                    mode: document.documentElement.getAttribute('data-theme') || 'light'
                 }
-            };
+            }
+        }
+    });
 
-            const revenueChart = new ApexCharts(document.querySelector("#revenueChart"), revenueOptions);
-            revenueChart.render();
+    // Plan Donut Chart
+    const planCtx = document.getElementById('planChart').getContext('2d');
+    const planDist = @json($subscriptionPlanDist);
 
-            // Traffic Chart (Donut) - Real data from controller
-            const txStatus = @json($transactionStatusBreakdown ?? []);
-            const txLabels = Object.keys(txStatus).map(k => k.charAt(0).toUpperCase() + k.slice(1));
-            const txValues = Object.values(txStatus);
-
-            const trafficOptions = {
-                series: txValues.length ? txValues : [1],
-                chart: {
-                    type: 'donut',
-                    height: 300,
-                    background: 'transparent',
-                    fontFamily: 'inherit',
-                    animations: {
-                        enabled: true,
-                        easing: 'easeinout',
-                        speed: 800
-                    }
-                },
-                labels: txLabels.length ? txLabels : ['No Data'],
-                colors: ['#10b981', '#f59e0b', '#ef4444', '#6b7280'],
-                plotOptions: {
-                    pie: {
-                        donut: {
-                            size: '75%'
-                        },
-                        expandOnClick: false
-                    }
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    width: 0
-                },
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        colors: textColor
-                    }
-                },
-                theme: {
-                    mode: document.documentElement.getAttribute('data-theme') || 'light'
-                }
-            };
-
-            const trafficChart = new ApexCharts(document.querySelector("#trafficChart"), trafficOptions);
-            trafficChart.render();
-
-            // Listen for theme change to update charts
-            document.getElementById('theme-toggle')?.addEventListener('click', () => {
-                setTimeout(() => {
-                    const currentTheme = document.documentElement.getAttribute('data-theme');
-                    revenueChart.updateOptions({
-                        theme: {
-                            mode: currentTheme
-                        }
-                    });
-                    trafficChart.updateOptions({
-                        theme: {
-                            mode: currentTheme
-                        }
-                    });
-                }, 100);
-            });
-        });
-    </script>
+    new Chart(planCtx, {
+        type: 'doughnut',
+        data: {
+            labels: planDist.length ? planDist.map(d => d.name) : ['Starter', 'Professional', 'Enterprise'],
+            datasets: [{
+                data: planDist.length ? planDist.map(d => d.count) : [45, 30, 25],
+                backgroundColor: ['#4F46E5', '#06B6D4', '#10B981', '#F59E0B', '#8B5CF6'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+            },
+            cutout: '70%'
+        }
+    });
+});
+</script>
 @endpush

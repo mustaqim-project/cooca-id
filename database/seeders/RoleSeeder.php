@@ -1,25 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
-class RoleSeeder extends Seeder
+final class RoleSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create roles
-        Role::firstOrCreate(['name' => 'super_admin']);
-        Role::firstOrCreate(['name' => 'admin']);
-        Role::firstOrCreate(['name' => 'customer']);
-        Role::firstOrCreate(['name' => 'affiliator']);
+        // Guards: admin, customer, affiliator
+        $guards = ['admin', 'customer', 'affiliator'];
+
+        $rolesByGuard = [
+            'admin' => ['super_admin', 'admin', 'support_admin', 'finance_admin'],
+            'customer' => ['customer', 'customer_manager', 'customer_staff'],
+            'affiliator' => ['affiliator', 'top_affiliator'],
+        ];
+
+        foreach ($rolesByGuard as $guard => $roles) {
+            foreach ($roles as $roleName) {
+                Role::firstOrCreate(['name' => $roleName, 'guard_name' => $guard]);
+            }
+        }
+
+        echo "✅ Roles Spatie RBAC successfully seeded.\n";
     }
 }

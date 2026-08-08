@@ -15,7 +15,7 @@ final class ReviewPolicy
         return true;
     }
 
-    public function view(Admin|Customer|Customer $user, Review $review): bool
+    public function view(Admin|Affiliator|Customer $user, Review $review): bool
     {
         if ($user instanceof Admin) {
             return true;
@@ -32,7 +32,7 @@ final class ReviewPolicy
         return false;
     }
 
-    public function create(Customer|Customer $user): bool
+    public function create(Customer $user): bool
     {
         return true;
     }
@@ -47,7 +47,7 @@ final class ReviewPolicy
         return true;
     }
 
-    public function delete(Admin|Customer|Customer $user, Review $review): bool
+    public function delete(Admin|Affiliator|Customer $user, Review $review): bool
     {
         if ($user instanceof Admin) {
             return true;

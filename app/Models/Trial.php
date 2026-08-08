@@ -37,7 +37,7 @@ final class Trial extends Model
     protected $table = 'trials';
 
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'erp_product_id',
         'subscription_plan_id',
         'subdomain',

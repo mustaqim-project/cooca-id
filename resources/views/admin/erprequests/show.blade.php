@@ -1,250 +1,158 @@
-@extends('admin.layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'ERP Request Details')
+@section('title', 'Detail Pengajuan ERP — COOCA.ID Admin')
 
 @section('content')
-    <div class="d-flex flex-column gap-4">
+<div class="page-header" style="margin-bottom: 24px;">
+    <div>
+        <div class="breadcrumb" style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748B; margin-bottom: 8px;">
+            <a href="{{ route('admin.dashboard') }}" style="color: #4F46E5; text-decoration: none;">Admin</a>
+            <span>/</span>
+            <a href="{{ route('admin.erp-requests.index') }}" style="color: #4F46E5; text-decoration: none;">Pengajuan ERP</a>
+            <span>/</span>
+            <span>Detail #{{ substr($request->id, 0, 8) }}</span>
+        </div>
+        <h1 style="font-size: 24px; font-weight: 800; color: #1E293B; margin: 0;">
+            Detail Pengajuan ERP — {{ $request->customer->name ?? 'Customer' }}
+        </h1>
+    </div>
+</div>
 
-        <!-- Header & Action Toolbar -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <a href="{{ route('admin.erp-requests.index') }}"
-                    class="btn btn-light border-0 rounded-circle p-2 shadow-sm hover-lift"><i
-                        class="bi bi-arrow-left"></i></a>
-                <div>
-                    <h2 class="mb-1 fw-bold">ERP Request #{{ $request->id ?? '001' }}</h2>
-                    <p class="text-secondary mb-0">Manage customer ERP setup workflow and status transitions.</p>
+@if(session('success'))
+    <div style="background: #DEF7EC; border: 1px solid #31C48D; color: #03543F; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: 600;">
+        <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
+    </div>
+@endif
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+    {{-- Left Main Detail --}}
+    <div style="background: white; border-radius: 16px; border: 1px solid #E2E8F0; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+        <h3 style="font-size: 16px; font-weight: 800; color: #1E293B; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 12px;">
+            Informasi Instansi & Pemohon
+        </h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 13px;">
+            <div>
+                <div style="color: #64748B; font-weight: 600; font-size: 11px; text-transform: uppercase;">Nama Customer</div>
+                <div style="font-weight: 700; color: #1E293B; margin-top: 4px;">{{ $request->customer->name ?? '-' }}</div>
+            </div>
+            <div>
+                <div style="color: #64748B; font-weight: 600; font-size: 11px; text-transform: uppercase;">Email Customer</div>
+                <div style="font-weight: 700; color: #1E293B; margin-top: 4px;">{{ $request->customer->email ?? '-' }}</div>
+            </div>
+            <div>
+                <div style="color: #64748B; font-weight: 600; font-size: 11px; text-transform: uppercase;">Produk ERP</div>
+                <div style="font-weight: 700; color: #4F46E5; margin-top: 4px;">{{ $request->product->name ?? '-' }}</div>
+            </div>
+            <div>
+                <div style="color: #64748B; font-weight: 600; font-size: 11px; text-transform: uppercase;">Nomor WA</div>
+                <div style="font-weight: 700; color: #059669; margin-top: 4px;">+{{ $request->customer->phone ?? '-' }}</div>
+            </div>
+            <div>
+                <div style="color: #64748B; font-weight: 600; font-size: 11px; text-transform: uppercase;">Subdomain Yang Diminta</div>
+                <div style="font-weight: 700; color: #1E293B; margin-top: 4px;">
+                    {{ $request->requested_subdomain ? $request->requested_subdomain . '.cooca.id' : '-' }}
                 </div>
             </div>
-            <div class="d-flex flex-wrap gap-2">
-                <!-- Dynamic Actions based on ErpRequest Status -->
-                <form action="{{ route('admin.erp-requests.mark-waiting-setup', $request->id) }}" method="POST"
-                    class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-warning rounded-pill px-4 hover-lift shadow-sm">
-                        <i class="bi bi-hourglass-split me-2"></i> Mark Waiting Setup
-                    </button>
-                </form>
-                <form action="{{ route('admin.erp-requests.mark-in-setup', $request->id) }}" method="POST"
-                    class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-info rounded-pill px-4 hover-lift shadow-sm text-white">
-                        <i class="bi bi-gear-wide-connected me-2"></i> Mark In Setup
-                    </button>
-                </form>
-                <form action="{{ route('admin.erp-requests.mark-domain-setup', $request->id) }}" method="POST"
-                    class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
-                        <i class="bi bi-globe me-2"></i> Mark Domain Setup
-                    </button>
-                </form>
-                <form action="{{ route('admin.erp-requests.mark-testing', $request->id) }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-secondary rounded-pill px-4 hover-lift shadow-sm">
-                        <i class="bi bi-bug me-2"></i> Mark Testing
-                    </button>
-                </form>
-                <button type="button" class="btn btn-success rounded-pill px-4 hover-lift shadow-sm" data-bs-toggle="modal"
-                    data-bs-target="#confirmReadyModal">
-                    <i class="bi bi-check-circle me-2"></i> Confirm Ready & Activate Trial
-                </button>
+            <div>
+                <div style="color: #64748B; font-weight: 600; font-size: 11px; text-transform: uppercase;">Custom Domain</div>
+                <div style="font-weight: 700; color: #1E293B; margin-top: 4px;">
+                    {{ $request->requested_domain ?? '-' }}
+                </div>
             </div>
         </div>
 
-        <!-- Main Content Grid -->
-        <div class="row g-4">
-            <!-- Sidebar Customer Info -->
-            <div class="col-12 col-xl-4">
-                <div class="card border-0 shadow-sm rounded-4 glass p-4 h-100">
-                    <div class="d-flex align-items-center gap-3 mb-4">
-                        <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold fs-4"
-                            style="width: 60px; height: 60px;">
-                            <i class="bi bi-person"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-0">{{ $request->customer->name ?? 'John Doe' }}</h5>
-                            <p class="text-secondary fs-7 mb-0">{{ $request->customer->email ?? 'customer@example.com' }}
-                            </p>
-                        </div>
-                    </div>
+        @if($request->notes)
+            <div style="margin-top: 20px; padding: 12px; background: #F8FAFC; border-radius: 10px; border: 1px solid #E2E8F0;">
+                <div style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 4px;">Catatan Pemohon:</div>
+                <div style="font-size: 13px; color: #334155;">{{ $request->notes }}</div>
+            </div>
+        @endif
 
-                    <div class="d-flex flex-column gap-3 fs-7">
-                        <div class="d-flex justify-content-between">
-                            <span class="text-secondary">Status</span>
-                            <span
-                                class="badge bg-primary-subtle text-primary border rounded-pill px-3 py-1">{{ $request->status ?? 'Pending Approval' }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="text-secondary">Product Requested</span>
-                            <span class="fw-medium">{{ $request->product->name ?? 'Odoo Enterprise' }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="text-secondary">Affiliator Partner</span>
-                            <span class="fw-medium">{{ $request->affiliator->name ?? 'Direct' }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="text-secondary">Approved By</span>
-                            <span class="fw-medium">{{ $request->approvedBy->name ?? 'Pending' }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="text-secondary">Submitted At</span>
-                            <span
-                                class="fw-medium">{{ $request->created_at ?? null ? $request->created_at->format('M d, Y H:i') : 'Oct 15, 2026' }}</span>
-                        </div>
-                    </div>
+        @if($request->admin_notes)
+            <div style="margin-top: 12px; padding: 12px; background: #FEF3C7; border-radius: 10px; border: 1px solid #FCD34D;">
+                <div style="font-size: 11px; font-weight: 700; color: #92400E; text-transform: uppercase; margin-bottom: 4px;">Catatan Admin:</div>
+                <div style="font-size: 13px; color: #78350F;">{{ $request->admin_notes }}</div>
+            </div>
+        @endif
+    </div>
 
-                    <hr class="border-light my-4">
+    {{-- Right Actions & Status Panel --}}
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="background: white; border-radius: 16px; border: 1px solid #E2E8F0; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+            <h4 style="font-size: 14px; font-weight: 800; color: #1E293B; margin-bottom: 12px;">Status Pengajuan</h4>
+            
+            @php
+                $labels = \App\Models\ErpRequest::getStatusLabels();
+            @endphp
+            <div style="font-size: 16px; font-weight: 800; color: #4F46E5; margin-bottom: 16px;">
+                {{ $labels[$request->status] ?? strtoupper($request->status) }}
+            </div>
 
-                    <!-- Approve / Reject Actions -->
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-outline-success rounded-pill flex-grow-1" data-bs-toggle="modal"
-                            data-bs-target="#approveModal">
-                            <i class="bi bi-check-lg me-1"></i> Approve
+            @if($request->approvedBy)
+                <div style="font-size: 12px; color: #64748B; margin-bottom: 16px;">
+                    Disetujui oleh: <strong>{{ $request->approvedBy->name ?? 'Admin' }}</strong><br>
+                    Waktu: {{ $request->approved_at ? $request->approved_at->translatedFormat('d M Y, H:i') : '-' }}
+                </div>
+            @endif
+
+            {{-- Action Buttons --}}
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                @if(in_array($request->status, ['submitted', 'waiting_approval']))
+                    <form action="{{ route('admin.erp-requests.approve', $request->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" style="width: 100%; background: #10B981; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer;">
+                            <i class="fa-solid fa-check"></i> Setujui Pengajuan ERP
                         </button>
-                        <button class="btn btn-outline-danger rounded-pill flex-grow-1" data-bs-toggle="modal"
-                            data-bs-target="#rejectModal">
-                            <i class="bi bi-x-lg me-1"></i> Reject
+                    </form>
+
+                    <form action="{{ route('admin.erp-requests.reject', $request->id) }}" method="POST" style="margin-top: 6px;">
+                        @csrf
+                        <input type="hidden" name="rejection_reason" value="Tidak memenuhi syarat deployment">
+                        <button type="submit" onclick="return confirm('Apakah Anda yakin ingin menolak pengajuan ini?')" style="width: 100%; background: #EF4444; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer;">
+                            <i class="fa-solid fa-xmark"></i> Tolak Pengajuan
                         </button>
-                    </div>
-                </div>
-            </div>
+                    </form>
+                @endif
 
-            <!-- Details & Setup Info -->
-            <div class="col-12 col-xl-8">
-                <div class="card border-0 shadow-sm rounded-4 glass h-100">
-                    <div class="card-header bg-transparent border-bottom border-light p-4">
-                        <h5 class="fw-bold mb-0">Workflow & Setup Configuration</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="row g-4">
-                            <div class="col-12">
-                                <label class="text-secondary fs-7 mb-1 d-block">Admin Notes / Rejection Reason</label>
-                                <div class="p-3 bg-light rounded-3 border">
-                                    {{ $request->admin_notes ?? 'No specific admin notes or rejection notes attached to this ERP request yet.' }}
-                                </div>
-                            </div>
+                @if($request->status === 'waiting_setup')
+                    <form action="{{ route('admin.erp-requests.mark-in-setup', $request->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" style="width: 100%; background: #0284C7; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer;">
+                            <i class="fa-solid fa-gears"></i> Mulai Proses Setup Instansi
+                        </button>
+                    </form>
+                @endif
 
-                            <div class="col-12">
-                                <h6 class="fw-bold mt-2 mb-3"><i class="bi bi-globe me-2 text-primary"></i> Requested
-                                    Domains</h6>
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-borderless align-middle mb-0">
-                                        <thead class="bg-light text-secondary text-uppercase fs-7">
-                                            <tr>
-                                                <th class="py-2 px-3">Domain Name</th>
-                                                <th class="py-2 px-3">Type</th>
-                                                <th class="py-2 px-3 text-end">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="py-2 px-3 fw-medium">customer-app.cooca.id</td>
-                                                <td class="py-2 px-3 text-secondary">Subdomain</td>
-                                                <td class="py-2 px-3 text-end"><span
-                                                        class="badge bg-success-subtle text-success border rounded-pill">Active</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @if($request->status === 'in_setup')
+                    <form action="{{ route('admin.erp-requests.mark-domain-setup', $request->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" style="width: 100%; background: #0284C7; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer;">
+                            <i class="fa-solid fa-globe"></i> Konfigurasi Domain
+                        </button>
+                    </form>
+                @endif
+
+                @if($request->status === 'domain_setup')
+                    <form action="{{ route('admin.erp-requests.mark-testing', $request->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" style="width: 100%; background: #0284C7; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer;">
+                            <i class="fa-solid fa-vial"></i> Pengujian / Testing
+                        </button>
+                    </form>
+                @endif
+
+                @if($request->status === 'testing')
+                    <form action="{{ route('admin.erp-requests.confirm-ready', $request->id) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="trial_days" value="14">
+                        <button type="submit" style="width: 100%; background: #6366F1; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer;">
+                            <i class="fa-solid fa-rocket"></i> Aktivasi Trial & Terbitkan Lisensi
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
     </div>
-
-    <!-- Modal: Approve Request -->
-    <div class="modal fade" id="approveModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content glass border-0 rounded-4 shadow-lg overflow-hidden">
-                <div class="modal-header border-bottom p-4 bg-light">
-                    <h5 class="modal-title fw-bold">Approve ERP Request</h5>
-                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <form action="{{ route('admin.erp-requests.approve', $request->id) }}" method="POST">
-                    @csrf
-                    <div class="modal-body p-4">
-                        <div class="form-floating">
-                            <textarea class="form-control rounded-3 shadow-none border bg-transparent" id="admin_notes" name="admin_notes"
-                                placeholder="Notes" style="height: 100px"></textarea>
-                            <label for="admin_notes">Optional Admin Notes</label>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-top p-3 bg-light d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-light border rounded-pill px-4"
-                            data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success rounded-pill px-4 shadow-sm hover-lift"><i
-                                class="bi bi-check-lg me-2"></i> Confirm Approve</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Reject Request -->
-    <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content glass border-0 rounded-4 shadow-lg overflow-hidden">
-                <div class="modal-header border-bottom p-4 bg-light">
-                    <h5 class="modal-title fw-bold text-danger">Reject ERP Request</h5>
-                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <form action="{{ route('admin.erp-requests.reject', $request->id) }}" method="POST">
-                    @csrf
-                    <div class="modal-body p-4">
-                        <div class="form-floating">
-                            <textarea class="form-control rounded-3 shadow-none border bg-transparent" id="rejection_reason"
-                                name="rejection_reason" placeholder="Reason" style="height: 100px" required></textarea>
-                            <label for="rejection_reason">Rejection Reason (Required)</label>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-top p-3 bg-light d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-light border rounded-pill px-4"
-                            data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm hover-lift"><i
-                                class="bi bi-x-lg me-2"></i> Confirm Reject</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Confirm Ready & Activate Trial -->
-    <div class="modal fade" id="confirmReadyModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content glass border-0 rounded-4 shadow-lg overflow-hidden">
-                <div class="modal-header border-bottom p-4 bg-light">
-                    <h5 class="modal-title fw-bold text-success">Activate Trial & Confirm Ready</h5>
-                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <form action="{{ route('admin.erp-requests.confirm-ready', $request->id) }}" method="POST">
-                    @csrf
-                    <div class="modal-body p-4">
-                        <div class="form-floating mb-3">
-                            <input type="number" class="form-control rounded-3 shadow-none border bg-transparent"
-                                id="trial_days" name="trial_days" value="14" min="1" max="365"
-                                required>
-                            <label for="trial_days">Trial Duration (Days)</label>
-                        </div>
-                        <p class="text-secondary fs-7 mb-0">This action will trigger the
-                            <code>TrialActivationService</code>, create a license, and dispatch email notifications to the
-                            customer.
-                        </p>
-                    </div>
-                    <div class="modal-footer border-top p-3 bg-light d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-light border rounded-pill px-4"
-                            data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success rounded-pill px-4 shadow-sm hover-lift"><i
-                                class="bi bi-rocket-takeoff me-2"></i> Activate Now</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+</div>
 @endsection
