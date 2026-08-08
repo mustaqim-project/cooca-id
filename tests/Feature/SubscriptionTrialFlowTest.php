@@ -34,14 +34,15 @@ class SubscriptionTrialFlowTest extends TestCase
             'phone' => '08123456789',
             'address' => 'Test Address',
         ]);
+        $customer->refresh();
 
         $this->actingAs($customer, 'customer');
 
         // Get a product
-        $product = Product::first();
-        if (!$product) {
-            $this->markTestSkipped('No product available to test.');
-        }
+        $product = Product::first() ?? Product::factory()->create([
+            'name' => 'Test Product',
+            'slug' => 'test-product',
+        ]);
 
         // Test Trial Form Request
         $response = $this->get('/customer/trials/create?product_slug=' . $product->slug);
@@ -67,10 +68,12 @@ class SubscriptionTrialFlowTest extends TestCase
         echo "Trial Flow: OK\n";
 
         // Test Subscribe Form Request
-        $plan = $product->subscriptionPlans()->first();
-        if (!$plan) {
-            $this->markTestSkipped('No subscription plan available for product.');
-        }
+        $plan = $product->subscriptionPlans()->first() ?? SubscriptionPlan::factory()->create([
+            'product_id' => $product->id,
+            'name' => 'Monthly Plan',
+            'price' => 100000,
+            'duration_months' => 1,
+        ]);
 
         $subGet = $this->get('/customer/subscriptions/create?product_slug=' . $product->slug);
         $subGet->assertStatus(200);
@@ -83,6 +86,8 @@ class SubscriptionTrialFlowTest extends TestCase
             'domain' => 'test-domain-' . rand(1000, 9999),
         ]);
         
+        $postSub->assertSessionHasNoErrors();
+        
         // This should redirect to the invoice/payment page
         $postSub->assertRedirect();
         
@@ -94,5 +99,15 @@ class SubscriptionTrialFlowTest extends TestCase
         $subscription = \App\Models\Subscription::where('customer_id', $customer->id)->latest()->first();
         
         echo "Subscribe Flow: OK\n";
+
+        // Test Cancel Unpaid Subscription
+        $cancelResponse = $this->post('/customer/subscriptions/' . $subscription->id . '/cancel');
+        $cancelResponse->assertRedirect();
+        
+        $this->assertDatabaseMissing('subscriptions', [
+            'id' => $subscription->id,
+        ]);
+        
+        echo "Cancel Unpaid Subscription: OK\n";
     }
 }

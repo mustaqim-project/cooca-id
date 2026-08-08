@@ -200,9 +200,6 @@ final class SubscriptionController extends Controller
             ->with('success', 'Berhasil memilih paket langganan. Silakan selesaikan pembayaran.');
     }
 
-    /**
-     * Cancel the specified subscription.
-     */
     public function cancel(Request $request, string $id)
     {
         $customer     = Auth::user();
@@ -216,6 +213,48 @@ final class SubscriptionController extends Controller
             }
             return redirect()->route('customer.subscriptions.index')
                 ->with('error', 'Subscription not found');
+        }
+
+        // If unpaid (trial), delete completely (cancel unpaid subscription)
+        if ($subscription->status === 'trial') {
+            DB::beginTransaction();
+            try {
+                // Delete associated license if it exists and is inactive (unpaid)
+                if ($subscription->license && $subscription->license->status === 'inactive') {
+                    // Delete associated domain if it exists
+                    if ($subscription->license->domainRecord) {
+                        $subscription->license->domainRecord->delete();
+                    }
+                    $subscription->license->delete();
+                }
+
+                // Delete pending transactions
+                Transaction::where('subscription_id', $subscription->id)
+                    ->whereIn('status', ['pending', 'expire', 'cancel'])
+                    ->delete();
+
+                // Delete pending invoices
+                Invoice::where('subscription_id', $subscription->id)
+                    ->whereIn('status', ['issued', 'pending'])
+                    ->delete();
+
+                // Delete the subscription
+                $subscription->delete();
+
+                DB::commit();
+
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['message' => 'Subscription deleted successfully']);
+                }
+                return redirect()->route('customer.products.index')
+                    ->with('success', 'Langganan berhasil dibatalkan.');
+            } catch (\Exception $e) {
+                DB::rollBack();
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['message' => 'Gagal membatalkan langganan: ' . $e->getMessage()], 500);
+                }
+                return back()->with('error', 'Gagal membatalkan langganan: ' . $e->getMessage());
+            }
         }
 
         $this->subscriptionService->cancelSubscription($subscription);
@@ -431,3 +470,4 @@ final class SubscriptionController extends Controller
         }
     }
 }
+

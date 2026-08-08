@@ -323,6 +323,12 @@
                     <a href="{{ route('customer.subscriptions.checkout', $sub->id) }}" class="btn btn-warning btn-sm" style="flex:1;justify-content:center;">
                         <i class="fa-solid fa-credit-card"></i> Bayar Sekarang
                     </a>
+                    <button type="button"
+                        class="btn btn-danger-outline btn-sm"
+                        onclick="confirmCancel('{{ $sub->id }}', '{{ addslashes($prod?->name ?? 'Subscription') }}')"
+                        title="Batalkan langganan">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                     @elseif($isExpired || $soonExpire)
                     <a href="{{ route('customer.subscriptions.checkout', $sub->id) }}" class="btn btn-warning btn-sm" style="flex:1;justify-content:center;">
                         <i class="fa-solid fa-rotate"></i> Perpanjang
@@ -428,6 +434,10 @@
     </div>
 </div>
 
+<form id="cancel-subscription-form" action="" method="POST" style="display:none;">
+    @csrf
+</form>
+
 <script>
 function switchTab(tab) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -440,5 +450,13 @@ function switchTab(tab) {
 // Restore last tab on load
 const savedTab = sessionStorage.getItem('serviceTab');
 if (savedTab && document.getElementById('tab-' + savedTab)) switchTab(savedTab);
+
+function confirmCancel(subId, prodName) {
+    if (confirm('Apakah Anda yakin ingin membatalkan langganan "' + prodName + '" yang belum dibayar? Semua data lisensi terkait akan dihapus.')) {
+        const form = document.getElementById('cancel-subscription-form');
+        form.action = '/customer/subscriptions/' + subId + '/cancel';
+        form.submit();
+    }
+}
 </script>
 @endsection
