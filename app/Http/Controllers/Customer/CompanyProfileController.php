@@ -25,13 +25,13 @@ class CompanyProfileController extends Controller
         $customer = $request->user();
         $validated = $request->validate([
             'company_name' => 'required|string|max:255',
-            'industry' => 'nullable|string|max:255',
-            'company_size' => 'nullable|in:1-10,11-50,51-200,201-500,500+',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'city' => 'nullable|string|max:100',
-            'province' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:10',
+            'industry' => 'required|string|max:255',
+            'company_size' => 'required|in:1-10,11-50,51-200,201-500,500+',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string',
+            'city' => 'required|string|max:100',
+            'province' => 'required|string|max:100',
+            'postal_code' => 'required|string|max:10',
             'npwp' => 'nullable|string|max:30',
             'website' => 'nullable|url|max:255',
         ]);

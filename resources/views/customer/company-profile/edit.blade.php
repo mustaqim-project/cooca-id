@@ -43,8 +43,8 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Tax ID / NPWP</label>
-                                <input type="text" name="tax_id" class="form-input"
-                                    value="{{ old('tax_id', $profile?->tax_id) }}" placeholder="e.g. 01.234.567.8-901.000">
+                                <input type="text" name="npwp" class="form-input"
+                                    value="{{ old('npwp', $profile?->npwp) }}" placeholder="e.g. 01.234.567.8-901.000">
                                 <!-- NOT required -->
                             </div>
                         </div>
@@ -87,6 +87,19 @@
                                         {{ old('company_size', $profile?->company_size) === '201+' ? 'selected' : '' }}>
                                         200+ Enterprise</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Company Phone <span style="color:var(--danger);">*</span></label>
+                                <input type="text" name="phone" class="form-input"
+                                    value="{{ old('phone', $profile?->phone ?? $customer->phone) }}" placeholder="e.g. +628123456789" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Website</label>
+                                <input type="url" name="website" class="form-input"
+                                    value="{{ old('website', $profile?->website) }}" placeholder="https://example.com">
                             </div>
                         </div>
 
