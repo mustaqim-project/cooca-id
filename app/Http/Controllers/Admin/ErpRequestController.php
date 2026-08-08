@@ -72,7 +72,7 @@ final class ErpRequestController extends Controller
             'causer_type' => \App\Models\Admin::class,
             'action' => 'erp_approved',
             'module' => 'erp_request',
-            'description' => "ERP request approved for customer {$erpRequest->customer->email}",
+            'description' => "ERP request approved for customer " . ($erpRequest->customer?->email ?? 'unknown'),
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'metadata' => ['erp_request_id' => $erpRequest->id],
@@ -99,7 +99,7 @@ final class ErpRequestController extends Controller
             'causer_type' => \App\Models\Admin::class,
             'action' => 'erp_rejected',
             'module' => 'erp_request',
-            'description' => "ERP request rejected for customer {$erpRequest->customer->email}",
+            'description' => "ERP request rejected for customer " . ($erpRequest->customer?->email ?? 'unknown'),
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'metadata' => [
