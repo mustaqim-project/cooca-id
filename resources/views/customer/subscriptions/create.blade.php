@@ -179,6 +179,100 @@
                         }
                     </script>
 
+                    @if($showCompanyFields)
+                        <div class="divider mt-4 mb-4" style="border-top: 1px dashed var(--border); margin: 20px 0;"></div>
+                        <h3 class="font-bold text-sm mb-3" style="color:var(--primary); display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-building"></i> Lengkapi Profil Perusahaan
+                        </h3>
+                        <p class="text-xs text-muted mb-4" style="line-height:1.4;">
+                            Silakan lengkapi data profil perusahaan Anda terlebih dahulu. Data ini akan otomatis memperbarui profil Anda dan digunakan untuk invoice/laporan.
+                        </p>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Nama Perusahaan <span style="color:var(--danger);">*</span></label>
+                                <input type="text" name="company_name" class="form-input"
+                                    value="{{ old('company_name', $companyProfile?->company_name ?? $customer->business_name) }}"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">NPWP / Tax ID</label>
+                                <input type="text" name="npwp" class="form-input"
+                                    value="{{ old('npwp', $companyProfile?->npwp) }}" placeholder="e.g. 01.234.567.8-901.000">
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Bidang Industri <span style="color:var(--danger);">*</span></label>
+                                <select name="industry" class="form-select" required>
+                                    <option value="">— Pilih Industri —</option>
+                                    <option value="retail" {{ old('industry', $companyProfile?->industry) === 'retail' ? 'selected' : '' }}>Retail & E-commerce</option>
+                                    <option value="manufacturing" {{ old('industry', $companyProfile?->industry) === 'manufacturing' ? 'selected' : '' }}>Manufacturing & Production</option>
+                                    <option value="services" {{ old('industry', $companyProfile?->industry) === 'services' ? 'selected' : '' }}>Professional Services & Consulting</option>
+                                    <option value="technology" {{ old('industry', $companyProfile?->industry) === 'technology' ? 'selected' : '' }}>Technology, IT & Software</option>
+                                    <option value="construction" {{ old('industry', $companyProfile?->industry) === 'construction' ? 'selected' : '' }}>Construction & Real Estate</option>
+                                    <option value="healthcare" {{ old('industry', $companyProfile?->industry) === 'healthcare' ? 'selected' : '' }}>Healthcare & Medical</option>
+                                    <option value="hospitality" {{ old('industry', $companyProfile?->industry) === 'hospitality' ? 'selected' : '' }}>Hospitality, Tourism & Food Services</option>
+                                    <option value="education" {{ old('industry', $companyProfile?->industry) === 'education' ? 'selected' : '' }}>Education & Training</option>
+                                    <option value="agriculture" {{ old('industry', $companyProfile?->industry) === 'agriculture' ? 'selected' : '' }}>Agriculture, Farming & Forestry</option>
+                                    <option value="automotive" {{ old('industry', $companyProfile?->industry) === 'automotive' ? 'selected' : '' }}>Automotive, Workshop & Transportation</option>
+                                    <option value="finance" {{ old('industry', $companyProfile?->industry) === 'finance' ? 'selected' : '' }}>Finance, Banking & Insurance</option>
+                                    <option value="logistics" {{ old('industry', $companyProfile?->industry) === 'logistics' ? 'selected' : '' }}>Logistics & Supply Chain</option>
+                                    <option value="wholesale" {{ old('industry', $companyProfile?->industry) === 'wholesale' ? 'selected' : '' }}>Wholesale & Distribution</option>
+                                    <option value="creative" {{ old('industry', $companyProfile?->industry) === 'creative' ? 'selected' : '' }}>Entertainment, Media & Creative</option>
+                                    <option value="other" {{ old('industry', $companyProfile?->industry) === 'other' ? 'selected' : '' }}>Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Ukuran Perusahaan <span style="color:var(--danger);">*</span></label>
+                                <select name="company_size" class="form-select" required>
+                                    <option value="">— Pilih Ukuran —</option>
+                                    <option value="1-10" {{ old('company_size', $companyProfile?->company_size) === '1-10' ? 'selected' : '' }}>1-10 Karyawan</option>
+                                    <option value="11-50" {{ old('company_size', $companyProfile?->company_size) === '11-50' ? 'selected' : '' }}>11-50 Karyawan</option>
+                                    <option value="51-200" {{ old('company_size', $companyProfile?->company_size) === '51-200' ? 'selected' : '' }}>51-200 Karyawan</option>
+                                    <option value="201+" {{ old('company_size', $companyProfile?->company_size) === '201+' ? 'selected' : '' }}>200+ Karyawan</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Telepon Perusahaan <span style="color:var(--danger);">*</span></label>
+                                <input type="text" name="phone" class="form-input"
+                                    value="{{ old('phone', $companyProfile?->phone ?? $customer->phone) }}" placeholder="e.g. +628123456789" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Website</label>
+                                <input type="url" name="website" class="form-input"
+                                    value="{{ old('website', $companyProfile?->website) }}" placeholder="https://example.com">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Alamat Lengkap <span style="color:var(--danger);">*</span></label>
+                            <textarea name="address" class="form-textarea" rows="3" placeholder="Alamat lengkap perusahaan" required>{{ old('address', $companyProfile?->address) }}</textarea>
+                        </div>
+
+                        <div class="grid-3 mb-4">
+                            <div class="form-group">
+                                <label class="form-label">Kota <span style="color:var(--danger);">*</span></label>
+                                <input type="text" name="city" class="form-input"
+                                    value="{{ old('city', $companyProfile?->city) }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Provinsi <span style="color:var(--danger);">*</span></label>
+                                <input type="text" name="province" class="form-input"
+                                    value="{{ old('province', $companyProfile?->province) }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Kode Pos <span style="color:var(--danger);">*</span></label>
+                                <input type="text" name="postal_code" class="form-input"
+                                    value="{{ old('postal_code', $companyProfile?->postal_code) }}" required>
+                            </div>
+                        </div>
+                    @endif
+
                     <button type="submit" class="btn btn-primary btn-lg w-full mt-2" style="justify-content:center;">
                         <i class="fa-solid fa-credit-card"></i> Lanjut ke Pembayaran
                     </button>

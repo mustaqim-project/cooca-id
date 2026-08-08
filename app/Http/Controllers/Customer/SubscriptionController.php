@@ -46,14 +46,15 @@ final class SubscriptionController extends Controller
     public function create(Request $request): View|\Illuminate\Http\RedirectResponse
     {
         $customer = auth('customer')->user();
-        if (!$customer->isCompanyProfileComplete()) {
-            return redirect()->route('customer.company-profile.edit')
-                ->with('error', 'Silakan lengkapi Profil Perusahaan Anda terlebih dahulu sebelum berlangganan.');
-        }
+        $showCompanyFields = !$customer->isCompanyProfileComplete();
+        $companyProfile = $customer->companyProfile ?? new \App\Models\CompanyProfile();
 
         return view('customer.subscriptions.create', [
             'preselectedProductId' => $request->query('product_id'),
             'preselectedPlanId' => $request->query('plan_id'),
+            'showCompanyFields' => $showCompanyFields,
+            'companyProfile' => $companyProfile,
+            'customer' => $customer,
         ]);
     }
 
@@ -111,8 +112,22 @@ final class SubscriptionController extends Controller
     {
         $customer = Auth::user();
         if (!$customer->isCompanyProfileComplete()) {
-            return redirect()->route('customer.company-profile.edit')
-                ->with('error', 'Silakan lengkapi Profil Perusahaan Anda terlebih dahulu sebelum berlangganan.');
+            \App\Models\CompanyProfile::updateOrCreate(
+                ['customer_id' => $customer->id],
+                $request->only([
+                    'company_name',
+                    'industry',
+                    'company_size',
+                    'phone',
+                    'address',
+                    'city',
+                    'province',
+                    'postal_code',
+                    'npwp',
+                    'website',
+                ])
+            );
+            $customer->load('companyProfile');
         }
 
         $data     = $request->validated();

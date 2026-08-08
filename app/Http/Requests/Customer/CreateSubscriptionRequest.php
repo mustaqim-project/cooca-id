@@ -15,7 +15,7 @@ final class CreateSubscriptionRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'product_slug' => ['required', 'string', 'exists:products,slug'],
             'subscription_plan_id' => ['required', 'exists:subscription_plans,id'],
             'voucher_code' => ['nullable', 'string', 'max:50'],
@@ -47,6 +47,22 @@ final class CreateSubscriptionRequest extends FormRequest
                 }
             ],
         ];
+
+        $customer = auth('customer')->user();
+        if ($customer && !$customer->isCompanyProfileComplete()) {
+            $rules['company_name'] = ['required', 'string', 'max:255'];
+            $rules['industry'] = ['required', 'string', 'max:255'];
+            $rules['company_size'] = ['required', 'in:1-10,11-50,51-200,201-500,500+'];
+            $rules['phone'] = ['required', 'string', 'max:20'];
+            $rules['address'] = ['required', 'string'];
+            $rules['city'] = ['required', 'string', 'max:100'];
+            $rules['province'] = ['required', 'string', 'max:100'];
+            $rules['postal_code'] = ['required', 'string', 'max:10'];
+            $rules['npwp'] = ['nullable', 'string', 'max:30'];
+            $rules['website'] = ['nullable', 'url', 'max:255'];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
