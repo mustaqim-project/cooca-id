@@ -10,6 +10,10 @@ final class SendLicenseReadyNotification
 {
     public function handle(LicenseGenerated $event): void
     {
+        if ($event->license->is_trial) {
+            return;
+        }
+
         SendLicenseReadyJob::dispatch(
             $event->license->customer,
             $event->license->license_code,
