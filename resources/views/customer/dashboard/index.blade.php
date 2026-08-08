@@ -20,9 +20,9 @@
 
     // Handle variables safely whether passed as $stats or individual collections
     $activeLicensesCount  = $stats['activeLicenses'] ?? ($licenses ?? collect())->where('status', 'active')->count();
-    $totalLicensesCount   = $stats['totalLicenses'] ?? ($licenses ?? collect())->count();
+    $totalLicensesCount   = $stats['totalLicenses'] ?? ($licenses ?? collect())->filter(fn($l) => $l->status === 'active' || $l->is_trial)->count();
     $activeSubCount       = $stats['activeSubscriptions'] ?? ($subscriptions ?? collect())->where('status', 'active')->count();
-    $totalSubCount        = $stats['totalSubscriptions'] ?? ($subscriptions ?? collect())->count();
+    $totalSubCount        = $stats['totalSubscriptions'] ?? ($subscriptions ?? collect())->whereIn('status', ['active', 'expired', 'cancelled'])->count();
     $pendingInvoicesCount = $stats['pendingInvoices'] ?? ($recentInvoices ?? collect())->whereIn('status', ['issued', 'overdue', 'pending'])->count();
     $totalSpentAmt        = $stats['totalSpent'] ?? ($recentInvoices ?? collect())->where('status', 'paid')->sum('amount');
 

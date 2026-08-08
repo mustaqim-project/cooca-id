@@ -161,11 +161,11 @@
             <div class="card-body">
                 <div class="stats-row">
                     <span class="text-sm text-muted">Total Subscriptions</span>
-                    <span class="font-bold">{{ $customer->subscriptions()->count() }}</span>
+                    <span class="font-bold">{{ $customer->subscriptions()->whereIn('status', ['active', 'expired', 'cancelled'])->count() }}</span>
                 </div>
                 <div class="stats-row">
                     <span class="text-sm text-muted">Active Licenses</span>
-                    <span class="font-bold">{{ $customer->licenses()->where('status', 'active')->count() }}</span>
+                    <span class="font-bold">{{ $customer->licenses()->where(function($q){ $q->where('status', 'active')->orWhere('is_trial', true); })->count() }}</span>
                 </div>
                 <div class="stats-row">
                     <span class="text-sm text-muted">Total Invoices</span>

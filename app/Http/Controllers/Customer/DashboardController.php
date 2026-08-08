@@ -41,12 +41,21 @@ final class DashboardController extends Controller
             ->where('expires_at', '<=', $now->copy()->addDays(30))
             ->count();
 
-        $totalLicenses = License::where('customer_id', $customer->id)->count();
+        // Only count licenses that are active or belong to an active/completed subscription (paid)
+        $totalLicenses = License::where('customer_id', $customer->id)
+            ->where(function ($q) {
+                $q->where('status', 'active')
+                  ->orWhere('is_trial', true);
+            })
+            ->count();
 
         // ─────────────────────────────────────────────
         // SUBSCRIPTION KPIs
         // ─────────────────────────────────────────────
-        $totalSubscriptions  = Subscription::where('customer_id', $customer->id)->count();
+        // Only count subscriptions that have been paid (active, expired, cancelled) — not pending/trial
+        $totalSubscriptions  = Subscription::where('customer_id', $customer->id)
+            ->whereIn('status', ['active', 'expired', 'cancelled'])
+            ->count();
         $activeSubscriptions = Subscription::where('customer_id', $customer->id)
             ->where('status', 'active')
             ->count();
@@ -118,6 +127,11 @@ final class DashboardController extends Controller
 
         $recentLicenses = License::where('customer_id', $customer->id)
             ->with(['subscription.subscriptionPlan'])
+            ->where(function ($q) {
+                // Show active licenses, OR trial licenses (active_trial) without subscription check
+                $q->where('status', 'active')
+                  ->orWhere('is_trial', true);
+            })
             ->orderBy('expires_at')
             ->limit(5)
             ->get();
