@@ -49,14 +49,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
 
     // ERP Requests Management
     Route::get('/erp-requests', [ErpRequestController::class, 'index'])->name('erp-requests.index');
-    Route::get('/erp-requests/{erp_request}', [ErpRequestController::class, 'show'])->name('erp-requests.show');
-    Route::post('/erp-requests/{erp_request}/approve', [ErpRequestController::class, 'approve'])->name('erp-requests.approve');
-    Route::post('/erp-requests/{erp_request}/reject', [ErpRequestController::class, 'reject'])->name('erp-requests.reject');
-    Route::post('/erp-requests/{erp_request}/mark-waiting-setup', [ErpRequestController::class, 'markWaitingSetup'])->name('erp-requests.mark-waiting-setup');
-    Route::post('/erp-requests/{erp_request}/mark-in-setup', [ErpRequestController::class, 'markInSetup'])->name('erp-requests.mark-in-setup');
-    Route::post('/erp-requests/{erp_request}/mark-domain-setup', [ErpRequestController::class, 'markDomainSetup'])->name('erp-requests.mark-domain-setup');
-    Route::post('/erp-requests/{erp_request}/mark-testing', [ErpRequestController::class, 'markTesting'])->name('erp-requests.mark-testing');
-    Route::post('/erp-requests/{erp_request}/confirm-ready', [ErpRequestController::class, 'confirmReady'])->name('erp-requests.confirm-ready');
+    Route::get('/erp-requests/{erpRequest}', [ErpRequestController::class, 'show'])->name('erp-requests.show');
+    Route::post('/erp-requests/{erpRequest}/approve', [ErpRequestController::class, 'approve'])->name('erp-requests.approve');
+    Route::post('/erp-requests/{erpRequest}/reject', [ErpRequestController::class, 'reject'])->name('erp-requests.reject');
+    Route::post('/erp-requests/{erpRequest}/mark-waiting-setup', [ErpRequestController::class, 'markWaitingSetup'])->name('erp-requests.mark-waiting-setup');
+    Route::post('/erp-requests/{erpRequest}/mark-in-setup', [ErpRequestController::class, 'markInSetup'])->name('erp-requests.mark-in-setup');
+    Route::post('/erp-requests/{erpRequest}/mark-domain-setup', [ErpRequestController::class, 'markDomainSetup'])->name('erp-requests.mark-domain-setup');
+    Route::post('/erp-requests/{erpRequest}/mark-testing', [ErpRequestController::class, 'markTesting'])->name('erp-requests.mark-testing');
+    Route::post('/erp-requests/{erpRequest}/confirm-ready', [ErpRequestController::class, 'confirmReady'])->name('erp-requests.confirm-ready');
 
     // Products Management
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
