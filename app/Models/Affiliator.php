@@ -145,6 +145,11 @@ final class Affiliator extends Authenticatable
         return $this->hasMany(Customer::class, 'affiliator_id');
     }
 
+    public function profile(): HasOne
+    {
+        return $this->hasOne(AffiliatorProfile::class, 'user_id');
+    }
+
     public function downlines(): HasMany
     {
         return $this->hasMany(Affiliator::class, 'parent_affiliator_id');
