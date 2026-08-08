@@ -24,7 +24,14 @@ final class LicenseController extends Controller
     public function index()
     {
         $customer = Auth::user();
-        $licenses = \App\Models\License::where('customer_id', $customer->getKey())->get();
+        $licenses = \App\Models\License::where('customer_id', $customer->getKey())
+            ->where(function ($query) {
+                $query->where('status', '!=', 'inactive')
+                      ->orWhereHas('subscription', function ($q) {
+                          $q->where('status', 'active');
+                      });
+            })
+            ->get();
 
         return view('customer.licenses.index', [
             'licenses' => LicenseResource::collection($licenses),
@@ -56,13 +63,28 @@ final class LicenseController extends Controller
         $customer = Auth::user();
         
         try {
-            $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->firstOrFail();
-            $license->update(['status' => 'active', 'activated_at' => now()]);
+            $license = \App\Models\License::where('id', $id)
+                ->where('customer_id', $customer->getKey())
+                ->where('status', 'inactive')
+                ->whereHas('subscription', function ($q) {
+                    $q->where('status', 'active');
+                })
+                ->firstOrFail();
+
+            $subscription = $license->subscription;
+            $startsAt = now();
+
+            $license->update([
+                'status' => 'active',
+                'activated_at' => $startsAt,
+                'starts_at' => $subscription->started_at ?? $startsAt,
+                'expires_at' => $subscription->expires_at,
+            ]);
             
             return redirect()->route('customer.licenses.credentials', $license->id)
                 ->with('success', 'License activated successfully!');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to activate license: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Gagal mengaktifkan lisensi: Pembayaran belum diselesaikan atau lisensi tidak valid.']);
         }
     }
 

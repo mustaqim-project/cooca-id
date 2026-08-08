@@ -12,7 +12,7 @@
     // Active subscriptions
     $activeSubs  = $customer?->subscriptions()
         ->with(['subscriptionPlan.product', 'license'])
-        ->whereIn('status', ['active', 'expired', 'pending'])
+        ->whereIn('status', ['active', 'expired', 'pending', 'trial'])
         ->latest()
         ->get() ?? collect();
 
@@ -25,7 +25,7 @@
 
     // Total active services
     $totalActive = $activeSubs->where('status', 'active')->count()
-                 + $activeTrials->where('status', 'active')->count();
+                 + $activeTrials->where('status', 'active_trial')->count();
 @endphp
 
 {{-- ── PAGE HEADER ── --}}
@@ -268,6 +268,7 @@
                         @if($isExpired) <span class="badge badge-danger">Expired</span>
                         @elseif($soonExpire) <span class="badge badge-warning">Segera Berakhir</span>
                         @elseif($sub->status === 'active') <span class="badge badge-success">Active</span>
+                        @elseif($sub->status === 'trial') <span class="badge badge-muted">Pending Payment</span>
                         @else <span class="badge badge-muted">{{ ucfirst($sub->status) }}</span>
                         @endif
                     </div>
@@ -313,12 +314,16 @@
                 @endif
 
                 <div class="flex gap-2">
-                    @if($lic?->domain)
+                    @if($lic?->domain && $lic->status === 'active')
                     <a href="https://{{ $lic->domain }}" target="_blank" class="btn btn-primary btn-sm">
                         <i class="fa-solid fa-rocket"></i> Launch
                     </a>
                     @endif
-                    @if($isExpired || $soonExpire)
+                    @if($sub->status === 'trial')
+                    <a href="{{ route('customer.subscriptions.checkout', $sub->id) }}" class="btn btn-warning btn-sm" style="flex:1;justify-content:center;">
+                        <i class="fa-solid fa-credit-card"></i> Bayar Sekarang
+                    </a>
+                    @elseif($isExpired || $soonExpire)
                     <a href="{{ route('customer.subscriptions.checkout', $sub->id) }}" class="btn btn-warning btn-sm" style="flex:1;justify-content:center;">
                         <i class="fa-solid fa-rotate"></i> Perpanjang
                     </a>

@@ -43,7 +43,15 @@
             </div>
             <div class="stats-row">
                 <span class="text-sm text-muted">Expires At</span>
-                <span class="text-sm font-bold">{{ $license->expires_at ? $license->expires_at->format('d M Y') : 'Lifetime' }}</span>
+                <span class="text-sm font-bold">
+                    @if($license->status === 'inactive')
+                        <span class="text-muted">Belum Aktif</span>
+                    @elseif($license->expires_at)
+                        {{ $license->expires_at->format('d M Y') }}
+                    @else
+                        Lifetime
+                    @endif
+                </span>
             </div>
         </div>
     </div>

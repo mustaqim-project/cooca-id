@@ -187,6 +187,8 @@ final class SubscriptionController extends Controller
 
         $subscription = $this->createSubscriptionAction->execute($subscriptionData);
 
+        $license->update(['subscription_id' => $subscription->id]);
+
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'message' => 'Subscription created successfully',

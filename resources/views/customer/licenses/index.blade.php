@@ -65,7 +65,9 @@
                             @endif
                         </td>
                         <td class="text-xs text-muted">
-                            @if($license->expires_at)
+                            @if($license->status === 'inactive')
+                                <span class="text-muted">Belum Aktif</span>
+                            @elseif($license->expires_at)
                                 {{ $license->expires_at->format('d M Y') }}
                                 @if($license->expires_at->isPast())
                                     <span class="text-danger font-bold"> (expired)</span>
@@ -81,7 +83,7 @@
                                 <a href="{{ route('customer.licenses.show', $license->id) }}" class="btn btn-ghost btn-sm">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
-                                @if($license->status === 'inactive')
+                                @if($license->status === 'inactive' && $license->subscription?->status === 'active')
                                     <a href="{{ route('customer.licenses.activate', $license->id) }}" class="btn btn-primary btn-sm">
                                         Activate
                                     </a>

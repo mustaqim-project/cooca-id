@@ -34,6 +34,8 @@ wa-server/
 /public/build
 /public/hot
 /public/storage
+/public/agreements/*
+!/public/agreements/.gitignore
 .vite/
 
 # WhatsApp Web & Bot Server Cache/Sessions
