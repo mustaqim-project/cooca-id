@@ -152,12 +152,21 @@ Route::get('/clear-app-cache', [\App\Http\Controllers\Web\SystemController::clas
 
 Route::get('/debug-mail-config', function () {
     $latestFailed = \Illuminate\Support\Facades\DB::table('failed_jobs')->latest('failed_at')->first();
+    $erpRequest = \Illuminate\Support\Facades\DB::table('erp_requests')->where('id', '019fe170-c56c-73e8-b6f4-9ae7eac2edd2')->first();
     return response()->json([
         'default_mailer' => config('mail.default'),
         'mail_from' => config('mail.from'),
         'queue_connection' => config('queue.default'),
         'jobs_count' => \Illuminate\Support\Facades\DB::table('jobs')->count(),
         'failed_jobs_count' => \Illuminate\Support\Facades\DB::table('failed_jobs')->count(),
+        'target_erp_request' => $erpRequest ? [
+            'id' => $erpRequest->id,
+            'status' => $erpRequest->status,
+            'approved_at' => $erpRequest->approved_at,
+            'trial_starts_at' => $erpRequest->trial_starts_at,
+            'trial_ends_at' => $erpRequest->trial_ends_at,
+            'admin_notes' => $erpRequest->admin_notes,
+        ] : 'not_found',
         'latest_failed_job' => $latestFailed ? [
             'id' => $latestFailed->id,
             'connection' => $latestFailed->connection,
