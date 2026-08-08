@@ -45,10 +45,6 @@ final class CaptchaHelper
      */
     public static function verify(?string $userAnswer): bool
     {
-        if (app()->environment('testing')) {
-            return $userAnswer !== 'wrong_captcha';
-        }
-
         $expectedAnswer = Session::get('captcha_answer');
 
         if (is_null($expectedAnswer) || is_null($userAnswer)) {

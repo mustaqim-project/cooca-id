@@ -35,9 +35,13 @@ class MidtransVerificationTest extends TestCase
             'business_name'     => 'Midtrans Verifikator',
         ]);
 
+        \App\Helpers\CaptchaHelper::generate();
+        $captchaAnswer = \Illuminate\Support\Facades\Session::get('captcha_answer');
+
         $response = $this->post('/customer/login', [
             'email'    => 'midtrans.verification@cooca.id',
             'password' => 'Midtrans2026!',
+            'captcha'  => $captchaAnswer,
         ]);
 
         $this->assertAuthenticatedAs($customer, 'customer');
