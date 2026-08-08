@@ -151,7 +151,7 @@ Route::get('/login', [AuthWebController::class, 'showCustomerLogin'])->name('log
 Route::get('/clear-app-cache', [\App\Http\Controllers\Web\SystemController::class, 'clearAppCache']);
 
 Route::get('/debug-mail-config', function () {
-    $latestFailed = \Illuminate\Support\Facades\DB::table('failed_jobs')->latest()->first();
+    $latestFailed = \Illuminate\Support\Facades\DB::table('failed_jobs')->latest('failed_at')->first();
     return response()->json([
         'default_mailer' => config('mail.default'),
         'mail_from' => config('mail.from'),
