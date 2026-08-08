@@ -39,7 +39,7 @@
                                 <div class="text-xs text-muted">{{ $sub->customer->email ?? '' }}</div>
                             </td>
                             <td>
-                                <div class="font-bold text-sm">{{ $sub->product->name ?? 'SaaS Product' }}</div>
+                                <div class="font-bold text-sm">{{ optional($sub->subscriptionPlan->product ?? null)->name ?? 'SaaS Product' }}</div>
                                 <span class="badge badge-purple">{{ $sub->subscriptionPlan->name ?? 'Plan' }}</span>
                             </td>
                             <td>
