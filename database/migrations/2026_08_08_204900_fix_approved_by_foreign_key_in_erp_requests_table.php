@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('erp_requests', function (Blueprint $table) {
-            // Drop foreign key referencing customers
-            $table->dropForeign('erp_requests_approved_by_foreign');
+        if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+            Schema::table('erp_requests', function (Blueprint $table) {
+                // Drop foreign key referencing customers
+                $table->dropForeign('erp_requests_approved_by_foreign');
 
-            // Add new foreign key referencing admins
-            $table->foreign('approved_by')
-                ->references('id')
-                ->on('admins')
-                ->onDelete('set null');
-        });
+                // Add new foreign key referencing admins
+                $table->foreign('approved_by')
+                    ->references('id')
+                    ->on('admins')
+                    ->onDelete('set null');
+            });
+        }
     }
 
     /**
@@ -28,13 +30,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('erp_requests', function (Blueprint $table) {
-            $table->dropForeign(['approved_by']);
-            
-            $table->foreign('approved_by')
-                ->references('id')
-                ->on('customers')
-                ->onDelete('set null');
-        });
+        if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+            Schema::table('erp_requests', function (Blueprint $table) {
+                $table->dropForeign(['approved_by']);
+                
+                $table->foreign('approved_by')
+                    ->references('id')
+                    ->on('customers')
+                    ->onDelete('set null');
+            });
+        }
     }
 };

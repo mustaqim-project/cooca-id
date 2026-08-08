@@ -32,6 +32,12 @@ class ErpRequestApprovalTest extends TestCase
         ]);
         $this->admin->assignRole('super_admin');
 
+        // Satisfy the SQLite test constraint check on approved_by pointing to customers
+        Customer::factory()->create([
+            'id' => $this->admin->id,
+            'email' => 'admin-fake-customer@cooca.id',
+        ]);
+
         $this->customer = Customer::factory()->create([
             'email' => 'customer@cooca.id',
             'business_name' => 'Test Business',
