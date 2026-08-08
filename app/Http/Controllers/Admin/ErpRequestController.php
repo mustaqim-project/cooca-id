@@ -24,8 +24,10 @@ final class ErpRequestController extends Controller
             abort(401, 'Unauthenticated.');
         }
 
-        $permissions = $admin->permissions ?? [];
-        if (!in_array('manage_erp_requests', $permissions) && !in_array('super_admin', $permissions)) {
+        $roles = $admin->roles->pluck('name')->toArray();
+        $permissions = $admin->getAllPermissions()->pluck('name')->toArray();
+
+        if (!in_array('manage_erp_requests', $permissions) && !in_array('super_admin', $roles)) {
             abort(403, 'Unauthorized action.');
         }
     }
