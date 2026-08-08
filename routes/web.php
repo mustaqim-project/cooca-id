@@ -149,3 +149,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::get('/login', [AuthWebController::class, 'showCustomerLogin'])->name('login');
 
 Route::get('/clear-app-cache', [\App\Http\Controllers\Web\SystemController::class, 'clearAppCache']);
+
+Route::get('/debug-mail-config', function () {
+    return response()->json([
+        'default_mailer' => config('mail.default'),
+        'mail_from' => config('mail.from'),
+        'mailers' => collect(config('mail.mailers'))->map(function ($mailer) {
+            if (isset($mailer['password'])) {
+                $mailer['password'] = '******'; // Hide password for security
+            }
+            return $mailer;
+        }),
+    ]);
+});
