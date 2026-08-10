@@ -395,7 +395,7 @@
 
                         <img src="{{ public_path('assets/image/1782511520_logo_light.png') }}" alt="COOCA.ID"
                             style="
-                        width: 100px;
+                        width: 110px;
                         height: auto;
                         display: block;
                         margin-bottom: 7px;
