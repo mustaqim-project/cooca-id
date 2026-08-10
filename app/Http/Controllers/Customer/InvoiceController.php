@@ -88,14 +88,17 @@ class InvoiceController extends Controller
         // Use Policy for authorization (prevents IDOR)
         Gate::authorize('download', $invoice);
 
-        // Generate PDF (implementation depends on PDF library used)
-        // For now, we'll return a response that would trigger PDF generation
+        // Use the InvoiceService to generate or retrieve the invoice PDF
+        $invoiceService = app(\App\Services\Invoice\InvoiceService::class);
+        $pdfPath = $invoiceService->generateInvoicePdf($invoice);
 
-        $pdf = \App\Services\InvoicePdfService::generate($invoice);
+        $fullPath = storage_path('app/' . ltrim($pdfPath, '/'));
 
-        return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->stream();
-        }, "invoice-{$invoice->invoice_number}.pdf", [
+        if (!file_exists($fullPath)) {
+            abort(500, 'Invoice file not found');
+        }
+
+        return response()->download($fullPath, "invoice-{$invoice->invoice_number}.pdf", [
             'Content-Type' => 'application/pdf',
         ]);
     }
