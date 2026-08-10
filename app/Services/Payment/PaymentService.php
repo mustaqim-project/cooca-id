@@ -45,9 +45,14 @@ final class PaymentService
      */
     public function createSnapTransaction(Transaction $transaction): array
     {
+        // Ensure order_id only contains characters allowed by Midtrans
+        $rawOrderId = (string) $transaction->invoice_number;
+        // Midtrans allows alphanumeric and - _ ~ . ; replace other chars with '-'
+        $sanitizedOrderId = preg_replace('/[^A-Za-z0-9\-_.~]/', '-', $rawOrderId);
+
         $payload = [
             'transaction_details' => [
-                'order_id' => $transaction->invoice_number,
+                'order_id' => $sanitizedOrderId,
                 'gross_amount' => (int) round((float) $transaction->net_amount),
             ],
             'customer_details' => [
