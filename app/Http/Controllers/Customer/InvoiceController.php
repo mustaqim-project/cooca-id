@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Gate;
 
 /**
  * Customer Invoice Controller
- * 
+ *
  * Manages customer invoices.
  */
 class InvoiceController extends Controller
@@ -27,7 +27,7 @@ class InvoiceController extends Controller
         $customer = Auth::user();
 
         $query = Invoice::where('customer_id', $customer->id)
-            ->with(['subscription', 'transaction'])
+            ->with(['transaction.subscription', 'transaction'])
             ->latest('created_at');
 
         // Filters
@@ -71,7 +71,7 @@ class InvoiceController extends Controller
         // Use Policy for authorization (prevents IDOR)
         Gate::authorize('view', $invoice);
 
-        $invoice->load(['subscription.product', 'transaction']);
+        $invoice->load(['transaction.subscription.product', 'transaction']);
 
         return view('customer.invoices.show', [
             'invoice' => $invoice,
@@ -90,9 +90,9 @@ class InvoiceController extends Controller
 
         // Generate PDF (implementation depends on PDF library used)
         // For now, we'll return a response that would trigger PDF generation
-        
+
         $pdf = \App\Services\InvoicePdfService::generate($invoice);
-        
+
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
         }, "invoice-{$invoice->invoice_number}.pdf", [
