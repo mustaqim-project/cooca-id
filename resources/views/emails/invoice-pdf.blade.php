@@ -393,17 +393,13 @@
 
                     <td class="brand">
 
-                        <img src="{{ public_path('assets/image/1782509862_logo.png') }}" alt="COOCA.ID"
+                        <img src="{{ public_path('assets/image/1782511520_logo_light.png') }}" alt="COOCA.ID"
                             style="
                         width: 80px;
                         height: auto;
                         display: block;
                         margin-bottom: 7px;
                     ">
-                        <div class="brand-name">
-                            COOCA.ID
-                        </div>
-
                         <div class="brand-tagline">
                             Dari UMKM Untuk UMKM
                         </div>
