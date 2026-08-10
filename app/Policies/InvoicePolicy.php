@@ -10,7 +10,7 @@ use App\Models\Invoice;
 
 final class InvoicePolicy
 {
-    public function viewAny(?Admin $admin): bool
+    public function viewAny(Admin|Customer|null $user): bool
     {
         return true;
     }
@@ -37,5 +37,10 @@ final class InvoicePolicy
     public function delete(Admin $admin): bool
     {
         return true;
+    }
+
+    public function download(Admin|Customer $user, Invoice $invoice): bool
+    {
+        return $this->view($user, $invoice);
     }
 }

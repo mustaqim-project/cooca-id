@@ -25,7 +25,7 @@ final class PaymentController extends Controller
     {
         $payments = \App\Models\Transaction::where('customer_id', Auth::id())
             ->paginate(15);
-            
+
         return view('customer.payments.index', [
             'payments' => $payments
         ]);
@@ -36,7 +36,7 @@ final class PaymentController extends Controller
         $transaction = \App\Models\Transaction::where('id', $payment)
             ->where('customer_id', Auth::id())
             ->first();
-            
+
         if (!$transaction) {
             abort(404);
         }
@@ -65,10 +65,15 @@ final class PaymentController extends Controller
 
         $paymentUrl = ($this->processPaymentAction)($transactionData);
 
-        return response()->json([
-            'message' => 'Payment initiated successfully',
-            'payment_url' => $paymentUrl,
-        ]);
+        // If the client expects JSON (AJAX), return JSON; otherwise redirect browser to payment URL
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'message' => 'Payment initiated successfully',
+                'payment_url' => $paymentUrl,
+            ]);
+        }
+
+        return redirect()->to($paymentUrl);
     }
 
     /**

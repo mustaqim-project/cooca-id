@@ -64,7 +64,7 @@ final class SubscriptionController extends Controller
         if (!$domain) {
             return response()->json(['available' => false, 'message' => 'Domain/Subdomain is required.']);
         }
-        
+
         $domainStr = str_contains($domain, '.') ? $domain : $domain . '.cooca.id';
 
         if (!preg_match('/^[a-zA-Z0-9.-]+$/', $domainStr)) {
@@ -74,7 +74,7 @@ final class SubscriptionController extends Controller
         $existsInLicenses = \App\Models\License::where('domain', $domainStr)
             ->where('customer_id', '!=', auth('customer')->id())
             ->exists();
-        
+
         $subdomainOnly = str_replace('.cooca.id', '', $domainStr);
         $existsInRequests = \App\Models\ErpRequest::where('requested_subdomain', $subdomainOnly)
             ->where('customer_id', '!=', auth('customer')->id())
@@ -82,7 +82,7 @@ final class SubscriptionController extends Controller
             ->exists();
 
         $exists = $existsInLicenses || $existsInRequests;
-            
+
         return response()->json([
             'available' => !$exists,
             'message' => $exists ? 'Domain Tidak Tersedia' : 'Domain tersedia.'
@@ -155,6 +155,15 @@ final class SubscriptionController extends Controller
             ->where('product_id', $product->id)
             ->first();
 
+        // Prevent creating a license for a domain that is already taken by another customer
+        $domainTaken = \App\Models\License::where('domain', $domain->domain)
+            ->where('customer_id', '!=', $customer->getKey())
+            ->exists();
+
+        if ($domainTaken) {
+            return back()->with('error', 'Domain sudah digunakan oleh pelanggan lain. Silakan pilih domain lain.');
+        }
+
         if (!$license) {
             do {
                 $licenseCode = strtoupper(Str::random(16));
@@ -187,7 +196,10 @@ final class SubscriptionController extends Controller
 
         $subscription = $this->createSubscriptionAction->execute($subscriptionData);
 
-        $license->update(['subscription_id' => $subscription->id]);
+        $license->update([
+            'subscription_id' => $subscription->id,
+            'is_trial' => false,
+        ]);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
@@ -348,7 +360,7 @@ final class SubscriptionController extends Controller
         try {
             $productIds = [$subscription->subscriptionPlan->product_id];
             $voucherData = $this->voucherService->applyVoucher($request->voucher_code, $basePurchaseAmount, $customer, $productIds);
-            
+
             if (!$voucherData) {
                 return response()->json(['success' => false, 'message' => 'Voucher tidak valid atau sudah kedaluwarsa.'], 400);
             }
@@ -388,7 +400,7 @@ final class SubscriptionController extends Controller
 
         $discountPercent = (float) ($plan?->discount_percent ?? 0);
         $planDiscountAmount = round($price * ($discountPercent / 100), 2);
-        
+
         $baseAmount = round($price - $planDiscountAmount, 2);
         $voucherDiscountAmount = 0;
         $voucherId = null;
@@ -473,4 +485,3 @@ final class SubscriptionController extends Controller
         }
     }
 }
-

@@ -27,7 +27,7 @@ class InvoiceController extends Controller
         $customer = Auth::user();
 
         $query = Invoice::where('customer_id', $customer->id)
-            ->with(['transaction.subscription', 'transaction'])
+            ->with(['transaction', 'transaction.subscription.subscriptionPlan.product'])
             ->latest('created_at');
 
         // Filters
@@ -71,7 +71,7 @@ class InvoiceController extends Controller
         // Use Policy for authorization (prevents IDOR)
         Gate::authorize('view', $invoice);
 
-        $invoice->load(['transaction.subscription.product', 'transaction']);
+        $invoice->load(['transaction', 'transaction.subscription.subscriptionPlan.product']);
 
         return view('customer.invoices.show', [
             'invoice' => $invoice,
