@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\License;
 
@@ -104,11 +106,13 @@ final class LicenseService
      */
     public function activateLicense(License $license, \DateTimeInterface $activatedAt, ?\DateTimeInterface $expiresAt): License
     {
-        return $this->licenseRepository->update($license->id, [
+        $this->licenseRepository->update($license->id, [
             'status' => 'active',
             'activated_at' => $activatedAt,
             'expires_at' => $expiresAt,
         ]);
+
+        return $this->licenseRepository->find($license->id);
     }
 
     /**
@@ -182,7 +186,7 @@ final class LicenseService
             $license->token_code
         );
         Cache::forget($cacheKey);
-        
+
         // Also clear wildcard pattern if Redis available
         if (config('cache.default') === 'redis') {
             try {
@@ -268,10 +272,10 @@ final class LicenseService
         if (!empty($customerDomain)) {
             $normalizedCustomerDomain = str_replace(['http://', 'https://'], '', $customerDomain);
             $normalizedCustomerDomain = rtrim($normalizedCustomerDomain, '/');
-            
+
             $normalizedRequestDomain = str_replace(['http://', 'https://'], '', $data['domain']);
             $normalizedRequestDomain = rtrim($normalizedRequestDomain, '/');
-            
+
             if ($normalizedCustomerDomain !== $normalizedRequestDomain) {
                 return ['valid' => false, 'message' => 'Customer URL mismatch'];
             }
@@ -328,7 +332,7 @@ final class LicenseService
                 'name' => $license->product->name ?? null,
             ]
         ];
-        
+
         $startedAt = $license->activated_at ?? $license->created_at;
         $expiredAt = $license->expires_at;
 

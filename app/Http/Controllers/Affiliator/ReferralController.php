@@ -34,4 +34,12 @@ final class ReferralController extends Controller
     {
         return view('affiliator.referrals.stats');
     }
+
+    /**
+     * Display a single referral (customer) details.
+     */
+    public function show(\App\Models\Customer $customer)
+    {
+        return view('affiliator.referrals.show', ['referral' => $customer]);
+    }
 }

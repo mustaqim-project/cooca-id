@@ -42,8 +42,8 @@ final class LiveChatTemplateController extends Controller
             'sort_order' => 'nullable|integer',
         ]);
 
-        $shortcut = $request->input('shortcut') 
-            ? Str::slug($request->input('shortcut')) 
+        $shortcut = $request->input('shortcut')
+            ? Str::slug($request->input('shortcut'))
             : Str::slug($request->input('title'));
 
         // Ensure unique shortcut
@@ -107,5 +107,31 @@ final class LiveChatTemplateController extends Controller
         }
 
         return redirect()->back()->with('success', 'Template balasan cepat berhasil dihapus.');
+    }
+
+    /**
+     * Show form to create a new template.
+     */
+    public function create()
+    {
+        return view('admin.live-chats.templates-create');
+    }
+
+    /**
+     * Display the specified template.
+     */
+    public function show(string $id)
+    {
+        $template = LiveChatTemplate::findOrFail($id);
+        return view('admin.live-chats.template-show', compact('template'));
+    }
+
+    /**
+     * Show edit form for template.
+     */
+    public function edit(string $id)
+    {
+        $template = LiveChatTemplate::findOrFail($id);
+        return view('admin.live-chats.templates-edit', compact('template'));
     }
 }

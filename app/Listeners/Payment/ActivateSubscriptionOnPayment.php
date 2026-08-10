@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Listeners\Payment;
@@ -16,7 +17,9 @@ final class ActivateSubscriptionOnPayment
     public function handle(PaymentPaid $event): void
     {
         if ($event->transaction->subscription) {
-            $this->subscriptionService->activateSubscription($event->transaction->subscription);
+            $subscription = $event->transaction->subscription;
+            $duration = $subscription->subscriptionPlan->duration_months ?? 1;
+            $this->subscriptionService->activateSubscription($subscription, (int) $duration);
         }
     }
 }

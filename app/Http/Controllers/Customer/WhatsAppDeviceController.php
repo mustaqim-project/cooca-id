@@ -51,6 +51,50 @@ class WhatsAppDeviceController extends Controller
     }
 
     /**
+     * Show form to create new device for customer.
+     */
+    public function create()
+    {
+        return view('customer.whatsapp.create');
+    }
+
+    /**
+     * Show edit form for customer device.
+     */
+    public function edit($key)
+    {
+        $customerId = Auth::guard('customer')->id();
+        $device = WhatsAppDevice::where('owner_type', 'customer')
+            ->where('owner_id', $customerId)
+            ->where(function ($q) use ($key) {
+                $q->where('uuid', $key)->orWhere('id', $key);
+            })
+            ->firstOrFail();
+
+        return view('customer.whatsapp.edit', compact('device'));
+    }
+
+    /**
+     * Update customer device.
+     */
+    public function update(Request $request, $key)
+    {
+        $customerId = Auth::guard('customer')->id();
+        $device = WhatsAppDevice::where('owner_type', 'customer')
+            ->where('owner_id', $customerId)
+            ->where(function ($q) use ($key) {
+                $q->where('uuid', $key)->orWhere('id', $key);
+            })
+            ->firstOrFail();
+
+        $request->validate(['name' => 'required|string|max:100']);
+        $device->update(['name' => $request->input('name')]);
+
+        return redirect()->route('customer.whatsapp-devices.show', $device->uuid)
+            ->with('success', 'Device updated successfully.');
+    }
+
+    /**
      * Generate WA API Device Baru untuk Customer.
      */
     public function store(Request $request)
@@ -85,7 +129,7 @@ class WhatsAppDeviceController extends Controller
         $customerId = Auth::guard('customer')->id();
         $device = WhatsAppDevice::where('owner_type', 'customer')
             ->where('owner_id', $customerId)
-            ->where(function($q) use ($key) {
+            ->where(function ($q) use ($key) {
                 $q->where('uuid', $key)->orWhere('id', $key);
             })
             ->firstOrFail();
@@ -127,7 +171,7 @@ class WhatsAppDeviceController extends Controller
         $customerId = Auth::guard('customer')->id();
         $device = WhatsAppDevice::where('owner_type', 'customer')
             ->where('owner_id', $customerId)
-            ->where(function($q) use ($key) {
+            ->where(function ($q) use ($key) {
                 $q->where('uuid', $key)->orWhere('id', $key);
             })
             ->firstOrFail();
@@ -179,7 +223,7 @@ class WhatsAppDeviceController extends Controller
         $customerId = Auth::guard('customer')->id();
         $device = WhatsAppDevice::where('owner_type', 'customer')
             ->where('owner_id', $customerId)
-            ->where(function($q) use ($key) {
+            ->where(function ($q) use ($key) {
                 $q->where('uuid', $key)->orWhere('id', $key);
             })
             ->firstOrFail();
@@ -243,7 +287,7 @@ class WhatsAppDeviceController extends Controller
         $customerId = Auth::guard('customer')->id();
         $device = WhatsAppDevice::where('owner_type', 'customer')
             ->where('owner_id', $customerId)
-            ->where(function($q) use ($key) {
+            ->where(function ($q) use ($key) {
                 $q->where('uuid', $key)->orWhere('id', $key);
             })
             ->firstOrFail();

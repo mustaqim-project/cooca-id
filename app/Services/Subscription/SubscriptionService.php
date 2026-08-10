@@ -58,8 +58,8 @@ final class SubscriptionService
                 $fromStatus,
                 'active',
                 'Subscription activated',
-                system: true,
-                actorType: 'system'
+                null,
+                'system'
             );
 
             // If subscription has a license, activate it too
@@ -87,7 +87,7 @@ final class SubscriptionService
     {
         return DB::transaction(function () use ($subscription) {
             $fromStatus = $subscription->status;
-            
+
             $this->subscriptionRepository->update($subscription->id, [
                 'status' => 'expired',
             ]);
@@ -99,8 +99,8 @@ final class SubscriptionService
                 $fromStatus,
                 'expired',
                 'Subscription expired',
-                system: true,
-                actorType: 'system'
+                null,
+                'system'
             );
 
             // Expire associated license
@@ -123,7 +123,7 @@ final class SubscriptionService
     {
         return DB::transaction(function () use ($subscription) {
             $fromStatus = $subscription->status;
-            
+
             $this->subscriptionRepository->update($subscription->id, [
                 'status'       => 'cancelled',
                 'cancelled_at' => now(),
@@ -136,8 +136,8 @@ final class SubscriptionService
                 $fromStatus,
                 'cancelled',
                 'Subscription cancelled',
-                system: true,
-                actorType: 'system'
+                null,
+                'system'
             );
 
             return $subscription;
@@ -151,7 +151,7 @@ final class SubscriptionService
     {
         return DB::transaction(function () use ($subscription, $reason) {
             $fromStatus = $subscription->status;
-            
+
             $this->subscriptionRepository->update($subscription->id, [
                 'status' => 'suspended',
             ]);
@@ -163,8 +163,8 @@ final class SubscriptionService
                 $fromStatus,
                 'suspended',
                 "Suspended: {$reason}",
-                system: true,
-                actorType: 'system'
+                null,
+                'system'
             );
 
             Log::info("Subscription suspended", [
@@ -189,7 +189,7 @@ final class SubscriptionService
             }
 
             $fromStatus = $subscription->status;
-            
+
             $this->subscriptionRepository->update($subscription->id, [
                 'status' => 'active',
             ]);
@@ -201,8 +201,8 @@ final class SubscriptionService
                 $fromStatus,
                 'active',
                 'Subscription reactivated after suspension',
-                system: true,
-                actorType: 'system'
+                null,
+                'system'
             );
 
             return $subscription;
@@ -226,7 +226,7 @@ final class SubscriptionService
             }
 
             $oldPlanId = $subscription->subscription_plan_id;
-            
+
             $this->subscriptionRepository->update($subscription->id, [
                 'subscription_plan_id' => $newPlanId,
             ]);
@@ -313,7 +313,7 @@ final class SubscriptionService
     ): Subscription {
         $fromStatus = $subscription->status;
         $durationMonths = $this->getPlanDurationMonths($subscription->subscription_plan_id);
-        
+
         $newExpiresAt = now()->addMonths($durationMonths);
 
         $this->subscriptionRepository->update($subscription->id, [
@@ -352,7 +352,7 @@ final class SubscriptionService
         Invoice $invoice
     ): Subscription {
         $durationMonths = $this->getPlanDurationMonths($subscription->subscription_plan_id);
-        
+
         // Extend from current expiry or now if no expiry
         $baseDate = $subscription->expires_at ?? now();
         $newExpiresAt = $baseDate->addMonths($durationMonths);
@@ -439,7 +439,7 @@ final class SubscriptionService
     {
         return DB::transaction(function () use ($subscription, $durationMonths) {
             $fromStatus = $subscription->status;
-            
+
             $newExpiresAt = $subscription->expires_at
                 ? $subscription->expires_at->addMonths($durationMonths)
                 : now()->addMonths($durationMonths);

@@ -79,7 +79,10 @@ final class BlogCategoryController extends Controller
         // Upload cover image (converted to WebP)
         if ($request->hasFile('cover_image')) {
             $validated['cover_image'] = app(ImageService::class)->saveToStorage(
-                $request->file('cover_image'), 'public', 'blog/categories', $slug
+                $request->file('cover_image'),
+                'public',
+                'blog/categories',
+                $slug
             );
         } else {
             unset($validated['cover_image']);
@@ -88,7 +91,10 @@ final class BlogCategoryController extends Controller
         // Upload OG image (converted to WebP)
         if ($request->hasFile('og_image')) {
             $validated['og_image'] = app(ImageService::class)->saveToStorage(
-                $request->file('og_image'), 'public', 'blog/categories/og', "{$slug}-og"
+                $request->file('og_image'),
+                'public',
+                'blog/categories/og',
+                "{$slug}-og"
             );
         } else {
             unset($validated['og_image']);
@@ -110,6 +116,16 @@ final class BlogCategoryController extends Controller
     public function edit(BlogCategory $blogCategory)
     {
         return view('admin.blog.categories.edit', [
+            'category' => $blogCategory,
+        ]);
+    }
+
+    /**
+     * Display the specified category.
+     */
+    public function show(BlogCategory $blogCategory)
+    {
+        return view('admin.blog.categories.show', [
             'category' => $blogCategory,
         ]);
     }
@@ -152,7 +168,10 @@ final class BlogCategoryController extends Controller
                 Storage::disk('public')->delete($blogCategory->cover_image);
             }
             $validated['cover_image'] = app(ImageService::class)->saveToStorage(
-                $request->file('cover_image'), 'public', 'blog/categories', $slug
+                $request->file('cover_image'),
+                'public',
+                'blog/categories',
+                $slug
             );
         } else {
             unset($validated['cover_image']);
@@ -164,7 +183,10 @@ final class BlogCategoryController extends Controller
                 Storage::disk('public')->delete($blogCategory->og_image);
             }
             $validated['og_image'] = app(ImageService::class)->saveToStorage(
-                $request->file('og_image'), 'public', 'blog/categories/og', "{$slug}-og"
+                $request->file('og_image'),
+                'public',
+                'blog/categories/og',
+                "{$slug}-og"
             );
         } else {
             unset($validated['og_image']);

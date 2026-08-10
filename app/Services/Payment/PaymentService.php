@@ -127,7 +127,7 @@ final class PaymentService
             // Log to midtrans_transactions table for idempotency tracking
             MidtransTransaction::create([
                 'transaction_id' => (string) $transaction->id,
-                'order_id' => $transaction->midtrans_order_id,
+                'order_id' => $payload['order_id'] ?? $transaction->midtrans_order_id,
                 'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
                 'currency' => $payload['currency'] ?? 'IDR',
                 'payment_type' => $payload['payment_type'] ?? null,
@@ -215,7 +215,7 @@ final class PaymentService
             // Log to midtrans_transactions table
             MidtransTransaction::create([
                 'transaction_id' => (string) $transaction->id,
-                'order_id' => $transaction->midtrans_order_id,
+                'order_id' => $payload['order_id'] ?? $transaction->midtrans_order_id,
                 'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
                 'currency' => $payload['currency'] ?? 'IDR',
                 'payment_type' => $payload['payment_type'] ?? null,
@@ -258,7 +258,7 @@ final class PaymentService
             // Log to midtrans_transactions table
             MidtransTransaction::create([
                 'transaction_id' => (string) $transaction->id,
-                'order_id' => $transaction->midtrans_order_id,
+                'order_id' => $payload['order_id'] ?? $transaction->midtrans_order_id,
                 'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
                 'currency' => $payload['currency'] ?? 'IDR',
                 'payment_type' => $payload['payment_type'] ?? null,
@@ -310,7 +310,7 @@ final class PaymentService
             // Log to midtrans_transactions table
             MidtransTransaction::create([
                 'transaction_id' => (string) $transaction->id,
-                'order_id' => $transaction->midtrans_order_id,
+                'order_id' => $payload['order_id'] ?? $transaction->midtrans_order_id,
                 'gross_amount' => $payload['gross_amount'] ?? $transaction->gross_amount,
                 'currency' => $payload['currency'] ?? 'IDR',
                 'payment_type' => $payload['payment_type'] ?? null,

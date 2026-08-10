@@ -40,4 +40,16 @@ final class DownlineController extends Controller
         return view('affiliator.downlines.stats');
     }
 
+    /**
+     * Show details for a downline affiliator.
+     */
+    public function show(string $affiliatorId)
+    {
+        $affiliator = $this->affiliatorRepository->findById($affiliatorId);
+        if (!$affiliator) {
+            abort(404);
+        }
+
+        return view('affiliator.downlines.show', ['affiliator' => $affiliator]);
+    }
 }

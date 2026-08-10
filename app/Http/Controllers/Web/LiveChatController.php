@@ -106,11 +106,11 @@ final class LiveChatController extends Controller
                 // 2. Alert Admin Mobile WA with link to Admin Live Chat Panel
                 if ($device->phone_number && $device->phone_number !== $cleanPhone) {
                     $adminMsg = "🔔 *PERCAKAPAN LIVE CHAT BARU*\n\n"
-                              . "👤 *Customer*: {$name}\n"
-                              . "📱 *No. WA*: +{$cleanPhone}\n"
-                              . "💬 *Pesan*: {$messageText}\n\n"
-                              . "👉 *Balas Realtime di Admin Panel*:\n" . route('admin.live-chats.index');
-                    
+                        . "👤 *Customer*: {$name}\n"
+                        . "📱 *No. WA*: +{$cleanPhone}\n"
+                        . "💬 *Pesan*: {$messageText}\n\n"
+                        . "👉 *Balas Realtime di Admin Panel*:\n" . route('admin.live-chats.index');
+
                     $this->gatewayService->sendMessage($device->session_id, $device->phone_number, $adminMsg);
                 }
             } catch (\Throwable $e) {
@@ -215,5 +215,12 @@ final class LiveChatController extends Controller
             'message' => 'Percakapan berhasil diakhiri dan riwayat telah dikirim ke WhatsApp Anda.',
         ]);
     }
-}
 
+    /**
+     * Backwards-compatible wrapper for route expecting `end`.
+     */
+    public function end(Request $request)
+    {
+        return $this->endChat($request);
+    }
+}

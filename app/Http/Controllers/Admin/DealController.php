@@ -78,6 +78,19 @@ class DealController extends Controller
     }
 
     /**
+     * Show the form for editing the specified deal.
+     */
+    public function edit(string $id)
+    {
+        $deal = Deal::findOrFail($id);
+        $pipelines = Pipeline::all();
+        $stages = Stage::orderBy('order')->get();
+        $contracts = Contract::with('customer')->latest()->get();
+
+        return view('admin.deals.edit', compact('deal', 'pipelines', 'stages', 'contracts'));
+    }
+
+    /**
      * Update the specified deal in storage.
      */
     public function update(Request $request, string $id)
@@ -119,7 +132,7 @@ class DealController extends Controller
     public function destroy(string $id)
     {
         $deal = Deal::findOrFail($id);
-        
+
         if ($deal->agreement_document) {
             $oldPath = public_path(ltrim($deal->agreement_document, '/'));
             if (File::exists($oldPath)) {

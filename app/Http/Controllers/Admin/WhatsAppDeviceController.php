@@ -51,6 +51,51 @@ class WhatsAppDeviceController extends Controller
     }
 
     /**
+     * Show form to create a new device.
+     */
+    public function create()
+    {
+        return view('admin.whatsapp.create');
+    }
+
+    /**
+     * Show edit form for device.
+     */
+    public function edit($key)
+    {
+        $adminId = Auth::guard('admin')->id();
+        $device = WhatsAppDevice::where('owner_type', 'admin')
+            ->where('owner_id', $adminId)
+            ->where(function ($q) use ($key) {
+                $q->where('uuid', $key)->orWhere('id', $key);
+            })
+            ->firstOrFail();
+
+        return view('admin.whatsapp.edit', compact('device'));
+    }
+
+    /**
+     * Update device (name/status) basic handler.
+     */
+    public function update(Request $request, $key)
+    {
+        $adminId = Auth::guard('admin')->id();
+        $device = WhatsAppDevice::where('owner_type', 'admin')
+            ->where('owner_id', $adminId)
+            ->where(function ($q) use ($key) {
+                $q->where('uuid', $key)->orWhere('id', $key);
+            })
+            ->firstOrFail();
+
+        $request->validate(['name' => 'required|string|max:100']);
+
+        $device->update(['name' => $request->input('name')]);
+
+        return redirect()->route('admin.whatsapp-devices.show', $device->uuid)
+            ->with('success', 'Device updated successfully.');
+    }
+
+    /**
      * Generate WA API Device Baru untuk Admin.
      */
     public function store(Request $request)
@@ -85,7 +130,7 @@ class WhatsAppDeviceController extends Controller
         $adminId = Auth::guard('admin')->id();
         $device = WhatsAppDevice::where('owner_type', 'admin')
             ->where('owner_id', $adminId)
-            ->where(function($q) use ($key) {
+            ->where(function ($q) use ($key) {
                 $q->where('uuid', $key)->orWhere('id', $key);
             })
             ->firstOrFail();
@@ -127,7 +172,7 @@ class WhatsAppDeviceController extends Controller
         $adminId = Auth::guard('admin')->id();
         $device = WhatsAppDevice::where('owner_type', 'admin')
             ->where('owner_id', $adminId)
-            ->where(function($q) use ($key) {
+            ->where(function ($q) use ($key) {
                 $q->where('uuid', $key)->orWhere('id', $key);
             })
             ->firstOrFail();
@@ -179,7 +224,7 @@ class WhatsAppDeviceController extends Controller
         $adminId = Auth::guard('admin')->id();
         $device = WhatsAppDevice::where('owner_type', 'admin')
             ->where('owner_id', $adminId)
-            ->where(function($q) use ($key) {
+            ->where(function ($q) use ($key) {
                 $q->where('uuid', $key)->orWhere('id', $key);
             })
             ->firstOrFail();
@@ -243,7 +288,7 @@ class WhatsAppDeviceController extends Controller
         $adminId = Auth::guard('admin')->id();
         $device = WhatsAppDevice::where('owner_type', 'admin')
             ->where('owner_id', $adminId)
-            ->where(function($q) use ($key) {
+            ->where(function ($q) use ($key) {
                 $q->where('uuid', $key)->orWhere('id', $key);
             })
             ->firstOrFail();

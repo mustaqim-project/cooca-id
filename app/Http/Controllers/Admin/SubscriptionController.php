@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 
 /**
  * Admin Subscription Controller
- * 
+ *
  * Manages customer subscriptions from admin panel.
  */
 class SubscriptionController extends Controller
@@ -63,6 +63,26 @@ class SubscriptionController extends Controller
     }
 
     /**
+     * Validate domain availability (admin AJAX).
+     */
+    public function validateDomain(Request $request)
+    {
+        $domain = $request->input('domain');
+        if (!$domain) {
+            return response()->json(['available' => false, 'message' => 'Domain/Subdomain is required.']);
+        }
+        $domainStr = str_contains($domain, '.') ? $domain : $domain . '.cooca.id';
+
+        if (!preg_match('/^[a-zA-Z0-9.-]+$/', $domainStr)) {
+            return response()->json(['available' => false, 'message' => 'Invalid domain format.']);
+        }
+
+        $exists = License::where('domain', $domainStr)->exists();
+
+        return response()->json(['available' => !$exists, 'message' => $exists ? 'Domain Tidak Tersedia' : 'Domain tersedia.']);
+    }
+
+    /**
      * Display the specified subscription.
      */
     public function show(Subscription $subscription)
@@ -70,7 +90,7 @@ class SubscriptionController extends Controller
         $subscription->load(['customer', 'subscriptionPlan.product', 'license', 'transactions']);
 
         $timeline = [];
-        
+
         // Add subscription creation event
         $timeline[] = [
             'date' => $subscription->created_at,
