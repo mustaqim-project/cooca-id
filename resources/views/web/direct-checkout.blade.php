@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -71,7 +72,7 @@
             margin-bottom: 15px;
             font-size: 15px;
         }
-        
+
         .summary-item.total {
             border-top: 1px dashed var(--border-color);
             padding-top: 15px;
@@ -84,7 +85,7 @@
         .summary-label {
             color: var(--text-muted);
         }
-        
+
         .summary-value {
             font-weight: 600;
         }
@@ -124,13 +125,14 @@
             border-radius: 8px;
             margin-bottom: 25px;
         }
-        
+
         .user-info p {
             margin: 5px 0;
             font-size: 14px;
         }
     </style>
 </head>
+
 <body>
 
     <div class="checkout-container">
@@ -138,7 +140,7 @@
             <h1>COOCA.ID</h1>
             <p>Selesaikan Pembayaran Langganan Anda</p>
         </div>
-        
+
         <div class="checkout-body">
             <div class="user-info">
                 <p><strong>Nama:</strong> {{ $customer->name }}</p>
@@ -159,27 +161,30 @@
                     <span class="summary-label">Harga Dasar</span>
                     <span class="summary-value">Rp {{ number_format($price, 0, ',', '.') }}</span>
                 </div>
-                
-                @if($discountAmount > 0)
-                <div class="summary-item">
-                    <span class="summary-label">Diskon Paket ({{ $plan->discount_percent }}%)</span>
-                    <span class="summary-value" style="color:#ef233c;">- Rp {{ number_format($discountAmount, 0, ',', '.') }}</span>
-                </div>
+
+                @if (($discountAmount ?? 0) > 0)
+                    <div class="summary-item">
+                        <span class="summary-label">Diskon Paket ({{ $plan->discount_percent }}%)</span>
+                        <span class="summary-value" style="color:#ef233c;">- Rp
+                            {{ number_format($discountAmount ?? 0, 0, ',', '.') }}</span>
+                    </div>
                 @endif
-                
+
                 <div class="summary-item total">
                     <span class="summary-label">Total Pembayaran</span>
                     <span class="summary-value">Rp {{ number_format($netAmount, 0, ',', '.') }}</span>
                 </div>
             </div>
 
-            @if($snapToken)
+            @if ($snapToken)
                 <button id="pay-button" class="btn-pay"><i class="fa-solid fa-lock"></i> Bayar Sekarang</button>
             @elseif($pendingTransaction && $pendingTransaction->midtrans_order_id)
-                <button id="pay-pending-button" class="btn-pay"><i class="fa-solid fa-clock"></i> Lanjutkan Pembayaran (Pending)</button>
+                <button id="pay-pending-button" class="btn-pay"><i class="fa-solid fa-clock"></i> Lanjutkan Pembayaran
+                    (Pending)</button>
             @else
                 <button class="btn-pay" disabled>Gagal Memuat Pembayaran</button>
-                <p style="text-align:center;color:red;font-size:13px;margin-top:10px;">Terjadi kesalahan sistem. Silakan muat ulang halaman.</p>
+                <p style="text-align:center;color:red;font-size:13px;margin-top:10px;">Terjadi kesalahan sistem. Silakan
+                    muat ulang halaman.</p>
             @endif
         </div>
     </div>
@@ -192,37 +197,41 @@
             $isSandbox = filter_var($integration->config['sandbox'] ?? true, FILTER_VALIDATE_BOOLEAN);
             $clientKey = $integration->config['client_key'] ?? $clientKey;
         }
-        $midtransJsUrl = $isSandbox ? 'https://app.sandbox.midtrans.com/snap/snap.js' : 'https://app.midtrans.com/snap/snap.js';
+        $midtransJsUrl = $isSandbox
+            ? 'https://app.sandbox.midtrans.com/snap/snap.js'
+            : 'https://app.midtrans.com/snap/snap.js';
     @endphp
     <script src="{{ $midtransJsUrl }}" data-client-key="{{ $clientKey }}"></script>
     <script>
-        @if($snapToken)
+        @if ($snapToken)
             var payButton = document.getElementById('pay-button');
-            payButton.addEventListener('click', function () {
+            payButton.addEventListener('click', function() {
                 snap.pay('{{ $snapToken }}', {
-                    onSuccess: function(result){
+                    onSuccess: function(result) {
                         window.location.href = "{{ route('customer.payments.success') }}";
                     },
-                    onPending: function(result){
+                    onPending: function(result) {
                         window.location.href = "{{ route('customer.payments.pending') }}";
                     },
-                    onError: function(result){
+                    onError: function(result) {
                         window.location.href = "{{ route('customer.payments.failed') }}";
                     },
-                    onClose: function(){
+                    onClose: function() {
                         alert('Anda menutup jendela pembayaran sebelum menyelesaikannya.');
                     }
                 });
             });
-        @elseif($pendingTransaction)
+        @elseif ($pendingTransaction)
             var payPendingButton = document.getElementById('pay-pending-button');
-            payPendingButton.addEventListener('click', function () {
+            payPendingButton.addEventListener('click', function() {
                 // If it is pending, ideally we should just query Midtrans status or redirect to invoice
                 // For simplicity on direct link, we'll inform them it's pending.
-                alert('Transaksi ini sedang berstatus PENDING. Silakan login ke Dashboard untuk melihat rincian pembayaran.');
+                alert(
+                    'Transaksi ini sedang berstatus PENDING. Silakan login ke Dashboard untuk melihat rincian pembayaran.');
                 window.location.href = "{{ route('customer.login') }}";
             });
         @endif
     </script>
 </body>
+
 </html>
