@@ -1,170 +1,483 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Invoice {{ $invoice->invoice_number }}</title>
+    <meta charset="UTF-8">
+
     <style>
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 12px;
-            color: #333;
-            margin: 0;
-            padding: 0;
+        @page {
+            margin: 32px 36px;
         }
 
-        .wrapper {
-            padding: 24px;
-        }
-
-        .header,
-        .footer {
-            text-align: center;
-        }
-
-        .header h2 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .header small {
-            display: block;
-            font-size: 12px;
-            color: #666;
-            margin-top: 4px;
-        }
-
-        .section {
-            margin-top: 24px;
-        }
-
-        .grid {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .box {
-            width: 100%;
-            max-width: 48%;
-            background: #f9f9f9;
-            padding: 14px;
-            border-radius: 8px;
+        * {
             box-sizing: border-box;
         }
 
-        .box h3 {
-            margin: 0 0 10px;
-            font-size: 14px;
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 11px;
+            color: #1f2937;
+            background: #ffffff;
+        }
+
+        .wrapper {
+            width: 100%;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            width: 100%;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #111827;
+        }
+
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .brand {
+            width: 60%;
+            vertical-align: top;
+        }
+
+        .brand-name {
+            margin: 0;
+            font-size: 25px;
+            font-weight: bold;
+            letter-spacing: -0.5px;
+            color: #111827;
+        }
+
+        .brand-tagline {
+            margin-top: 4px;
+            font-size: 9px;
+            color: #6b7280;
+        }
+
+        .invoice-title {
+            width: 40%;
+            text-align: right;
+            vertical-align: top;
+        }
+
+        .invoice-title h1 {
+            margin: 0;
+            font-size: 25px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .invoice-title p {
+            margin: 5px 0 0;
+            font-size: 9px;
+            color: #6b7280;
+        }
+
+        /* =========================
+           META
+        ========================= */
+
+        .meta {
+            width: 100%;
+            margin-top: 22px;
+            border-collapse: collapse;
+        }
+
+        .meta td {
+            vertical-align: top;
+        }
+
+        .invoice-info {
+            width: 50%;
+        }
+
+        .customer-info {
+            width: 50%;
+            text-align: right;
+        }
+
+        .section-label {
+            margin: 0 0 8px;
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: #6b7280;
+        }
+
+        .info-row {
+            margin-bottom: 5px;
+            line-height: 1.45;
+        }
+
+        .info-label {
+            display: inline-block;
+            width: 85px;
+            color: #6b7280;
+        }
+
+        .info-value {
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .customer-name {
+            font-size: 13px;
+            font-weight: bold;
+            color: #111827;
+            margin-bottom: 5px;
+        }
+
+        .customer-detail {
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status-wrapper {
+            margin-top: 12px;
         }
 
         .status-badge {
             display: inline-block;
             padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 11px;
+            font-size: 8px;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.5px;
+            border-radius: 20px;
         }
 
         .status-issued {
-            background: #fff4e5;
-            color: #b35d00;
-            border: 1px solid #ffd8a8;
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
         }
 
         .status-paid {
-            background: #e6ffed;
-            color: #066f27;
+            background: #ecfdf5;
+            color: #047857;
             border: 1px solid #a7f3d0;
         }
 
         .status-overdue {
-            background: #ffe7e7;
-            color: #a11212;
-            border: 1px solid #fca5a5;
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
         }
 
         .status-cancelled {
             background: #f3f4f6;
-            color: #374151;
+            color: #4b5563;
             border: 1px solid #d1d5db;
         }
 
-        .table {
+        /* =========================
+           BILLING SECTION
+        ========================= */
+
+        .section {
+            margin-top: 25px;
+        }
+
+        .section-title {
+            margin: 0 0 10px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        /* =========================
+           INVOICE TABLE
+        ========================= */
+
+        .invoice-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 16px;
+            table-layout: fixed;
         }
 
-        .table th,
-        .table td {
-            border: 1px solid #ddd;
-            padding: 10px;
+        .invoice-table th {
+            padding: 10px 9px;
+            background: #111827;
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: bold;
             text-align: left;
+            border: 1px solid #111827;
         }
 
-        .table th {
-            background: #f3f4f6;
+        .invoice-table td {
+            padding: 11px 9px;
+            font-size: 10px;
+            color: #374151;
+            vertical-align: top;
+            border-bottom: 1px solid #e5e7eb;
         }
+
+        .invoice-table .description {
+            width: 45%;
+        }
+
+        .invoice-table .product {
+            width: 30%;
+        }
+
+        .invoice-table .amount {
+            width: 25%;
+            text-align: right;
+        }
+
+        .product-name {
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .plan-name {
+            margin-top: 3px;
+            font-size: 9px;
+            color: #6b7280;
+        }
+
+        /* =========================
+           TOTAL
+        ========================= */
+
+        .total-wrapper {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .total-table {
+            width: 48%;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+
+        .total-table td {
+            padding: 6px 0;
+            font-size: 10px;
+        }
+
+        .total-label {
+            text-align: right;
+            padding-right: 15px !important;
+            color: #6b7280;
+        }
+
+        .total-value {
+            width: 125px;
+            text-align: right;
+            color: #374151;
+        }
+
+        .grand-total td {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border-top: 2px solid #111827;
+            font-size: 13px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        /* =========================
+           PAYMENT INFO
+        ========================= */
+
+        .payment-box {
+            margin-top: 25px;
+            padding: 13px 15px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+        }
+
+        .payment-title {
+            margin: 0 0 6px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .payment-text {
+            margin: 0;
+            font-size: 9px;
+            line-height: 1.6;
+            color: #6b7280;
+        }
+
+        /* =========================
+           NOTES
+        ========================= */
+
+        .notes {
+            margin-top: 22px;
+            font-size: 9px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .notes-title {
+            margin: 0 0 5px;
+            font-weight: bold;
+            color: #374151;
+        }
+
+        .notes p {
+            margin: 3px 0;
+        }
+
+        .notes a {
+            color: #111827;
+            text-decoration: none;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            margin-top: 35px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 8px;
+        }
+
+        .footer strong {
+            color: #6b7280;
+        }
+
+        /* =========================
+           UTILITIES
+        ========================= */
 
         .text-right {
             text-align: right;
         }
 
-        .totals {
-            margin-top: 16px;
-            width: 100%;
-            border-collapse: collapse;
+        .text-muted {
+            color: #6b7280;
         }
 
-        .totals td {
-            padding: 8px;
-        }
-
-        .totals .label {
-            text-align: right;
+        .bold {
             font-weight: bold;
-            width: 80%;
         }
 
-        .totals .value {
-            text-align: right;
-            width: 20%;
-        }
-
-        .notes {
-            margin-top: 24px;
-            font-size: 11px;
-            color: #555;
-            line-height: 1.5;
+        .nowrap {
+            white-space: nowrap;
         }
     </style>
 </head>
 
 <body>
+
     <div class="wrapper">
+
+        {{-- =========================================================
+             HEADER
+        ========================================================== --}}
         <div class="header">
-            <img src="{{ public_path('assets/image/1782509862_logo.png') }}" alt="COOCA.ID"
-                style="max-width: 200px; height: auto; object-fit: contain; margin-bottom: 12px;" />
-            <h2>COOCA.ID</h2>
-            {{-- <small>PT COOCA TECHNOLOGIES INDONESIA | cooca.id</small> --}}
+
+            <table class="header-table">
+                <tr>
+
+                    <td class="brand">
+
+                        <div class="brand-name">
+                            COOCA.ID
+                        </div>
+
+                        <div class="brand-tagline">
+                            Dari UMKM Untuk UMKM
+                        </div>
+
+                    </td>
+
+                    <td class="invoice-title">
+
+                        <h1>INVOICE</h1>
+
+                        <p>
+                            Invoice resmi pembayaran layanan COOCA.ID
+                        </p>
+
+                    </td>
+
+                </tr>
+            </table>
+
         </div>
 
-        <div class="section grid">
-            <div class="box">
-                <h3>Invoice</h3>
-                <div><strong>No. Invoice:</strong> {{ $invoice->invoice_number }}</div>
-                <div><strong>Issue Date:</strong>
-                    {{ $invoice->issued_at?->format('d M Y') ?? $invoice->created_at->format('d M Y') }}</div>
-                <div><strong>Due Date:</strong> {{ $invoice->due_at?->format('d M Y') ?? '—' }}</div>
-                @if ($invoice->paid_at)
-                    <div><strong>Paid Date:</strong> {{ $invoice->paid_at->format('d M Y') }}</div>
-                @endif
-                <div style="margin-top: 10px;">
+
+        {{-- =========================================================
+             INVOICE & CUSTOMER INFORMATION
+        ========================================================== --}}
+
+        <table class="meta">
+
+            <tr>
+
+                {{-- INVOICE INFORMATION --}}
+                <td class="invoice-info">
+
+                    <div class="section-label">
+                        Invoice Information
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">
+                            Invoice No.
+                        </span>
+
+                        <span class="info-value">
+                            {{ $invoice->invoice_number }}
+                        </span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">
+                            Issue Date
+                        </span>
+
+                        <span class="info-value">
+                            {{ $invoice->issued_at?->format('d M Y') ?? $invoice->created_at->format('d M Y') }}
+                        </span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">
+                            Due Date
+                        </span>
+
+                        <span class="info-value">
+                            {{ $invoice->due_at?->format('d M Y') ?? '—' }}
+                        </span>
+                    </div>
+
+                    @if ($invoice->paid_at)
+                        <div class="info-row">
+                            <span class="info-label">
+                                Paid Date
+                            </span>
+
+                            <span class="info-value">
+                                {{ $invoice->paid_at->format('d M Y') }}
+                            </span>
+                        </div>
+                    @endif
+
+
+                    {{-- STATUS --}}
                     @php
                         $statusClass = match ($invoice->status) {
                             'paid' => 'status-paid',
@@ -173,77 +486,248 @@
                             default => 'status-issued',
                         };
                     @endphp
-                    <span class="status-badge {{ $statusClass }}">{{ ucfirst($invoice->status) }}</span>
-                </div>
-            </div>
 
-            <div class="box">
-                <h3>Bill To</h3>
-                <div><strong>Name:</strong> {{ $customer->name ?? $invoice->customer?->name }}</div>
-                <div><strong>Email:</strong> {{ $customer->email ?? $invoice->customer?->email }}</div>
-                @if (!empty($customer->phone ?? $invoice->customer?->phone))
-                    <div><strong>Phone:</strong> {{ $customer->phone ?? $invoice->customer?->phone }}</div>
-                @endif
-                @if (!empty($customer->business_name ?? $invoice->customer?->business_name))
-                    <div><strong>Company:</strong> {{ $customer->business_name ?? $invoice->customer?->business_name }}
+                    <div class="status-wrapper">
+
+                        <span class="status-badge {{ $statusClass }}">
+                            {{ ucfirst($invoice->status) }}
+                        </span>
+
                     </div>
-                @endif
-            </div>
-        </div>
+
+                </td>
+
+
+                {{-- CUSTOMER INFORMATION --}}
+                <td class="customer-info">
+
+                    <div class="section-label">
+                        Bill To
+                    </div>
+
+                    <div class="customer-name">
+                        {{ $customer->name ?? ($invoice->customer?->name ?? 'Customer') }}
+                    </div>
+
+                    @if (!empty($customer->business_name ?? $invoice->customer?->business_name))
+                        <div class="customer-detail">
+                            {{ $customer->business_name ?? $invoice->customer?->business_name }}
+                        </div>
+                    @endif
+
+                    @if (!empty($customer->email ?? $invoice->customer?->email))
+                        <div class="customer-detail">
+                            {{ $customer->email ?? $invoice->customer?->email }}
+                        </div>
+                    @endif
+
+                    @if (!empty($customer->phone ?? $invoice->customer?->phone))
+                        <div class="customer-detail">
+                            {{ $customer->phone ?? $invoice->customer?->phone }}
+                        </div>
+                    @endif
+
+                </td>
+
+            </tr>
+
+        </table>
+
+
+        {{-- =========================================================
+             INVOICE DETAIL
+        ========================================================== --}}
 
         <div class="section">
-            <h3>Detail Tagihan</h3>
-            <table class="table">
+
+            <div class="section-title">
+                Detail Tagihan
+            </div>
+
+
+            <table class="invoice-table">
+
                 <thead>
+
                     <tr>
-                        <th>Description</th>
-                        <th>Product / Plan</th>
-                        <th class="text-right">Amount</th>
+
+                        <th class="description">
+                            Description
+                        </th>
+
+                        <th class="product">
+                            Product / Plan
+                        </th>
+
+                        <th class="amount">
+                            Amount
+                        </th>
+
                     </tr>
+
                 </thead>
+
                 <tbody>
+
                     <tr>
-                        <td>{{ $invoice->transaction?->description ?? 'Pembayaran langganan SaaS Cooca' }}</td>
-                        <td>
-                            {{ $invoice->transaction?->subscription?->product?->name ?? 'COOCA SaaS Subscription' }}
-                            @if ($invoice->transaction?->subscription?->subscriptionPlan?->name)
-                                <div style="font-size:11px;color:#555;">
-                                    {{ $invoice->transaction->subscription->subscriptionPlan->name }}</div>
-                            @endif
+
+                        <td class="description">
+
+                            {{ $invoice->transaction?->description ?? 'Pembayaran langganan SaaS Cooca' }}
+
                         </td>
-                        <td class="text-right">Rp {{ number_format($invoice->amount, 0, ',', '.') }}</td>
+
+
+                        <td class="product">
+
+                            <div class="product-name">
+
+                                {{ $invoice->transaction?->subscription?->product?->name ?? 'COOCA SaaS Subscription' }}
+
+                            </div>
+
+
+                            @if ($invoice->transaction?->subscription?->subscriptionPlan?->name)
+                                <div class="plan-name">
+
+                                    {{ $invoice->transaction->subscription->subscriptionPlan->name }}
+
+                                </div>
+                            @endif
+
+                        </td>
+
+
+                        <td class="amount nowrap">
+
+                            Rp {{ number_format($invoice->amount, 0, ',', '.') }}
+
+                        </td>
+
                     </tr>
+
                 </tbody>
+
             </table>
 
-            <table class="totals">
-                <tr>
-                    <td class="label">Subtotal</td>
-                    <td class="value">Rp {{ number_format($invoice->amount, 0, ',', '.') }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Diskon</td>
-                    <td class="value">Rp 0</td>
-                </tr>
-                <tr>
-                    <td class="label">Total</td>
-                    <td class="value"><strong>Rp {{ number_format($invoice->amount, 0, ',', '.') }}</strong></td>
-                </tr>
-            </table>
         </div>
 
-        <div class="section notes">
-            <p><strong>Catatan:</strong></p>
-            <p>Terima kasih telah menggunakan layanan COOCA.ID. Mohon selesaikan pembayaran sebelum tanggal jatuh tempo.
+
+        {{-- =========================================================
+             TOTAL
+        ========================================================== --}}
+
+        <div class="total-wrapper">
+
+            <table class="total-table">
+
+                <tr>
+
+                    <td class="total-label">
+                        Subtotal
+                    </td>
+
+                    <td class="total-value">
+                        Rp {{ number_format($invoice->amount, 0, ',', '.') }}
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td class="total-label">
+                        Diskon
+                    </td>
+
+                    <td class="total-value">
+                        Rp 0
+                    </td>
+
+                </tr>
+
+                <tr class="grand-total">
+
+                    <td class="total-label">
+                        TOTAL
+                    </td>
+
+                    <td class="total-value">
+                        Rp {{ number_format($invoice->amount, 0, ',', '.') }}
+                    </td>
+
+                </tr>
+
+            </table>
+
+        </div>
+
+
+        {{-- =========================================================
+             PAYMENT INFORMATION
+        ========================================================== --}}
+
+        <div class="payment-box">
+
+            <div class="payment-title">
+                Informasi Pembayaran
+            </div>
+
+            <p class="payment-text">
+                Silakan melakukan pembayaran sesuai dengan nominal yang
+                tercantum pada invoice ini sebelum tanggal jatuh tempo.
+                Invoice ini diterbitkan secara otomatis oleh sistem COOCA.ID.
             </p>
-            <p>Jika Anda memiliki pertanyaan tentang invoice ini, silakan hubungi tim dukungan kami di <a
-                    href="mailto:support@cooca.id">support@cooca.id</a>.</p>
+
         </div>
+
+
+        {{-- =========================================================
+             NOTES
+        ========================================================== --}}
+
+        <div class="notes">
+
+            <div class="notes-title">
+                Catatan
+            </div>
+
+            <p>
+                Terima kasih telah menggunakan layanan COOCA.ID.
+            </p>
+
+            <p>
+                Mohon selesaikan pembayaran sebelum tanggal jatuh tempo
+                untuk menjaga layanan tetap aktif.
+            </p>
+
+            <p>
+                Jika Anda memiliki pertanyaan mengenai invoice ini,
+                silakan hubungi tim support melalui
+                <a href="mailto:support@cooca.id">
+                    support@cooca.id
+                </a>.
+            </p>
+
+        </div>
+
+
+        {{-- =========================================================
+             FOOTER
+        ========================================================== --}}
 
         <div class="footer">
-            <small>Invoice generated automatically oleh sistem COOCA.ID.</small>
+
+            Invoice ini dibuat secara otomatis oleh
+            <strong>COOCA.ID</strong>.
+
+            <br>
+
+            Tidak diperlukan tanda tangan atau stempel.
+
         </div>
+
     </div>
+
 </body>
 
 </html>
