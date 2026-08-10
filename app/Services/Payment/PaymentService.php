@@ -79,6 +79,16 @@ final class PaymentService
 
         $data = $response->json();
 
+        // If Midtrans did not return an order_id, treat as failure and log response
+        if (!isset($data['order_id'])) {
+            Log::error('Midtrans Snap creation returned no order_id', [
+                'transaction_id' => (string) $transaction->id,
+                'response' => $response->body(),
+            ]);
+
+            throw new \RuntimeException('Midtrans Snap creation failed: missing order_id in response');
+        }
+
         // Update transaction with Midtrans info
         DB::table('transactions')
             ->where('id', (string) $transaction->id)
@@ -88,7 +98,7 @@ final class PaymentService
             ]);
 
         return [
-            'snap_token' => $data['token'],
+            'snap_token' => $data['token'] ?? null,
             'snap_url' => $data['redirect_url'] ?? null,
         ];
     }
