@@ -6,11 +6,10 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
-use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-
+use Illuminate\Support\Str;
 
 /**
  * Customer Invoice Controller
@@ -98,7 +97,9 @@ class InvoiceController extends Controller
             abort(500, 'Invoice file not found');
         }
 
-        return response()->download($fullPath, "invoice-{$invoice->invoice_number}.pdf", [
+        $downloadName = Str::slug("invoice-{$invoice->invoice_number}", '_') . '.pdf';
+
+        return response()->download($fullPath, $downloadName, [
             'Content-Type' => 'application/pdf',
         ]);
     }

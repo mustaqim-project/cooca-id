@@ -485,6 +485,16 @@ final class PaymentService
     }
 
     /**
+     * Find transaction by Midtrans order ID
+     */
+    public function findTransactionByOrderId(string $orderId): ?Transaction
+    {
+        return Transaction::with(['customer', 'subscription.subscriptionPlan.product', 'invoice'])
+            ->where('midtrans_order_id', $orderId)
+            ->first();
+    }
+
+    /**
      * Refund a transaction wrapper
      */
     public function refundTransaction(string $id, ?string $reason): array

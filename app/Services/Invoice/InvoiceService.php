@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Services\Invoice;
 
 use App\Models\Transaction;
 use App\Models\Invoice;
 use App\Repositories\Contracts\InvoiceRepositoryInterface;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 final class InvoiceService
@@ -16,7 +18,7 @@ final class InvoiceService
 
     public function generateFromTransaction(Transaction $transaction): Invoice
     {
-        return \DB::transaction(function () use ($transaction) {
+        return DB::transaction(function () use ($transaction) {
             $invoiceNumber = $this->invoiceRepository->generateInvoiceNumber();
 
             $invoice = $this->invoiceRepository->create([
@@ -40,7 +42,8 @@ final class InvoiceService
     public function generateInvoicePdf(Invoice $invoice): string
     {
         $yearMonth = $invoice->created_at->format('Y/m');
-        $filename = "{$invoice->invoice_number}.pdf";
+        $safeInvoiceNumber = preg_replace('/[^A-Za-z0-9_-]+/', '_', $invoice->invoice_number);
+        $filename = "{$safeInvoiceNumber}.pdf";
         $relativePath = "invoices/{$yearMonth}/{$filename}";
         $fullPath = storage_path("app/public/{$relativePath}");
 
@@ -69,7 +72,7 @@ final class InvoiceService
             throw new \RuntimeException('Invoice not found');
         }
 
-        if ($invoice->customer_id->toString() !== $customerId) {
+        if ((string) $invoice->customer_id !== $customerId) {
             throw new \RuntimeException('Unauthorized access to invoice');
         }
 

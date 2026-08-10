@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Customer;
 
 use App\Actions\Payment\ProcessPayment\ProcessPaymentAction;
-use App\DTOs\TransactionData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\ProcessPaymentRequest;
+use App\Models\Invoice;
 use App\Services\Payment\PaymentService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -54,18 +52,31 @@ final class PaymentController extends Controller
         $customer = Auth::user();
         $data = $request->validated();
 
-        $transactionData = TransactionData::from([
-            'customer_id' => $customer->getKey(),
-            'subscription_id' => $data['subscription_id'],
-            'gross_amount' => $data['gross_amount'],
-            'voucher_discount' => $data['voucher_discount'] ?? 0,
-            'voucher_id' => $data['voucher_id'] ?? null,
-            'payment_method' => $data['payment_method'] ?? 'bank_transfer',
-        ]);
+        if (empty($data['invoice_id'])) {
+            abort(400, 'Invalid payment request: invoice_id is required.');
+        }
 
-        $paymentUrl = ($this->processPaymentAction)($transactionData);
+        $invoice = Invoice::with('transaction')
+            ->where('id', $data['invoice_id'])
+            ->where('customer_id', $customer->getKey())
+            ->firstOrFail();
 
-        // If the client expects JSON (AJAX), return JSON; otherwise redirect browser to payment URL
+        $transaction = $invoice->transaction;
+        if (!$transaction) {
+            abort(400, 'Invoice tidak terkait dengan transaksi.');
+        }
+
+        if ($transaction->status === 'paid') {
+            return back()->with('error', 'Invoice sudah dibayar.');
+        }
+
+        $paymentData = $this->processPaymentAction->execute($transaction);
+        $paymentUrl = $paymentData['snap_url'] ?? null;
+
+        if (!$paymentUrl) {
+            return back()->with('error', 'Gagal memproses pembayaran. Silakan coba lagi.');
+        }
+
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'message' => 'Payment initiated successfully',
