@@ -79,14 +79,15 @@ final class PaymentService
 
         $data = $response->json();
 
-        // If Midtrans did not return an order_id, treat as failure and log response
+        // If Midtrans did not return an order_id, don't fail — use our sanitized order id
         if (!isset($data['order_id'])) {
-            Log::error('Midtrans Snap creation returned no order_id', [
+            Log::warning('Midtrans Snap creation returned no order_id; using local order id', [
                 'transaction_id' => (string) $transaction->id,
+                'provided_order_id' => $sanitizedOrderId,
                 'response' => $response->body(),
             ]);
 
-            throw new \RuntimeException('Midtrans Snap creation failed: missing order_id in response');
+            $data['order_id'] = $sanitizedOrderId;
         }
 
         // Update transaction with Midtrans info
