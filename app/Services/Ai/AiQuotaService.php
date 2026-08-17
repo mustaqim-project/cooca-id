@@ -26,9 +26,9 @@ final class AiQuotaService
                 'allowed_models' => [
                     'gpt-4o',
                     'gpt-4o-mini',
-                    'gemini-1.5-flash',
-                    'gemini-1.5-pro',
-                    'gemini-2.0-flash',
+                    'gemini-3.6-flash',
+                    'gemini-2.5-pro',
+                    'gemini-flash-latest',
                     'claude-3-5-sonnet-20241022',
                     'claude-3-5-haiku-20241022',
                     'deepseek-chat',

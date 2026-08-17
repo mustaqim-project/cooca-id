@@ -44,9 +44,9 @@ final class ChatCompletionController extends Controller
         $modelDefinitions = [
             'gpt-4o' => ['name' => 'GPT-4o', 'provider' => 'OpenAI', 'context' => '128k', 'description' => 'Flagship multi-modal model for high-complexity tasks.'],
             'gpt-4o-mini' => ['name' => 'GPT-4o Mini', 'provider' => 'OpenAI', 'context' => '128k', 'description' => 'Fast, lightweight intelligence for everyday tasks.'],
-            'gemini-1.5-flash' => ['name' => 'Gemini 1.5 Flash', 'provider' => 'Google', 'context' => '1M', 'description' => 'High speed, high throughput model for rapid workflows.'],
-            'gemini-1.5-pro' => ['name' => 'Gemini 1.5 Pro', 'provider' => 'Google', 'context' => '2M', 'description' => 'Massive context model for deep reasoning and code generation.'],
-            'gemini-2.0-flash' => ['name' => 'Gemini 2.0 Flash', 'provider' => 'Google', 'context' => '1M', 'description' => 'Next-generation multimodal reasoning and latency reduction.'],
+            'gemini-3.6-flash' => ['name' => 'Gemini 3.6 Flash', 'provider' => 'Google', 'context' => '1M', 'description' => 'Ultra high-speed, latest generation multimodal model for rapid workflows.'],
+            'gemini-2.5-pro' => ['name' => 'Gemini 2.5 Pro', 'provider' => 'Google', 'context' => '2M', 'description' => 'Massive context model for deep reasoning and code generation.'],
+            'gemini-flash-latest' => ['name' => 'Gemini Flash Latest', 'provider' => 'Google', 'context' => '1M', 'description' => 'Always points to the latest Gemini Flash release.'],
             'claude-3-5-sonnet-20241022' => ['name' => 'Claude 3.5 Sonnet', 'provider' => 'Anthropic', 'context' => '200k', 'description' => 'State-of-the-art coding, analysis, and writing.'],
             'claude-3-5-haiku-20241022' => ['name' => 'Claude 3.5 Haiku', 'provider' => 'Anthropic', 'context' => '200k', 'description' => 'Ultra fast performance at a fraction of the cost.'],
             'deepseek-chat' => ['name' => 'DeepSeek-V3', 'provider' => 'DeepSeek', 'context' => '64k', 'description' => 'Powerful mixture-of-experts model for general reasoning.'],
