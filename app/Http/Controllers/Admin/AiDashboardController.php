@@ -75,6 +75,12 @@ final class AiDashboardController extends Controller
             ->latest()
             ->paginate(15);
 
+        // Recent Usage Logs
+        $recentLogs = AiUsageLog::with(['apiKey.customer', 'license'])
+            ->latest('created_at')
+            ->limit(25)
+            ->get();
+
         return view('admin.ai.dashboard', compact(
             'monthlyUsage',
             'providers',
