@@ -160,7 +160,7 @@
                         </button>
 
                         @if($pData['is_configured'])
-                            <form action="{{ route('admin.ai.providers.toggle') }}" method="POST" style="display: inline;">
+                            <form action="{{ \Illuminate\Support\Facades\Route::has('admin.ai.providers.toggle') ? route('admin.ai.providers.toggle') : url('/admin/ai/providers/toggle') }}" method="POST" style="display: inline;">
                                 @csrf
                                 <input type="hidden" name="provider" value="{{ $pKey }}">
                                 <button type="submit" class="btn btn-ghost btn-xs" title="Toggle Status">
@@ -168,7 +168,7 @@
                                 </button>
                             </form>
 
-                            <form action="{{ route('admin.ai.providers.test') }}" method="POST" style="display: inline;">
+                            <form action="{{ \Illuminate\Support\Facades\Route::has('admin.ai.providers.test') ? route('admin.ai.providers.test') : url('/admin/ai/providers/test') }}" method="POST" style="display: inline;">
                                 @csrf
                                 <input type="hidden" name="provider" value="{{ $pKey }}">
                                 <button type="submit" class="btn btn-outline btn-xs" title="Test Connection Ping">
@@ -333,7 +333,7 @@
             <div class="card-title" id="modal-provider-title">Konfigurasi Provider</div>
             <button type="button" class="btn btn-ghost btn-xs" onclick="closeProviderModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <form action="{{ route('admin.ai.providers.save') }}" method="POST">
+        <form action="{{ \Illuminate\Support\Facades\Route::has('admin.ai.providers.save') ? route('admin.ai.providers.save') : url('/admin/ai/providers/save') }}" method="POST">
             @csrf
             <input type="hidden" name="provider" id="modal-provider-key" value="">
             <div class="card-body" style="display: flex; flex-direction: column; gap: 14px; padding: 20px;">
