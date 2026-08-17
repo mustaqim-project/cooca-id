@@ -36,9 +36,14 @@ final class AiUsageLog extends Model
         'created_at' => 'datetime',
     ];
 
+    public function apiKey(): BelongsTo
+    {
+        return $this->belongsTo(AiApiKey::class, 'ai_api_key_id');
+    }
+
     public function aiApiKey(): BelongsTo
     {
-        return $this->belongsTo(AiApiKey::class);
+        return $this->apiKey();
     }
 
     public function license(): BelongsTo

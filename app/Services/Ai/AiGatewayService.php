@@ -35,14 +35,14 @@ final class AiGatewayService
             ]);
         }
 
-        $provider = $this->providers->resolveFor($payload['model']);
         $started = microtime(true);
 
         try {
+            $provider = $this->providers->resolveFor($payload['model']);
             $providerResponse = $provider->chatCompletion($payload);
         } catch (Throwable $e) {
             $this->metering->logError($apiKey, $license, $payload['model'], $e);
-            return $this->errorResponse(502, 'AI provider request failed. Please try again.');
+            return $this->errorResponse(502, 'AI provider request failed: ' . $e->getMessage());
         }
 
         $durationMs = (int) ((microtime(true) - $started) * 1000);
