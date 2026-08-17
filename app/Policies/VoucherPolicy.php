@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Admin;
+use App\Models\Admin;
 use App\Models\Voucher;
 
 final class VoucherPolicy

@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Admin;
+use App\Models\Affiliator;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AffiliatorPolicy

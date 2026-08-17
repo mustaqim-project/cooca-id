@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Admin;
-use App\Affiliator;
-use App\Customer;
+use App\Models\Admin;
+use App\Models\Affiliator;
+use App\Models\Customer;
 use App\Models\Ticket;
 
 final class TicketPolicy

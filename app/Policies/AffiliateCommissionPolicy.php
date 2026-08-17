@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Admin;
-use App\Affiliator;
+use App\Models\Admin;
+use App\Models\Affiliator;
 use App\Models\AffiliateCommission;
 
 final class AffiliateCommissionPolicy

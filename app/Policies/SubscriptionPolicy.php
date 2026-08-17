@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Admin;
-use App\Customer;
-use App\Subscription;
+use App\Models\Admin;
+use App\Models\Customer;
+use App\Models\Subscription;
 
 final class SubscriptionPolicy
 {
