@@ -165,7 +165,7 @@
                             </td>
                             <td style="padding: 12px 18px; text-align: right;">
                                 @if($k->status === 'active')
-                                    <form action="{{ route('customer.ai-usage.keys.revoke', $k->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menonaktifkan API Key [{{ $k->name }}]? Aplikasi yang menggunakan kunci ini tidak akan bisa mengakses AI lagi.');" style="display: inline;">
+                                    <form action="{{ \Illuminate\Support\Facades\Route::has('customer.ai-usage.keys.revoke') ? route('customer.ai-usage.keys.revoke', $k->id) : url('/customer/ai-usage/keys/' . $k->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menonaktifkan API Key [{{ $k->name }}]? Aplikasi yang menggunakan kunci ini tidak akan bisa mengakses AI lagi.');" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-outline btn-xs" style="color: var(--danger); border-color: var(--border);">
@@ -339,7 +339,7 @@ echo $data['choices'][0]['message']['content'];</pre>
             <div class="card-title font-bold" style="color: var(--text);">Buat AI API Key Baru</div>
             <button type="button" class="btn btn-ghost btn-xs" onclick="closeNewKeyModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <form action="{{ route('customer.ai-usage.keys.store') }}" method="POST">
+        <form action="{{ \Illuminate\Support\Facades\Route::has('customer.ai-usage.keys.store') ? route('customer.ai-usage.keys.store') : url('/customer/ai-usage/keys') }}" method="POST">
             @csrf
             <div class="card-body" style="display: flex; flex-direction: column; gap: 14px; padding: 20px;">
                 <div class="form-group">

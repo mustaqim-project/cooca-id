@@ -86,6 +86,10 @@ final class AiDashboardController extends Controller
 
     public function saveProvider(Request $request)
     {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.ai.dashboard');
+        }
+
         $validated = $request->validate([
             'provider' => 'required|string|in:openai,anthropic,gemini,deepseek',
             'api_key'  => 'nullable|string',
@@ -102,11 +106,15 @@ final class AiDashboardController extends Controller
         $config->is_active = $request->boolean('is_active', true);
         $config->save();
 
-        return back()->with('success', "Konfigurasi AI Provider [{$validated['provider']}] berhasil disimpan.");
+        return redirect()->route('admin.ai.dashboard')->with('success', "Konfigurasi AI Provider [{$validated['provider']}] berhasil disimpan.");
     }
 
     public function toggleProvider(Request $request)
     {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.ai.dashboard');
+        }
+
         $validated = $request->validate([
             'provider' => 'required|string|in:openai,anthropic,gemini,deepseek',
         ]);
@@ -115,14 +123,18 @@ final class AiDashboardController extends Controller
         if ($config) {
             $config->update(['is_active' => !$config->is_active]);
             $statusStr = $config->is_active ? 'Diaktifkan' : 'Dinonaktifkan';
-            return back()->with('success', "Provider [{$config->provider}] berhasil {$statusStr}.");
+            return redirect()->route('admin.ai.dashboard')->with('success', "Provider [{$config->provider}] berhasil {$statusStr}.");
         }
 
-        return back()->with('error', "Provider belum dikonfigurasi.");
+        return redirect()->route('admin.ai.dashboard')->with('error', "Provider belum dikonfigurasi.");
     }
 
     public function testProvider(Request $request)
     {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.ai.dashboard');
+        }
+
         $validated = $request->validate([
             'provider' => 'required|string|in:openai,anthropic,gemini,deepseek',
         ]);
@@ -146,14 +158,18 @@ final class AiDashboardController extends Controller
                 'max_tokens' => 10,
             ]);
 
-            return back()->with('success', "Test koneksi ke [{$validated['provider']}] BERHASIL! Model {$model} merespon dengan baik.");
+            return redirect()->route('admin.ai.dashboard')->with('success', "Test koneksi ke [{$validated['provider']}] BERHASIL! Model {$model} merespon dengan baik.");
         } catch (Throwable $e) {
-            return back()->with('error', "Test koneksi ke [{$validated['provider']}] GAGAL: " . $e->getMessage());
+            return redirect()->route('admin.ai.dashboard')->with('error', "Test koneksi ke [{$validated['provider']}] GAGAL: " . $e->getMessage());
         }
     }
 
     public function savePlanConfig(Request $request)
     {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.ai.dashboard');
+        }
+
         $validated = $request->validate([
             'subscription_plan_id' => 'required|uuid|exists:subscription_plans,id',
             'monthly_token_quota'  => 'required|integer|min:1000',
@@ -172,11 +188,15 @@ final class AiDashboardController extends Controller
             ]
         );
 
-        return back()->with('success', 'Konfigurasi Kuota AI Plan berhasil diperbarui.');
+        return redirect()->route('admin.ai.dashboard')->with('success', 'Konfigurasi Kuota AI Plan berhasil diperbarui.');
     }
 
     public function grantBonus(Request $request, AiUsageCycle $cycle)
     {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.ai.dashboard');
+        }
+
         $validated = $request->validate([
             'bonus_tokens' => 'required|integer|min:1',
             'reason'       => 'required|string|max:255',
@@ -184,6 +204,6 @@ final class AiDashboardController extends Controller
 
         $cycle->increment('token_quota', $validated['bonus_tokens']);
 
-        return back()->with('success', "Berhasil menambahkan bonus +" . number_format($validated['bonus_tokens']) . " token ke siklus ini.");
+        return redirect()->route('admin.ai.dashboard')->with('success', "Berhasil menambahkan bonus +" . number_format($validated['bonus_tokens']) . " token ke siklus ini.");
     }
 }

@@ -28,8 +28,8 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'veri
 
     // AI Gateway & API Key Management
     Route::get('/ai-usage', [\App\Http\Controllers\Customer\AiUsageController::class, 'index'])->name('ai-usage.index');
-    Route::post('/ai-usage/keys', [\App\Http\Controllers\Customer\AiUsageController::class, 'createKey'])->name('ai-usage.keys.store');
-    Route::delete('/ai-usage/keys/{key}', [\App\Http\Controllers\Customer\AiUsageController::class, 'revokeKey'])->name('ai-usage.keys.revoke');
+    Route::match(['get', 'post'], '/ai-usage/keys', [\App\Http\Controllers\Customer\AiUsageController::class, 'createKey'])->name('ai-usage.keys.store');
+    Route::match(['get', 'delete'], '/ai-usage/keys/{key}', [\App\Http\Controllers\Customer\AiUsageController::class, 'revokeKey'])->name('ai-usage.keys.revoke');
 
     // Products Catalog
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');

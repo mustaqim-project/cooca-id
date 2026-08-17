@@ -40,11 +40,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     // AI Gateway Console & Settings
     Route::prefix('ai')->name('ai.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Admin\AiDashboardController::class, 'index'])->name('dashboard');
-        Route::post('/providers/save', [\App\Http\Controllers\Admin\AiDashboardController::class, 'saveProvider'])->name('providers.save');
-        Route::post('/providers/toggle', [\App\Http\Controllers\Admin\AiDashboardController::class, 'toggleProvider'])->name('providers.toggle');
-        Route::post('/providers/test', [\App\Http\Controllers\Admin\AiDashboardController::class, 'testProvider'])->name('providers.test');
-        Route::post('/plans/save', [\App\Http\Controllers\Admin\AiDashboardController::class, 'savePlanConfig'])->name('plans.save');
-        Route::post('/cycles/{cycle}/bonus', [\App\Http\Controllers\Admin\AiDashboardController::class, 'grantBonus'])->name('cycles.bonus');
+        Route::match(['get', 'post'], '/providers/save', [\App\Http\Controllers\Admin\AiDashboardController::class, 'saveProvider'])->name('providers.save');
+        Route::match(['get', 'post'], '/providers/toggle', [\App\Http\Controllers\Admin\AiDashboardController::class, 'toggleProvider'])->name('providers.toggle');
+        Route::match(['get', 'post'], '/providers/test', [\App\Http\Controllers\Admin\AiDashboardController::class, 'testProvider'])->name('providers.test');
+        Route::match(['get', 'post'], '/plans/save', [\App\Http\Controllers\Admin\AiDashboardController::class, 'savePlanConfig'])->name('plans.save');
+        Route::match(['get', 'post'], '/cycles/{cycle}/bonus', [\App\Http\Controllers\Admin\AiDashboardController::class, 'grantBonus'])->name('cycles.bonus');
     });
 
     // Live Chat Support Management
