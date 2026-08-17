@@ -22,12 +22,14 @@ final class AiApiKey extends Model
         'name',
         'key_prefix',
         'key_hash',
+        'secret_key',
         'status',
         'last_used_at',
         'revoked_at',
     ];
 
     protected $casts = [
+        'secret_key' => 'encrypted',
         'last_used_at' => 'datetime',
         'revoked_at' => 'datetime',
     ];
@@ -35,6 +37,11 @@ final class AiApiKey extends Model
     protected $hidden = [
         'key_hash',
     ];
+
+    public function getPlainKeyAttribute(): ?string
+    {
+        return $this->secret_key ?? null;
+    }
 
     public function license(): BelongsTo
     {

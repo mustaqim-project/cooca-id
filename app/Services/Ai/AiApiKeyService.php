@@ -28,6 +28,7 @@ final class AiApiKeyService
             'name'        => $name,
             'key_prefix'  => $prefix,
             'key_hash'    => hash('sha256', $rawKey),
+            'secret_key'  => $rawKey,
             'status'      => 'active',
         ]);
 

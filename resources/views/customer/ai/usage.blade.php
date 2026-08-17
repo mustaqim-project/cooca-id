@@ -144,9 +144,21 @@
                                 {{ $k->name }}
                             </td>
                             <td style="padding: 12px 18px;">
-                                <code style="background: var(--bg-secondary); color: var(--text); padding: 4px 8px; border-radius: var(--radius-sm); font-size: 12px; font-family: monospace;">
-                                    {{ $k->key_prefix }}••••••••••••••••
-                                </code>
+                                @if($k->plain_key)
+                                    <div class="flex items-center gap-2" style="max-width: 320px;">
+                                        <code id="key-text-{{ $k->id }}" data-full="{{ $k->plain_key }}" data-masked="{{ $k->key_prefix }}••••••••••••••••" data-state="masked" style="background: var(--bg-secondary); color: var(--text); padding: 4px 8px; border-radius: var(--radius-sm); font-size: 12px; font-family: monospace; border: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">{{ $k->key_prefix }}••••••••••••••••</code>
+                                        <button type="button" class="btn btn-ghost btn-xs" onclick="toggleKeyVisibility('{{ $k->id }}')" title="Tampilkan / Sembunyikan API Key" style="padding: 4px 8px;">
+                                            <i id="key-eye-{{ $k->id }}" class="fa-regular fa-eye"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-ghost btn-xs" onclick="copyKeyText('{{ $k->id }}')" title="Salin API Key" style="padding: 4px 8px; color: var(--primary);">
+                                            <i class="fa-regular fa-copy"></i>
+                                        </button>
+                                    </div>
+                                @else
+                                    <code style="background: var(--bg-secondary); color: var(--text); padding: 4px 8px; border-radius: var(--radius-sm); font-size: 12px; font-family: monospace;">
+                                        {{ $k->key_prefix }}••••••••••••••••
+                                    </code>
+                                @endif
                             </td>
                             <td style="padding: 12px 18px;">
                                 <span class="text-xs font-semibold" style="color: var(--primary);">
@@ -385,18 +397,32 @@ function copyNewKey() {
     });
 }
 
-function switchSnippet(lang, btn) {
-    document.querySelectorAll('.tab-btn').forEach(b => {
-        b.classList.remove('btn-primary', 'active');
-        b.classList.add('btn-outline');
-    });
-    btn.classList.add('btn-primary', 'active');
-    btn.classList.remove('btn-outline');
+function toggleKeyVisibility(id) {
+    const codeEl = document.getElementById('key-text-' + id);
+    const eyeEl = document.getElementById('key-eye-' + id);
+    if (!codeEl || !eyeEl) return;
 
-    const langs = ['curl', 'js', 'python', 'php'];
-    langs.forEach(l => {
-        const el = document.getElementById('snippet-' + l);
-        if (el) el.style.display = (l === lang) ? 'block' : 'none';
+    const fullKey = codeEl.getAttribute('data-full');
+    const maskedKey = codeEl.getAttribute('data-masked');
+    const state = codeEl.getAttribute('data-state');
+
+    if (state === 'masked') {
+        codeEl.innerText = fullKey;
+        codeEl.setAttribute('data-state', 'revealed');
+        eyeEl.className = 'fa-regular fa-eye-slash';
+    } else {
+        codeEl.innerText = maskedKey;
+        codeEl.setAttribute('data-state', 'masked');
+        eyeEl.className = 'fa-regular fa-eye';
+    }
+}
+
+function copyKeyText(id) {
+    const codeEl = document.getElementById('key-text-' + id);
+    if (!codeEl) return;
+    const fullKey = codeEl.getAttribute('data-full');
+    navigator.clipboard.writeText(fullKey).then(() => {
+        alert('API Key berhasil disalin ke clipboard!');
     });
 }
 </script>
