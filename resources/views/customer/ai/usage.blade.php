@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'AI Gateway & API Usage — COOCA.ID')
+@section('title', 'AI Gateway, Kuota & Tracking Penggunaan Token — COOCA.ID')
 
 @push('styles')
 <style>
@@ -56,16 +56,16 @@
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
     <div>
         <h1 style="font-size: 24px; font-weight: 800; color: var(--text); margin: 0; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-brain" style="color: var(--primary);"></i> AI Gateway & API Access
+            <i class="fa-solid fa-brain" style="color: var(--primary);"></i> AI Gateway & Tracking Token
         </h1>
         <p style="color: var(--text-muted); margin: 4px 0 0; font-size: 14px;">
-            Akses multi-model AI (OpenAI GPT, Google Gemini, Anthropic Claude, DeepSeek) menggunakan satu API Key terpadu.
+            Pantau penggunaan token, sisa kuota, riwayat pemanggilan API, serta akses multi-model AI (OpenAI GPT, Gemini, Claude, DeepSeek).
         </p>
     </div>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
         @if($licenses->isNotEmpty())
             <button type="button" class="btn btn-outline" onclick="openTopUpModal()" style="border-color: var(--primary); color: var(--primary); font-weight: 700;">
-                <i class="fa-solid fa-bolt" style="color: var(--accent);"></i> Top-Up Token AI
+                <i class="fa-solid fa-bolt" style="color: var(--accent);"></i> Top-Up Kuota Token
             </button>
             <button type="button" class="btn btn-primary" onclick="openNewKeyModal()">
                 <i class="fa-solid fa-plus"></i> Buat API Key Baru
@@ -81,6 +81,61 @@
 @if(session('error'))
     <div class="alert alert-danger mb-4"><i class="fa-solid fa-triangle-exclamation"></i> {{ session('error') }}</div>
 @endif
+
+{{-- Monthly KPI Cards for Customer --}}
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <div class="card" style="border: 1px solid var(--border); padding: 18px; border-radius: var(--radius-md);">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold uppercase text-muted">Token Terpakai Bulan Ini</span>
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                <i class="fa-solid fa-microchip"></i>
+            </div>
+        </div>
+        <div class="font-extrabold text-2xl" style="color: var(--text);">
+            {{ number_format($currentMonthUsage->total_tokens ?? 0) }}
+        </div>
+        <div class="text-xs text-muted mt-1">Akumulasi input & output token</div>
+    </div>
+
+    <div class="card" style="border: 1px solid var(--border); padding: 18px; border-radius: var(--radius-md);">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold uppercase text-muted">Total Permintaan API</span>
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--success-soft); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+        </div>
+        <div class="font-extrabold text-2xl" style="color: var(--success);">
+            {{ number_format($currentMonthUsage->total_requests ?? 0) }}
+        </div>
+        <div class="text-xs text-muted mt-1">Panggilan chat/completions</div>
+    </div>
+
+    <div class="card" style="border: 1px solid var(--border); padding: 18px; border-radius: var(--radius-md);">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold uppercase text-muted">Rata-rata Waktu Respon</span>
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--warning-soft); color: var(--warning); display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                <i class="fa-solid fa-stopwatch"></i>
+            </div>
+        </div>
+        <div class="font-extrabold text-2xl" style="color: var(--warning);">
+            {{ number_format((float)($currentMonthUsage->avg_latency ?? 0)) }} ms
+        </div>
+        <div class="text-xs text-muted mt-1">Kecepatan latensi gateway</div>
+    </div>
+
+    <div class="card" style="border: 1px solid var(--border); padding: 18px; border-radius: var(--radius-md);">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold uppercase text-muted">Status AI Gateway</span>
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                <i class="fa-solid fa-shield-check"></i>
+            </div>
+        </div>
+        <div class="font-extrabold text-2xl" style="color: var(--accent);">
+            Aktif & Siap
+        </div>
+        <div class="text-xs text-muted mt-1">Protokol OpenAI 100% Kompatibel</div>
+    </div>
+</div>
 
 {{-- One-Time Reveal Flash Card --}}
 @if(session('new_api_key'))
@@ -262,6 +317,79 @@
             </table>
         </div>
     </div>
+</div>
+
+{{-- Live Token Tracking & Telemetry Logs --}}
+<div class="card mb-4">
+    <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
+        <div class="card-title font-bold text-sm" style="color: var(--text);">
+            <i class="fa-solid fa-list-check" style="color: var(--primary); margin-right: 6px;"></i> Live Tracking & Riwayat Penggunaan Token
+        </div>
+        <span class="text-xs text-muted">Pencatatan real-time setiap request AI</span>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        <div class="table-responsive">
+            <table class="table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: var(--bg-secondary); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; color: var(--text-muted);">
+                        <th style="padding: 12px 18px;">Waktu</th>
+                        <th style="padding: 12px 18px;">API Key</th>
+                        <th style="padding: 12px 18px;">Model LLM</th>
+                        <th style="padding: 12px 18px;">Prompt (Input)</th>
+                        <th style="padding: 12px 18px;">Completion (Output)</th>
+                        <th style="padding: 12px 18px;">Total Token</th>
+                        <th style="padding: 12px 18px;">Latensi</th>
+                        <th style="padding: 12px 18px; text-align: right;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($recentLogs as $log)
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">
+                                {{ $log->created_at?->format('d M Y') }}
+                                <div style="font-size: 11px; color: var(--text);">{{ $log->created_at?->format('H:i:s') }}</div>
+                            </td>
+                            <td style="padding: 14px 18px;">
+                                <div class="font-bold text-xs" style="color: var(--text);">{{ $log->apiKey->name ?? 'API Key' }}</div>
+                                <div class="font-mono text-xs text-muted">{{ substr($log->ai_api_key_id, 0, 8) }}...</div>
+                            </td>
+                            <td style="padding: 14px 18px;">
+                                <code style="background: var(--primary-soft); color: var(--primary); padding: 3px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">
+                                    {{ $log->model }}
+                                </code>
+                            </td>
+                            <td style="padding: 14px 18px;" class="font-mono text-xs">{{ number_format($log->prompt_tokens) }}</td>
+                            <td style="padding: 14px 18px;" class="font-mono text-xs">{{ number_format($log->completion_tokens) }}</td>
+                            <td style="padding: 14px 18px;" class="font-mono text-xs font-bold" style="color: var(--text);">
+                                <span class="badge badge-primary font-mono text-xs">{{ number_format($log->total_tokens) }}</span>
+                            </td>
+                            <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">{{ $log->duration_ms }} ms</td>
+                            <td style="padding: 14px 18px; text-align: right;">
+                                @if($log->status === 'success')
+                                    <span class="badge badge-success" style="font-size: 10px;">200 OK</span>
+                                @elseif($log->status === 'quota_exceeded')
+                                    <span class="badge badge-warning" style="font-size: 10px;">429 QUOTA</span>
+                                @else
+                                    <span class="badge badge-danger" style="font-size: 10px;">{{ strtoupper($log->status) }}</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center text-muted" style="padding: 40px;">
+                                Belum ada riwayat panggilan API atau penggunaan token yang tercatat.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @if($recentLogs->hasPages())
+        <div class="card-footer" style="padding: 14px 20px; border-top: 1px solid var(--border);">
+            {{ $recentLogs->links() }}
+        </div>
+    @endif
 </div>
 
 {{-- Quick Integration Guide --}}

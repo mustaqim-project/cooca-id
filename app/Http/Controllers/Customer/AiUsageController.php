@@ -47,14 +47,22 @@ final class AiUsageController extends Controller
             ->get()
             ->keyBy('license_id');
 
-        // Recent Usage Logs
-        $recentLogs = AiUsageLog::whereIn('license_id', $licenseIds)
-            ->latest()
-            ->limit(25)
-            ->get();
+        $apiKeyIds = $keys->pluck('id')->toArray();
+
+        // Recent Usage Logs for this customer
+        $recentLogs = AiUsageLog::with('apiKey')
+            ->where(function ($query) use ($licenseIds, $apiKeyIds) {
+                $query->whereIn('license_id', $licenseIds)
+                      ->orWhereIn('ai_api_key_id', $apiKeyIds);
+            })
+            ->latest('created_at')
+            ->paginate(25);
 
         // Aggregates for current month
-        $currentMonthUsage = AiUsageLog::whereIn('license_id', $licenseIds)
+        $currentMonthUsage = AiUsageLog::where(function ($query) use ($licenseIds, $apiKeyIds) {
+                $query->whereIn('license_id', $licenseIds)
+                      ->orWhereIn('ai_api_key_id', $apiKeyIds);
+            })
             ->where('created_at', '>=', now()->startOfMonth())
             ->selectRaw('SUM(total_tokens) as total_tokens, COUNT(*) as total_requests, AVG(duration_ms) as avg_latency')
             ->first();
