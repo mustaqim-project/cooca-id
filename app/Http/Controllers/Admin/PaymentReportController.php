@@ -83,7 +83,7 @@ final class PaymentReportController extends Controller
         $totalPendingCount = (clone $baseQuery)->where('status', 'pending')->count();
         $totalFailedCount = (clone $baseQuery)->whereIn('status', ['failed', 'canceled', 'expire'])->count();
 
-        $totalGrossPaid = (float) ((clone $baseQuery)->where('status', 'paid')->sum('gross_amount') ?: (clone $baseQuery)->where('status', 'paid')->sum('amount'));
+        $totalGrossPaid = (float) (clone $baseQuery)->where('status', 'paid')->sum('gross_amount');
         $totalNetPaid = (float) (clone $baseQuery)->where('status', 'paid')->sum('net_amount');
         $totalDiscountPaid = (float) (clone $baseQuery)->where('status', 'paid')->sum('voucher_discount');
 
@@ -281,7 +281,7 @@ final class PaymentReportController extends Controller
                         $gateway,
                         $channelDetail,
                         strtoupper($tx->status),
-                        (float) ($tx->gross_amount ?? $tx->amount ?? 0),
+                        (float) ($tx->gross_amount ?? $tx->net_amount ?? 0),
                         (float) ($tx->voucher_discount ?? 0),
                         (float) ($tx->net_amount ?? 0),
                         $tx->verifier->name ?? ($tx->status === 'paid' ? 'Sistem / Webhook' : '—'),

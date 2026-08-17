@@ -50,6 +50,11 @@ final class SubscriptionPlan extends Model
         return $this->hasMany(License::class, 'subscription_plan_id');
     }
 
+    public function aiPlanConfig(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(AiPlanConfig::class, 'subscription_plan_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
