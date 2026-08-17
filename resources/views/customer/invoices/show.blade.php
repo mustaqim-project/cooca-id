@@ -6,11 +6,19 @@
     <span class="crumb-current">{{ $invoice->invoice_number }}</span>
 @endsection
 @section('content')
+    @php
+        $isPaid = $invoice->isPaid();
+        $tx = $invoice->transaction;
+        $hasProof = $tx && $tx->payment_proof;
+        $isVerifying = !$isPaid && $hasProof && $tx->status === 'pending';
+        $isRejected = !$isPaid && $tx && $tx->status === 'failed' && $tx->rejection_reason;
+    @endphp
+
     <div class="page-header">
         <div>
             <h1 class="page-title"><i class="fa-solid fa-file-invoice"
                     style="color:var(--primary);margin-right:10px;"></i>Invoice #{{ $invoice->invoice_number }}</h1>
-            <p class="page-subtitle">Issued on
+            <p class="page-subtitle">Diterbitkan pada
                 {{ $invoice->issued_at?->format('d M Y') ?? $invoice->created_at->format('d M Y') }}</p>
         </div>
         <div class="page-actions">
@@ -18,7 +26,7 @@
                 <i class="fa-solid fa-download"></i> Download PDF
             </a>
             <a href="{{ route('customer.invoices.index') }}" class="btn btn-outline">
-                <i class="fa-solid fa-arrow-left"></i> Back
+                <i class="fa-solid fa-arrow-left"></i> Kembali
             </a>
         </div>
     </div>
@@ -35,30 +43,37 @@
                 <div class="text-right">
                     <div class="font-bold text-xl">{{ $invoice->invoice_number }}</div>
                     <div class="mt-2">
-                        @if ($invoice->status === 'paid')
+                        @if ($isPaid)
                             <span class="badge badge-success" style="font-size:14px;padding:6px 14px;">PAID</span>
-                        @elseif($invoice->status === 'overdue')
+                        @elseif($isVerifying)
+                            <span class="badge badge-warning" style="font-size:14px;padding:6px 14px;">
+                                <i class="fa-solid fa-clock"></i> VERIFIKASI PEMBAYARAN
+                            </span>
+                        @elseif($invoice->status === 'overdue' || ($invoice->due_at && $invoice->due_at->isPast()))
                             <span class="badge badge-danger" style="font-size:14px;padding:6px 14px;">OVERDUE</span>
                         @else
-                            <span class="badge badge-warning" style="font-size:14px;padding:6px 14px;">PENDING
-                                PAYMENT</span>
+                            <span class="badge badge-warning" style="font-size:14px;padding:6px 14px;">PENDING PAYMENT</span>
                         @endif
                     </div>
                 </div>
             </div>
 
-            <div class="grid-2 mb-6" style="background:var(--bg);border-radius:var(--radius);padding:18px;">
+            <div class="grid-2 mb-6" style="background:var(--bg-secondary);border-radius:var(--radius);padding:18px;border:1px solid var(--border);">
                 <div>
-                    <div class="text-xs text-muted font-bold uppercase mb-1">Billed To</div>
-                    <div class="font-bold text-sm">
+                    <div class="text-xs text-muted font-bold uppercase mb-1">Ditagihkan Kepada (Billed To)</div>
+                    <div class="font-bold text-sm" style="color: var(--text);">
                         {{ auth('customer')->user()->business_name ?? auth('customer')->user()->name }}</div>
                     <div class="text-xs text-muted">{{ auth('customer')->user()->email }}</div>
                 </div>
                 <div class="text-right">
-                    <div class="text-xs text-muted font-bold uppercase mb-1">Invoice Dates</div>
-                    <div class="text-xs">Issued: <strong>{{ $invoice->issued_at?->format('d M Y') ?? '—' }}</strong></div>
-                    <div class="text-xs">Due: <strong
-                            style="color:var(--danger);">{{ $invoice->due_at?->format('d M Y') ?? '—' }}</strong></div>
+                    <div class="text-xs text-muted font-bold uppercase mb-1">Tanggal Tagihan</div>
+                    <div class="text-xs">Diterbitkan: <strong>{{ $invoice->issued_at?->format('d M Y') ?? '—' }}</strong></div>
+                    <div class="text-xs">Jatuh Tempo: <strong style="color:var(--danger);">{{ $invoice->due_at?->format('d M Y') ?? '—' }}</strong></div>
+                    @if($isPaid)
+                        <div class="text-xs mt-1" style="color: var(--success); font-weight: 700;">
+                            Lunas: {{ $invoice->paid_at ? $invoice->paid_at->format('d M Y H:i') : ($tx?->paid_at ? $tx->paid_at->format('d M Y H:i') : '—') }}
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -66,21 +81,21 @@
             <table class="data-table mb-6">
                 <thead>
                     <tr>
-                        <th>Description</th>
-                        <th class="text-right">Amount</th>
+                        <th>Deskripsi Item</th>
+                        <th class="text-right">Jumlah</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>
-                            <div class="font-bold text-sm">
+                            <div class="font-bold text-sm" style="color: var(--text);">
                                 {{ $invoice->transaction?->subscription?->product?->name ?? 'COOCA SaaS Subscription' }}
                             </div>
                             <div class="text-xs text-muted">
                                 {{ $invoice->transaction?->subscription?->subscriptionPlan?->name ?? 'Service Plan' }}
                             </div>
                         </td>
-                        <td class="text-right font-bold text-base">
+                        <td class="text-right font-bold text-base" style="color: var(--text);">
                             Rp {{ number_format($invoice->amount, 0, ',', '.') }}
                         </td>
                     </tr>
@@ -88,25 +103,65 @@
             </table>
 
             <div class="flex justify-between items-center pt-4" style="border-top:2px solid var(--border);">
-                <div class="text-sm font-bold">Total Amount Due:</div>
+                <div class="text-sm font-bold" style="color: var(--text);">Total Tagihan:</div>
                 <div class="text-2xl font-bold" style="color:var(--primary);">
                     Rp {{ number_format($invoice->amount, 0, ',', '.') }}
                 </div>
             </div>
 
-            {{-- Payment Section for Unpaid Invoices --}}
-            @if (in_array($invoice->status, ['issued', 'overdue', 'pending', 'unpaid']))
-                @php
-                    $tx = $invoice->transaction;
-                    $hasProof = $tx && $tx->payment_proof;
-                    $isRejected = $tx && $tx->status === 'failed' && $tx->rejection_reason;
-                    $bName = \App\Models\Setting::get('payment.bank_transfer.bank_name', 'Bank Central Asia (BCA)');
-                    $bNumber = \App\Models\Setting::get('payment.bank_transfer.account_number', '8830-8899-8800');
-                    $bHolder = \App\Models\Setting::get('payment.bank_transfer.account_name', 'PT COOCA TECHNOLOGIES INDONESIA');
-                    $bInst = \App\Models\Setting::get('payment.bank_transfer.instructions', 'Silakan transfer sesuai jumlah tagihan.');
-                @endphp
+            {{-- Condition A: Invoice is PAID --}}
+            @if ($isPaid)
+                <div class="divider my-6" style="height:1px;background:var(--border);"></div>
+                <div class="card" style="border: 1px solid var(--success); background: var(--success-soft); box-shadow: none;">
+                    <div class="card-body" style="padding: 24px;">
+                        <div class="flex items-center gap-3">
+                            <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--success); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-base" style="color: var(--success);">Tagihan Ini Telah Lunas (PAID)</div>
+                                <div class="text-xs text-muted" style="color: var(--text-2); margin-top: 2px;">
+                                    Pembayaran telah dikonfirmasi dan layanan SaaS Anda telah aktif.
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="divider my-6"></div>
+                        <div class="grid-2 mt-4 text-xs" style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; gap: 12px;">
+                            <div>
+                                <span class="text-muted">Metode Pembayaran:</span>
+                                <div class="font-bold mt-1" style="color: var(--text);">
+                                    {{ $tx?->isManualTransfer() ? 'Transfer Bank Manual' : 'Midtrans Payment Gateway' }}
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-muted">Waktu Konfirmasi Lunas:</span>
+                                <div class="font-bold mt-1 font-mono" style="color: var(--text);">
+                                    {{ $invoice->paid_at ? $invoice->paid_at->format('d M Y, H:i') : ($tx?->paid_at ? $tx->paid_at->format('d M Y, H:i') : '—') }}
+                                </div>
+                            </div>
+                            @if($tx?->sender_name)
+                                <div>
+                                    <span class="text-muted">Nama Pengirim Rekening:</span>
+                                    <div class="font-bold mt-1" style="color: var(--text);">{{ $tx->sender_name }}</div>
+                                </div>
+                            @endif
+                            @if($tx?->payment_proof)
+                                <div>
+                                    <span class="text-muted">Bukti Pembayaran:</span>
+                                    <div class="mt-1">
+                                        <a href="{{ $tx->payment_proof_url }}" target="_blank" class="btn btn-ghost btn-xs" style="color: var(--primary);">
+                                            <i class="fa-solid fa-file-invoice"></i> Buka Bukti Bayar
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+            {{-- Condition B: Invoice is UNPAID / PENDING --}}
+            @else
+                <div class="divider my-6" style="height:1px;background:var(--border);"></div>
 
                 @if ($isRejected)
                     <div class="alert alert-danger mb-4">
@@ -114,13 +169,13 @@
                         <div class="text-xs mt-1">Alasan: <strong>{{ $tx->rejection_reason }}</strong></div>
                         <div class="text-xs mt-1">Silakan lakukan transfer ulang atau unggah bukti transfer yang valid di bawah ini.</div>
                     </div>
-                @elseif ($hasProof && $tx->status === 'pending')
+                @elseif ($isVerifying)
                     <div class="alert alert-warning mb-4" style="border-radius:var(--radius);padding:16px;">
                         <div class="flex items-center justify-between" style="flex-wrap:wrap;gap:12px;">
                             <div>
                                 <div class="font-bold text-sm"><i class="fa-solid fa-clock"></i> Bukti Transfer Sedang Diverifikasi</div>
                                 <div class="text-xs mt-1">Pengirim: <strong>{{ $tx->sender_name ?? 'Pelanggan' }}</strong> · Diunggah pada: {{ $tx->payment_proof_uploaded_at?->format('d M Y H:i') ?? $tx->updated_at->format('d M Y H:i') }}</div>
-                                <div class="text-xs mt-1 text-muted">Tim kami sedang memeriksa mutasi rekening. Transaksi akan otomatis aktif setelah diverifikasi.</div>
+                                <div class="text-xs mt-1 text-muted">Tim admin kami sedang memeriksa mutasi rekening. Transaksi akan otomatis aktif setelah diverifikasi.</div>
                             </div>
                             <div>
                                 <a href="{{ $tx->payment_proof_url }}" target="_blank" class="btn btn-outline btn-sm">
@@ -178,100 +233,60 @@
                                 $cBanks = \App\Models\CompanyBankAccount::active()->ordered()->get();
                             @endphp
 
-                            <div style="display:flex;flex-direction:column;gap:8px;">
-                                <div class="text-xs font-bold uppercase text-muted" style="letter-spacing:0.5px;">
-                                    <i class="fa-solid fa-building-columns" style="color:var(--primary);margin-right:4px;"></i> Rekening Tujuan Transfer
-                                </div>
-
-                                @if($cBanks->count() > 0)
-                                    @foreach($cBanks as $cb)
-                                        <div class="bank-account-card">
-                                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                                                <span class="font-bold text-sm" style="color:var(--primary);">{{ $cb->bank_name }}</span>
-                                                @if($cb->is_primary)
-                                                    <span class="badge badge-warning" style="font-size:10px;"><i class="fa-solid fa-star"></i> Utama</span>
-                                                @endif
-                                            </div>
-                                            <div class="bank-account-number-box">
-                                                <div class="font-mono font-bold text-base">{{ $cb->account_number }}</div>
-                                                <button type="button" class="btn btn-ghost btn-xs" onclick="copyInvAccNum('{{ $cb->account_number }}')">
+                            <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;">
+                                <div class="text-xs text-muted font-bold uppercase mb-2">Rekening Tujuan Transfer:</div>
+                                @if($cBanks->isNotEmpty())
+                                    <div style="display:flex;flex-direction:column;gap:10px;">
+                                        @foreach($cBanks as $b)
+                                            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;display:flex;justify-content:space-between;align-items:center;">
+                                                <div>
+                                                    <div class="font-bold text-sm" style="color:var(--text);">{{ $b->bank_name }}</div>
+                                                    <div class="font-mono text-base font-bold text-primary" style="letter-spacing:1px;">{{ $b->account_number }}</div>
+                                                    <div class="text-xs text-muted">a.n. {{ $b->account_holder }}</div>
+                                                </div>
+                                                <button type="button" class="btn btn-ghost btn-xs" onclick="navigator.clipboard.writeText('{{ $b->account_number }}');alert('Nomor rekening disalin!')">
                                                     <i class="fa-solid fa-copy"></i> Salin
                                                 </button>
                                             </div>
-                                            <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;" class="text-muted">
-                                                <span>a/n <strong style="color:var(--text);">{{ $cb->account_holder }}</strong></span>
-                                                @if($cb->qr_code_url)
-                                                    <a href="{{ $cb->qr_code_url }}" target="_blank" class="badge badge-success" style="font-size:10px;text-decoration:none;">
-                                                        <i class="fa-solid fa-qrcode"></i> QRIS
-                                                    </a>
-                                                @endif
-                                            </div>
-                                            @if($cb->instructions)
-                                                <div class="bank-instructions-box">
-                                                    {{ $cb->instructions }}
-                                                </div>
-                                            @endif
-                                        </div>
-                                    @endforeach
+                                        @endforeach
+                                    </div>
                                 @else
-                                    <div class="bank-account-card">
-                                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                                            <span class="text-xs font-bold uppercase text-muted">Rekening Tujuan</span>
-                                            <span class="badge badge-primary">{{ $bName }}</span>
-                                        </div>
-                                        <div class="bank-account-number-box">
-                                            <div>
-                                                <div class="text-xs text-muted">Nomor Rekening:</div>
-                                                <div class="font-mono font-bold text-lg">{{ $bNumber }}</div>
-                                            </div>
-                                            <button type="button" class="btn btn-ghost btn-sm" onclick="copyInvAccNum('{{ $bNumber }}')">
-                                                <i class="fa-solid fa-copy"></i> Salin
-                                            </button>
-                                        </div>
-                                        <div class="text-xs text-muted">Atas Nama: <strong style="color:var(--text);">{{ $bHolder }}</strong></div>
-                                        <div class="bank-instructions-box">{{ $bInst }}</div>
+                                    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+                                        <div class="font-bold text-sm">{{ \App\Models\Setting::get('payment.bank_transfer.bank_name', 'BCA') }}</div>
+                                        <div class="font-mono text-base font-bold text-primary">{{ \App\Models\Setting::get('payment.bank_transfer.account_number', '883088998800') }}</div>
+                                        <div class="text-xs text-muted">a.n. {{ \App\Models\Setting::get('payment.bank_transfer.account_name', 'PT COOCA TECHNOLOGIES INDONESIA') }}</div>
                                     </div>
                                 @endif
                             </div>
 
-                            <form method="POST" action="{{ route('customer.payments.store') }}" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:12px;">
+                            <form method="POST" action="{{ route('customer.subscriptions.checkout.process', $invoice->transaction?->subscription_id ?? $invoice->id) }}" enctype="multipart/form-data">
                                 @csrf
-                                <input type="hidden" name="invoice_id" value="{{ $invoice->id }}">
                                 <input type="hidden" name="payment_type" value="manual_transfer">
+                                <input type="hidden" name="transaction_id" value="{{ $invoice->transaction_id }}">
 
-                                <div>
-                                    <label class="form-label text-xs font-bold" for="inv-sender-name">
-                                        Nama Pemilik Rekening Pengirim <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" name="sender_name" id="inv-sender-name" class="form-input" placeholder="Contoh: Budi Santoso" value="{{ old('sender_name', $tx?->sender_name) }}" required>
+                                <div class="form-group mb-3">
+                                    <label class="form-label text-xs font-bold uppercase">Nama Pemilik Rekening Pengirim <span class="text-danger">*</span></label>
+                                    <input type="text" name="sender_name" class="form-input" required placeholder="Contoh: Budi Santoso" value="{{ old('sender_name', $tx?->sender_name) }}">
                                 </div>
 
-                                <div>
-                                    <label class="form-label text-xs font-bold" for="inv-payment-proof">
-                                        Upload Bukti Bayar / Struk Transfer <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="file" name="payment_proof" id="inv-payment-proof" class="form-input" accept="image/jpeg,image/png,image/webp,application/pdf" required onchange="previewInvProof(this)">
-                                    <div class="text-xs text-muted mt-1">Format: JPG, PNG, WEBP, PDF (Maksimal 5MB).</div>
-                                    <div id="inv-proof-preview-wrap" style="display:none;margin-top:10px;text-align:center;">
-                                        <img id="inv-proof-preview-img" src="" alt="Preview Bukti" style="max-height:160px;border-radius:8px;border:1px solid var(--border);margin:0 auto;object-fit:contain;">
-                                        <div id="inv-proof-file-name" class="text-xs text-muted mt-1"></div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label text-xs font-bold uppercase">Unggah Bukti Transfer (JPG/PNG/PDF, maks 5MB) <span class="text-danger">*</span></label>
+                                    <input type="file" name="payment_proof" class="form-input" required accept=".jpg,.jpeg,.png,.pdf" onchange="previewInvProof(this)">
+                                    <div id="inv-proof-preview" style="display:none;margin-top:10px;">
+                                        <img id="inv-preview-img" src="#" alt="Preview Bukti" style="max-height:180px;border-radius:6px;border:1px solid var(--border);">
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label class="form-label text-xs font-bold" for="inv-payment-notes">
-                                        Catatan Pembayaran (Opsional)
-                                    </label>
-                                    <input type="text" name="payment_notes" id="inv-payment-notes" class="form-input" placeholder="Contoh: Transfer via M-BCA jam 14:30" value="{{ old('payment_notes', $tx?->payment_notes) }}">
+                                <div class="form-group mb-4">
+                                    <label class="form-label text-xs font-bold uppercase">Catatan Pembayaran (Opsional)</label>
+                                    <textarea name="payment_notes" class="form-textarea" rows="2" placeholder="Catatan tambahan bila ada...">{{ old('payment_notes') }}</textarea>
                                 </div>
 
-                                <button type="submit" class="btn btn-success btn-lg w-full" style="justify-content:center;font-size:15px;padding:14px;">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                                    {{ $hasProof ? 'Unggah Ulang Bukti Pembayaran' : 'Kirim Bukti Pembayaran' }}
+                                <button type="submit" class="btn btn-primary btn-lg w-full" style="justify-content:center;font-size:15px;padding:14px;">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i> Kirim Bukti Transfer
                                 </button>
                             </form>
                         </div>
-
                     </div>
                 </div>
             @endif
@@ -287,53 +302,38 @@ function toggleInvPayment(type) {
     const secMidtrans = document.getElementById('inv-sec-midtrans');
     const secManual = document.getElementById('inv-sec-manual');
 
-    if (type === 'manual_transfer') {
-        if (cardMidtrans) cardMidtrans.classList.remove('active');
-        if (cardManual) cardManual.classList.add('active');
-        if (secMidtrans) secMidtrans.style.display = 'none';
-        if (secManual) secManual.style.display = 'flex';
-    } else {
-        if (cardMidtrans) cardMidtrans.classList.add('active');
-        if (cardManual) cardManual.classList.remove('active');
-        if (secMidtrans) secMidtrans.style.display = 'flex';
-        if (secManual) secManual.style.display = 'none';
-    }
-}
+    if (!cardMidtrans || !cardManual || !secMidtrans || !secManual) return;
 
-function copyInvAccNum(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Nomor rekening ' + text + ' berhasil disalin!');
-    }).catch(() => {
-        alert('Nomor rekening: ' + text);
-    });
+    if (type === 'midtrans') {
+        cardMidtrans.classList.add('active');
+        cardManual.classList.remove('active');
+        secMidtrans.style.display = 'flex';
+        secManual.style.display = 'none';
+    } else {
+        cardManual.classList.add('active');
+        cardMidtrans.classList.remove('active');
+        secMidtrans.style.display = 'none';
+        secManual.style.display = 'flex';
+    }
 }
 
 function previewInvProof(input) {
-    const wrap = document.getElementById('inv-proof-preview-wrap');
-    const img = document.getElementById('inv-proof-preview-img');
-    const nameEl = document.getElementById('inv-proof-file-name');
+    const preview = document.getElementById('inv-proof-preview');
+    const img = document.getElementById('inv-preview-img');
+    if (!preview || !img) return;
 
-    if (!input.files || !input.files[0]) {
-        if (wrap) wrap.style.display = 'none';
-        return;
-    }
-
-    const file = input.files[0];
-    if (nameEl) nameEl.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
-
-    if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            if (img) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
                 img.src = e.target.result;
-                img.style.display = 'block';
-            }
-            if (wrap) wrap.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    } else {
-        if (img) img.style.display = 'none';
-        if (wrap) wrap.style.display = 'block';
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+        }
     }
 }
 </script>

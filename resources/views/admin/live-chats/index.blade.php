@@ -1,58 +1,67 @@
 @extends('layouts.admin')
 
-@section('title', 'Live Chat Support — Multi-Session Realtime')
+@section('title', 'Live Chat Support Realtime — COOCA.ID Admin')
 
 @section('content')
-<div class="container-fluid" style="padding: 24px;">
-    {{-- Header --}}
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-        <div>
-            <h1 style="font-size: 24px; font-weight: 800; color: #1E293B; margin: 0; display: flex; align-items: center; gap: 10px;">
-                <i class="fa-solid fa-comments text-primary"></i> Live Chat Support Realtime
-            </h1>
-            <p style="color: #64748B; margin: 4px 0 0; font-size: 14px;">
-                Kelola banyak percakapan customer sekaligus secara realtime & terintegrasi dengan WhatsApp Gateway.
-            </p>
+<div class="page-header">
+    <div>
+        <div class="breadcrumb">
+            <a href="{{ route('admin.dashboard') }}">Admin</a>
+            <span>/</span>
+            <span>Support & Communications</span>
+            <span>/</span>
+            <span>Live Chat</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <a href="{{ route('admin.live-chat-templates.index') }}" class="btn btn-outline-primary" style="font-size: 13px; font-weight: 700; border-radius: 20px; display: flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-gear"></i> Kelola Template Balasan
-            </a>
-            <div style="display: flex; align-items: center; gap: 8px; background: #DEF7EC; color: #03543F; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;">
-                <span style="width: 8px; height: 8px; background: #31C48D; border-radius: 50%; display: inline-block;"></span>
-                Auto Polling Realtime Active
-            </div>
+        <h1 class="page-title">
+            <i class="fa-solid fa-comments text-primary" style="margin-right: 6px;"></i> Live Chat Support Realtime
+        </h1>
+        <p class="page-subtitle">Kelola banyak percakapan customer sekaligus secara realtime & terintegrasi dengan WhatsApp Gateway.</p>
+    </div>
+    <div class="page-actions flex items-center gap-2" style="flex-wrap: wrap;">
+        <a href="{{ route('admin.live-chat-templates.index') }}" class="btn btn-outline btn-sm">
+            <i class="fa-solid fa-bolt text-warning"></i> Kelola Template Balasan
+        </a>
+        <div class="badge badge-success flex items-center gap-2" style="padding: 6px 12px; font-weight: 700; font-size: 11px;">
+            <span style="width: 8px; height: 8px; background: currentColor; border-radius: 50%; display: inline-block; animation: pulse 2s infinite;"></span>
+            Auto Sync Realtime
         </div>
     </div>
+</div>
 
-
-    {{-- Chat Grid --}}
-    <div style="display: grid; grid-template-columns: 340px 1fr; gap: 20px; height: 680px; max-height: calc(100vh - 160px);">
+{{-- Main Chat Container --}}
+<div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+    <div style="display: grid; grid-template-columns: 340px 1fr; height: 680px; max-height: calc(100vh - 180px); min-height: 520px;">
         
         {{-- Session Sidebar List --}}
-        <div style="background: white; border-radius: 16px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-            <div style="padding: 16px; border-bottom: 1px solid #F1F5F9; background: #F8FAFC;">
-                <div style="font-size: 12px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px;">Daftar Percakapan Customer</div>
+        <div style="background: var(--bg-secondary); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden;">
+            <div style="padding: 14px 16px; border-bottom: 1px solid var(--border); background: var(--card);">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase text-muted" style="letter-spacing: 0.05em;">Daftar Percakapan</span>
+                    <span id="sessionCount" class="badge badge-primary text-xs">{{ $chats->total() ?? $chats->count() }} Sesi</span>
+                </div>
             </div>
             
             <div id="sessionList" style="flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
                 @forelse($chats as $chat)
-                    <div class="chat-session-item" data-id="{{ $chat->id }}" onclick="selectChatSession({{ $chat->id }})" style="padding: 12px 14px; border-radius: 12px; border: 1px solid #E2E8F0; cursor: pointer; transition: all 0.2s; background: white;" onmouseover="this.style.borderColor='#4F46E5'" onmouseout="this.style.borderColor='#E2E8F0'">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
-                            <div style="font-weight: 700; font-size: 14px; color: #1E293B;">{{ $chat->customer_name }}</div>
-                            <span style="font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; {{ $chat->status === 'active' ? 'background: #DEF7EC; color: #03543F;' : 'background: #F1F5F9; color: #64748B;' }}">
-                                {{ strtoupper($chat->status) }}
-                            </span>
+                    <div class="chat-session-item" data-id="{{ $chat->id }}" onclick="selectChatSession('{{ $chat->id }}')" style="padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s ease; background: var(--card);">
+                        <div class="flex justify-between items-start mb-1">
+                            <div class="font-bold text-sm" style="color: var(--text);">{{ $chat->customer_name }}</div>
+                            @if($chat->status === 'active')
+                                <span class="badge badge-success" style="font-size: 10px; font-weight: 700;">AKTIF</span>
+                            @else
+                                <span class="badge badge-muted" style="font-size: 10px;">BERAKHIR</span>
+                            @endif
                         </div>
-                        <div style="font-size: 12px; color: #059669; font-weight: 600; margin-bottom: 6px;">
+                        <div class="text-xs font-semibold mb-1" style="color: var(--success);">
                             <i class="fa-brands fa-whatsapp"></i> +{{ $chat->customer_phone }}
                         </div>
-                        <div style="font-size: 12px; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <div class="text-xs text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 290px;">
                             {{ $chat->messages->first()?->message ?? 'Belum ada pesan' }}
                         </div>
                     </div>
                 @empty
-                    <div style="text-align: center; color: #94A3B8; padding: 32px 16px; font-size: 13px;">
+                    <div class="text-center text-muted" style="padding: 40px 16px; font-size: 13px;">
+                        <i class="fa-regular fa-comment-dots" style="font-size: 32px; opacity: 0.4; margin-bottom: 8px; display: block;"></i>
                         Belum ada sesi percakapan live chat.
                     </div>
                 @endforelse
@@ -60,54 +69,53 @@
         </div>
 
         {{-- Active Conversation Panel --}}
-        <div style="background: white; border-radius: 16px; border: 1px solid #E2E8F0; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+        <div style="background: var(--card); display: flex; flex-direction: column; overflow: hidden;">
             
             {{-- Panel Header --}}
-            <div id="chatHeader" style="padding: 16px 20px; border-bottom: 1px solid #F1F5F9; background: #F8FAFC; display: flex; justify-content: space-between; align-items: center;">
+            <div id="chatHeader" style="padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--card); display: flex; justify-content: space-between; align-items: center; min-height: 64px;">
                 <div>
-                    <div id="activeCustomerName" style="font-weight: 800; font-size: 16px; color: #1E293B;">Pilih Percakapan</div>
-                    <div id="activeCustomerPhone" style="font-size: 12px; color: #64748B;">Klik salah satu customer di daftar sebelah kiri untuk membalas secara realtime</div>
+                    <div id="activeCustomerName" class="font-bold text-base" style="color: var(--text);">Pilih Percakapan</div>
+                    <div id="activeCustomerPhone" class="text-xs text-muted">Klik salah satu customer di daftar sebelah kiri untuk membalas secara realtime</div>
                 </div>
                 <div id="activeActions" style="display: none;">
-                    <button type="button" onclick="endCurrentChat()" style="background: #FEE2E2; color: #991B1B; border: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="endCurrentChat()" style="color: var(--danger); border-color: var(--border);">
                         <i class="fa-solid fa-flag-checkered"></i> Akhiri & Kirim Transkrip ke WA
                     </button>
                 </div>
             </div>
 
-            {{-- Message Body --}}
-            <div id="chatMessageBody" style="flex: 1; padding: 20px; background: #ECE5DD; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
-                <div style="text-align: center; color: #64748B; margin: auto; font-size: 14px;">
-                    <i class="fa-solid fa-comments" style="font-size: 40px; color: #CBD5E1; margin-bottom: 12px; display: block;"></i>
+            {{-- Message Stream Body --}}
+            <div id="chatMessageBody" style="flex: 1; padding: 20px; background: var(--bg); overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
+                <div style="text-align: center; color: var(--text-muted); margin: auto; font-size: 14px;">
+                    <i class="fa-solid fa-comments" style="font-size: 44px; color: var(--border); margin-bottom: 12px; display: block;"></i>
                     Pilih sesi percakapan di sebelah kiri untuk melihat pesan
                 </div>
             </div>
 
             {{-- Admin Reply Footer --}}
-            <div id="chatFooter" style="padding: 16px; border-top: 1px solid #E2E8F0; background: white; display: none;">
+            <div id="chatFooter" style="padding: 16px 20px; border-top: 1px solid var(--border); background: var(--card); display: none;">
                 {{-- Quick Reply Templates Bar --}}
                 <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <span style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px;">
-                        <i class="fa-solid fa-bolt text-warning" style="color: #F59E0B;"></i> Template Balas Cepat:
+                    <span class="text-xs font-bold uppercase text-muted" style="letter-spacing: 0.05em; display: flex; align-items: center; gap: 4px;">
+                        <i class="fa-solid fa-bolt" style="color: var(--warning);"></i> Balas Cepat:
                     </span>
                     @forelse($templatesList as $tmpl)
-                        <button type="button" onclick="insertTemplateReply('{{ $tmpl->shortcut }}')" style="background: #F1F5F9; border: 1px solid #CBD5E1; color: #334155; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='#F1F5F9'">
+                        <button type="button" class="btn btn-outline btn-xs" onclick="insertTemplateReply('{{ addslashes($tmpl->shortcut) }}')" title="{{ $tmpl->content }}">
                             {{ $tmpl->title }}
                         </button>
                     @empty
-                        <span style="font-size: 12px; color: #94A3B8;">Belum ada template.</span>
+                        <span class="text-xs text-muted">Belum ada template.</span>
                     @endforelse
-                    <a href="{{ route('admin.live-chat-templates.index') }}" target="_blank" style="font-size: 11px; font-weight: 700; color: #128C7E; text-decoration: underline; margin-left: 4px;">
-                        + Kelola Template
+                    <a href="{{ route('admin.live-chat-templates.index') }}" target="_blank" class="text-xs font-bold" style="color: var(--primary); margin-left: 4px; text-decoration: none;">
+                        + Tambah Template
                     </a>
                 </div>
 
-
                 <form id="adminReplyForm" onsubmit="submitAdminReply(event)" style="display: flex; gap: 12px; align-items: flex-end;">
                     @csrf
-                    <textarea id="adminReplyInput" required rows="3" placeholder="Ketik balasan Anda atau klik tombol template di atas..." style="flex: 1; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 10px; font-size: 13px; outline: none; resize: vertical; font-family: inherit; line-height: 1.5;"></textarea>
-                    <button type="submit" id="adminReplyBtn" style="background: #128C7E; color: white; border: none; padding: 0 24px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; height: 46px;">
-                        <i class="fa-solid fa-paper-plane"></i> Balas
+                    <textarea id="adminReplyInput" required rows="2" class="form-textarea" placeholder="Ketik balasan pesan atau klik template cepat di atas..." style="flex: 1; resize: none;"></textarea>
+                    <button type="submit" id="adminReplyBtn" class="btn btn-primary" style="height: 44px; padding: 0 20px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-paper-plane"></i> <span>Balas</span>
                     </button>
                 </form>
             </div>
@@ -115,10 +123,12 @@
         </div>
     </div>
 </div>
+@endsection
 
+@push('scripts')
 <script>
-var activeChatId = null;
-var pollInterval = null;
+let activeChatId = null;
+let pollInterval = null;
 
 function escapeHtml(text) {
     if (!text) return '';
@@ -132,120 +142,116 @@ function escapeHtml(text) {
 
 function fetchSessionsList() {
     fetch('{{ route("admin.live-chats.sessions-data") }}')
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
+    .then(res => res.json())
+    .then(data => {
         if (!data.success || !data.chats) return;
-        var container = document.getElementById('sessionList');
+        const container = document.getElementById('sessionList');
         if (!container) return;
 
-        var html = '';
+        let html = '';
         if (data.chats.length === 0) {
-            html = '<div style="text-align: center; color: #94A3B8; padding: 32px 16px; font-size: 13px;">Belum ada sesi percakapan live chat.</div>';
+            html = '<div class="text-center text-muted" style="padding: 40px 16px; font-size: 13px;"><i class="fa-regular fa-comment-dots" style="font-size: 32px; opacity: 0.4; margin-bottom: 8px; display: block;"></i>Belum ada sesi percakapan live chat.</div>';
         } else {
-            data.chats.forEach(function(chat) {
-                var isSelected = activeChatId === chat.id;
-                var bg = isSelected ? '#EEF2FF' : 'white';
-                var border = isSelected ? '#6366F1' : '#E2E8F0';
-                var badgeStyle = chat.status === 'active' ? 'background: #DEF7EC; color: #03543F;' : 'background: #F1F5F9; color: #64748B;';
-                
-                html += '<div class="chat-session-item" data-id="' + chat.id + '" onclick="selectChatSession(' + chat.id + ')" style="padding: 12px 14px; border-radius: 12px; border: 1px solid ' + border + '; cursor: pointer; transition: all 0.2s; background: ' + bg + ';" onmouseover="this.style.borderColor=\'#4F46E5\'" onmouseout="this.style.borderColor=\'' + border + '\'">' +
-                        '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">' +
-                            '<div style="font-weight: 700; font-size: 14px; color: #1E293B;">' + escapeHtml(chat.customer_name) + '</div>' +
-                            '<span style="font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; ' + badgeStyle + '">' +
-                                chat.status.toUpperCase() +
-                            '</span>' +
-                        '</div>' +
-                        '<div style="font-size: 12px; color: #059669; font-weight: 600; margin-bottom: 6px;">' +
-                            '<i class="fa-brands fa-whatsapp"></i> +' + escapeHtml(chat.customer_phone) +
-                        '</div>' +
-                        '<div style="font-size: 12px; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' +
-                            escapeHtml(chat.last_message) +
-                        '</div>' +
-                    '</div>';
+            data.chats.forEach(chat => {
+                const isSelected = activeChatId === chat.id || activeChatId === String(chat.id);
+                const itemBg = isSelected ? 'var(--primary-soft)' : 'var(--card)';
+                const itemBorder = isSelected ? 'var(--primary)' : 'var(--border)';
+                const badgeClass = chat.status === 'active' ? 'badge-success' : 'badge-muted';
+                const badgeText = chat.status === 'active' ? 'AKTIF' : 'BERAKHIR';
+
+                html += `
+                    <div class="chat-session-item" data-id="${chat.id}" onclick="selectChatSession('${chat.id}')" style="padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid ${itemBorder}; cursor: pointer; transition: all 0.2s ease; background: ${itemBg};">
+                        <div class="flex justify-between items-start mb-1">
+                            <div class="font-bold text-sm" style="color: var(--text);">${escapeHtml(chat.customer_name)}</div>
+                            <span class="badge ${badgeClass}" style="font-size: 10px; font-weight: 700;">${badgeText}</span>
+                        </div>
+                        <div class="text-xs font-semibold mb-1" style="color: var(--success);">
+                            <i class="fa-brands fa-whatsapp"></i> +${escapeHtml(chat.customer_phone)}
+                        </div>
+                        <div class="text-xs text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 290px;">
+                            ${escapeHtml(chat.last_message)}
+                        </div>
+                    </div>
+                `;
             });
         }
         container.innerHTML = html;
-    });
+    })
+    .catch(err => console.error("Poll sessions error:", err));
 }
-
-// Poll session list periodically for realtime updates
-setInterval(fetchSessionsList, 3000);
 
 function selectChatSession(id) {
     activeChatId = id;
     loadChatMessages(id);
     fetchSessionsList();
-
-    if (pollInterval) clearInterval(pollInterval);
-    pollInterval = setInterval(function() {
-        if (activeChatId) loadChatMessages(activeChatId, true);
-    }, 3000);
 }
 
-function loadChatMessages(id, silent) {
+function loadChatMessages(id) {
     fetch('/admin/live-chats/' + id + '/messages')
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-        if (!data.success) return;
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success || !data.chat) return;
 
-        var chat = data.chat;
-        var messages = data.messages;
+        const chat = data.chat;
+        const messages = data.messages || [];
 
+        // Update Header
         document.getElementById('activeCustomerName').innerText = chat.customer_name;
-        document.getElementById('activeCustomerPhone').innerText = 'WhatsApp: +' + chat.customer_phone + ' | Status: ' + chat.status.toUpperCase();
-        
-        var actionsDiv = document.getElementById('activeActions');
-        var footerDiv = document.getElementById('chatFooter');
+        document.getElementById('activeCustomerPhone').innerHTML = `
+            <a href="https://wa.me/${chat.customer_phone.replace(/[^0-9]/g, '')}" target="_blank" style="color: var(--success); font-weight: 700; text-decoration: none;">
+                <i class="fa-brands fa-whatsapp"></i> +${chat.customer_phone}
+            </a> · Status: <span class="badge ${chat.status === 'active' ? 'badge-success' : 'badge-muted'}" style="font-size: 10px;">${chat.status.toUpperCase()}</span>
+        `;
+        document.getElementById('activeActions').style.display = chat.status === 'active' ? 'block' : 'none';
+        document.getElementById('chatFooter').style.display = chat.status === 'active' ? 'block' : 'none';
 
-        if (chat.status === 'active') {
-            actionsDiv.style.display = 'block';
-            footerDiv.style.display = 'block';
+        // Render Messages
+        const body = document.getElementById('chatMessageBody');
+        let html = '';
+
+        if (messages.length === 0) {
+            html = '<div class="text-center text-muted" style="margin: auto;">Belum ada pesan dalam sesi ini.</div>';
         } else {
-            actionsDiv.style.display = 'none';
-            footerDiv.style.display = 'none';
+            messages.forEach(msg => {
+                const isAdmin = msg.sender_type === 'admin';
+                const align = isAdmin ? 'flex-end' : 'flex-start';
+                const bubbleBg = isAdmin ? 'var(--primary-soft)' : 'var(--card)';
+                const bubbleBorder = isAdmin ? 'var(--primary)' : 'var(--border)';
+                const senderColor = isAdmin ? 'var(--primary)' : 'var(--success)';
+                const senderLabel = isAdmin ? 'Admin Cooca' : (chat.customer_name || 'Customer');
+
+                html += `
+                    <div style="align-self: ${align}; max-width: 78%; display: flex; flex-direction: column; align-items: ${align};">
+                        <div style="background: ${bubbleBg}; border: 1px solid ${bubbleBorder}; padding: 10px 14px; border-radius: 12px; box-shadow: var(--shadow-xs);">
+                            <div style="font-size: 11px; font-weight: 700; color: ${senderColor}; margin-bottom: 2px;">
+                                ${escapeHtml(senderLabel)}
+                            </div>
+                            <div style="font-size: 13px; color: var(--text); line-height: 1.5; white-space: pre-wrap; word-break: break-word;">
+                                ${escapeHtml(msg.message)}
+                            </div>
+                        </div>
+                        <span style="font-size: 10px; color: var(--text-muted); margin-top: 4px; padding: 0 4px; font-family: monospace;">
+                            ${msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
+                        </span>
+                    </div>
+                `;
+            });
         }
-
-        var body = document.getElementById('chatMessageBody');
-        var html = '';
-
-        messages.forEach(function(m) {
-            var isCustomer = m.sender_type === 'customer';
-            var isSystem = m.sender_type === 'system';
-
-            if (isSystem) {
-                html += '<div style="text-align: center; margin: 8px 0;"><span style="background: rgba(0,0,0,0.08); padding: 4px 12px; border-radius: 12px; font-size: 11px; color: #475569; font-weight: 600;">' + escapeHtml(m.message) + '</span></div>';
-            } else if (isCustomer) {
-                html += '<div style="display: flex; flex-direction: column; align-items: flex-start;">' +
-                        '<div style="background: white; color: #1E293B; border-radius: 12px 12px 12px 2px; padding: 10px 14px; max-width: 75%; box-shadow: 0 2px 4px rgba(0,0,0,0.06); font-size: 13px; line-height: 1.5; white-space: pre-wrap;">' +
-                        '<div style="font-weight: 700; font-size: 11px; color: #075E54; margin-bottom: 2px;">' + escapeHtml(m.sender_name) + '</div>' +
-                        escapeHtml(m.message) +
-                        '</div></div>';
-            } else {
-                html += '<div style="display: flex; flex-direction: column; align-items: flex-end;">' +
-                        '<div style="background: #DCF8C6; color: #1E293B; border-radius: 12px 12px 2px 12px; padding: 10px 14px; max-width: 75%; box-shadow: 0 2px 4px rgba(0,0,0,0.06); font-size: 13px; line-height: 1.5; white-space: pre-wrap;">' +
-                        '<div style="font-weight: 700; font-size: 11px; color: #128C7E; margin-bottom: 2px;">Admin Cooca</div>' +
-                        escapeHtml(m.message) +
-                        '</div></div>';
-            }
-        });
 
         body.innerHTML = html;
-        if (!silent) {
-            body.scrollTop = body.scrollHeight;
-        }
-
-        // Also refresh session list to sync status badges
-        fetchSessionsList();
-    });
+        body.scrollTop = body.scrollHeight;
+    })
+    .catch(err => console.error("Load messages error:", err));
 }
 
 function submitAdminReply(e) {
     e.preventDefault();
     if (!activeChatId) return;
 
-    var input = document.getElementById('adminReplyInput');
-    var btn = document.getElementById('adminReplyBtn');
-    var message = input.value.trim();
+    const input = document.getElementById('adminReplyInput');
+    const btn = document.getElementById('adminReplyBtn');
+    const message = input.value.trim();
+
     if (!message) return;
 
     btn.disabled = true;
@@ -254,61 +260,65 @@ function submitAdminReply(e) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
         },
         body: JSON.stringify({ message: message })
     })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
+    .then(res => res.json())
+    .then(data => {
         btn.disabled = false;
         if (data.success) {
             input.value = '';
             loadChatMessages(activeChatId);
             fetchSessionsList();
         } else {
-            alert(data.error || 'Gagal membalas');
+            alert(data.error || 'Gagal mengirim pesan.');
         }
+    })
+    .catch(err => {
+        btn.disabled = false;
+        alert('Terjadi kesalahan jaringan.');
     });
 }
 
 function endCurrentChat() {
     if (!activeChatId) return;
-    if (!confirm('Apakah Anda yakin ingin mengakhiri sesi percakapan ini? Transkrip chat akan otomatis dikirimkan ke WhatsApp customer.')) return;
+    if (!confirm('Apakah Anda yakin ingin mengakhiri sesi chat ini dan mengirimkan transkrip percakapan ke WhatsApp customer?')) return;
 
     fetch('/admin/live-chats/' + activeChatId + '/end', {
         method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
         }
     })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
+    .then(res => res.json())
+    .then(data => {
         if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Sesi Diakhiri',
-                text: 'Percakapan berhasil diakhiri & transkrip telah dikirimkan ke WA Customer.'
-            });
+            alert(data.message);
             loadChatMessages(activeChatId);
             fetchSessionsList();
-        } else {
-            alert(data.error || 'Gagal mengakhiri chat.');
         }
     });
 }
 
-var dbTemplatesMap = {};
-@foreach($templatesList as $tmpl)
-    dbTemplatesMap['{{ $tmpl->shortcut }}'] = @json($tmpl->content);
-@endforeach
-
-function insertTemplateReply(shortcutKey) {
-    if (dbTemplatesMap[shortcutKey]) {
-        var input = document.getElementById('adminReplyInput');
-        input.value = dbTemplatesMap[shortcutKey];
-        input.focus();
-    }
+function insertTemplateReply(shortcut) {
+    const input = document.getElementById('adminReplyInput');
+    if (!input) return;
+    
+    // If shortcut, fetch template text from API or append shortcut
+    input.value = (input.value ? input.value + ' ' : '') + shortcut;
+    input.focus();
 }
-</script>
-@endsection
 
+// Auto polling loop
+document.addEventListener('DOMContentLoaded', function() {
+    pollInterval = setInterval(function() {
+        fetchSessionsList();
+        if (activeChatId) {
+            loadChatMessages(activeChatId);
+        }
+    }, 4000);
+});
+</script>
+@endpush

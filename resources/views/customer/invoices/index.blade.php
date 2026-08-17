@@ -7,10 +7,13 @@
 <div class="page-header">
     <div>
         <h1 class="page-title"><i class="fa-solid fa-file-invoice" style="color:var(--primary);margin-right:10px;"></i>Invoices</h1>
-        <p class="page-subtitle">View, download, and pay your invoices.</p>
+        <p class="page-subtitle">Lihat, unduh, dan kelola tagihan langganan Anda.</p>
     </div>
     <div class="page-actions">
-        @php $outstanding = $invoices->where('status', 'overdue')->sum('amount'); @endphp
+        @php
+            $invItems = $invoices instanceof \Illuminate\Pagination\AbstractPaginator ? $invoices->getCollection() : collect($invoices);
+            $outstanding = $invItems->filter(fn($i) => !$i->isPaid() && ($i->status === 'overdue' || ($i->due_at && $i->due_at->isPast())))->sum('amount');
+        @endphp
         @if($outstanding > 0)
             <div class="alert alert-danger" style="margin-bottom:0;padding:10px 16px;">
                 <i class="fa-solid fa-triangle-exclamation"></i>
@@ -23,10 +26,9 @@
 {{-- Summary KPI --}}
 <div class="kpi-grid mb-6" style="grid-template-columns:repeat(4,1fr);">
     @php
-        $invItems = $invoices instanceof \Illuminate\Pagination\AbstractPaginator ? $invoices->getCollection() : collect($invoices);
-        $paid    = $invItems->where('status', 'paid')->sum('amount');
-        $pending = $invItems->whereIn('status', ['issued', 'pending'])->sum('amount');
-        $overdue = $invItems->where('status', 'overdue')->sum('amount');
+        $paid    = $invItems->filter(fn($i) => $i->isPaid())->sum('amount');
+        $pending = $invItems->filter(fn($i) => !$i->isPaid() && in_array($i->status, ['issued', 'pending']))->sum('amount');
+        $overdue = $invItems->filter(fn($i) => !$i->isPaid() && ($i->status === 'overdue' || ($i->due_at && $i->due_at->isPast())))->sum('amount');
         $total   = $invoices->total() ?? $invItems->count();
     @endphp
     <div class="kpi-card kpi-success">
@@ -37,7 +39,7 @@
     <div class="kpi-card kpi-warning">
         <div class="kpi-icon warning"><i class="fa-solid fa-clock"></i></div>
         <div class="kpi-value" style="font-size:18px;">Rp {{ number_format($pending, 0, ',', '.') }}</div>
-        <div class="kpi-label">Pending</div>
+        <div class="kpi-label">Pending Payment</div>
     </div>
     <div class="kpi-card kpi-danger">
         <div class="kpi-icon danger"><i class="fa-solid fa-circle-xmark"></i></div>
@@ -57,7 +59,7 @@
         <div class="card-title">Invoice History</div>
         <form method="GET" class="flex gap-2">
             <select name="status" class="form-select" style="min-width:140px;padding:7px 12px;font-size:13px;" onchange="this.form.submit()">
-                <option value="">All Status</option>
+                <option value="">Semua Status</option>
                 <option value="paid"    {{ request('status') === 'paid'    ? 'selected' : '' }}>Paid</option>
                 <option value="issued"  {{ request('status') === 'issued'  ? 'selected' : '' }}>Pending</option>
                 <option value="overdue" {{ request('status') === 'overdue' ? 'selected' : '' }}>Overdue</option>
@@ -79,22 +81,35 @@
                 </thead>
                 <tbody>
                     @forelse($invoices as $invoice)
+                    @php
+                        $isPaid = $invoice->isPaid();
+                        $isVerifying = !$isPaid && $invoice->transaction && $invoice->transaction->hasPaymentProof() && $invoice->transaction->status === 'pending';
+                    @endphp
                     <tr>
                         <td class="font-semibold">{{ $invoice->invoice_number }}</td>
                         <td class="text-sm text-muted">{{ $invoice->issued_at?->format('d M Y') ?? '—' }}</td>
                         <td class="text-sm text-muted">
                             {{ $invoice->due_at?->format('d M Y') ?? '—' }}
-                            @if($invoice->due_at?->isPast() && $invoice->status !== 'paid')
+                            @if(!$isPaid && $invoice->due_at?->isPast())
                                 <span class="badge badge-danger" style="font-size:10px;">Overdue</span>
                             @endif
                         </td>
                         <td><span class="font-bold">Rp {{ number_format($invoice->amount, 0, ',', '.') }}</span></td>
                         <td>
-                            @if($invoice->status === 'paid')     <span class="badge badge-success">Paid</span>
-                            @elseif($invoice->status === 'overdue')  <span class="badge badge-danger">Overdue</span>
-                            @elseif($invoice->status === 'issued')   <span class="badge badge-warning">Pending</span>
-                            @elseif($invoice->status === 'cancelled') <span class="badge badge-muted">Cancelled</span>
-                            @else <span class="badge badge-muted">{{ ucfirst($invoice->status) }}</span>
+                            @if($isPaid)
+                                <span class="badge badge-success">Paid</span>
+                            @elseif($isVerifying)
+                                <span class="badge badge-warning" style="font-size: 11px;">
+                                    <i class="fa-solid fa-clock"></i> Verifikasi Bukti
+                                </span>
+                            @elseif($invoice->status === 'overdue' || ($invoice->due_at && $invoice->due_at->isPast()))
+                                <span class="badge badge-danger">Overdue</span>
+                            @elseif($invoice->status === 'issued' || $invoice->status === 'pending')
+                                <span class="badge badge-warning">Pending</span>
+                            @elseif($invoice->status === 'cancelled')
+                                <span class="badge badge-muted">Cancelled</span>
+                            @else
+                                <span class="badge badge-muted">{{ ucfirst($invoice->status) }}</span>
                             @endif
                         </td>
                         <td>
@@ -105,7 +120,7 @@
                                 <a href="{{ route('customer.invoices.download', $invoice->id) }}" class="btn btn-ghost btn-sm" title="Download">
                                     <i class="fa-solid fa-download"></i>
                                 </a>
-                                @if(in_array($invoice->status, ['issued', 'overdue']))
+                                @if(!$isPaid && !$isVerifying && in_array($invoice->status, ['issued', 'overdue', 'pending', 'unpaid']))
                                     <form method="POST" action="{{ route('customer.payments.store') }}" style="display:inline;">
                                         @csrf
                                         <input type="hidden" name="invoice_id" value="{{ $invoice->id }}">

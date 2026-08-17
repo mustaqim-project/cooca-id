@@ -20,8 +20,10 @@ final class Invoice extends Model
         'invoice_number',
         'customer_id',
         'amount',
+        'status',
         'issued_at',
         'due_at',
+        'paid_at',
         'pdf_path',
     ];
 
@@ -55,7 +57,11 @@ final class Invoice extends Model
 
     public function isPaid(): bool
     {
-        return $this->status === self::STATUS_PAID;
+        if ($this->status === self::STATUS_PAID) {
+            return true;
+        }
+
+        return $this->transaction !== null && $this->transaction->status === 'paid';
     }
 
     public function isDraft(): bool
