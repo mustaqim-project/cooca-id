@@ -157,7 +157,7 @@ final class Transaction extends Model
 
     public function verifier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(User::class, 'verified_by');
+        return $this->belongsTo(Admin::class, 'verified_by');
     }
 
     public function isManualTransfer(): bool
