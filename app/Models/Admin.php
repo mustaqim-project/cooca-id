@@ -52,4 +52,14 @@ class Admin extends Authenticatable
     {
         return 'string';
     }
+
+    public function auditLogs(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(AuditLog::class, 'user', 'user_type', 'user_id');
+    }
+
+    public function activityLogs(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(ActivityLog::class, 'causer', 'causer_type', 'causer_id');
+    }
 }

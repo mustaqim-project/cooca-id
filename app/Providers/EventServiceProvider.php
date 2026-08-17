@@ -31,6 +31,18 @@ final class EventServiceProvider extends ServiceProvider
             \App\Listeners\Customer\SendWelcomeNotification::class,
         ],
         \App\Events\Customer\AffiliatorRegistered::class => [],
+        \Illuminate\Auth\Events\Login::class => [
+            [\App\Listeners\Auth\LogAuthenticationActivity::class, 'handleLogin'],
+        ],
+        \Illuminate\Auth\Events\Logout::class => [
+            [\App\Listeners\Auth\LogAuthenticationActivity::class, 'handleLogout'],
+        ],
+        \Illuminate\Auth\Events\Failed::class => [
+            [\App\Listeners\Auth\LogAuthenticationActivity::class, 'handleFailed'],
+        ],
+        \Illuminate\Auth\Events\PasswordReset::class => [
+            [\App\Listeners\Auth\LogAuthenticationActivity::class, 'handlePasswordReset'],
+        ],
     ];
 
     public function boot(): void

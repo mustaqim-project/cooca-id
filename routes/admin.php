@@ -207,6 +207,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     // System & Security Logs
     Route::resource('audit-logs', AuditLogController::class)->only(['index', 'show']);
     Route::get('error-logs', [ErrorLogController::class, 'index'])->name('error-logs.index');
+    Route::get('error-logs/download', [ErrorLogController::class, 'download'])->name('error-logs.download');
     Route::delete('error-logs/clear', [ErrorLogController::class, 'clear'])->name('error-logs.clear');
     
     // Blocked IPs

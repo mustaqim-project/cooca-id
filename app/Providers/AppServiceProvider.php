@@ -108,6 +108,7 @@ final class AppServiceProvider extends ServiceProvider
         $this->bootRateLimiters();
 
         \Illuminate\Database\Eloquent\Relations\Relation::morphMap([
+            'admin' => \App\Models\Admin::class,
             'customer' => \App\Models\Customer::class,
             'affiliator' => \App\Models\Affiliator::class,
         ]);

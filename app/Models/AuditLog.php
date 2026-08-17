@@ -70,12 +70,12 @@ final class AuditLog extends Model
 
     public function user(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo(__FUNCTION__, 'user_type', 'user_id');
     }
 
     public function model(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo(__FUNCTION__, 'model_type', 'model_id');
     }
 
     public function scopeRiskLevel($query, string $riskLevel): \Illuminate\Database\Eloquent\Builder
