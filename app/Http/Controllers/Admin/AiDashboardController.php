@@ -69,18 +69,20 @@ final class AiDashboardController extends Controller
             ->latest()
             ->paginate(15);
 
-        // Recent Usage Logs
-        $recentLogs = AiUsageLog::with(['apiKey.customer', 'license'])
+        // AI Token Packages & Recent Purchases
+        $tokenPackages = \App\Models\AiTokenPackage::orderBy('sort_order', 'asc')->get();
+        $recentPurchases = \App\Models\AiTokenPurchase::with(['customer', 'license.product', 'package'])
             ->latest()
-            ->limit(20)
-            ->get();
+            ->paginate(15);
 
         return view('admin.ai.dashboard', compact(
             'monthlyUsage',
             'providers',
             'plans',
             'activeCycles',
-            'recentLogs'
+            'recentLogs',
+            'tokenPackages',
+            'recentPurchases'
         ));
     }
 
@@ -205,5 +207,68 @@ final class AiDashboardController extends Controller
         $cycle->increment('token_quota', $validated['bonus_tokens']);
 
         return redirect()->route('admin.ai.dashboard')->with('success', "Berhasil menambahkan bonus +" . number_format($validated['bonus_tokens']) . " token ke siklus ini.");
+    }
+
+    public function savePackage(Request $request)
+    {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.ai.dashboard');
+        }
+
+        $validated = $request->validate([
+            'id'           => 'nullable|uuid|exists:ai_token_packages,id',
+            'name'         => 'required|string|max:100',
+            'token_amount' => 'required|integer|min:1000',
+            'price'        => 'required|numeric|min:0',
+            'description'  => 'nullable|string|max:500',
+            'badge'        => 'nullable|string|max:50',
+            'sort_order'   => 'required|integer|min:0',
+            'is_active'    => 'nullable|boolean',
+        ]);
+
+        $data = [
+            'name'         => $validated['name'],
+            'slug'         => \Illuminate\Support\Str::slug($validated['name']) . '-' . rand(100, 999),
+            'token_amount' => $validated['token_amount'],
+            'price'        => $validated['price'],
+            'description'  => $validated['description'] ?? null,
+            'badge'        => $validated['badge'] ?? null,
+            'sort_order'   => $validated['sort_order'],
+            'is_active'    => $request->boolean('is_active', true),
+        ];
+
+        if (!empty($validated['id'])) {
+            unset($data['slug']); // keep existing slug
+            \App\Models\AiTokenPackage::where('id', $validated['id'])->update($data);
+            $msg = 'Paket token AI berhasil diperbarui.';
+        } else {
+            \App\Models\AiTokenPackage::create($data);
+            $msg = 'Paket token AI baru berhasil dibuat.';
+        }
+
+        return redirect()->route('admin.ai.dashboard')->with('success', $msg);
+    }
+
+    public function togglePackage(Request $request, \App\Models\AiTokenPackage $package)
+    {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.ai.dashboard');
+        }
+
+        $package->update(['is_active' => !$package->is_active]);
+        $statusStr = $package->is_active ? 'Diaktifkan' : 'Dinonaktifkan';
+
+        return redirect()->route('admin.ai.dashboard')->with('success', "Paket [{$package->name}] berhasil {$statusStr}.");
+    }
+
+    public function deletePackage(Request $request, \App\Models\AiTokenPackage $package)
+    {
+        if ($request->isMethod('get')) {
+            return redirect()->route('admin.ai.dashboard');
+        }
+
+        $package->delete();
+
+        return redirect()->route('admin.ai.dashboard')->with('success', "Paket [{$package->name}] berhasil dihapus.");
     }
 }

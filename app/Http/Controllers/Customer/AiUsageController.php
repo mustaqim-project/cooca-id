@@ -59,14 +59,79 @@ final class AiUsageController extends Controller
             ->selectRaw('SUM(total_tokens) as total_tokens, COUNT(*) as total_requests, AVG(duration_ms) as avg_latency')
             ->first();
 
+        // AI Token Packages
+        $tokenPackages = \App\Models\AiTokenPackage::active()->get();
+
         return view('customer.ai.usage', compact(
             'customer',
             'licenses',
             'keys',
             'cycles',
             'recentLogs',
-            'currentMonthUsage'
+            'currentMonthUsage',
+            'tokenPackages'
         ));
+    }
+
+    public function purchasePackage(Request $request)
+    {
+        $customer = Auth::guard('customer')->user() ?? Auth::user();
+
+        $validated = $request->validate([
+            'license_id' => 'required|uuid|exists:licenses,id',
+            'package_id' => 'required|uuid|exists:ai_token_packages,id',
+        ]);
+
+        $license = License::where('id', $validated['license_id'])
+            ->where('customer_id', $customer->getKey())
+            ->where('status', License::STATUS_ACTIVE)
+            ->firstOrFail();
+
+        $package = \App\Models\AiTokenPackage::where('id', $validated['package_id'])
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        $invoice = \Illuminate\Support\Facades\DB::transaction(function () use ($customer, $license, $package) {
+            $invoiceNumber = 'INV-AI-' . strtoupper(date('Ymd')) . '-' . strtoupper(\Illuminate\Support\Str::random(6));
+
+            $transaction = \App\Models\Transaction::create([
+                'customer_id'      => $customer->getKey(),
+                'subscription_id'  => $license->subscription_id ?? null,
+                'type'             => 'ai_token_topup',
+                'description'      => "Top-Up Kuota Token AI: {$package->name} (+" . number_format($package->token_amount) . " Token)",
+                'invoice_number'   => $invoiceNumber,
+                'gross_amount'     => $package->price,
+                'voucher_discount' => 0,
+                'net_amount'       => $package->price,
+                'payment_method'   => 'pending',
+                'payment_gateway'  => 'midtrans',
+                'status'           => 'pending',
+            ]);
+
+            $invoice = \App\Models\Invoice::create([
+                'transaction_id' => $transaction->id,
+                'invoice_number' => $invoiceNumber,
+                'customer_id'    => $customer->getKey(),
+                'amount'         => $package->price,
+                'status'         => 'issued',
+                'issued_at'      => now(),
+                'due_at'         => now()->addDays(3),
+            ]);
+
+            \App\Models\AiTokenPurchase::create([
+                'customer_id'         => $customer->getKey(),
+                'license_id'          => $license->id,
+                'ai_token_package_id' => $package->id,
+                'transaction_id'      => $transaction->id,
+                'tokens_amount'       => $package->token_amount,
+                'price_paid'          => $package->price,
+                'status'              => 'pending',
+            ]);
+
+            return $invoice;
+        });
+
+        return redirect()->route('customer.invoices.show', $invoice->id)->with('success', "Tagihan #{$invoice->invoice_number} untuk {$package->name} berhasil dibuat. Silakan pilih metode pembayaran Anda.");
     }
 
     public function createKey(Request $request)

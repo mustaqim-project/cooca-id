@@ -1,22 +1,61 @@
 @extends('layouts.customer')
 
-@section('title', 'AI Gateway & API Keys — COOCA.ID')
+@section('title', 'AI Gateway & API Usage — COOCA.ID')
 
-@section('breadcrumb')
-    <a href="{{ route('customer.dashboard') }}" class="crumb">Dashboard</a>
-    <span class="crumb-separator">/</span>
-    <span class="crumb-current">AI Platform & API Keys</span>
-@endsection
+@push('styles')
+<style>
+.gateway-param-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+.gateway-code-block {
+    position: relative;
+    background: #090d16;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    color: #e2e8f0;
+    overflow-x: auto;
+}
+.gateway-token-badge {
+    background: var(--primary-soft);
+    color: var(--primary);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-family: monospace;
+}
+.package-card {
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--card);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+.package-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+.package-card.selected {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+}
+</style>
+@endpush
 
 @section('content')
-<div class="page-header" style="margin-bottom: 24px;">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
     <div>
-        <div class="breadcrumb" style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
-            <a href="{{ route('customer.dashboard') }}" style="color: var(--primary); text-decoration: none;">Dashboard</a>
-            <span>/</span>
-            <span>AI Platform</span>
-        </div>
-        <h1 style="font-size: 24px; font-weight: 800; color: var(--text); margin: 0; display: flex; align-items: center; gap: 10px;">
+        <h1 style="font-size: 24px; font-weight: 800; color: var(--text); margin: 0; display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-brain" style="color: var(--primary);"></i> AI Gateway & API Access
         </h1>
         <p style="color: var(--text-muted); margin: 4px 0 0; font-size: 14px;">
@@ -25,6 +64,9 @@
     </div>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
         @if($licenses->isNotEmpty())
+            <button type="button" class="btn btn-outline" onclick="openTopUpModal()" style="border-color: var(--primary); color: var(--primary); font-weight: 700;">
+                <i class="fa-solid fa-bolt" style="color: var(--accent);"></i> Top-Up Token AI
+            </button>
             <button type="button" class="btn btn-primary" onclick="openNewKeyModal()">
                 <i class="fa-solid fa-plus"></i> Buat API Key Baru
             </button>
@@ -34,6 +76,10 @@
 
 @if(session('success'))
     <div class="alert alert-success mb-4"><i class="fa-solid fa-circle-check"></i> {{ session('success') }}</div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger mb-4"><i class="fa-solid fa-triangle-exclamation"></i> {{ session('error') }}</div>
 @endif
 
 {{-- One-Time Reveal Flash Card --}}
@@ -72,9 +118,9 @@
                     <span class="badge badge-primary font-bold text-xs">
                         {{ $lic->product->name ?? 'Paket SaaS' }}
                     </span>
-                    <span class="text-xs font-mono text-muted">
-                        Lisensi: #{{ substr($lic->id, 0, 8) }}
-                    </span>
+                    <button type="button" class="btn btn-ghost btn-xs" onclick="openTopUpModal('{{ $lic->id }}')" style="color: var(--primary); font-weight: 700;">
+                        <i class="fa-solid fa-bolt"></i> + Top-Up Kuota
+                    </button>
                 </div>
 
                 <div class="text-xs text-muted mb-3">
@@ -95,9 +141,12 @@
                     </div>
                 </div>
 
-                <div class="text-xs text-muted font-mono" style="border-top: 1px solid var(--border); padding-top: 10px;">
-                    <i class="fa-regular fa-clock" style="margin-right: 4px;"></i> Reset Kuota: 
-                    <strong>{{ $cycle?->cycle_end ? $cycle->cycle_end->format('d M Y') : 'Akhir Bulan' }}</strong>
+                <div class="text-xs text-muted font-mono" style="border-top: 1px solid var(--border); padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>
+                        <i class="fa-regular fa-clock" style="margin-right: 4px;"></i> Reset: 
+                        <strong>{{ $cycle?->cycle_end ? $cycle->cycle_end->format('d M Y') : 'Akhir Bulan' }}</strong>
+                    </span>
+                    <span class="text-xs font-mono text-muted">Lic: {{ substr($lic->id, 0, 8) }}...</span>
                 </div>
             </div>
         </div>
@@ -130,7 +179,7 @@
                 <thead>
                     <tr style="background: var(--bg-secondary); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; color: var(--text-muted);">
                         <th style="padding: 12px 18px;">Nama Kunci</th>
-                        <th style="padding: 12px 18px;">Prefix Kunci</th>
+                        <th style="padding: 12px 18px;">API Key Rahasia</th>
                         <th style="padding: 12px 18px;">Lisensi Terkait</th>
                         <th style="padding: 12px 18px;">Status</th>
                         <th style="padding: 12px 18px;">Terakhir Digunakan</th>
@@ -139,58 +188,73 @@
                 </thead>
                 <tbody>
                     @forelse($keys as $k)
-                        <tr style="border-bottom: 1px solid var(--border); font-size: 13px;">
-                            <td style="padding: 12px 18px; font-weight: 700; color: var(--text);">
-                                {{ $k->name }}
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 14px 18px;">
+                                <strong style="color: var(--text); font-size: 13px;">{{ $k->name }}</strong>
+                                <div class="text-xs text-muted font-mono">{{ $k->id }}</div>
                             </td>
-                            <td style="padding: 12px 18px;">
-                                @if($k->plain_key)
-                                    <div class="flex items-center gap-2" style="max-width: 320px;">
-                                        <code id="key-text-{{ $k->id }}" data-full="{{ $k->plain_key }}" data-masked="{{ $k->key_prefix }}••••••••••••••••" data-state="masked" style="background: var(--bg-secondary); color: var(--text); padding: 4px 8px; border-radius: var(--radius-sm); font-size: 12px; font-family: monospace; border: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">{{ $k->key_prefix }}••••••••••••••••</code>
-                                        <button type="button" class="btn btn-ghost btn-xs" onclick="toggleKeyVisibility('{{ $k->id }}')" title="Tampilkan / Sembunyikan API Key" style="padding: 4px 8px;">
+                            <td style="padding: 14px 18px;">
+                                @php
+                                    $hasPlain = !empty($k->plain_key);
+                                    $masked = $k->key_prefix . '••••••••••••••••••••••••';
+                                    $full = $hasPlain ? $k->plain_key : $masked;
+                                @endphp
+                                <div class="flex items-center gap-2" style="max-width: 320px;">
+                                    <code id="key-text-{{ $k->id }}" 
+                                          data-full="{{ $full }}" 
+                                          data-masked="{{ $masked }}" 
+                                          data-state="masked"
+                                          class="font-mono text-xs font-bold" 
+                                          style="background: var(--bg-secondary); color: var(--text); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); word-break: break-all; flex: 1;">
+                                        {{ $masked }}
+                                    </code>
+                                    
+                                    @if($hasPlain)
+                                        <button type="button" class="btn btn-ghost btn-xs" onclick="toggleKeyVisibility('{{ $k->id }}')" title="Tampilkan / Sembunyikan Kunci" style="padding: 4px 6px;">
                                             <i id="key-eye-{{ $k->id }}" class="fa-regular fa-eye"></i>
                                         </button>
-                                        <button type="button" class="btn btn-ghost btn-xs" onclick="copyKeyText('{{ $k->id }}')" title="Salin API Key" style="padding: 4px 8px; color: var(--primary);">
-                                            <i class="fa-regular fa-copy"></i>
+                                        <button type="button" class="btn btn-ghost btn-xs" onclick="copyKeyText('{{ $k->id }}')" title="Salin API Key" style="padding: 4px 6px;">
+                                            <i class="fa-solid fa-copy"></i>
                                         </button>
-                                    </div>
-                                @else
-                                    <code style="background: var(--bg-secondary); color: var(--text); padding: 4px 8px; border-radius: var(--radius-sm); font-size: 12px; font-family: monospace;">
-                                        {{ $k->key_prefix }}••••••••••••••••
-                                    </code>
-                                @endif
+                                    @endif
+                                </div>
                             </td>
-                            <td style="padding: 12px 18px;">
-                                <span class="text-xs font-semibold" style="color: var(--primary);">
+                            <td style="padding: 14px 18px;">
+                                <span class="font-bold text-xs" style="color: var(--text);">
                                     {{ $k->license->product->name ?? 'Paket SaaS' }}
                                 </span>
+                                <div class="text-xs text-muted font-mono">
+                                    {{ $k->license->domain ?? 'Semua Domain' }}
+                                </div>
                             </td>
-                            <td style="padding: 12px 18px;">
+                            <td style="padding: 14px 18px;">
                                 @if($k->status === 'active')
-                                    <span class="badge badge-success" style="font-size: 11px;">Aktif</span>
+                                    <span class="badge badge-success" style="font-size: 10px;">AKTIF</span>
                                 @else
-                                    <span class="badge badge-danger" style="font-size: 11px;">Revoked</span>
+                                    <span class="badge badge-danger" style="font-size: 10px;">REVOKED</span>
                                 @endif
                             </td>
-                            <td style="padding: 12px 18px; color: var(--text-muted); font-size: 12px;">
+                            <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">
                                 {{ $k->last_used_at ? $k->last_used_at->diffForHumans() : 'Belum pernah' }}
                             </td>
-                            <td style="padding: 12px 18px; text-align: right;">
+                            <td style="padding: 14px 18px; text-align: right;">
                                 @if($k->status === 'active')
-                                    <form action="{{ \Illuminate\Support\Facades\Route::has('customer.ai-usage.keys.revoke') ? route('customer.ai-usage.keys.revoke', $k->id) : url('/customer/ai-usage/keys/' . $k->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menonaktifkan API Key [{{ $k->name }}]? Aplikasi yang menggunakan kunci ini tidak akan bisa mengakses AI lagi.');" style="display: inline;">
+                                    <form action="{{ \Illuminate\Support\Facades\Route::has('customer.ai-usage.keys.revoke') ? route('customer.ai-usage.keys.revoke', $k->id) : url('/customer/ai-usage/keys/' . $k->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menonaktifkan API Key ini? Aksi ini tidak dapat dibatalkan.');" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-outline btn-xs" style="color: var(--danger); border-color: var(--border);">
-                                            <i class="fa-solid fa-ban"></i> Revoke
+                                        <button type="submit" class="btn btn-ghost btn-xs" style="color: var(--danger);" title="Revoke Key">
+                                            <i class="fa-solid fa-ban"></i> Nonaktifkan
                                         </button>
                                     </form>
+                                @else
+                                    <span class="text-xs text-muted">—</span>
                                 @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="6" class="text-center text-muted" style="padding: 40px;">
-                                Belum ada API Key yang dibuat. Klik tombol <strong>Buat API Key Baru</strong> di atas.
+                                Belum ada AI API Key. Buat kunci pertama Anda untuk mulai memanggil API.
                             </td>
                         </tr>
                     @endforelse
@@ -200,147 +264,105 @@
     </div>
 </div>
 
-{{-- Interactive API Documentation & Code Snippets --}}
+{{-- Quick Integration Guide --}}
 <div class="card mb-4">
     <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
         <div class="card-title font-bold text-sm" style="color: var(--text);">
-            <i class="fa-solid fa-code" style="color: var(--primary); margin-right: 6px;"></i> Panduan Integrasi Endpoint API
+            <i class="fa-solid fa-code" style="color: var(--primary); margin-right: 6px;"></i> Panduan Integrasi (OpenAI-Compatible SDK & cURL)
         </div>
-        <span class="badge badge-primary text-xs">OpenAI Compatible Format</span>
+        <span class="text-xs text-muted">Base URL: <code style="color: var(--primary); font-weight: bold;">https://cooca.id/api/v1/ai</code></span>
     </div>
     <div class="card-body" style="padding: 20px;">
-        <div class="flex items-center gap-2 mb-3">
-            <span class="badge badge-success font-mono font-bold">POST</span>
-            <code style="font-size: 13px; font-weight: 700; color: var(--text); background: var(--bg-secondary); padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); flex: 1;">
-                https://cooca.id/api/v1/ai/chat/completions
-            </code>
-        </div>
+        <p class="text-xs text-muted mb-3" style="color: var(--text-muted);">
+            COOCA AI Gateway 100% kompatibel dengan protokol format OpenAI. Cukup ubah <code>baseURL</code> pada library resmi OpenAI (Node.js, Python, PHP, Go) atau kirim cURL langsung.
+        </p>
 
-        <div style="margin-top: 14px;">
-            <div class="flex items-center gap-2 mb-2">
-                <button type="button" class="btn btn-primary btn-xs tab-btn active" onclick="switchSnippet('curl', this)">cURL</button>
-                <button type="button" class="btn btn-outline btn-xs tab-btn" onclick="switchSnippet('js', this)">JavaScript (Node / Fetch)</button>
-                <button type="button" class="btn btn-outline btn-xs tab-btn" onclick="switchSnippet('python', this)">Python</button>
-                <button type="button" class="btn btn-outline btn-xs tab-btn" onclick="switchSnippet('php', this)">PHP (Laravel / Guzzle)</button>
-            </div>
-
-            <pre id="snippet-curl" style="background: var(--bg-secondary); color: var(--text); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-family: monospace; font-size: 12px; line-height: 1.5; overflow-x: auto; margin: 0;">curl -X POST https://cooca.id/api/v1/ai/chat/completions \
+        <div class="gateway-code-block mb-3">
+<pre style="margin: 0;"><code>curl -X POST https://cooca.id/api/v1/ai/chat/completions \
   -H "Authorization: Bearer YOUR_COOCA_AI_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-4o-mini",
+    "model": "gemini-3.6-flash",
     "messages": [
       {"role": "system", "content": "You are a helpful assistant."},
       {"role": "user", "content": "Halo COOCA AI!"}
     ],
     "temperature": 0.7,
     "max_tokens": 1000
-  }'</pre>
-
-            <pre id="snippet-js" style="display: none; background: var(--bg-secondary); color: var(--text); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-family: monospace; font-size: 12px; line-height: 1.5; overflow-x: auto; margin: 0;">const response = await fetch('https://cooca.id/api/v1/ai/chat/completions', {
-  method: 'POST',
-  headers: {
-    'Authorization': 'Bearer YOUR_COOCA_AI_KEY',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    model: 'gemini-1.5-flash',
-    messages: [
-      { role: 'user', content: 'Halo COOCA AI!' }
-    ]
-  })
-});
-const data = await response.json();
-console.log(data.choices[0].message.content);</pre>
-
-            <pre id="snippet-python" style="display: none; background: var(--bg-secondary); color: var(--text); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-family: monospace; font-size: 12px; line-height: 1.5; overflow-x: auto; margin: 0;">from openai import OpenAI
-
-client = OpenAI(
-    api_key="YOUR_COOCA_AI_KEY",
-    base_url="https://cooca.id/api/v1/ai"
-)
-
-response = client.chat.completions.create(
-    model="deepseek-chat",
-    messages=[{"role": "user", "content": "Halo COOCA AI!"}]
-)
-print(response.choices[0].message.content)</pre>
-
-            <pre id="snippet-php" style="display: none; background: var(--bg-secondary); color: var(--text); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-family: monospace; font-size: 12px; line-height: 1.5; overflow-x: auto; margin: 0;">use Illuminate\Support\Facades\Http;
-
-$response = Http::withHeaders([
-    'Authorization' => 'Bearer YOUR_COOCA_AI_KEY',
-    'Content-Type'  => 'application/json',
-])->post('https://cooca.id/api/v1/ai/chat/completions', [
-    'model' => 'claude-3-5-haiku-20241022',
-    'messages' => [
-        ['role' => 'user', 'content' => 'Halo COOCA AI!'],
-    ],
-]);
-
-$data = $response->json();
-echo $data['choices'][0]['message']['content'];</pre>
+  }'</code></pre>
         </div>
     </div>
 </div>
 
-{{-- Recent Requests Telemetry --}}
-<div class="card">
-    <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
-        <div class="card-title font-bold text-sm" style="color: var(--text);">
-            <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary); margin-right: 6px;"></i> Riwayat Permintaan AI Terbaru
+{{-- Modal: Top-Up Token AI --}}
+<div id="topup-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div class="card" style="max-width: 680px; width: 90%; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-lg); border-radius: var(--radius-md); max-height: 90vh; overflow-y: auto;">
+        <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
+            <div class="card-title font-bold" style="color: var(--text); display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-bolt" style="color: var(--accent);"></i> Top-Up Kuota Token AI
+            </div>
+            <button type="button" class="btn btn-ghost btn-xs" onclick="closeTopUpModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
-    </div>
-    <div class="card-body" style="padding: 0;">
-        <div class="table-responsive">
-            <table class="table" style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background: var(--bg-secondary); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; color: var(--text-muted);">
-                        <th style="padding: 12px 18px;">Waktu</th>
-                        <th style="padding: 12px 18px;">Model</th>
-                        <th style="padding: 12px 18px;">Prompt Tokens</th>
-                        <th style="padding: 12px 18px;">Completion</th>
-                        <th style="padding: 12px 18px;">Total Tokens</th>
-                        <th style="padding: 12px 18px;">Latency</th>
-                        <th style="padding: 12px 18px; text-align: right;">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($recentLogs as $log)
-                        <tr style="border-bottom: 1px solid var(--border); font-size: 12px;">
-                            <td style="padding: 12px 18px; color: var(--text-muted); font-family: monospace;">
-                                {{ $log->created_at?->format('H:i:s') }}
-                                <span style="font-size: 10px; display: block;">{{ $log->created_at?->format('d M Y') }}</span>
-                            </td>
-                            <td style="padding: 12px 18px;">
-                                <code style="background: var(--primary-soft); color: var(--primary); padding: 3px 6px; border-radius: var(--radius-sm); font-weight: 700;">
-                                    {{ $log->model }}
-                                </code>
-                            </td>
-                            <td style="padding: 12px 18px; font-family: monospace;">{{ number_format($log->prompt_tokens) }}</td>
-                            <td style="padding: 12px 18px; font-family: monospace;">{{ number_format($log->completion_tokens) }}</td>
-                            <td style="padding: 12px 18px; font-family: monospace; font-weight: 700; color: var(--text);">{{ number_format($log->total_tokens) }}</td>
-                            <td style="padding: 12px 18px; font-family: monospace; color: var(--text-muted);">{{ $log->duration_ms }} ms</td>
-                            <td style="padding: 12px 18px; text-align: right;">
-                                @if($log->status === 'success')
-                                    <span class="badge badge-success" style="font-size: 10px;">200 OK</span>
-                                @elseif($log->status === 'quota_exceeded')
-                                    <span class="badge badge-warning" style="font-size: 10px;">429 QUOTA</span>
-                                @else
-                                    <span class="badge badge-danger" style="font-size: 10px;">{{ strtoupper($log->status) }}</span>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-center text-muted" style="padding: 40px;">
-                                Belum ada riwayat permintaan API AI.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+        <form action="{{ route('customer.ai-usage.packages.purchase') }}" method="POST">
+            @csrf
+            <div class="card-body" style="display: flex; flex-direction: column; gap: 18px; padding: 20px;">
+                <div class="form-group">
+                    <label class="form-label text-xs font-bold uppercase">1. Pilih Lisensi SaaS yang Akan Diisi</label>
+                    <select name="license_id" id="topup-license-select" required class="form-select" style="width: 100%;">
+                        @foreach($licenses as $lic)
+                            <option value="{{ $lic->id }}">
+                                {{ $lic->product->name ?? 'Paket SaaS' }} — Lisensi: #{{ substr($lic->id, 0, 8) }} ({{ $lic->domain ?? 'Semua Domain' }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="form-label text-xs font-bold uppercase mb-2" style="display: block;">2. Pilih Paket Kuota Token</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+                        @forelse($tokenPackages as $idx => $pkg)
+                            <label class="package-card {{ $idx === 0 ? 'selected' : '' }}" onclick="selectPackageRadio('pkg-{{ $pkg->id }}', this)">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="font-bold text-sm" style="color: var(--text);">{{ $pkg->name }}</div>
+                                    @if($pkg->badge)
+                                        <span class="badge badge-warning" style="font-size: 10px; font-weight: 700;">{{ $pkg->badge }}</span>
+                                    @endif
+                                </div>
+                                <div class="mb-2">
+                                    <div class="font-mono font-extrabold text-base" style="color: var(--primary);">
+                                        +{{ number_format($pkg->token_amount) }} Token
+                                    </div>
+                                    <div class="text-xs text-muted mt-1">{{ $pkg->description ?? 'Tambahan kuota token instan' }}</div>
+                                </div>
+                                <div class="flex justify-between items-center pt-2" style="border-top: 1px solid var(--border); margin-top: auto;">
+                                    <span class="font-extrabold text-sm" style="color: var(--text);">
+                                        Rp {{ number_format($pkg->price, 0, ',', '.') }}
+                                    </span>
+                                    <input type="radio" name="package_id" id="pkg-{{ $pkg->id }}" value="{{ $pkg->id }}" {{ $idx === 0 ? 'checked' : '' }} required style="accent-color: var(--primary);">
+                                </div>
+                            </label>
+                        @empty
+                            <div class="text-center text-muted" style="padding: 20px; grid-column: 1 / -1;">
+                                Belum ada paket top-up yang aktif saat ini.
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="card" style="background: var(--bg-secondary); border: 1px solid var(--border); padding: 14px; border-radius: var(--radius-sm);">
+                    <div class="flex items-center gap-2 text-xs font-semibold" style="color: var(--text);">
+                        <i class="fa-solid fa-shield-halved" style="color: var(--success);"></i> Pembayaran Aman & Instan
+                    </div>
+                    <p class="text-xs text-muted mb-0 mt-1">
+                        Mendukung pembayaran otomatis melalui <strong>QRIS, Virtual Account BCA/Mandiri/BNI/BRI</strong> via Midtrans atau <strong>Transfer Bank Manual</strong>. Kuota otomatis bertambah segera setelah pembayaran berstatus Lunas.
+                    </p>
+                </div>
+            </div>
+            <div class="card-footer flex justify-end gap-2" style="padding: 14px 20px; border-top: 1px solid var(--border);">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="closeTopUpModal()">Batal</button>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-cart-shopping"></i> Lanjutkan Pembayaran</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -381,6 +403,26 @@ echo $data['choices'][0]['message']['content'];</pre>
 
 @push('scripts')
 <script>
+function openTopUpModal(licenseId = null) {
+    if (licenseId) {
+        const select = document.getElementById('topup-license-select');
+        if (select) select.value = licenseId;
+    }
+    document.getElementById('topup-modal').style.display = 'flex';
+}
+
+function closeTopUpModal() {
+    document.getElementById('topup-modal').style.display = 'none';
+}
+
+function selectPackageRadio(radioId, cardEl) {
+    const radio = document.getElementById(radioId);
+    if (radio) radio.checked = true;
+
+    document.querySelectorAll('.package-card').forEach(c => c.classList.remove('selected'));
+    cardEl.classList.add('selected');
+}
+
 function openNewKeyModal() {
     document.getElementById('new-key-modal').style.display = 'flex';
 }

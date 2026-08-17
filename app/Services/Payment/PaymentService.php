@@ -153,6 +153,23 @@ final class PaymentService
                 ActivateSubscriptionJob::dispatch($transaction);
             }
 
+            // Credit AI Token Purchase if this is an AI Top-up transaction
+            $aiPurchase = \App\Models\AiTokenPurchase::where('transaction_id', (string) $transaction->id)
+                ->where('status', 'pending')
+                ->first();
+
+            if ($aiPurchase) {
+                $license = $aiPurchase->license;
+                if ($license) {
+                    $cycle = app(\App\Services\Ai\AiQuotaService::class)->currentCycleFor($license);
+                    $cycle->increment('token_quota', (int) $aiPurchase->tokens_amount);
+                }
+                $aiPurchase->update([
+                    'status' => 'completed',
+                    'credited_at' => Carbon::now(),
+                ]);
+            }
+
             // Record voucher usage if applicable
             if ($transaction->voucher_id) {
                 $voucher = \App\Models\Voucher::find($transaction->voucher_id);
@@ -198,8 +215,10 @@ final class PaymentService
     /**
      * Verify and approve manual bank transfer payment
      */
-    public function verifyManualPayment(Transaction $transaction, ?string $adminId = null): void
+    public function verifyManualPayment(Transaction $transaction, mixed $admin = null): void
     {
+        $adminId = $admin instanceof \App\Models\Admin ? (string) $admin->getKey() : (is_string($admin) ? $admin : null);
+
         DB::beginTransaction();
         try {
             $transaction->update([
@@ -222,6 +241,23 @@ final class PaymentService
             // Activate subscription via queued job for reliability
             if ($transaction->subscription) {
                 ActivateSubscriptionJob::dispatch($transaction);
+            }
+
+            // Credit AI Token Purchase if this is an AI Top-up transaction
+            $aiPurchase = \App\Models\AiTokenPurchase::where('transaction_id', (string) $transaction->id)
+                ->where('status', 'pending')
+                ->first();
+
+            if ($aiPurchase) {
+                $license = $aiPurchase->license;
+                if ($license) {
+                    $cycle = app(\App\Services\Ai\AiQuotaService::class)->currentCycleFor($license);
+                    $cycle->increment('token_quota', (int) $aiPurchase->tokens_amount);
+                }
+                $aiPurchase->update([
+                    'status' => 'completed',
+                    'credited_at' => Carbon::now(),
+                ]);
             }
 
             // Record voucher usage if applicable

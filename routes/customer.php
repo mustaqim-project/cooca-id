@@ -30,6 +30,7 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'veri
     Route::get('/ai-usage', [\App\Http\Controllers\Customer\AiUsageController::class, 'index'])->name('ai-usage.index');
     Route::match(['get', 'post'], '/ai-usage/keys', [\App\Http\Controllers\Customer\AiUsageController::class, 'createKey'])->name('ai-usage.keys.store');
     Route::match(['get', 'delete'], '/ai-usage/keys/{key}', [\App\Http\Controllers\Customer\AiUsageController::class, 'revokeKey'])->name('ai-usage.keys.revoke');
+    Route::post('/ai-usage/packages/purchase', [\App\Http\Controllers\Customer\AiUsageController::class, 'purchasePackage'])->name('ai-usage.packages.purchase');
 
     // Products Catalog
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');

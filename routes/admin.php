@@ -45,6 +45,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
         Route::match(['get', 'post'], '/providers/test', [\App\Http\Controllers\Admin\AiDashboardController::class, 'testProvider'])->name('providers.test');
         Route::match(['get', 'post'], '/plans/save', [\App\Http\Controllers\Admin\AiDashboardController::class, 'savePlanConfig'])->name('plans.save');
         Route::match(['get', 'post'], '/cycles/{cycle}/bonus', [\App\Http\Controllers\Admin\AiDashboardController::class, 'grantBonus'])->name('cycles.bonus');
+        Route::match(['get', 'post'], '/packages/save', [\App\Http\Controllers\Admin\AiDashboardController::class, 'savePackage'])->name('packages.save');
+        Route::match(['get', 'post'], '/packages/{package}/toggle', [\App\Http\Controllers\Admin\AiDashboardController::class, 'togglePackage'])->name('packages.toggle');
+        Route::match(['get', 'delete', 'post'], '/packages/{package}/delete', [\App\Http\Controllers\Admin\AiDashboardController::class, 'deletePackage'])->name('packages.delete');
     });
 
     // Live Chat Support Management
