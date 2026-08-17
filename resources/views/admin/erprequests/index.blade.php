@@ -1,113 +1,256 @@
 @extends('layouts.admin')
 
-@section('title', 'Pengajuan ERP SaaS — COOCA.ID Admin')
+@section('title', 'Pengajuan Instansi & Lisensi ERP — COOCA.ID Admin')
 
 @section('content')
-<div class="page-header" style="margin-bottom: 24px;">
+<div class="page-header">
     <div>
-        <div class="breadcrumb" style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748B; margin-bottom: 8px;">
-            <a href="{{ route('admin.dashboard') }}" style="color: #4F46E5; text-decoration: none;">Admin</a>
+        <div class="breadcrumb">
+            <a href="{{ route('admin.dashboard') }}">Admin</a>
+            <span>/</span>
+            <span>SaaS Operations</span>
             <span>/</span>
             <span>Pengajuan ERP</span>
         </div>
-        <h1 style="font-size: 24px; font-weight: 800; color: #1E293B; margin: 0; display: flex; align-items: center; gap: 10px;">
-            <i class="fa-solid fa-server text-primary"></i> Pengajuan Instansi & Lisensi ERP
-        </h1>
-        <p style="color: #64748B; margin: 4px 0 0; font-size: 14px;">
-            Kelola permohonan deploy instansi ERP, persetujuan domain, dan aktivasi lisensi SaaS customer.
-        </p>
+        <h1 class="page-title">Pengajuan Instansi & Lisensi ERP</h1>
+        <p class="page-subtitle">Kelola permohonan deploy instansi ERP, persetujuan domain/subdomain, dan aktivasi lisensi SaaS customer.</p>
+    </div>
+    <div class="page-actions">
+        <button type="button" class="btn btn-outline btn-sm" onclick="window.location.reload();">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh
+        </button>
     </div>
 </div>
 
 @if(session('success'))
-    <div style="background: #DEF7EC; border: 1px solid #31C48D; color: #03543F; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: 600;">
-        <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
-    </div>
+    <div class="alert alert-success mb-4"><i class="fa-solid fa-circle-check"></i> {{ session('success') }}</div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger mb-4"><i class="fa-solid fa-circle-xmark"></i> {{ session('error') }}</div>
 @endif
 
-<div class="card" style="background: white; border-radius: 16px; border: 1px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow: hidden;">
+{{-- KPI Stats Grid --}}
+<div class="kpi-grid">
+    <div class="kpi-card" style="--kpi-color1: var(--primary); --kpi-color2: var(--accent);">
+        <div class="kpi-header">
+            <span class="kpi-label">Total Permohonan</span>
+            <div class="kpi-icon" style="background: var(--primary-soft); color: var(--primary);">
+                <i class="fa-solid fa-server"></i>
+            </div>
+        </div>
+        <div class="kpi-value">{{ number_format($stats['total'] ?? 0) }}</div>
+        <div class="kpi-trend">
+            <span class="trend-label">Seluruh pengajuan instansi ERP</span>
+        </div>
+    </div>
+
+    <div class="kpi-card" style="--kpi-color1: var(--warning); --kpi-color2: var(--orange);">
+        <div class="kpi-header">
+            <span class="kpi-label">Menunggu Persetujuan</span>
+            <div class="kpi-icon" style="background: var(--warning-soft); color: var(--warning);">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+        </div>
+        <div class="kpi-value" style="color: var(--warning);">{{ number_format($stats['waiting_approval'] ?? 0) }}</div>
+        <div class="kpi-trend">
+            <span class="trend-label text-warning">Perlu tindakan review admin</span>
+        </div>
+    </div>
+
+    <div class="kpi-card" style="--kpi-color1: var(--accent); --kpi-color2: var(--primary);">
+        <div class="kpi-header">
+            <span class="kpi-label">Dalam Setup & Testing</span>
+            <div class="kpi-icon" style="background: var(--accent-soft); color: var(--accent);">
+                <i class="fa-solid fa-gears"></i>
+            </div>
+        </div>
+        <div class="kpi-value" style="color: var(--accent);">{{ number_format($stats['in_progress'] ?? 0) }}</div>
+        <div class="kpi-trend">
+            <span class="trend-label">Tahap setup database & domain</span>
+        </div>
+    </div>
+
+    <div class="kpi-card" style="--kpi-color1: var(--success); --kpi-color2: #059669;">
+        <div class="kpi-header">
+            <span class="kpi-label">Trial Aktif (Live)</span>
+            <div class="kpi-icon" style="background: var(--success-soft); color: var(--success);">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+        </div>
+        <div class="kpi-value" style="color: var(--success);">{{ number_format($stats['active_trial'] ?? 0) }}</div>
+        <div class="kpi-trend">
+            <span class="trend-label text-success">Instansi berjalan & berlisensi</span>
+        </div>
+    </div>
+</div>
+
+{{-- Filters Card --}}
+<div class="card mb-4">
+    <div class="card-body" style="padding: 16px 20px;">
+        <form method="GET" action="{{ route('admin.erp-requests.index') }}" class="flex items-center justify-between" style="flex-wrap: wrap; gap: 12px;">
+            <div class="flex items-center gap-3" style="flex-wrap: wrap; flex: 1;">
+                <div style="min-width: 260px; flex: 1;">
+                    <input type="text" name="search" class="form-input" placeholder="🔍 Cari customer, email, nomor WA, domain..." value="{{ request('search') }}">
+                </div>
+
+                <div style="min-width: 200px;">
+                    <select name="status" class="form-select">
+                        <option value="all">Semua Status Permohonan</option>
+                        <option value="submitted" {{ request('status') === 'submitted' ? 'selected' : '' }}>🟡 Baru Diajukan (Submitted)</option>
+                        <option value="waiting_approval" {{ request('status') === 'waiting_approval' ? 'selected' : '' }}>⏳ Menunggu Approval</option>
+                        <option value="waiting_setup" {{ request('status') === 'waiting_setup' ? 'selected' : '' }}>⚙️ Menunggu Setup</option>
+                        <option value="in_setup" {{ request('status') === 'in_setup' ? 'selected' : '' }}>🔧 Dalam Proses Setup</option>
+                        <option value="domain_setup" {{ request('status') === 'domain_setup' ? 'selected' : '' }}>🌐 Konfigurasi Domain</option>
+                        <option value="testing" {{ request('status') === 'testing' ? 'selected' : '' }}>🧪 Tahap Pengujian</option>
+                        <option value="active_trial" {{ request('status') === 'active_trial' ? 'selected' : '' }}>🟢 Trial Aktif</option>
+                        <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>🔴 Ditolak</option>
+                        <option value="trial_expired" {{ request('status') === 'trial_expired' ? 'selected' : '' }}>⚪ Trial Berakhir</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
+                @if(request()->hasAny(['search', 'status']))
+                    <a href="{{ route('admin.erp-requests.index') }}" class="btn btn-ghost btn-sm">
+                        <i class="fa-solid fa-xmark"></i> Reset
+                    </a>
+                @endif
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Data Table --}}
+<div class="card">
     <div class="card-body" style="padding: 0;">
-        <div class="data-table-wrap" style="overflow-x: auto;">
-            <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+        <div class="data-table-wrap" style="border: none; border-radius: 0;">
+            <table class="data-table">
                 <thead>
-                    <tr style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0; font-size: 12px; text-transform: uppercase; color: #64748B; letter-spacing: 0.5px;">
-                        <th style="padding: 14px 18px;">Pemohon (Customer)</th>
-                        <th style="padding: 14px 18px;">Produk ERP</th>
-                        <th style="padding: 14px 18px;">Domain & Subdomain</th>
-                        <th style="padding: 14px 18px;">Status</th>
-                        <th style="padding: 14px 18px;">Waktu Pengajuan</th>
-                        <th style="padding: 14px 18px; text-align: right;">Aksi</th>
+                    <tr>
+                        <th style="width: 240px;">Pemohon (Customer)</th>
+                        <th>Produk ERP</th>
+                        <th>Domain / Subdomain Instansi</th>
+                        <th style="width: 170px;">Status</th>
+                        <th style="width: 160px;">Waktu Pengajuan</th>
+                        <th style="width: 80px; text-align: center;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($requests as $req)
-                        <tr style="border-bottom: 1px solid #F1F5F9; font-size: 13px;">
-                            <td style="padding: 14px 18px;">
-                                <div style="font-weight: 700; color: #1E293B;">{{ $req->customer->name ?? 'N/A' }}</div>
-                                <div style="font-size: 12px; color: #64748B;">{{ $req->customer->email ?? '' }}</div>
+                        <tr>
+                            <td>
+                                <div class="font-bold text-sm" style="color: var(--text);">
+                                    {{ $req->customer->name ?? 'N/A' }}
+                                </div>
+                                <div class="text-xs text-muted">{{ $req->customer->email ?? '' }}</div>
                                 @if($req->customer->phone ?? false)
-                                    <div style="font-size: 11px; color: #059669; font-weight: 600; margin-top: 2px;">
-                                        <i class="fa-brands fa-whatsapp"></i> +{{ $req->customer->phone }}
+                                    <div class="text-xs mt-1" style="color: var(--success); font-weight: 600;">
+                                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $req->customer->phone) }}" target="_blank" style="color: var(--success); text-decoration: none;">
+                                            <i class="fa-brands fa-whatsapp"></i> +{{ $req->customer->phone }}
+                                        </a>
                                     </div>
                                 @endif
                             </td>
-                            <td style="padding: 14px 18px;">
-                                <span style="font-weight: 700; color: #4F46E5;">{{ $req->product->name ?? 'Paket ERP' }}</span>
-                            </td>
-                            <td style="padding: 14px 18px;">
-                                @if($req->requested_subdomain)
-                                    <code style="background: #EEF2FF; color: #4F46E5; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 12px;">
-                                        https://{{ $req->requested_subdomain }}.cooca.id
-                                    </code>
-                                @elseif($req->requested_domain)
-                                    <code style="background: #FEF3C7; color: #92400E; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 12px;">
-                                        https://{{ $req->requested_domain }}
-                                    </code>
-                                @else
-                                    <span style="color: #94A3B8;">-</span>
+                            <td>
+                                <div class="font-bold text-sm" style="color: var(--primary);">
+                                    {{ $req->product->name ?? 'Paket ERP SaaS' }}
+                                </div>
+                                @if($req->affiliator)
+                                    <div class="text-xs text-muted mt-1">
+                                        Ref: <span class="font-semibold">{{ $req->affiliator->name }}</span>
+                                    </div>
                                 @endif
                             </td>
-                            <td style="padding: 14px 18px;">
+                            <td>
+                                @if($req->requested_subdomain)
+                                    <div class="flex items-center gap-2">
+                                        <code style="background: var(--primary-soft); color: var(--primary); padding: 4px 8px; border-radius: var(--radius-sm); font-weight: 700; font-size: 12px;">
+                                            https://{{ $req->requested_subdomain }}.cooca.id
+                                        </code>
+                                        <a href="https://{{ $req->requested_subdomain }}.cooca.id" target="_blank" class="text-xs text-muted" title="Buka URL Instansi">
+                                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                        </a>
+                                    </div>
+                                @elseif($req->requested_domain)
+                                    <div class="flex items-center gap-2">
+                                        <code style="background: var(--warning-soft); color: var(--warning); padding: 4px 8px; border-radius: var(--radius-sm); font-weight: 700; font-size: 12px;">
+                                            https://{{ $req->requested_domain }}
+                                        </code>
+                                        <a href="https://{{ $req->requested_domain }}" target="_blank" class="text-xs text-muted" title="Buka Domain">
+                                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                        </a>
+                                    </div>
+                                @else
+                                    <span class="text-xs text-muted">—</span>
+                                @endif
+                            </td>
+                            <td>
                                 @php
-                                    $statusBg = match($req->status) {
-                                        'active_trial', 'waiting_setup' => 'background: #DEF7EC; color: #03543F;',
-                                        'submitted', 'waiting_approval' => 'background: #FEF3C7; color: #92400E;',
-                                        'in_setup', 'domain_setup', 'testing' => 'background: #E0F2FE; color: #075985;',
-                                        'rejected', 'trial_expired' => 'background: #FEE2E2; color: #991B1B;',
-                                        default => 'background: #F1F5F9; color: #64748B;',
-                                    };
                                     $labels = \App\Models\ErpRequest::getStatusLabels();
+                                    $status = $req->status;
                                 @endphp
-                                <span style="font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; {{ $statusBg }}">
-                                    {{ $labels[$req->status] ?? strtoupper($req->status) }}
-                                </span>
+                                @if(in_array($status, ['active_trial', 'waiting_setup']))
+                                    <span class="badge badge-success" style="font-weight: 700;">
+                                        <i class="fa-solid fa-circle-check"></i> {{ $labels[$status] ?? strtoupper($status) }}
+                                    </span>
+                                @elseif(in_array($status, ['submitted', 'waiting_approval']))
+                                    <span class="badge badge-warning" style="font-weight: 700;">
+                                        <i class="fa-solid fa-clock"></i> {{ $labels[$status] ?? strtoupper($status) }}
+                                    </span>
+                                @elseif(in_array($status, ['in_setup', 'domain_setup', 'testing']))
+                                    <span class="badge badge-primary" style="font-weight: 700;">
+                                        <i class="fa-solid fa-gears"></i> {{ $labels[$status] ?? strtoupper($status) }}
+                                    </span>
+                                @elseif(in_array($status, ['rejected', 'trial_expired']))
+                                    <span class="badge badge-danger" style="font-weight: 700;">
+                                        <i class="fa-solid fa-circle-xmark"></i> {{ $labels[$status] ?? strtoupper($status) }}
+                                    </span>
+                                @else
+                                    <span class="badge badge-muted">{{ $labels[$status] ?? strtoupper($status) }}</span>
+                                @endif
                             </td>
-                            <td style="padding: 14px 18px; color: #64748B; font-size: 12px;">
-                                {{ $req->created_at ? $req->created_at->translatedFormat('d M Y, H:i') : '-' }}
-                            </td>
-                            <td style="padding: 14px 18px; text-align: right;">
-                                <div style="display: flex; gap: 6px; justify-content: flex-end;">
-                                    <a href="{{ route('admin.erp-requests.show', $req->id) }}" class="btn btn-sm btn-outline-primary" style="font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 8px;">
-                                        <i class="fa-solid fa-eye"></i> Detail
-                                    </a>
+                            <td>
+                                <div class="font-mono text-xs font-bold" style="color: var(--text);">
+                                    {{ $req->created_at ? $req->created_at->format('H:i:s') : '-' }}
                                 </div>
+                                <div class="text-xs text-muted">
+                                    {{ $req->created_at ? $req->created_at->format('d M Y') : '-' }}
+                                </div>
+                                <div class="text-xs text-faint" style="font-size: 10px;">
+                                    {{ $req->created_at ? $req->created_at->diffForHumans() : '' }}
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <a href="{{ route('admin.erp-requests.show', $req->id) }}" class="btn btn-outline btn-sm" title="Kelola Pengajuan" style="padding: 6px 10px;">
+                                    <i class="fa-solid fa-eye"></i> Detail
+                                </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" style="text-align: center; color: #94A3B8; padding: 40px; font-size: 14px;">
-                                Belum ada pengajuan instansi ERP.
+                            <td colspan="6" class="text-center text-muted" style="padding: 60px 20px;">
+                                <i class="fa-solid fa-server" style="font-size: 44px; margin-bottom: 12px; display: block; opacity: 0.4; color: var(--primary);"></i>
+                                <div class="font-bold text-base" style="color: var(--text);">Tidak Ada Permohonan ERP Ditemukan</div>
+                                <div class="text-xs text-muted mt-1">Belum ada pengajuan instansi ERP untuk kriteria pencarian atau status ini.</div>
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        @if($requests->hasPages())
-            <div style="padding: 16px; border-top: 1px solid #E2E8F0;">
+    </div>
+    @if($requests->hasPages())
+        <div class="card-footer flex justify-between items-center" style="padding: 16px 24px;">
+            <div class="text-xs text-muted">
+                Menampilkan <strong>{{ $requests->firstItem() }}</strong> - <strong>{{ $requests->lastItem() }}</strong> dari <strong>{{ $requests->total() }}</strong> total pengajuan
+            </div>
+            <div>
                 {{ $requests->links() }}
             </div>
-        @endif
-    </div>
+        </div>
+    @endif
 </div>
 @endsection

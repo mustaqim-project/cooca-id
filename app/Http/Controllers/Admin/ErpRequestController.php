@@ -32,14 +32,42 @@ final class ErpRequestController extends Controller
         }
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $requests = ErpRequest::with(['customer', 'product', 'affiliator', 'approvedBy'])
-            ->latest()
-            ->paginate(20);
+        $query = ErpRequest::with(['customer', 'product', 'affiliator', 'approvedBy']);
+
+        if ($request->filled('status') && $request->input('status') !== 'all') {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->input('search'));
+            $query->where(function ($q) use ($search) {
+                $q->where('requested_subdomain', 'like', "%{$search}%")
+                  ->orWhere('requested_domain', 'like', "%{$search}%")
+                  ->orWhereHas('customer', function ($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%")
+                         ->orWhere('email', 'like', "%{$search}%")
+                         ->orWhere('phone', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('product', function ($pq) use ($search) {
+                      $pq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $requests = $query->latest()->paginate(20)->withQueryString();
+
+        $stats = [
+            'total' => ErpRequest::count(),
+            'waiting_approval' => ErpRequest::whereIn('status', ['submitted', 'waiting_approval'])->count(),
+            'in_progress' => ErpRequest::whereIn('status', ['waiting_setup', 'in_setup', 'domain_setup', 'testing'])->count(),
+            'active_trial' => ErpRequest::where('status', 'active_trial')->count(),
+        ];
 
         return view('admin.erprequests.index', [
             'requests' => $requests,
+            'stats' => $stats,
         ]);
     }
 
