@@ -19,14 +19,14 @@ final class AuthenticateAiApiKey
             return response()->json(['error' => ['message' => 'Missing API key']], 401);
         }
 
-        $rawKey = substr($header, 7);
-        $prefix = substr($rawKey, 0, 12);
+        $rawKey = trim(substr($header, 7));
+        $hash = hash('sha256', $rawKey);
 
-        $apiKey = AiApiKey::where('key_prefix', $prefix)
+        $apiKey = AiApiKey::where('key_hash', $hash)
             ->where('status', 'active')
             ->first();
 
-        if (!$apiKey || !hash_equals($apiKey->key_hash, hash('sha256', $rawKey))) {
+        if (!$apiKey) {
             return response()->json(['error' => ['message' => 'Invalid API key']], 401);
         }
 
