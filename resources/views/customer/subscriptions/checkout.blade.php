@@ -236,8 +236,8 @@
                         @endif
                     @else
                         {{-- Payment Method Selection Tabs / Radio Cards --}}
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                            <label class="payment-method-card" id="card-midtrans" onclick="togglePaymentMethod('midtrans')" style="border:2px solid var(--primary);background:rgba(67,97,238,0.05);padding:14px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:all 0.2s;">
+                        <div class="payment-methods-grid">
+                            <label class="payment-method-card active" id="card-midtrans" onclick="togglePaymentMethod('midtrans')">
                                 <input type="radio" name="select_payment_type" value="midtrans" checked onchange="togglePaymentMethod('midtrans')" style="display:none;">
                                 <div style="display:flex;align-items:center;gap:8px;">
                                     <i class="fa-solid fa-bolt" style="color:var(--primary);font-size:16px;"></i>
@@ -247,10 +247,10 @@
                                 <span class="badge badge-success" style="align-self:flex-start;font-size:10px;margin-top:4px;">Otomatis Instan</span>
                             </label>
 
-                            <label class="payment-method-card" id="card-manual" onclick="togglePaymentMethod('manual_transfer')" style="border:1px solid var(--border);background:var(--bg);padding:14px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:all 0.2s;">
+                            <label class="payment-method-card" id="card-manual" onclick="togglePaymentMethod('manual_transfer')">
                                 <input type="radio" name="select_payment_type" value="manual_transfer" onchange="togglePaymentMethod('manual_transfer')" style="display:none;">
                                 <div style="display:flex;align-items:center;gap:8px;">
-                                    <i class="fa-solid fa-building-columns" style="color:#6c757d;font-size:16px;"></i>
+                                    <i class="fa-solid fa-building-columns" style="color:var(--text-muted);font-size:16px;"></i>
                                     <strong style="font-size:13px;">Transfer Manual</strong>
                                 </div>
                                 <span class="text-xs text-muted">Transfer ke Rekening Resmi PT COOCA</span>
@@ -299,7 +299,7 @@
 
                                 @if($companyBanks->count() > 0)
                                     @foreach($companyBanks as $cBank)
-                                        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:0 2px 6px rgba(0,0,0,0.02);position:relative;">
+                                        <div class="bank-account-card">
                                             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                                                 <div style="display:flex;align-items:center;gap:8px;">
                                                     @if($cBank->logo_url)
@@ -316,7 +316,7 @@
                                                 @endif
                                             </div>
 
-                                            <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);padding:8px 12px;border-radius:8px;border:1px dashed var(--primary);margin:6px 0;">
+                                            <div class="bank-account-number-box">
                                                 <div>
                                                     <div class="text-xs text-muted">Nomor Rekening:</div>
                                                     <div class="font-mono font-bold text-base">{{ $cBank->account_number }}</div>
@@ -339,19 +339,19 @@
                                             </div>
 
                                             @if($cBank->instructions)
-                                                <div class="text-xs text-muted mt-2" style="font-style:italic;line-height:1.3;background:rgba(67,97,238,0.03);padding:6px 8px;border-radius:6px;">
+                                                <div class="bank-instructions-box">
                                                     {{ $cBank->instructions }}
                                                 </div>
                                             @endif
                                         </div>
                                     @endforeach
                                 @else
-                                    <div style="background:linear-gradient(135deg, rgba(67,97,238,0.08), rgba(76,201,240,0.08));border:1px solid var(--border);border-radius:var(--radius);padding:16px;">
+                                    <div class="bank-account-card">
                                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
                                             <span class="text-xs font-bold uppercase text-muted">Rekening Tujuan Transfer</span>
                                             <span class="badge badge-primary">{{ $bName }}</span>
                                         </div>
-                                        <div style="display:flex;align-items:center;justify-content:space-between;background:#fff;padding:10px 14px;border-radius:8px;border:1px dashed var(--primary);margin-bottom:8px;">
+                                        <div class="bank-account-number-box">
                                             <div>
                                                 <div class="text-xs text-muted">Nomor Rekening:</div>
                                                 <div class="font-mono font-bold text-lg">{{ $bNumber }}</div>
@@ -363,7 +363,7 @@
                                         <div class="text-xs text-muted">
                                             Atas Nama: <strong style="color:var(--text);">{{ $bHolder }}</strong>
                                         </div>
-                                        <div class="text-xs text-muted mt-2" style="font-style:italic;line-height:1.4;">
+                                        <div class="bank-instructions-box">
                                             {{ $bInst }}
                                         </div>
                                     </div>
@@ -442,25 +442,13 @@
             const secManual = document.getElementById('section-manual');
 
             if (type === 'manual_transfer') {
-                if (cardMidtrans) {
-                    cardMidtrans.style.border = '1px solid var(--border)';
-                    cardMidtrans.style.background = 'var(--bg)';
-                }
-                if (cardManual) {
-                    cardManual.style.border = '2px solid var(--primary)';
-                    cardManual.style.background = 'rgba(67,97,238,0.05)';
-                }
+                if (cardMidtrans) cardMidtrans.classList.remove('active');
+                if (cardManual) cardManual.classList.add('active');
                 if (secMidtrans) secMidtrans.style.display = 'none';
                 if (secManual) secManual.style.display = 'flex';
             } else {
-                if (cardMidtrans) {
-                    cardMidtrans.style.border = '2px solid var(--primary)';
-                    cardMidtrans.style.background = 'rgba(67,97,238,0.05)';
-                }
-                if (cardManual) {
-                    cardManual.style.border = '1px solid var(--border)';
-                    cardManual.style.background = 'var(--bg)';
-                }
+                if (cardMidtrans) cardMidtrans.classList.add('active');
+                if (cardManual) cardManual.classList.remove('active');
                 if (secMidtrans) secMidtrans.style.display = 'flex';
                 if (secManual) secManual.style.display = 'none';
             }

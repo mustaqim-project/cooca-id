@@ -74,11 +74,11 @@
                     <div class="text-xs mt-1">Alasan: <strong>{{ $tx->rejection_reason }}</strong></div>
                 </div>
             @elseif ($hasProof && $tx->status === 'pending')
-                <div class="alert alert-warning mb-2" style="background:#fffbeb;border:1px solid #fef3c7;color:#92400e;border-radius:var(--radius);padding:12px;">
+                <div class="alert alert-warning mb-2" style="border-radius:var(--radius);padding:12px;">
                     <div class="font-bold text-sm"><i class="fa-solid fa-clock"></i> Bukti Transfer Sedang Diverifikasi</div>
                     <div class="text-xs mt-1">Pengirim: <strong>{{ $tx->sender_name ?? 'Pelanggan' }}</strong></div>
                     <div class="mt-2">
-                        <a href="{{ $tx->payment_proof_url }}" target="_blank" class="btn btn-outline btn-sm" style="background:#fff;">
+                        <a href="{{ $tx->payment_proof_url }}" target="_blank" class="btn btn-outline btn-sm">
                             <i class="fa-solid fa-file-invoice"></i> Lihat Bukti Bayar
                         </a>
                     </div>
@@ -86,8 +86,8 @@
             @endif
 
             {{-- Method tabs --}}
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <label id="proj-card-midtrans" onclick="toggleProjPay('midtrans')" style="border:2px solid var(--primary);background:rgba(67,97,238,0.06);padding:12px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;">
+            <div class="payment-methods-grid">
+                <label class="payment-method-card active" id="proj-card-midtrans" onclick="toggleProjPay('midtrans')">
                     <input type="radio" name="proj_pay_type" value="midtrans" checked onchange="toggleProjPay('midtrans')" style="display:none;">
                     <div style="display:flex;align-items:center;gap:6px;">
                         <i class="fa-solid fa-bolt" style="color:var(--primary);"></i>
@@ -96,10 +96,10 @@
                     <span class="text-xs text-muted">QRIS, VA, E-Wallet</span>
                 </label>
 
-                <label id="proj-card-manual" onclick="toggleProjPay('manual')" style="border:1px solid var(--border);background:#fff;padding:12px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;">
+                <label class="payment-method-card" id="proj-card-manual" onclick="toggleProjPay('manual')">
                     <input type="radio" name="proj_pay_type" value="manual" onchange="toggleProjPay('manual')" style="display:none;">
                     <div style="display:flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-building-columns" style="color:#6c757d;"></i>
+                        <i class="fa-solid fa-building-columns" style="color:var(--text-muted);"></i>
                         <strong style="font-size:13px;">Transfer Manual</strong>
                     </div>
                     <span class="text-xs text-muted">Upload Bukti Bayar</span>
@@ -154,25 +154,29 @@
                 <div style="display:flex;flex-direction:column;gap:8px;">
                     @if($pBanks->count() > 0)
                         @foreach($pBanks as $pb)
-                            <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;">
+                            <div class="bank-account-card">
                                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
                                     <span class="font-bold text-sm" style="color:var(--primary);">{{ $pb->bank_name }}</span>
                                     @if($pb->is_primary)
                                         <span class="badge badge-warning" style="font-size:10px;"><i class="fa-solid fa-star"></i> Utama</span>
                                     @endif
                                 </div>
-                                <div class="font-mono font-bold text-base">{{ $pb->account_number }}</div>
-                                <div class="text-xs text-muted">a/n <strong>{{ $pb->account_holder }}</strong></div>
+                                <div class="bank-account-number-box">
+                                    <div class="font-mono font-bold text-base">{{ $pb->account_number }}</div>
+                                </div>
+                                <div class="text-xs text-muted">a/n <strong style="color:var(--text);">{{ $pb->account_holder }}</strong></div>
                             </div>
                         @endforeach
                     @else
-                        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px;">
+                        <div class="bank-account-card">
                             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                                 <span class="text-xs font-bold uppercase text-muted">Rekening Tujuan</span>
                                 <span class="badge badge-primary">{{ $bName }}</span>
                             </div>
-                            <div class="font-mono font-bold text-base">{{ $bNumber }}</div>
-                            <div class="text-xs text-muted">a/n <strong>{{ $bHolder }}</strong></div>
+                            <div class="bank-account-number-box">
+                                <div class="font-mono font-bold text-base">{{ $bNumber }}</div>
+                            </div>
+                            <div class="text-xs text-muted">a/n <strong style="color:var(--text);">{{ $bHolder }}</strong></div>
                         </div>
                     @endif
                 </div>
@@ -216,13 +220,13 @@ function toggleProjPay(type) {
     const secT = document.getElementById('proj-sec-manual');
 
     if (type === 'manual') {
-        if (cardM) { cardM.style.border = '1px solid var(--border)'; cardM.style.background = '#fff'; }
-        if (cardT) { cardT.style.border = '2px solid var(--primary)'; cardT.style.background = 'rgba(67,97,238,0.06)'; }
+        if (cardM) cardM.classList.remove('active');
+        if (cardT) cardT.classList.add('active');
         if (secM) secM.style.display = 'none';
         if (secT) secT.style.display = 'flex';
     } else {
-        if (cardM) { cardM.style.border = '2px solid var(--primary)'; cardM.style.background = 'rgba(67,97,238,0.06)'; }
-        if (cardT) { cardT.style.border = '1px solid var(--border)'; cardT.style.background = '#fff'; }
+        if (cardM) cardM.classList.add('active');
+        if (cardT) cardT.classList.remove('active');
         if (secM) secM.style.display = 'flex';
         if (secT) secT.style.display = 'none';
     }

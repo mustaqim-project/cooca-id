@@ -21,6 +21,17 @@
             --radius: 12px;
         }
 
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --secondary: #1e293b;
+                --text-dark: #f8fafc;
+                --text-muted: #94a3b8;
+                --border-color: rgba(255, 255, 255, 0.08);
+                --bg-color: #030712;
+                --card-bg: #111827;
+            }
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
@@ -202,7 +213,7 @@
                                         <span style="background: #fef3c7; color: #92400e; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px;">Utama</span>
                                     @endif
                                 </div>
-                                <div style="font-family: monospace; font-weight: 700; font-size: 14px; margin: 4px 0; color: #2b2d42;">
+                                <div style="font-family: monospace; font-weight: 700; font-size: 14px; margin: 4px 0; color: var(--text-dark);">
                                     {{ $dbk->account_number }}
                                 </div>
                                 <div style="font-size: 12px; color: var(--text-muted);">

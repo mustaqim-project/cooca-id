@@ -115,15 +115,15 @@
                         <div class="text-xs mt-1">Silakan lakukan transfer ulang atau unggah bukti transfer yang valid di bawah ini.</div>
                     </div>
                 @elseif ($hasProof && $tx->status === 'pending')
-                    <div class="alert alert-warning mb-4" style="background:#fffbeb;border:1px solid #fef3c7;color:#92400e;border-radius:var(--radius);padding:16px;">
-                        <div class="flex items-center justify-between">
+                    <div class="alert alert-warning mb-4" style="border-radius:var(--radius);padding:16px;">
+                        <div class="flex items-center justify-between" style="flex-wrap:wrap;gap:12px;">
                             <div>
                                 <div class="font-bold text-sm"><i class="fa-solid fa-clock"></i> Bukti Transfer Sedang Diverifikasi</div>
                                 <div class="text-xs mt-1">Pengirim: <strong>{{ $tx->sender_name ?? 'Pelanggan' }}</strong> · Diunggah pada: {{ $tx->payment_proof_uploaded_at?->format('d M Y H:i') ?? $tx->updated_at->format('d M Y H:i') }}</div>
                                 <div class="text-xs mt-1 text-muted">Tim kami sedang memeriksa mutasi rekening. Transaksi akan otomatis aktif setelah diverifikasi.</div>
                             </div>
                             <div>
-                                <a href="{{ $tx->payment_proof_url }}" target="_blank" class="btn btn-outline btn-sm" style="background:#fff;">
+                                <a href="{{ $tx->payment_proof_url }}" target="_blank" class="btn btn-outline btn-sm">
                                     <i class="fa-solid fa-file-invoice"></i> Lihat Bukti Bayar
                                 </a>
                             </div>
@@ -131,15 +131,15 @@
                     </div>
                 @endif
 
-                <div class="card" style="border:1px solid var(--border);box-shadow:none;background:var(--bg);">
-                    <div class="card-header" style="background:transparent;border-bottom:1px solid var(--border);">
+                <div class="card" style="border:1px solid var(--border);box-shadow:none;">
+                    <div class="card-header" style="border-bottom:1px solid var(--border);">
                         <div class="card-title text-base font-bold">Pilih Cara Pembayaran Tagihan</div>
                     </div>
                     <div class="card-body" style="padding:20px;display:flex;flex-direction:column;gap:16px;">
 
                         {{-- Tab Switcher --}}
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                            <label class="payment-method-card" id="inv-card-midtrans" onclick="toggleInvPayment('midtrans')" style="border:2px solid var(--primary);background:rgba(67,97,238,0.06);padding:14px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:all 0.2s;">
+                        <div class="payment-methods-grid">
+                            <label class="payment-method-card active" id="inv-card-midtrans" onclick="toggleInvPayment('midtrans')">
                                 <input type="radio" name="inv_payment_type" value="midtrans" checked onchange="toggleInvPayment('midtrans')" style="display:none;">
                                 <div style="display:flex;align-items:center;gap:8px;">
                                     <i class="fa-solid fa-bolt" style="color:var(--primary);font-size:16px;"></i>
@@ -149,10 +149,10 @@
                                 <span class="badge badge-success" style="align-self:flex-start;font-size:10px;margin-top:2px;">Otomatis Instan</span>
                             </label>
 
-                            <label class="payment-method-card" id="inv-card-manual" onclick="toggleInvPayment('manual_transfer')" style="border:1px solid var(--border);background:#fff;padding:14px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:all 0.2s;">
+                            <label class="payment-method-card" id="inv-card-manual" onclick="toggleInvPayment('manual_transfer')">
                                 <input type="radio" name="inv_payment_type" value="manual_transfer" onchange="toggleInvPayment('manual_transfer')" style="display:none;">
                                 <div style="display:flex;align-items:center;gap:8px;">
-                                    <i class="fa-solid fa-building-columns" style="color:#6c757d;font-size:16px;"></i>
+                                    <i class="fa-solid fa-building-columns" style="color:var(--text-muted);font-size:16px;"></i>
                                     <strong style="font-size:13px;">Transfer Bank Manual</strong>
                                 </div>
                                 <span class="text-xs text-muted">Transfer Rekening Resmi PT COOCA</span>
@@ -185,36 +185,41 @@
 
                                 @if($cBanks->count() > 0)
                                     @foreach($cBanks as $cb)
-                                        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;">
+                                        <div class="bank-account-card">
                                             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
                                                 <span class="font-bold text-sm" style="color:var(--primary);">{{ $cb->bank_name }}</span>
                                                 @if($cb->is_primary)
                                                     <span class="badge badge-warning" style="font-size:10px;"><i class="fa-solid fa-star"></i> Utama</span>
                                                 @endif
                                             </div>
-                                            <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);padding:8px 12px;border-radius:8px;border:1px dashed var(--primary);margin:4px 0;">
+                                            <div class="bank-account-number-box">
                                                 <div class="font-mono font-bold text-base">{{ $cb->account_number }}</div>
                                                 <button type="button" class="btn btn-ghost btn-xs" onclick="copyInvAccNum('{{ $cb->account_number }}')">
                                                     <i class="fa-solid fa-copy"></i> Salin
                                                 </button>
                                             </div>
                                             <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;" class="text-muted">
-                                                <span>a/n <strong>{{ $cb->account_holder }}</strong></span>
+                                                <span>a/n <strong style="color:var(--text);">{{ $cb->account_holder }}</strong></span>
                                                 @if($cb->qr_code_url)
                                                     <a href="{{ $cb->qr_code_url }}" target="_blank" class="badge badge-success" style="font-size:10px;text-decoration:none;">
                                                         <i class="fa-solid fa-qrcode"></i> QRIS
                                                     </a>
                                                 @endif
                                             </div>
+                                            @if($cb->instructions)
+                                                <div class="bank-instructions-box">
+                                                    {{ $cb->instructions }}
+                                                </div>
+                                            @endif
                                         </div>
                                     @endforeach
                                 @else
-                                    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px;">
+                                    <div class="bank-account-card">
                                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                                             <span class="text-xs font-bold uppercase text-muted">Rekening Tujuan</span>
                                             <span class="badge badge-primary">{{ $bName }}</span>
                                         </div>
-                                        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);padding:10px 14px;border-radius:8px;border:1px dashed var(--primary);margin-bottom:8px;">
+                                        <div class="bank-account-number-box">
                                             <div>
                                                 <div class="text-xs text-muted">Nomor Rekening:</div>
                                                 <div class="font-mono font-bold text-lg">{{ $bNumber }}</div>
@@ -224,7 +229,7 @@
                                             </button>
                                         </div>
                                         <div class="text-xs text-muted">Atas Nama: <strong style="color:var(--text);">{{ $bHolder }}</strong></div>
-                                        <div class="text-xs text-muted mt-2" style="font-style:italic;">{{ $bInst }}</div>
+                                        <div class="bank-instructions-box">{{ $bInst }}</div>
                                     </div>
                                 @endif
                             </div>
@@ -283,25 +288,13 @@ function toggleInvPayment(type) {
     const secManual = document.getElementById('inv-sec-manual');
 
     if (type === 'manual_transfer') {
-        if (cardMidtrans) {
-            cardMidtrans.style.border = '1px solid var(--border)';
-            cardMidtrans.style.background = '#fff';
-        }
-        if (cardManual) {
-            cardManual.style.border = '2px solid var(--primary)';
-            cardManual.style.background = 'rgba(67,97,238,0.06)';
-        }
+        if (cardMidtrans) cardMidtrans.classList.remove('active');
+        if (cardManual) cardManual.classList.add('active');
         if (secMidtrans) secMidtrans.style.display = 'none';
         if (secManual) secManual.style.display = 'flex';
     } else {
-        if (cardMidtrans) {
-            cardMidtrans.style.border = '2px solid var(--primary)';
-            cardMidtrans.style.background = 'rgba(67,97,238,0.06)';
-        }
-        if (cardManual) {
-            cardManual.style.border = '1px solid var(--border)';
-            cardManual.style.background = '#fff';
-        }
+        if (cardMidtrans) cardMidtrans.classList.add('active');
+        if (cardManual) cardManual.classList.remove('active');
         if (secMidtrans) secMidtrans.style.display = 'flex';
         if (secManual) secManual.style.display = 'none';
     }

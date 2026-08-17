@@ -172,7 +172,7 @@
                     <span class="text-sm text-muted">Tipe Gateway</span>
                     <span>
                         @if($transaction->isManualTransfer())
-                            <span class="badge badge-warning" style="background:#fef3c7;color:#92400e;border:1px solid #fde68a;">
+                            <span class="badge badge-warning">
                                 <i class="fa-solid fa-building-columns"></i> Transfer Bank Manual
                             </span>
                         @else
