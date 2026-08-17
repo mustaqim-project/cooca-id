@@ -30,6 +30,7 @@
     {{-- Customer Portal CSS --}}
     <link rel="stylesheet" href="{{ asset('css/customer.css') }}">
     @stack('styles')
+    @yield('styles')
 </head>
 <body>
 <div class="portal-wrap">
@@ -377,5 +378,6 @@
     });
 </script>
 @stack('scripts')
+@yield('scripts')
 </body>
 </html>

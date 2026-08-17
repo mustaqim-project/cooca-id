@@ -139,7 +139,7 @@
 
                         {{-- Tab Switcher --}}
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                            <label class="payment-method-card" id="inv-card-midtrans" style="border:2px solid var(--primary);background:rgba(67,97,238,0.06);padding:14px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:all 0.2s;">
+                            <label class="payment-method-card" id="inv-card-midtrans" onclick="toggleInvPayment('midtrans')" style="border:2px solid var(--primary);background:rgba(67,97,238,0.06);padding:14px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:all 0.2s;">
                                 <input type="radio" name="inv_payment_type" value="midtrans" checked onchange="toggleInvPayment('midtrans')" style="display:none;">
                                 <div style="display:flex;align-items:center;gap:8px;">
                                     <i class="fa-solid fa-bolt" style="color:var(--primary);font-size:16px;"></i>
@@ -149,7 +149,7 @@
                                 <span class="badge badge-success" style="align-self:flex-start;font-size:10px;margin-top:2px;">Otomatis Instan</span>
                             </label>
 
-                            <label class="payment-method-card" id="inv-card-manual" style="border:1px solid var(--border);background:#fff;padding:14px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:all 0.2s;">
+                            <label class="payment-method-card" id="inv-card-manual" onclick="toggleInvPayment('manual_transfer')" style="border:1px solid var(--border);background:#fff;padding:14px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:all 0.2s;">
                                 <input type="radio" name="inv_payment_type" value="manual_transfer" onchange="toggleInvPayment('manual_transfer')" style="display:none;">
                                 <div style="display:flex;align-items:center;gap:8px;">
                                     <i class="fa-solid fa-building-columns" style="color:#6c757d;font-size:16px;"></i>
@@ -274,7 +274,7 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 function toggleInvPayment(type) {
     const cardMidtrans = document.getElementById('inv-card-midtrans');
@@ -344,4 +344,4 @@ function previewInvProof(input) {
     }
 }
 </script>
-@endsection
+@endpush

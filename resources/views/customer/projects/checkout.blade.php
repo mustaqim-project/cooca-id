@@ -87,7 +87,7 @@
 
             {{-- Method tabs --}}
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <label id="proj-card-midtrans" style="border:2px solid var(--primary);background:rgba(67,97,238,0.06);padding:12px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;">
+                <label id="proj-card-midtrans" onclick="toggleProjPay('midtrans')" style="border:2px solid var(--primary);background:rgba(67,97,238,0.06);padding:12px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;">
                     <input type="radio" name="proj_pay_type" value="midtrans" checked onchange="toggleProjPay('midtrans')" style="display:none;">
                     <div style="display:flex;align-items:center;gap:6px;">
                         <i class="fa-solid fa-bolt" style="color:var(--primary);"></i>
@@ -96,7 +96,7 @@
                     <span class="text-xs text-muted">QRIS, VA, E-Wallet</span>
                 </label>
 
-                <label id="proj-card-manual" style="border:1px solid var(--border);background:#fff;padding:12px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;">
+                <label id="proj-card-manual" onclick="toggleProjPay('manual')" style="border:1px solid var(--border);background:#fff;padding:12px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;gap:4px;">
                     <input type="radio" name="proj_pay_type" value="manual" onchange="toggleProjPay('manual')" style="display:none;">
                     <div style="display:flex;align-items:center;gap:6px;">
                         <i class="fa-solid fa-building-columns" style="color:#6c757d;"></i>
@@ -207,7 +207,7 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 function toggleProjPay(type) {
     const cardM = document.getElementById('proj-card-midtrans');
@@ -228,4 +228,4 @@ function toggleProjPay(type) {
     }
 }
 </script>
-@endsection
+@endpush
