@@ -178,6 +178,12 @@ final class AiDashboardController extends Controller
             return redirect()->route('admin.ai.dashboard');
         }
 
+        if ($request->has('monthly_token_quota')) {
+            $request->merge([
+                'monthly_token_quota' => (int) str_replace(['.', ',', ' '], '', (string) $request->input('monthly_token_quota')),
+            ]);
+        }
+
         $validated = $request->validate([
             'subscription_plan_id' => 'required|uuid|exists:subscription_plans,id',
             'monthly_token_quota'  => 'required|integer|min:1000',
@@ -205,6 +211,12 @@ final class AiDashboardController extends Controller
             return redirect()->route('admin.ai.dashboard');
         }
 
+        if ($request->has('bonus_tokens')) {
+            $request->merge([
+                'bonus_tokens' => (int) str_replace(['.', ',', ' '], '', (string) $request->input('bonus_tokens')),
+            ]);
+        }
+
         $validated = $request->validate([
             'bonus_tokens' => 'required|integer|min:1',
             'reason'       => 'required|string|max:255',
@@ -219,6 +231,17 @@ final class AiDashboardController extends Controller
     {
         if ($request->isMethod('get')) {
             return redirect()->route('admin.ai.dashboard');
+        }
+
+        if ($request->has('token_amount')) {
+            $request->merge([
+                'token_amount' => (int) str_replace(['.', ',', ' '], '', (string) $request->input('token_amount')),
+            ]);
+        }
+        if ($request->has('price')) {
+            $request->merge([
+                'price' => (float) str_replace(['.', ',', ' '], '', (string) $request->input('price')),
+            ]);
         }
 
         $validated = $request->validate([
