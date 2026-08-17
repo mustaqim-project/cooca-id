@@ -12,11 +12,33 @@ final class AiQuotaService
 {
     public function planConfigFor(License $license): AiPlanConfig
     {
-        // Cari config berdasar plan. Kalau tidak ada, anggap ini bukan plan AI
-        $config = AiPlanConfig::where('subscription_plan_id', $license->subscription_plan_id)->first();
-        if (!$config) {
-            throw new \RuntimeException("Plan configuration not found for subscription_plan_id: {$license->subscription_plan_id}");
+        $config = null;
+        if ($license->subscription_plan_id) {
+            $config = AiPlanConfig::where('subscription_plan_id', $license->subscription_plan_id)->first();
         }
+
+        if (!$config) {
+            // Fallback default config for active licenses
+            $defaultConfig = new AiPlanConfig([
+                'subscription_plan_id' => $license->subscription_plan_id,
+                'monthly_token_quota' => 100000,
+                'requests_per_minute' => 60,
+                'allowed_models' => [
+                    'gpt-4o',
+                    'gpt-4o-mini',
+                    'gemini-1.5-flash',
+                    'gemini-1.5-pro',
+                    'gemini-2.0-flash',
+                    'claude-3-5-sonnet-20241022',
+                    'claude-3-5-haiku-20241022',
+                    'deepseek-chat',
+                    'deepseek-reasoner',
+                ],
+                'overage_policy' => 'hard_stop',
+            ]);
+            return $defaultConfig;
+        }
+
         return $config;
     }
 

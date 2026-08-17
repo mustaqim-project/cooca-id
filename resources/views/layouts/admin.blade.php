@@ -95,6 +95,10 @@
                         <span class="s-icon"><i class="fa-solid fa-flask"></i></span>
                         <span class="s-label">Trials</span>
                     </a>
+                    <a href="{{ route('admin.ai.dashboard') }}" class="sidebar-item {{ request()->routeIs('admin.ai.*') ? 'active' : '' }}" data-tooltip="AI Gateway & Models">
+                        <span class="s-icon"><i class="fa-solid fa-brain"></i></span>
+                        <span class="s-label">AI Gateway & LLM</span>
+                    </a>
                 </div>
 
                 {{-- Finance & Accounting --}}

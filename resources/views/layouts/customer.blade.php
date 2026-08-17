@@ -87,6 +87,13 @@
                     <span class="s-icon"><i class="fa-brands fa-whatsapp"></i></span>
                     <span class="s-label">WhatsApp API Generator</span>
                 </a>
+
+                <a href="{{ route('customer.ai-usage.index') }}"
+                   class="sidebar-item {{ request()->routeIs('customer.ai-usage.*') ? 'active' : '' }}"
+                   data-tooltip="AI Platform & Keys">
+                    <span class="s-icon"><i class="fa-solid fa-brain"></i></span>
+                    <span class="s-label">AI Gateway & Keys</span>
+                </a>
             </div>
 
 

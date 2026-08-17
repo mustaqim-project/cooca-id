@@ -37,9 +37,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // AI Gateway Dashboard
+    // AI Gateway Console & Settings
     Route::prefix('ai')->name('ai.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Admin\AiDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/providers/save', [\App\Http\Controllers\Admin\AiDashboardController::class, 'saveProvider'])->name('providers.save');
+        Route::post('/providers/toggle', [\App\Http\Controllers\Admin\AiDashboardController::class, 'toggleProvider'])->name('providers.toggle');
+        Route::post('/providers/test', [\App\Http\Controllers\Admin\AiDashboardController::class, 'testProvider'])->name('providers.test');
+        Route::post('/plans/save', [\App\Http\Controllers\Admin\AiDashboardController::class, 'savePlanConfig'])->name('plans.save');
         Route::post('/cycles/{cycle}/bonus', [\App\Http\Controllers\Admin\AiDashboardController::class, 'grantBonus'])->name('cycles.bonus');
     });
 
