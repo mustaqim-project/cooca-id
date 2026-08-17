@@ -26,6 +26,9 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'veri
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // AI Usage Tracking
+    Route::get('/ai-usage', [\App\Http\Controllers\Customer\AiUsageController::class, 'index'])->name('ai-usage.index');
+
     // Products Catalog
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');

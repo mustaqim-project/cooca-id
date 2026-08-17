@@ -41,3 +41,6 @@ Schedule::command('affiliates:calculate-monthly')->monthlyOn(1, '00:00')->name('
 Schedule::command('backup:clean')->dailyAt('01:00');
 Schedule::command('backup:run')->dailyAt('01:30');
 
+// AI Quota Lifecycle
+Schedule::command('ai:reset-usage-cycles')->daily();
+Schedule::command('ai:check-quota-thresholds')->hourly();

@@ -196,6 +196,135 @@ final class PaymentService
     }
 
     /**
+     * Verify and approve manual bank transfer payment
+     */
+    public function verifyManualPayment(Transaction $transaction, ?string $adminId = null): void
+    {
+        DB::beginTransaction();
+        try {
+            $transaction->update([
+                'status' => 'paid',
+                'paid_at' => Carbon::now(),
+                'verified_by' => $adminId,
+                'verified_at' => Carbon::now(),
+                'rejection_reason' => null,
+            ]);
+
+            // Update related invoice
+            $invoice = Invoice::where('transaction_id', (string) $transaction->id)->first();
+            if ($invoice) {
+                $invoice->update([
+                    'status' => 'paid',
+                    'paid_at' => Carbon::now(),
+                ]);
+            }
+
+            // Activate subscription via queued job for reliability
+            if ($transaction->subscription) {
+                ActivateSubscriptionJob::dispatch($transaction);
+            }
+
+            // Record voucher usage if applicable
+            if ($transaction->voucher_id) {
+                $voucher = \App\Models\Voucher::find($transaction->voucher_id);
+                $customer = \App\Models\Customer::find($transaction->customer_id);
+                if ($voucher && $customer) {
+                    $uuid = \Ramsey\Uuid\Uuid::fromString((string) $transaction->id);
+                    app(\App\Services\Voucher\VoucherService::class)->recordUsage(
+                        $voucher,
+                        $customer,
+                        $uuid,
+                        (float) $transaction->voucher_discount
+                    );
+                }
+            }
+
+            DB::commit();
+
+            // Queue notifications
+            SendPaymentConfirmationJob::dispatch($transaction);
+
+            // Queue commission calculation for affiliate payouts
+            ProcessCommissionJob::dispatch($transaction);
+
+            // Queue auto-journaling to Finance/ERP
+            AutoJournalPaymentJob::dispatch($transaction);
+
+            Log::info('PaymentService: Manual transaction verified and marked as paid', [
+                'transaction_id' => (string) $transaction->id,
+                'verified_by' => $adminId,
+                'invoice_number' => $transaction->invoice_number,
+                'amount' => $transaction->net_amount,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('PaymentService: Failed to verify manual transaction', [
+                'transaction_id' => (string) $transaction->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Reject manual bank transfer payment
+     */
+    public function rejectManualPayment(Transaction $transaction, string $reason, ?string $adminId = null): void
+    {
+        DB::beginTransaction();
+        try {
+            $transaction->update([
+                'status' => 'failed',
+                'failed_at' => Carbon::now(),
+                'verified_by' => $adminId,
+                'verified_at' => Carbon::now(),
+                'rejection_reason' => $reason,
+            ]);
+
+            $invoice = Invoice::where('transaction_id', (string) $transaction->id)->first();
+            if ($invoice) {
+                $invoice->update(['status' => 'failed']);
+            }
+
+            DB::commit();
+
+            // Notify customer of rejection
+            $customer = $transaction->customer;
+            if ($customer) {
+                try {
+                    $customer->notify(new \App\Notifications\Customer\PaymentRejectedNotification($transaction, $reason));
+                } catch (\Throwable $notifEx) {
+                    Log::warning('Email rejection notice failed: ' . $notifEx->getMessage());
+                }
+
+                try {
+                    $whatsappService = app(\App\Services\Notification\WhatsAppService::class);
+                    $msg = sprintf(
+                        "Halo %s,\n\nBukti pembayaran transfer manual untuk invoice %s sebesar Rp %s belum dapat kami verifikasi.\n\nAlasan: %s\n\nSilakan login ke dashboard COOCA.ID untuk memeriksa rincian tagihan dan mengunggah kembali bukti transfer yang valid.",
+                        $customer->name,
+                        $transaction->invoice_number,
+                        number_format((float) $transaction->net_amount, 0, ',', '.'),
+                        $reason
+                    );
+                    $whatsappService->send($customer->phone ?? $customer->email, $msg);
+                } catch (\Throwable $waEx) {
+                    Log::warning('WhatsApp rejection notice failed: ' . $waEx->getMessage());
+                }
+            }
+
+            Log::info('PaymentService: Manual transaction rejected', [
+                'transaction_id' => (string) $transaction->id,
+                'verified_by' => $adminId,
+                'reason' => $reason,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
      * Mark transaction as pending
      */
     public function markAsPending(

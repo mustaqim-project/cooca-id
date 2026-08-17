@@ -9,7 +9,6 @@ use App\Models\TrialStatusHistory;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\SubscriptionPlan;
-use App\Services\Provisioning\ProvisioningService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -19,9 +18,7 @@ use Carbon\Carbon;
  */
 final class TrialManagementService
 {
-    public function __construct(
-        private readonly ProvisioningService $provisioningService
-    ) {}
+    public function __construct() {}
 
     /**
      * Submit trial request untuk approval
@@ -124,32 +121,32 @@ final class TrialManagementService
                 'App\\Models\\Admin'
             );
 
-            // Trigger provisioning
-            try {
-                $provisioningJob = $this->provisioningService->provisionTrial($trial);
-                
-                // Run provisioning asynchronously via queue or synchronously based on config
-                if (config('app.sync_provisioning', false)) {
-                    $this->provisioningService->runProvisioning($provisioningJob);
-                } else {
-                    // Dispatch to queue - will be processed by queue worker
-                    \App\Jobs\Provisioning\RunProvisioningJob::dispatch($provisioningJob);
-                }
-            } catch (\Exception $e) {
-                Log::error("Provisioning failed for trial {$trialId}", [
-                    'error' => $e->getMessage(),
-                ]);
-                
-                $trial->update(['status' => Trial::STATUS_FAILED]);
-                $trial->recordStatusChange(
-                    Trial::STATUS_FAILED,
-                    'Provisioning failed: ' . $e->getMessage(),
-                    $adminId,
-                    'App\\Models\\Admin'
-                );
-                
-                throw $e;
-            }
+            // Trigger provisioning (Removed per user request)
+            // try {
+            //     $provisioningJob = $this->provisioningService->provisionTrial($trial);
+            //     
+            //     // Run provisioning asynchronously via queue or synchronously based on config
+            //     if (config('app.sync_provisioning', false)) {
+            //         $this->provisioningService->runProvisioning($provisioningJob);
+            //     } else {
+            //         // Dispatch to queue - will be processed by queue worker
+            //         \App\Jobs\Provisioning\RunProvisioningJob::dispatch($provisioningJob);
+            //     }
+            // } catch (\Exception $e) {
+            //     Log::error("Provisioning failed for trial {$trialId}", [
+            //         'error' => $e->getMessage(),
+            //     ]);
+            //     
+            //     $trial->update(['status' => Trial::STATUS_FAILED]);
+            //     $trial->recordStatusChange(
+            //         Trial::STATUS_FAILED,
+            //         'Provisioning failed: ' . $e->getMessage(),
+            //         $adminId,
+            //         'App\\Models\\Admin'
+            //     );
+            //     
+            //     throw $e;
+            // }
 
             // Dispatch notification job
             \App\Jobs\Notification\SendTrialApprovedNotificationJob::dispatch($trial);

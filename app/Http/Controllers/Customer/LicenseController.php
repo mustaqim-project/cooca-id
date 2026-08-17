@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Gate;
+
 final class LicenseController extends Controller
 {
     public function __construct(
@@ -50,6 +52,8 @@ final class LicenseController extends Controller
             abort(404, 'License not found');
         }
 
+        Gate::authorize('view', $license);
+
         return view('customer.licenses.show', [
             'license' => new LicenseResource($license),
         ]);
@@ -70,6 +74,8 @@ final class LicenseController extends Controller
                     $q->where('status', 'active');
                 })
                 ->firstOrFail();
+
+            Gate::authorize('update', $license);
 
             $subscription = $license->subscription;
             $startsAt = now();
@@ -99,6 +105,8 @@ final class LicenseController extends Controller
         if (!$license) {
             abort(404, 'License not found');
         }
+
+        Gate::authorize('view', $license);
 
         return view('customer.licenses.credentials', [
             'license' => new LicenseResource($license),

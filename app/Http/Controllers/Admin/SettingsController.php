@@ -63,6 +63,13 @@ class SettingsController extends Controller
 
             // SEO Options
             'google_no_follow' => (bool) Setting::get('seo.google_no_follow', false),
+
+            // Bank Transfer (Manual Payment)
+            'bank_transfer_active' => (bool) Setting::get('payment.bank_transfer.active', true),
+            'bank_transfer_bank_name' => Setting::get('payment.bank_transfer.bank_name', 'Bank Central Asia (BCA)'),
+            'bank_transfer_account_number' => Setting::get('payment.bank_transfer.account_number', '8830-8899-8800'),
+            'bank_transfer_account_name' => Setting::get('payment.bank_transfer.account_name', 'PT COOCA TECHNOLOGIES INDONESIA'),
+            'bank_transfer_instructions' => Setting::get('payment.bank_transfer.instructions', 'Silakan transfer sesuai jumlah total tagihan hingga digit terakhir. Setelah melakukan transfer, wajib mengunggah foto / screenshot / file bukti bayar agar verifikasi dapat diproses oleh tim kami.'),
         ];
 
         $seoPages = ['home', 'about', 'pricing', 'contact', 'solutions', 'features', 'affiliate', 'faq', 'docs', 'terms', 'privacy'];
@@ -88,11 +95,14 @@ class SettingsController extends Controller
             }
         }
 
+        $bankAccounts = \App\Models\CompanyBankAccount::ordered()->get();
+
         return view('admin.settings.index', [
             'settings' => $settings,
             'seoPages' => $seoPages,
             'integrations' => $integrations,
             'schemas' => $schemas,
+            'bankAccounts' => $bankAccounts,
         ]);
     }
 
@@ -145,6 +155,13 @@ class SettingsController extends Controller
 
             // WhatsApp Settings
             'whatsapp_notifications_active' => ['sometimes', 'boolean'],
+
+            // Bank Transfer
+            'bank_transfer_active' => ['sometimes', 'boolean'],
+            'bank_transfer_bank_name' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'bank_transfer_account_number' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'bank_transfer_account_name' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'bank_transfer_instructions' => ['sometimes', 'nullable', 'string'],
         ]);
 
         // Handle File Uploads
@@ -228,11 +245,16 @@ class SettingsController extends Controller
             'withdrawal_fee_ewallet' => ['affiliate.withdrawal_fee_ewallet', 'float', 'affiliate'],
             'minimum_withdrawal' => ['affiliate.minimum_withdrawal', 'float', 'affiliate'],
 
+            'bank_transfer_bank_name' => ['payment.bank_transfer.bank_name', 'string', 'payment'],
+            'bank_transfer_account_number' => ['payment.bank_transfer.account_number', 'string', 'payment'],
+            'bank_transfer_account_name' => ['payment.bank_transfer.account_name', 'string', 'payment'],
+            'bank_transfer_instructions' => ['payment.bank_transfer.instructions', 'text', 'payment'],
+
             'google_no_follow' => ['seo.google_no_follow', 'boolean', 'seo'],
         ];
 
         foreach ($validated as $field => $value) {
-            if (in_array($field, ['logo', 'logo_light', 'logo_dark', 'preloader_image_light', 'preloader_image_dark', 'favicon', 'google_no_follow', 'whatsapp_notifications_active'])) continue;
+            if (in_array($field, ['logo', 'logo_light', 'logo_dark', 'preloader_image_light', 'preloader_image_dark', 'favicon', 'google_no_follow', 'whatsapp_notifications_active', 'bank_transfer_active'])) continue;
 
             if (!isset($map[$field])) continue;
 
@@ -266,6 +288,16 @@ class SettingsController extends Controller
                 'value' => $request->boolean('whatsapp_notifications_active') ? '1' : '0',
                 'type' => 'boolean',
                 'group' => 'contact',
+                'updated_by' => $request->user('admin')?->id,
+            ]
+        );
+
+        Setting::updateOrCreate(
+            ['key' => 'payment.bank_transfer.active'],
+            [
+                'value' => $request->boolean('bank_transfer_active') ? '1' : '0',
+                'type' => 'boolean',
+                'group' => 'payment',
                 'updated_by' => $request->user('admin')?->id,
             ]
         );

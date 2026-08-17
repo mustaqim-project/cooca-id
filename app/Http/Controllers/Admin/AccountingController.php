@@ -15,27 +15,41 @@ use Illuminate\Support\Facades\DB;
 class AccountingController extends Controller
 {
     // --- Chart of Accounts ---
-    public function coaIndex()
+    public function coaIndex(\Illuminate\Http\Request $request)
     {
-        $accounts = ChartOfAccount::with(['typeAccount', 'subTypeAccount'])->get();
+        $accounts = ChartOfAccount::with(['typeAccount', 'subTypeAccount'])
+            ->when($request->filled('search'), fn ($q) => $q->where('name', 'like', "%{$request->search}%"))
+            ->paginate(25)
+            ->withQueryString();
+            
         return view('admin.finance.coa.index', compact('accounts'));
     }
 
     public function coaStore(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|integer',
+            'type' => 'nullable|integer',
+            'sub_type' => 'nullable|integer',
+            'is_enabled' => 'nullable|boolean',
+            'description' => 'nullable|string',
+            'parent' => 'nullable|integer',
         ]);
 
-        ChartOfAccount::create($request->all());
+        ChartOfAccount::create($validated);
         return back()->with('success', 'Akun berhasil ditambahkan.');
     }
 
     // --- Journal Entries ---
-    public function journalIndex()
+    public function journalIndex(\Illuminate\Http\Request $request)
     {
-        $journals = JournalEntry::with('items.accountObj')->orderBy('date', 'desc')->paginate(20);
+        $journals = JournalEntry::with('items.accountObj')
+            ->when($request->filled('search'), fn ($q) => $q->where('reference', 'like', "%{$request->search}%"))
+            ->orderBy('date', 'desc')
+            ->paginate(25)
+            ->withQueryString();
+            
         return view('admin.finance.journal.index', compact('journals'));
     }
 

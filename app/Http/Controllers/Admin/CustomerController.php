@@ -20,9 +20,13 @@ final class CustomerController extends Controller
     /**
      * Display listing of customers.
      */
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        $customers = $this->customerRepository->paginate(15);
+        $customers = Customer::with('subscriptions')
+            ->when($request->filled('search'), fn ($q) => $q->where('name', 'like', "%{$request->search}%"))
+            ->latest()
+            ->paginate(25)
+            ->withQueryString();
 
         return view('admin.customers.index', [
             'customers' => $customers,

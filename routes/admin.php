@@ -37,6 +37,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // AI Gateway Dashboard
+    Route::prefix('ai')->name('ai.')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\AiDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/cycles/{cycle}/bonus', [\App\Http\Controllers\Admin\AiDashboardController::class, 'grantBonus'])->name('cycles.bonus');
+    });
+
     // Live Chat Support Management
     Route::prefix('live-chats')->name('live-chats.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\AdminLiveChatController::class, 'index'])->name('index');
@@ -108,6 +114,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::get('/finance/export', [FinanceController::class, 'export'])->name('finance.export');
 
+    // Payment Methods Reporting
+    Route::get('/reports/payments', [\App\Http\Controllers\Admin\PaymentReportController::class, 'index'])->name('reports.payments.index');
+    Route::get('/reports/payments/export', [\App\Http\Controllers\Admin\PaymentReportController::class, 'export'])->name('reports.payments.export');
+
     // Full Accounting (ERP Port)
     Route::get('/accounting/coa', [App\Http\Controllers\Admin\AccountingController::class, 'coaIndex'])->name('accounting.coa.index');
     Route::post('/accounting/coa', [App\Http\Controllers\Admin\AccountingController::class, 'coaStore'])->name('accounting.coa.store');
@@ -126,6 +136,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     // Transactions Management
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
+    Route::post('/transactions/{transaction}/verify', [TransactionController::class, 'verify'])->name('transactions.verify');
+    Route::post('/transactions/{transaction}/reject', [TransactionController::class, 'reject'])->name('transactions.reject');
     Route::post('/transactions/{transaction}/refund', [TransactionController::class, 'refund'])->name('transactions.refund');
 
     // Vouchers Management
@@ -200,9 +212,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:admin', 'throttle:admi
     // Blocked IPs
     Route::resource('blocked-ips', \App\Http\Controllers\Admin\BlockedIpController::class)->only(['index', 'store', 'destroy']);
 
-    // Settings
+    // Settings & Company Bank Accounts CMS
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
+
+    Route::resource('bank-accounts', \App\Http\Controllers\Admin\CompanyBankAccountController::class);
+    Route::post('bank-accounts/{bank_account}/toggle-active', [\App\Http\Controllers\Admin\CompanyBankAccountController::class, 'toggleActive'])->name('bank-accounts.toggle-active');
+    Route::post('bank-accounts/{bank_account}/set-primary', [\App\Http\Controllers\Admin\CompanyBankAccountController::class, 'setPrimary'])->name('bank-accounts.set-primary');
+    Route::post('bank-accounts/reorder', [\App\Http\Controllers\Admin\CompanyBankAccountController::class, 'reorder'])->name('bank-accounts.reorder');
 
     // Product Categories Management
     Route::get('/product-categories', [App\Http\Controllers\Admin\ProductCategoryController::class, 'index'])->name('product-categories.index');

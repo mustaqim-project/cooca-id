@@ -11,6 +11,7 @@ use App\Models\Transaction;
 use App\Services\Payment\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 final class ProjectController extends Controller
 {
@@ -36,6 +37,8 @@ final class ProjectController extends Controller
             ->with(['tasks', 'transactions.invoice'])
             ->findOrFail($id);
 
+        Gate::authorize('view', $project);
+
         return view('customer.projects.show', compact('project'));
     }
 
@@ -49,6 +52,9 @@ final class ProjectController extends Controller
             ->where('customer_id', Auth::id())
             ->with('transaction')
             ->firstOrFail();
+
+        Gate::authorize('view', $project);
+        Gate::authorize('view', $invoice);
 
         if ($invoice->transaction->project_id !== $project->id) {
             abort(400, 'Invoice ini tidak terasosiasi dengan project ini.');

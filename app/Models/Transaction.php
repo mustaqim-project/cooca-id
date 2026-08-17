@@ -48,6 +48,10 @@ final class Transaction extends Model
         'voucher_id',
         'payment_method',
         'payment_gateway',
+        'payment_proof',
+        'payment_proof_uploaded_at',
+        'sender_name',
+        'payment_notes',
         'midtrans_order_id',
         'midtrans_transaction_id',
         'midtrans_status',
@@ -55,19 +59,25 @@ final class Transaction extends Model
         'paid_at',
         'failed_at',
         'refunded_at',
+        'verified_by',
+        'verified_at',
+        'rejection_reason',
     ];
 
     protected $casts = [
         'gross_amount' => 'decimal:2',
         'voucher_discount' => 'decimal:2',
         'net_amount' => 'decimal:2',
+        'payment_proof_uploaded_at' => 'datetime',
         'paid_at' => 'datetime',
         'failed_at' => 'datetime',
         'refunded_at' => 'datetime',
+        'verified_at' => 'datetime',
     ];
 
     protected $appends = [
         'customer_name',
+        'payment_proof_url',
     ];
 
     public const STATUS_PENDING = 'pending';
@@ -143,6 +153,34 @@ final class Transaction extends Model
     public function isPending(): bool
     {
         return $this->status === self::STATUS_PENDING;
+    }
+
+    public function verifier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function isManualTransfer(): bool
+    {
+        return $this->payment_gateway === 'manual' || $this->payment_method === 'manual_transfer' || $this->payment_method === 'bank_transfer_manual';
+    }
+
+    public function hasPaymentProof(): bool
+    {
+        return !empty($this->payment_proof);
+    }
+
+    public function getPaymentProofUrlAttribute(): ?string
+    {
+        if (empty($this->payment_proof)) {
+            return null;
+        }
+
+        if (str_starts_with($this->payment_proof, 'http')) {
+            return $this->payment_proof;
+        }
+
+        return asset('storage/' . ltrim($this->payment_proof, '/'));
     }
 
     public function getCustomerNameAttribute(): string

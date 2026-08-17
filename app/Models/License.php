@@ -131,6 +131,11 @@ final class License extends Model
         return $this->hasMany(Subscription::class, 'license_id');
     }
 
+    public function usageCycles(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AiUsageCycle::class, 'license_id');
+    }
+
     public function scopeActive($query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('status', self::STATUS_ACTIVE);

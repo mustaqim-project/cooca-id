@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Midtrans\WebhookController;
 use App\Http\Controllers\Api\V1\MidtransWebhookController;
 
 /*
@@ -58,11 +57,7 @@ Route::prefix('v1')->middleware(['throttle:api'])->group(function () {
 | Configure this URL in your Midtrans dashboard settings.
 */
 
-// Legacy webhook route (kept for backward compatibility during migration)
-Route::middleware(['throttle:midtrans-webhook'])->group(function () {
-    Route::post('/midtrans/webhook', [WebhookController::class, 'handle'])
-        ->name('api.midtrans.webhook.legacy');
-});
+
 
 // NEW: Production-ready V1 webhook handler with idempotency and enhanced security
 Route::middleware(['throttle:midtrans-webhook'])->group(function () {
@@ -88,4 +83,12 @@ Route::prefix('wa/worker')->group(function () {
     Route::get('/queue', [\App\Http\Controllers\Api\WhatsAppWorkerController::class, 'getQueue']);
     Route::post('/update', [\App\Http\Controllers\Api\WhatsAppWorkerController::class, 'updateQueue']);
 });
+
+// Cooca AI Gateway Routes
+Route::prefix('v1/ai')
+    ->middleware(['throttle:ai-gateway', \App\Http\Middleware\Ai\AuthenticateAiApiKey::class])
+    ->group(function () {
+        Route::post('/chat/completions', [\App\Http\Controllers\Api\V1\Ai\ChatCompletionController::class, 'handle']);
+    });
+
 

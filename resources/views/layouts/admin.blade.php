@@ -124,9 +124,17 @@
                         <span class="s-icon"><i class="fa-solid fa-file-invoice-dollar"></i></span>
                         <span class="s-label">Laba Rugi</span>
                     </a>
+                    <a href="{{ route('admin.reports.payments.index') }}" class="sidebar-item {{ request()->routeIs('admin.reports.payments.*') ? 'active' : '' }}" data-tooltip="Laporan Metode Pembayaran">
+                        <span class="s-icon"><i class="fa-solid fa-chart-pie"></i></span>
+                        <span class="s-label">Laporan Metode Bayar</span>
+                    </a>
                     <a href="{{ route('admin.settlements.index') }}" class="sidebar-item {{ request()->routeIs('admin.settlements.*') ? 'active' : '' }}" data-tooltip="Settlements">
-                        <span class="s-icon"><i class="fa-solid fa-building-columns"></i></span>
+                        <span class="s-icon"><i class="fa-solid fa-money-bill-transfer"></i></span>
                         <span class="s-label">Settlements</span>
+                    </a>
+                    <a href="{{ route('admin.bank-accounts.index') }}" class="sidebar-item {{ request()->routeIs('admin.bank-accounts.*') ? 'active' : '' }}" data-tooltip="Rekening Perusahaan">
+                        <span class="s-icon"><i class="fa-solid fa-building-columns"></i></span>
+                        <span class="s-label">Rekening Bank (CMS)</span>
                     </a>
                 </div>
 

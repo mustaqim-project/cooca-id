@@ -54,6 +54,12 @@
                 </tbody>
             </table>
         </div>
+        
+        @if(method_exists($projects, 'links'))
+        <div class="card-footer" style="padding: 1rem;">
+            {{ $projects->links() }}
+        </div>
+        @endif
     </div>
 </div>
 @endsection

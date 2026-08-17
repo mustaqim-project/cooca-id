@@ -10,8 +10,14 @@ class WhatsAppWorkerController extends Controller
     private function authenticate(Request $request)
     {
         $token = $request->bearerToken();
-        $expectedToken = env('WA_WORKER_TOKEN', 'secret-worker-token');
-        if (!$token || $token !== $expectedToken) {
+        $expectedToken = config('services.wa_worker.token');
+        
+        if (empty($expectedToken)) {
+            \Illuminate\Support\Facades\Log::critical('WA_WORKER_TOKEN is not configured — worker endpoints are unreachable.');
+            abort(500, 'Worker authentication is not configured');
+        }
+
+        if (!$token || !hash_equals($expectedToken, $token)) {
             abort(401, 'Unauthorized Worker');
         }
     }

@@ -81,8 +81,6 @@ final class FinanceController extends Controller
         $transactions = $query->paginate(20);
         
         // Summary metrics
-        $allPaid = Transaction::with(['midtransTransaction', 'commissions'])->where('status', 'paid')->get();
-        
         $summary = [
             'total_revenue' => 0,
             'total_tax' => 0,
@@ -91,14 +89,18 @@ final class FinanceController extends Controller
             'total_profit' => 0,
         ];
 
-        foreach ($allPaid as $tx) {
-            $metrics = $this->calculateMetrics($tx);
-            $summary['total_revenue'] += $metrics['net_amount'];
-            $summary['total_tax'] += $metrics['tax'];
-            $summary['total_fees'] += $metrics['midtrans_fee'];
-            $summary['total_commission'] += $metrics['affiliate_commission'];
-            $summary['total_profit'] += $metrics['net_profit'];
-        }
+        Transaction::with(['midtransTransaction', 'commissions'])
+            ->where('status', 'paid')
+            ->chunk(500, function ($paidChunk) use (&$summary) {
+                foreach ($paidChunk as $tx) {
+                    $metrics = $this->calculateMetrics($tx);
+                    $summary['total_revenue'] += $metrics['net_amount'];
+                    $summary['total_tax'] += $metrics['tax'];
+                    $summary['total_fees'] += $metrics['midtrans_fee'];
+                    $summary['total_commission'] += $metrics['affiliate_commission'];
+                    $summary['total_profit'] += $metrics['net_profit'];
+                }
+            });
 
         // Attach metrics to paginated items
         $transactions->getCollection()->transform(function ($tx) {
@@ -111,11 +113,6 @@ final class FinanceController extends Controller
 
     public function export(Request $request)
     {
-        $transactions = Transaction::with(['customer', 'midtransTransaction', 'commissions'])
-            ->where('status', 'paid')
-            ->orderBy('paid_at', 'desc')
-            ->get();
-
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="finance_report_' . date('Y-m-d') . '.csv"',
@@ -124,7 +121,7 @@ final class FinanceController extends Controller
             'Expires' => '0',
         ];
 
-        $callback = function () use ($transactions) {
+        $callback = function () {
             $file = fopen('php://output', 'w');
             
             // CSV Header
@@ -142,22 +139,27 @@ final class FinanceController extends Controller
                 'Net Profit'
             ]);
 
-            foreach ($transactions as $tx) {
-                $metrics = $this->calculateMetrics($tx);
-                fputcsv($file, [
-                    $tx->invoice_number,
-                    $tx->paid_at ? $tx->paid_at->format('Y-m-d H:i') : '',
-                    $tx->customer->name ?? 'Unknown',
-                    $metrics['payment_type'],
-                    $metrics['gross_amount'],
-                    $metrics['voucher_discount'],
-                    $metrics['net_amount'],
-                    $metrics['tax'],
-                    $metrics['midtrans_fee'],
-                    $metrics['affiliate_commission'],
-                    $metrics['net_profit'],
-                ]);
-            }
+            Transaction::with(['customer', 'midtransTransaction', 'commissions'])
+                ->where('status', 'paid')
+                ->orderBy('paid_at', 'desc')
+                ->chunk(500, function ($transactions) use ($file) {
+                    foreach ($transactions as $tx) {
+                        $metrics = $this->calculateMetrics($tx);
+                        fputcsv($file, [
+                            $tx->invoice_number,
+                            $tx->paid_at ? $tx->paid_at->format('Y-m-d H:i') : '',
+                            $tx->customer->name ?? 'Unknown',
+                            $metrics['payment_type'],
+                            $metrics['gross_amount'],
+                            $metrics['voucher_discount'],
+                            $metrics['net_amount'],
+                            $metrics['tax'],
+                            $metrics['midtrans_fee'],
+                            $metrics['affiliate_commission'],
+                            $metrics['net_profit'],
+                        ]);
+                    }
+                });
 
             fclose($file);
         };

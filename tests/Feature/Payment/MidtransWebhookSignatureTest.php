@@ -116,7 +116,7 @@ final class MidtransWebhookSignatureTest extends TestCase
 
         $invalidSignature = 'fake_signature';
 
-        $response = $this->postJson('/api/midtrans/webhook', $fakePayload, [
+        $response = $this->postJson('/api/v1/midtrans/webhook', $fakePayload, [
             'X-Signature-Key' => $invalidSignature,
             'Accept' => 'application/json',
         ]);
@@ -165,7 +165,7 @@ final class MidtransWebhookSignatureTest extends TestCase
         $inputString = $payload['order_id'] . $payload['status_code'] . $payload['gross_amount'] . $this->serverKey;
         $validSignature = hash('sha512', $inputString);
 
-        $response = $this->postJson('/api/midtrans/webhook', $payload, [
+        $response = $this->postJson('/api/v1/midtrans/webhook', $payload, [
             'X-Signature-Key' => $validSignature,
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',

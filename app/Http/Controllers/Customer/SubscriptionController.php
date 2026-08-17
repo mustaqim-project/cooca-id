@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Gate;
 
 final class SubscriptionController extends Controller
 {
@@ -99,6 +100,8 @@ final class SubscriptionController extends Controller
         if (!$subscription) {
             abort(404);
         }
+
+        Gate::authorize('view', $subscription);
 
         return view('customer.subscriptions.show', [
             'subscription' => $subscription,
@@ -227,6 +230,8 @@ final class SubscriptionController extends Controller
                 ->with('error', 'Subscription not found');
         }
 
+        Gate::authorize('update', $subscription);
+
         // If unpaid (trial), delete completely (cancel unpaid subscription)
         if ($subscription->status === 'trial') {
             DB::beginTransaction();
@@ -296,6 +301,8 @@ final class SubscriptionController extends Controller
                 ->with('error', 'Subscription not found');
         }
 
+        Gate::authorize('update', $subscription);
+
         return redirect()->route('customer.subscriptions.checkout', $subscription->id);
     }
 
@@ -308,6 +315,8 @@ final class SubscriptionController extends Controller
             ->where('customer_id', Auth::id())
             ->with(['subscriptionPlan.product', 'license'])
             ->firstOrFail();
+
+        Gate::authorize('view', $subscription);
 
         $plan            = $subscription->subscriptionPlan;
         $price           = (float) ($plan?->price ?? 0);
@@ -322,6 +331,14 @@ final class SubscriptionController extends Controller
             ->latest()
             ->first();
 
+        $bankSettings = [
+            'active' => (bool) \App\Models\Setting::get('payment.bank_transfer.active', true),
+            'bank_name' => \App\Models\Setting::get('payment.bank_transfer.bank_name', 'Bank Central Asia (BCA)'),
+            'account_number' => \App\Models\Setting::get('payment.bank_transfer.account_number', '8830-8899-8800'),
+            'account_name' => \App\Models\Setting::get('payment.bank_transfer.account_name', 'PT COOCA TECHNOLOGIES INDONESIA'),
+            'instructions' => \App\Models\Setting::get('payment.bank_transfer.instructions', 'Silakan transfer sesuai jumlah total tagihan hingga digit terakhir. Setelah transfer, wajib unggah bukti transfer/struk pada form di bawah ini agar tim kami dapat memverifikasi pembayaran Anda.'),
+        ];
+
         return view('customer.subscriptions.checkout', compact(
             'subscription',
             'plan',
@@ -330,6 +347,7 @@ final class SubscriptionController extends Controller
             'discountAmount',
             'netAmount',
             'pendingTransaction',
+            'bankSettings',
         ));
     }
 
@@ -381,7 +399,7 @@ final class SubscriptionController extends Controller
     }
 
     /**
-     * Create a pending Transaction + Invoice and open the Midtrans Snap payment popup.
+     * Create a pending Transaction + Invoice and process either Midtrans Snap or Manual Transfer with proof.
      */
     public function processCheckout(Request $request, string $id)
     {
@@ -390,6 +408,8 @@ final class SubscriptionController extends Controller
             ->where('customer_id', $customer->getKey())
             ->with(['subscriptionPlan'])
             ->firstOrFail();
+
+        Gate::authorize('update', $subscription);
 
         $plan  = $subscription->subscriptionPlan;
         $price = (float) ($plan?->price ?? 0);
@@ -412,7 +432,6 @@ final class SubscriptionController extends Controller
                 $voucherData = $this->voucherService->applyVoucher($request->voucher_code, $baseAmount, $customer, $productIds);
                 if ($voucherData) {
                     $voucherDiscountAmount = $this->voucherService->calculateDiscount($voucherData, $baseAmount);
-                    // Fetch the original voucher to get its ID
                     $voucher = \App\Models\Voucher::where('code', $voucherData->code)->first();
                     if ($voucher) {
                         $voucherId = $voucher->id;
@@ -426,6 +445,69 @@ final class SubscriptionController extends Controller
         $totalDiscount = $planDiscountAmount + $voucherDiscountAmount;
         $netAmount = max(0, round($price - $totalDiscount, 2));
 
+        $paymentType = $request->input('payment_type', 'midtrans');
+
+        // TIPE 2: MANUAL BANK TRANSFER
+        if (in_array($paymentType, ['manual_transfer', 'bank_transfer_manual', 'manual'])) {
+            $request->validate([
+                'payment_proof' => 'required|file|mimes:jpg,jpeg,png,webp,pdf|max:5120',
+                'sender_name' => 'required|string|max:255',
+                'payment_notes' => 'nullable|string|max:1000',
+            ], [
+                'payment_proof.required' => 'Wajib mengunggah file bukti transfer.',
+                'payment_proof.mimes' => 'Format file bukti bayar harus JPG, PNG, atau PDF.',
+                'sender_name.required' => 'Wajib mengisi nama pemilik rekening pengirim.',
+            ]);
+
+            $proofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+
+            try {
+                $invoice = DB::transaction(function () use ($customer, $subscription, $price, $totalDiscount, $netAmount, $voucherId, $proofPath, $request) {
+                    $yearMonth     = now()->format('Ym');
+                    $lastTxn       = Transaction::where('invoice_number', 'like', "INV/{$yearMonth}%")
+                        ->orderBy('invoice_number', 'desc')
+                        ->lockForUpdate()
+                        ->first();
+                    $lastNum       = $lastTxn ? (int) substr($lastTxn->invoice_number, -5) : 0;
+                    $invoiceNumber = "INV/{$yearMonth}/" . str_pad((string) ($lastNum + 1), 5, '0', STR_PAD_LEFT);
+
+                    $transaction = Transaction::create([
+                        'customer_id'               => $customer->getKey(),
+                        'subscription_id'           => $subscription->id,
+                        'type'                      => 'renewal',
+                        'invoice_number'            => $invoiceNumber,
+                        'gross_amount'              => $price,
+                        'voucher_discount'          => $totalDiscount,
+                        'voucher_id'                => $voucherId,
+                        'net_amount'                => $netAmount,
+                        'payment_method'            => 'bank_transfer_manual',
+                        'payment_gateway'           => 'manual',
+                        'payment_proof'             => $proofPath,
+                        'payment_proof_uploaded_at' => now(),
+                        'sender_name'               => $request->input('sender_name'),
+                        'payment_notes'             => $request->input('payment_notes'),
+                        'status'                    => 'pending',
+                    ]);
+
+                    return Invoice::create([
+                        'transaction_id' => $transaction->id,
+                        'invoice_number' => $invoiceNumber,
+                        'customer_id'    => $customer->getKey(),
+                        'amount'         => $netAmount,
+                        'status'         => 'issued',
+                        'issued_at'      => now(),
+                        'due_at'         => now()->addDays(3),
+                    ]);
+                });
+
+                return redirect()->route('customer.invoices.show', $invoice->id)
+                    ->with('success', 'Bukti pembayaran berhasil diunggah! Pembayaran Anda sedang menunggu verifikasi oleh tim kami.');
+            } catch (\Exception $e) {
+                return back()->with('error', 'Gagal memproses transaksi: ' . $e->getMessage());
+            }
+        }
+
+        // TIPE 1: MIDTRANS GATEWAY
         try {
             $snapData = DB::transaction(function () use ($customer, $subscription, $price, $totalDiscount, $netAmount, $voucherId) {
                 // Generate unique invoice number
@@ -469,6 +551,14 @@ final class SubscriptionController extends Controller
             $subscription->load('subscriptionPlan.product', 'license');
             $plan = $subscription->subscriptionPlan;
 
+            $bankSettings = [
+                'active' => (bool) \App\Models\Setting::get('payment.bank_transfer.active', true),
+                'bank_name' => \App\Models\Setting::get('payment.bank_transfer.bank_name', 'Bank Central Asia (BCA)'),
+                'account_number' => \App\Models\Setting::get('payment.bank_transfer.account_number', '8830-8899-8800'),
+                'account_name' => \App\Models\Setting::get('payment.bank_transfer.account_name', 'PT COOCA TECHNOLOGIES INDONESIA'),
+                'instructions' => \App\Models\Setting::get('payment.bank_transfer.instructions', 'Silakan transfer sesuai jumlah total tagihan.'),
+            ];
+
             return view('customer.subscriptions.checkout', [
                 'subscription'       => $subscription,
                 'plan'               => $plan,
@@ -479,6 +569,7 @@ final class SubscriptionController extends Controller
                 'pendingTransaction' => null,
                 'snapToken'          => $snapData['snap_token'] ?? null,
                 'snapUrl'            => $snapData['snap_url'] ?? null,
+                'bankSettings'       => $bankSettings,
             ]);
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal membuat transaksi: ' . $e->getMessage());

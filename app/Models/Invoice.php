@@ -20,10 +20,8 @@ final class Invoice extends Model
         'invoice_number',
         'customer_id',
         'amount',
-        'status',
         'issued_at',
         'due_at',
-        'paid_at',
         'pdf_path',
     ];
 
@@ -72,20 +70,22 @@ final class Invoice extends Model
 
     public function markAsIssued(): void
     {
-        $this->update([
-            'status' => self::STATUS_ISSUED,
-            'issued_at' => now(),
-        ]);
+        $this->status = self::STATUS_ISSUED;
+        $this->issued_at = now();
+        $this->save();
     }
 
     public function markAsPaid(): void
     {
-        $this->update(['status' => self::STATUS_PAID]);
+        $this->status = self::STATUS_PAID;
+        $this->paid_at = now();
+        $this->save();
     }
 
     public function markAsCancelled(): void
     {
-        $this->update(['status' => self::STATUS_CANCELLED]);
+        $this->status = self::STATUS_CANCELLED;
+        $this->save();
     }
 }
 

@@ -111,6 +111,8 @@ final class AppServiceProvider extends ServiceProvider
             'customer' => \App\Models\Customer::class,
             'affiliator' => \App\Models\Affiliator::class,
         ]);
+        
+        \Illuminate\Database\Eloquent\Model::preventLazyLoading(! app()->isProduction());
     }
 
     private function bootPolicies(): void
@@ -301,6 +303,19 @@ final class AppServiceProvider extends ServiceProvider
                         'message' => 'Too Many Requests',
                     ], 429, $headers);
                 });
+        });
+
+        // AI Gateway rate limiter
+        RateLimiter::for('ai-gateway', function (Request $request) {
+            $apiKey = $request->attributes->get('ai_api_key');
+
+            if (!$apiKey) {
+                return Limit::perMinute(5)->by($request->ip()); // belum ter-auth, batasi ketat by IP
+            }
+
+            $planConfig = app(\App\Services\Ai\AiQuotaService::class)->planConfigFor($apiKey->license);
+
+            return Limit::perMinute($planConfig->requests_per_minute)->by($apiKey->id);
         });
     }
 }

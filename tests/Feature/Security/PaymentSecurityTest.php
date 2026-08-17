@@ -42,7 +42,7 @@ final class PaymentSecurityTest extends TestCase
 
     public function test_webhook_without_signature_is_rejected(): void
     {
-        $response = $this->postJson('/api/midtrans/webhook', [
+        $response = $this->postJson('/api/v1/midtrans/webhook', [
             'order_id'           => 'ORDER-001',
             'transaction_status' => 'settlement',
             'gross_amount'       => '100000',
@@ -55,7 +55,7 @@ final class PaymentSecurityTest extends TestCase
 
     public function test_webhook_with_forged_signature_is_rejected(): void
     {
-        $response = $this->postJson('/api/midtrans/webhook', [
+        $response = $this->postJson('/api/v1/midtrans/webhook', [
             'order_id'           => 'ORDER-002',
             'transaction_status' => 'settlement',
             'gross_amount'       => '100000',
@@ -79,7 +79,7 @@ final class PaymentSecurityTest extends TestCase
         $validSig = hash('sha512', $orderId . '200' . $realAmount . $this->serverKey);
 
         // But submit with tampered amount
-        $response = $this->postJson('/api/midtrans/webhook', [
+        $response = $this->postJson('/api/v1/midtrans/webhook', [
             'order_id'           => $orderId,
             'transaction_status' => 'settlement',
             'gross_amount'       => $fakeAmount,
@@ -95,7 +95,7 @@ final class PaymentSecurityTest extends TestCase
 
     public function test_webhook_with_empty_signature_is_rejected(): void
     {
-        $response = $this->postJson('/api/midtrans/webhook', [
+        $response = $this->postJson('/api/v1/midtrans/webhook', [
             'order_id'           => 'ORDER-003',
             'transaction_status' => 'settlement',
             'gross_amount'       => '100000',
@@ -199,7 +199,7 @@ final class PaymentSecurityTest extends TestCase
         $nonExistentOrder = 'ORDER-DOES-NOT-EXIST-' . uniqid();
         $sig = hash('sha512', $nonExistentOrder . '200' . '100000' . $this->serverKey);
 
-        $response = $this->postJson('/api/midtrans/webhook', [
+        $response = $this->postJson('/api/v1/midtrans/webhook', [
             'order_id'           => $nonExistentOrder,
             'transaction_status' => 'settlement',
             'gross_amount'       => '100000',

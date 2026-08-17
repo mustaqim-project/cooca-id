@@ -21,6 +21,7 @@
 
     <div class="tabs">
         <div class="tab-item active" onclick="switchTab('general', this)">General Branding</div>
+        <div class="tab-item" onclick="switchTab('payment', this)">Bank & Manual Transfer</div>
         <div class="tab-item" onclick="switchTab('contact', this)">Contact & Social</div>
         <div class="tab-item" onclick="switchTab('affiliate', this)">Affiliate Rules</div>
         <div class="tab-item" onclick="switchTab('seo', this)">Global SEO</div>
@@ -66,6 +67,119 @@
                         <label class="form-label">Favicon (32x32 ICO / PNG)</label>
                         <input type="file" name="favicon" class="form-input">
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- PAYMENT & BANK TRANSFER TAB --}}
+    <div id="tab-payment" class="tab-content" style="display: none;">
+        {{-- Card CMS Rekening Bank --}}
+        <div class="card mb-6" style="border:1px solid var(--border);">
+            <div class="card-header flex justify-between items-center" style="background:var(--bg);">
+                <div>
+                    <div class="card-title font-bold text-base"><i class="fa-solid fa-building-columns" style="color:var(--primary);margin-right:8px;"></i> Daftar Rekening Bank Perusahaan (CMS)</div>
+                    <div class="text-xs text-muted mt-1">Daftar rekening bank yang tampil secara otomatis di halaman checkout dan invoice pelanggan.</div>
+                </div>
+                <div>
+                    <a href="{{ route('admin.bank-accounts.index') }}" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-gear"></i> Buka CMS Rekening Lengkap
+                    </a>
+                </div>
+            </div>
+            <div class="card-body" style="padding:0;">
+                <div class="data-table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Bank</th>
+                                <th>Nomor Rekening</th>
+                                <th>Atas Nama</th>
+                                <th>QRIS / Barcode</th>
+                                <th>Status</th>
+                                <th>Utama</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($bankAccounts as $bAcc)
+                                <tr>
+                                    <td>
+                                        <div style="display:flex;align-items:center;gap:8px;">
+                                            @if($bAcc->logo_url)
+                                                <img src="{{ $bAcc->logo_url }}" alt="{{ $bAcc->bank_name }}" style="height:22px;max-width:50px;object-fit:contain;">
+                                            @else
+                                                <span class="badge badge-primary">{{ $bAcc->bank_name }}</span>
+                                            @endif
+                                            <span class="font-bold text-xs">{{ $bAcc->bank_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td><code class="font-bold text-primary">{{ $bAcc->account_number }}</code></td>
+                                    <td class="text-xs">{{ $bAcc->account_holder }}</td>
+                                    <td>
+                                        @if($bAcc->qr_code_url)
+                                            <span class="badge badge-success" style="font-size:10px;">Ada QRIS</span>
+                                        @else
+                                            <span class="text-xs text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ $bAcc->is_active ? 'badge-success' : 'badge-muted' }}" style="font-size:10px;">
+                                            {{ $bAcc->is_active ? 'Aktif' : 'Nonaktif' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if($bAcc->is_primary)
+                                            <span class="badge badge-warning" style="font-size:10px;"><i class="fa-solid fa-star"></i> Utama</span>
+                                        @else
+                                            <span class="text-xs text-muted">—</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted" style="padding:20px;">
+                                        Belum ada rekening di database CMS. <a href="{{ route('admin.bank-accounts.index') }}" class="text-primary font-bold">Klik di sini untuk menambah rekening</a>.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-6">
+            <div class="card-header">
+                <div class="card-title">Pengaturan Umum Transfer Bank Manual</div>
+            </div>
+            <div class="card-body">
+                <div class="form-group mb-4" style="background:var(--bg);padding:16px;border-radius:var(--radius);border:1px solid var(--border);">
+                    <label class="flex items-center gap-2 cursor-pointer" style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" name="bank_transfer_active" value="1" {{ !empty($settings['bank_transfer_active']) ? 'checked' : '' }}>
+                        <span class="font-bold" style="font-size:14px;">🟢 Aktifkan Pilihan Transfer Bank Manual</span>
+                    </label>
+                    <div class="text-xs text-muted" style="margin-top:6px;margin-left:25px;">Jika aktif, pelanggan dapat memilih pembayaran via transfer manual ke rekening perusahaan selain menggunakan payment gateway Midtrans dan diwajibkan mengunggah bukti transfer.</div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Nama Bank Utama (Fallback)</label>
+                        <input type="text" name="bank_transfer_bank_name" class="form-input" placeholder="Contoh: Bank Central Asia (BCA)" value="{{ $settings['bank_transfer_bank_name'] ?? 'Bank Central Asia (BCA)' }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nomor Rekening Utama (Fallback)</label>
+                        <input type="text" name="bank_transfer_account_number" class="form-input font-mono" placeholder="Contoh: 8830-8899-8800" value="{{ $settings['bank_transfer_account_number'] ?? '8830-8899-8800' }}">
+                    </div>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label class="form-label">Nama Pemilik Rekening (Atas Nama)</label>
+                    <input type="text" name="bank_transfer_account_name" class="form-input" placeholder="Contoh: PT COOCA TECHNOLOGIES INDONESIA" value="{{ $settings['bank_transfer_account_name'] ?? 'PT COOCA TECHNOLOGIES INDONESIA' }}">
+                </div>
+
+                <div class="form-group mt-4">
+                    <label class="form-label">Petunjuk / Instruksi Pembayaran Transfer Global</label>
+                    <textarea name="bank_transfer_instructions" class="form-textarea" rows="3" placeholder="Petunjuk langkah transfer untuk pelanggan...">{{ $settings['bank_transfer_instructions'] ?? 'Silakan transfer sesuai nominal tagihan hingga digit terakhir. Setelah transfer, wajib upload bukti pembayaran agar dapat diverifikasi.' }}</textarea>
                 </div>
             </div>
         </div>

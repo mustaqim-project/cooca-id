@@ -177,14 +177,44 @@
             </div>
 
             @if ($snapToken)
-                <button id="pay-button" class="btn-pay"><i class="fa-solid fa-lock"></i> Bayar Sekarang</button>
+                <button id="pay-button" class="btn-pay"><i class="fa-solid fa-lock"></i> Bayar Sekarang via Midtrans</button>
             @elseif($pendingTransaction && $pendingTransaction->midtrans_order_id)
-                <button id="pay-pending-button" class="btn-pay"><i class="fa-solid fa-clock"></i> Lanjutkan Pembayaran
-                    (Pending)</button>
+                <button id="pay-pending-button" class="btn-pay"><i class="fa-solid fa-clock"></i> Lanjutkan Pembayaran (Pending)</button>
             @else
                 <button class="btn-pay" disabled>Gagal Memuat Pembayaran</button>
-                <p style="text-align:center;color:red;font-size:13px;margin-top:10px;">Terjadi kesalahan sistem. Silakan
-                    muat ulang halaman.</p>
+            @endif
+
+            @php
+                $dirBanks = \App\Models\CompanyBankAccount::active()->ordered()->get();
+            @endphp
+
+            @if($dirBanks->count() > 0)
+                <div style="margin-top: 24px; border-top: 1px dashed var(--border-color); padding-top: 20px;">
+                    <div style="font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-building-columns" style="color: var(--primary);"></i> Pilihan Transfer Bank Manual
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        @foreach($dirBanks as $dbk)
+                            <div style="background: var(--secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; font-size: 13px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <strong style="color: var(--primary);">{{ $dbk->bank_name }}</strong>
+                                    @if($dbk->is_primary)
+                                        <span style="background: #fef3c7; color: #92400e; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px;">Utama</span>
+                                    @endif
+                                </div>
+                                <div style="font-family: monospace; font-weight: 700; font-size: 14px; margin: 4px 0; color: #2b2d42;">
+                                    {{ $dbk->account_number }}
+                                </div>
+                                <div style="font-size: 12px; color: var(--text-muted);">
+                                    a/n {{ $dbk->account_holder }}
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px; text-align: center;">
+                        Setelah transfer, silakan <a href="{{ route('customer.login') }}" style="color: var(--primary); font-weight: 600;">login ke Dashboard</a> untuk mengunggah bukti bayar.
+                    </div>
+                </div>
             @endif
         </div>
     </div>

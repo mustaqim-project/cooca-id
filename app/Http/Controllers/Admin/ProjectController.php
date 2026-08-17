@@ -18,9 +18,14 @@ class ProjectController extends Controller
     /**
      * Display a listing of custom development projects.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::with(['customer', 'contract'])->latest()->get();
+        $projects = Project::with(['customer', 'contract'])
+            ->when($request->filled('search'), fn ($q) => $q->where('project_name', 'like', "%{$request->search}%"))
+            ->latest()
+            ->paginate(25)
+            ->withQueryString();
+            
         $customers = Customer::orderBy('name')->get();
         $contracts = Contract::with('customer')->latest()->get();
 

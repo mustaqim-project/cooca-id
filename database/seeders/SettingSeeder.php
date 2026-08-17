@@ -29,6 +29,11 @@ final class SettingSeeder extends Seeder
             ['key' => 'wa.worker_token', 'value' => 'cooca-wa-secret-token-12345', 'type' => 'string', 'group' => 'whatsapp', 'is_public' => false],
             ['key' => 'wa.server_url', 'value' => 'http://127.0.0.1:3000', 'type' => 'string', 'group' => 'whatsapp', 'is_public' => false],
             ['key' => 'midtrans.is_production', 'value' => 'false', 'type' => 'boolean', 'group' => 'payment', 'is_public' => false],
+            ['key' => 'payment.bank_transfer.active', 'value' => 'true', 'type' => 'boolean', 'group' => 'payment', 'is_public' => true],
+            ['key' => 'payment.bank_transfer.bank_name', 'value' => 'Bank Central Asia (BCA)', 'type' => 'string', 'group' => 'payment', 'is_public' => true],
+            ['key' => 'payment.bank_transfer.account_number', 'value' => '8830-8899-8800', 'type' => 'string', 'group' => 'payment', 'is_public' => true],
+            ['key' => 'payment.bank_transfer.account_name', 'value' => 'PT COOCA TECHNOLOGIES INDONESIA', 'type' => 'string', 'group' => 'payment', 'is_public' => true],
+            ['key' => 'payment.bank_transfer.instructions', 'value' => 'Silakan transfer sesuai jumlah total tagihan hingga digit terakhir. Setelah melakukan transfer, wajib mengunggah foto / screenshot / file bukti bayar agar verifikasi dapat diproses oleh tim kami.', 'type' => 'string', 'group' => 'payment', 'is_public' => true],
         ];
 
         foreach ($settings as $setting) {

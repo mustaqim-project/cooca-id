@@ -13,62 +13,44 @@ final class ProductCategorySeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'Restoran & F&B',
-                'slug' => 'restoran-fnb',
-                'description' => 'Sistem POS Kasir, KDS Dapur, Reservasi Meja, & Manajemen Bahan Baku Restoran.',
-                'icon' => 'fa-utensils',
+                'name' => 'Cooca ERP & Business',
+                'slug' => 'cooca-erp',
+                'description' => 'Sistem ERP Terpadu, Kasir POS Multi-Outlet, Manajemen Inventori & HPP, dan Akuntansi Otomatis.',
+                'icon' => 'fa-network-wired',
                 'sort_order' => 1,
                 'is_active' => true,
             ],
             [
-                'name' => 'Klinik & Medis',
-                'slug' => 'klinik-medis',
-                'description' => 'Rekam Medis Elektronik (EMR), Apotek & Farmasi, Antrean Pasien, & Bridging BPJS.',
-                'icon' => 'fa-hospital-user',
+                'name' => 'Cooca Booking & Services',
+                'slug' => 'cooca-booking',
+                'description' => 'Sistem Reservasi & Booking Jadwal Online, Notifikasi WhatsApp, dan Manajemen Komisi Terapis/Staf.',
+                'icon' => 'fa-calendar-check',
                 'sort_order' => 2,
                 'is_active' => true,
             ],
             [
-                'name' => 'Bengkel & Otomotif',
-                'slug' => 'bengkel-otomotif',
-                'description' => 'Work Order Servis Kendaraan, Stok Sparepart, Estimasi Biaya, & Komisi Mekanik.',
+                'name' => 'Cooca Bengkel & Otomotif',
+                'slug' => 'cooca-bengkel',
+                'description' => 'Sistem Work Order (PKB/SPK) Bengkel Mobil & Motor, Stok Sparepart, dan Komisi Mekanik.',
                 'icon' => 'fa-wrench',
                 'sort_order' => 3,
                 'is_active' => true,
             ],
-            [
-                'name' => 'Notaris & Legal',
-                'slug' => 'notaris-legal',
-                'description' => 'Manajemen Berkas Akta, Process Tracking Sertifikat, Billing Klien, & Filing Digital.',
-                'icon' => 'fa-scale-balanced',
-                'sort_order' => 4,
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Booking & Reservasi Jasa',
-                'slug' => 'booking-reservasi',
-                'description' => 'Penjadwalan Online Salon/Spa, DP Midtrans, Notifikasi WA Gateway, & Kalender Usaha.',
-                'icon' => 'fa-calendar-check',
-                'sort_order' => 5,
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Retail & Minimarket',
-                'slug' => 'retail-minimarket',
-                'description' => 'Point of Sales Multi-Cabang, Barcode Scanner, Stok Opname, & Laporan Keuangan.',
-                'icon' => 'fa-store',
-                'sort_order' => 6,
-                'is_active' => true,
-            ],
         ];
 
+        // Ensure allowed slugs
+        $allowedSlugs = array_column($categories, 'slug');
+
+        // Deactivate or clean unused categories that don't have linked foreign keys
+        ProductCategory::whereNotIn('slug', $allowedSlugs)->delete();
+
         foreach ($categories as $cat) {
-            ProductCategory::firstOrCreate(
+            ProductCategory::updateOrCreate(
                 ['slug' => $cat['slug']],
                 $cat
             );
         }
 
-        echo "✅ Product Categories successfully seeded.\n";
+        echo "✅ Product Categories updated (Cooca ERP, Cooca Booking, Cooca Bengkel).\n";
     }
 }

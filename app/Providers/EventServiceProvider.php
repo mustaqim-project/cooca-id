@@ -21,6 +21,7 @@ final class EventServiceProvider extends ServiceProvider
         \App\Events\Subscription\SubscriptionCancelled::class => [],
         \App\Events\License\LicenseGenerated::class => [
             \App\Listeners\License\SendLicenseReadyNotification::class,
+            \App\Listeners\Ai\ProvisionAiApiKeyOnLicenseActivated::class,
         ],
         \App\Events\License\LicenseRevoked::class => [],
         \App\Events\Affiliate\CommissionCalculated::class => [],

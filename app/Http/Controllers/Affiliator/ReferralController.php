@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\CustomerResource;
 use App\Repositories\Contracts\AffiliatorRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 final class ReferralController extends Controller
@@ -40,6 +41,8 @@ final class ReferralController extends Controller
      */
     public function show(\App\Models\Customer $customer)
     {
+        Gate::authorize('view', $customer);
+
         return view('affiliator.referrals.show', ['referral' => $customer]);
     }
 }
