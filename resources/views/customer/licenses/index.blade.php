@@ -17,7 +17,7 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>License Key</th>
+                        <th>License Code & Key</th>
                         <th>Product</th>
                         <th>Plan</th>
                         <th>Domain</th>
@@ -30,13 +30,25 @@
                     @forelse($licenses as $license)
                     <tr>
                         <td>
-                            <div class="flex items-center gap-2">
-                                <code style="font-size:12px;background:var(--bg);padding:4px 8px;border-radius:6px;border:1px solid var(--border);">
-                                    {{ substr($license->license_code, 0, 18) }}…
-                                </code>
-                                <button onclick="copyToClipboard('{{ $license->license_code }}')" class="btn btn-ghost btn-sm" title="Copy">
-                                    <i class="fa-solid fa-copy"></i>
-                                </button>
+                            <div style="display:flex;flex-direction:column;gap:4px;">
+                                <div class="flex items-center gap-1">
+                                    <span class="text-xs text-muted" style="min-width:32px;font-weight:600;">Code:</span>
+                                    <code style="font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-family:monospace;font-weight:700;color:var(--primary);">
+                                        {{ $license->license_code }}
+                                    </code>
+                                    <button type="button" onclick="copyToClipboard('{{ $license->license_code }}', 'License Code')" class="btn btn-ghost btn-xs" title="Copy License Code" style="padding:2px 5px;font-size:10px;">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-xs text-muted" style="min-width:32px;font-weight:600;">Key:</span>
+                                    <code style="font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-family:monospace;font-weight:700;color:var(--text);">
+                                        {{ $license->token_code }}
+                                    </code>
+                                    <button type="button" onclick="copyToClipboard('{{ $license->token_code }}', 'License Key')" class="btn btn-ghost btn-xs" title="Copy License Key" style="padding:2px 5px;font-size:10px;">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                </div>
                             </div>
                             @if($license->is_trial)
                                 <span class="badge badge-purple" style="margin-top:4px;">Trial</span>

@@ -56,5 +56,10 @@ return [
         'url' => env('WA_SERVER_URL', 'http://127.0.0.1:3000'),
     ],
 
+    'cooca' => [
+        'url' => env('COOCA_URL', 'https://cooca.id'),
+        'secret' => env('COOCA_SECRET', 'cooca-license-shared-secret-key-2026'),
+    ],
+
 ];
 

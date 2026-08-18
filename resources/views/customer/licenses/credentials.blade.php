@@ -28,18 +28,20 @@
         </div>
 
         <div class="form-group">
-            <label class="form-label">License Key</label>
+            <label class="form-label font-semibold">License Code</label>
+            <p class="text-xs text-muted mb-2">Kode lisensi utama untuk aktivasi instans ERP COOCA.</p>
             <div class="flex gap-2">
-                <input type="text" class="form-input font-mono" readonly value="{{ $license->license_code ?? $license['license_code'] ?? '—' }}" id="licKeyInput">
-                <button onclick="copyField('licKeyInput')" class="btn btn-primary">Copy</button>
+                <input type="text" class="form-input font-mono font-bold text-primary" readonly value="{{ $license->license_code ?? $license['license_code'] ?? '—' }}" id="licCodeInput">
+                <button onclick="copyField('licCodeInput')" class="btn btn-primary">Copy Code</button>
             </div>
         </div>
 
         <div class="form-group">
-            <label class="form-label">API Token Code</label>
+            <label class="form-label font-semibold">License Key (Token Code)</label>
+            <p class="text-xs text-muted mb-2">Kunci otentikasi dan token sinkronisasi lisensi dengan server COOCA.ID.</p>
             <div class="flex gap-2">
-                <input type="text" class="form-input font-mono" readonly value="{{ $license->token_code ?? $license['token_code'] ?? '****************' }}" id="tokCodeInput">
-                <button onclick="copyField('tokCodeInput')" class="btn btn-outline">Copy</button>
+                <input type="text" class="form-input font-mono font-bold" readonly value="{{ $license->token_code ?? $license['token_code'] ?? '****************' }}" id="tokCodeInput">
+                <button onclick="copyField('tokCodeInput')" class="btn btn-outline">Copy Key</button>
             </div>
         </div>
 

@@ -55,6 +55,50 @@
             </div>
         </div>
 
+        {{-- Associated License Info --}}
+        @if($subscription->license)
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">🔑 Associated License</div>
+                <span class="badge badge-{{ $subscription->license->status === 'active' ? 'success' : ($subscription->license->status === 'inactive' ? 'secondary' : 'danger') }}">
+                    {{ strtoupper($subscription->license->status) }}
+                </span>
+            </div>
+            <div class="card-body flex-col gap-3">
+                <div>
+                    <div class="text-xs text-muted font-bold uppercase">License Code</div>
+                    <code class="font-bold text-xs" style="background: var(--bg-secondary); color: var(--primary); padding: 4px 8px; border-radius: var(--radius-sm); display: inline-block; margin-top: 2px;">
+                        {{ $subscription->license->license_code }}
+                    </code>
+                </div>
+                <div>
+                    <div class="text-xs text-muted font-bold uppercase">License Key (Token Code)</div>
+                    <code class="font-bold text-xs" style="background: var(--bg-secondary); color: var(--text); padding: 4px 8px; border-radius: var(--radius-sm); display: inline-block; margin-top: 2px;">
+                        {{ $subscription->license->token_code }}
+                    </code>
+                </div>
+                <div>
+                    <div class="text-xs text-muted font-bold uppercase">Registered Domain</div>
+                    <div class="font-semibold text-sm">
+                        @if($subscription->license->domain)
+                            <a href="https://{{ $subscription->license->domain }}" target="_blank" style="color: var(--primary); text-decoration: none;">
+                                {{ $subscription->license->domain }} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i>
+                            </a>
+                        @else
+                            <span class="text-muted">Not assigned</span>
+                        @endif
+                    </div>
+                </div>
+                <div>
+                    <div class="text-xs text-muted font-bold uppercase">License Validity</div>
+                    <div class="font-semibold text-sm">
+                        {{ $subscription->license->starts_at?->format('d M Y') ?? '—' }} s/d {{ $subscription->license->expires_at?->format('d M Y') ?? 'Lifetime' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         {{-- Trial Info --}}
         @if($subscription->trial_ends_at)
         <div class="card">

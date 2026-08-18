@@ -29,7 +29,8 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Plan Name</th>
+                        <th>Plan & Product</th>
+                        <th>License Code & Key</th>
                         <th>Billing Cycle</th>
                         <th>Price</th>
                         <th>Start Date</th>
@@ -40,9 +41,41 @@
                 </thead>
                 <tbody>
                     @forelse($subscriptions as $sub)
-                    @php $plan = $sub->subscriptionPlan; @endphp
+                    @php
+                        $plan = $sub->subscriptionPlan;
+                        $lic  = $sub->license;
+                    @endphp
                     <tr>
-                        <td class="font-bold text-sm">{{ $plan?->name ?? 'Subscription' }}</td>
+                        <td>
+                            <div class="font-bold text-sm">{{ $plan?->name ?? 'Subscription' }}</div>
+                            <div class="text-xs text-muted">{{ $plan?->product?->name ?? $lic?->product?->name ?? '' }}</div>
+                        </td>
+                        <td>
+                            @if($lic)
+                                <div style="display:flex;flex-direction:column;gap:4px;">
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-xs text-muted" style="min-width:32px;font-weight:600;">Code:</span>
+                                        <code style="font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-family:monospace;font-weight:700;color:var(--primary);">
+                                            {{ $lic->license_code }}
+                                        </code>
+                                        <button type="button" onclick="copyToClipboard('{{ $lic->license_code }}', 'License Code')" class="btn btn-ghost btn-xs" title="Copy License Code" style="padding:2px 5px;font-size:10px;">
+                                            <i class="fa-solid fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-xs text-muted" style="min-width:32px;font-weight:600;">Key:</span>
+                                        <code style="font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-family:monospace;font-weight:700;color:var(--text);">
+                                            {{ $lic->token_code }}
+                                        </code>
+                                        <button type="button" onclick="copyToClipboard('{{ $lic->token_code }}', 'License Key')" class="btn btn-ghost btn-xs" title="Copy License Key" style="padding:2px 5px;font-size:10px;">
+                                            <i class="fa-solid fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @else
+                                <span class="text-muted text-xs">—</span>
+                            @endif
+                        </td>
                         <td><span class="badge badge-primary">{{ ucfirst($plan?->billing_cycle ?? 'monthly') }}</span></td>
                         <td class="font-bold text-sm">Rp {{ number_format($plan?->price ?? 0, 0, ',', '.') }}</td>
                         <td class="text-xs text-muted">{{ $sub->started_at?->format('d M Y') ?? '—' }}</td>
@@ -77,7 +110,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             <div class="empty-state">
                                 <div class="empty-state-icon">🔄</div>
                                 <div class="empty-state-title">No Active Subscriptions</div>
@@ -95,4 +128,30 @@
         <div class="card-footer">{{ $subscriptions->links() }}</div>
     @endif
 </div>
+
+<script>
+function copyToClipboard(text, label) {
+    if (!navigator.clipboard) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast(label + ' copied to clipboard!');
+        return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+        showToast(label + ' copied to clipboard!');
+    });
+}
+
+function showToast(msg) {
+    const el = document.createElement('div');
+    el.className = 'toast-wrap';
+    el.innerHTML = '<div class="toast toast-success"><span class="toast-icon"><i class="fa-solid fa-check" style="color:var(--success);"></i></span><div><div class="toast-title">Copied!</div><div class="toast-msg">' + msg + '</div></div></div>';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2500);
+}
+</script>
 @endsection

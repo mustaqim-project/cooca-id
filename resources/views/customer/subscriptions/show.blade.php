@@ -68,16 +68,81 @@
 
                 @if($lic)
                 <div class="divider"></div>
-                <div class="font-bold text-sm mb-2">Associated License & Access</div>
-                <div class="stats-row">
-                    <span class="text-sm text-muted">License Key</span>
-                    <code style="font-size:12px;background:var(--bg);padding:4px 8px;border-radius:4px;border:1px solid var(--border);">
-                        {{ $lic->license_code }}
-                    </code>
+                <div class="font-bold text-sm mb-3 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-key" style="color:var(--primary);"></i> Informasi Lisensi & Akses ERP
+                    </span>
+                    <a href="{{ route('customer.licenses.credentials', $lic->id) }}" class="btn btn-ghost btn-xs" style="font-size:11px;">
+                        <i class="fa-solid fa-shield-halved"></i> Full Credentials
+                    </a>
                 </div>
-                <div class="stats-row">
-                    <span class="text-sm text-muted">Domain</span>
-                    <span class="font-bold text-sm">{{ $lic->domain ?? 'Not set' }}</span>
+
+                <div class="stats-row" style="padding:10px 0;">
+                    <div>
+                        <span class="text-xs text-muted block font-semibold uppercase">License Code</span>
+                        <div class="text-xs text-muted">Gunakan kode ini saat aktivasi instans ERP</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <code style="font-size:13px;background:var(--bg);padding:6px 10px;border-radius:6px;border:1px solid var(--border);font-family:monospace;font-weight:700;color:var(--primary);">
+                            {{ $lic->license_code }}
+                        </code>
+                        <button type="button" onclick="copyToClipboard('{{ $lic->license_code }}', 'License Code')" class="btn btn-ghost btn-sm" title="Copy License Code">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-row" style="padding:10px 0;">
+                    <div>
+                        <span class="text-xs text-muted block font-semibold uppercase">License Key (Token Code)</span>
+                        <div class="text-xs text-muted">Kunci otentikasi lisensi & sinkronisasi API</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <code style="font-size:13px;background:var(--bg);padding:6px 10px;border-radius:6px;border:1px solid var(--border);font-family:monospace;font-weight:700;color:var(--text);">
+                            {{ $lic->token_code }}
+                        </code>
+                        <button type="button" onclick="copyToClipboard('{{ $lic->token_code }}', 'License Key')" class="btn btn-ghost btn-sm" title="Copy License Key">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-row" style="padding:10px 0;">
+                    <span class="text-sm text-muted">Domain Terdaftar</span>
+                    <span class="font-bold text-sm">
+                        @if($lic->domain)
+                            <a href="https://{{ $lic->domain }}" target="_blank" style="color:var(--primary);text-decoration:none;">
+                                {{ $lic->domain }} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px;"></i>
+                            </a>
+                        @else
+                            <span class="text-muted">Belum diatur</span>
+                        @endif
+                    </span>
+                </div>
+
+                <div class="stats-row" style="padding:10px 0;">
+                    <span class="text-sm text-muted">Status Lisensi</span>
+                    <span>
+                        @if($lic->status === 'active') <span class="badge badge-success">Active</span>
+                        @elseif($lic->status === 'inactive') <span class="badge badge-muted">Inactive</span>
+                        @elseif($lic->status === 'expired') <span class="badge badge-danger">Expired</span>
+                        @elseif($lic->status === 'revoked') <span class="badge badge-danger">Revoked</span>
+                        @else <span class="badge badge-muted">{{ ucfirst($lic->status) }}</span>
+                        @endif
+                    </span>
+                </div>
+
+                <div class="stats-row" style="padding:10px 0;">
+                    <span class="text-sm text-muted">Masa Berlaku Lisensi</span>
+                    <span class="text-sm font-semibold">
+                        @if($lic->status === 'inactive')
+                            <span class="text-muted">Belum Aktif</span>
+                        @elseif($lic->expires_at)
+                            {{ $lic->starts_at?->format('d M Y') ?? '—' }} s/d {{ $lic->expires_at->format('d M Y') }}
+                        @else
+                            Lifetime
+                        @endif
+                    </span>
                 </div>
                 @endif
             </div>
@@ -91,6 +156,11 @@
                 <div class="card-title">Management Actions</div>
             </div>
             <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+                @if($lic)
+                    <a href="{{ route('customer.licenses.credentials', $lic->id) }}" class="btn btn-outline w-full" style="justify-content:center;">
+                        <i class="fa-solid fa-shield-key"></i> View Credentials
+                    </a>
+                @endif
                 @if($subscription->status === 'active')
                     <form method="POST" action="{{ route('customer.subscriptions.renew', $subscription->id) }}">
                         @csrf
@@ -114,4 +184,30 @@
         </div>
     </div>
 </div>
+
+<script>
+function copyToClipboard(text, label) {
+    if (!navigator.clipboard) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast(label + ' copied to clipboard!');
+        return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+        showToast(label + ' copied to clipboard!');
+    });
+}
+
+function showToast(msg) {
+    const el = document.createElement('div');
+    el.className = 'toast-wrap';
+    el.innerHTML = '<div class="toast toast-success"><span class="toast-icon"><i class="fa-solid fa-check" style="color:var(--success);"></i></span><div><div class="toast-title">Copied!</div><div class="toast-msg">' + msg + '</div></div></div>';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2500);
+}
+</script>
 @endsection

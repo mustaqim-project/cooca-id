@@ -23,11 +23,33 @@
             <span class="badge badge-success">{{ ucfirst($license->status ?? $license['status'] ?? 'active') }}</span>
         </div>
         <div class="card-body">
-            <div class="stats-row">
-                <span class="text-sm text-muted">License Code</span>
-                <code style="font-size:13px;background:var(--bg);padding:4px 8px;border-radius:4px;border:1px solid var(--border);">
-                    {{ $license->license_code ?? $license['license_code'] }}
-                </code>
+            <div class="stats-row" style="padding:10px 0;">
+                <div>
+                    <span class="text-xs text-muted block font-semibold uppercase">License Code</span>
+                    <div class="text-xs text-muted">Kode identifikasi lisensi</div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <code style="font-size:13px;background:var(--bg);padding:6px 10px;border-radius:6px;border:1px solid var(--border);font-family:monospace;font-weight:700;color:var(--primary);">
+                        {{ $license->license_code ?? $license['license_code'] }}
+                    </code>
+                    <button type="button" onclick="copyToClipboard('{{ $license->license_code ?? $license['license_code'] }}', 'License Code')" class="btn btn-ghost btn-sm" title="Copy License Code">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="stats-row" style="padding:10px 0;">
+                <div>
+                    <span class="text-xs text-muted block font-semibold uppercase">License Key (Token Code)</span>
+                    <div class="text-xs text-muted">Kunci otentikasi API lisensi</div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <code style="font-size:13px;background:var(--bg);padding:6px 10px;border-radius:6px;border:1px solid var(--border);font-family:monospace;font-weight:700;color:var(--text);">
+                        {{ $license->token_code ?? $license['token_code'] }}
+                    </code>
+                    <button type="button" onclick="copyToClipboard('{{ $license->token_code ?? $license['token_code'] }}', 'License Key')" class="btn btn-ghost btn-sm" title="Copy License Key">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
+                </div>
             </div>
             <div class="stats-row">
                 <span class="text-sm text-muted">Product</span>
@@ -67,4 +89,30 @@
         </div>
     </div>
 </div>
+
+<script>
+function copyToClipboard(text, label) {
+    if (!navigator.clipboard) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast(label + ' copied to clipboard!');
+        return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+        showToast(label + ' copied to clipboard!');
+    });
+}
+
+function showToast(msg) {
+    const el = document.createElement('div');
+    el.className = 'toast-wrap';
+    el.innerHTML = '<div class="toast toast-success"><span class="toast-icon"><i class="fa-solid fa-check" style="color:var(--success);"></i></span><div><div class="toast-title">Copied!</div><div class="toast-msg">' + msg + '</div></div></div>';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2500);
+}
+</script>
 @endsection

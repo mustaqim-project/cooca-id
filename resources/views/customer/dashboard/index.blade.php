@@ -152,7 +152,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>License Key</th>
+                                <th>License Code & Key</th>
                                 <th>Product / Plan</th>
                                 <th>Domain</th>
                                 <th>Status</th>
@@ -163,9 +163,20 @@
                             @forelse($licList->take(5) as $license)
                             <tr>
                                 <td>
-                                    <code style="font-size:11px;background:var(--bg);padding:3px 6px;border-radius:4px;border:1px solid var(--border);">
-                                        {{ substr($license->license_code, 0, 16) }}…
-                                    </code>
+                                    <div style="display:flex;flex-direction:column;gap:2px;">
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-xs text-muted" style="min-width:30px;font-size:10px;font-weight:600;">Code:</span>
+                                            <code style="font-size:11px;background:var(--bg);padding:2px 5px;border-radius:4px;border:1px solid var(--border);color:var(--primary);font-weight:bold;">
+                                                {{ $license->license_code }}
+                                            </code>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-xs text-muted" style="min-width:30px;font-size:10px;font-weight:600;">Key:</span>
+                                            <code style="font-size:11px;background:var(--bg);padding:2px 5px;border-radius:4px;border:1px solid var(--border);color:var(--text);font-weight:bold;">
+                                                {{ $license->token_code }}
+                                            </code>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     <div class="font-semibold text-sm">{{ $license->product?->name ?? $license->subscriptionPlan?->name ?? 'License' }}</div>
