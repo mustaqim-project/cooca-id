@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Ai;
 
 use App\Models\AiPlanConfig;
+use App\Models\AiProviderConfig;
 use App\Models\AiUsageCycle;
 use App\Models\License;
 
@@ -18,22 +19,15 @@ final class AiQuotaService
         }
 
         if (!$config) {
+            $providerConfig = AiProviderConfig::first();
+            $allowedModels = $providerConfig ? $providerConfig->getModelsList() : ['gpt-4o-mini', 'gpt-4o'];
+
             // Fallback default config for active licenses
             $defaultConfig = new AiPlanConfig([
                 'subscription_plan_id' => $license->subscription_plan_id,
                 'monthly_token_quota' => 100000,
                 'requests_per_minute' => 60,
-                'allowed_models' => [
-                    'gpt-4o',
-                    'gpt-4o-mini',
-                    'gemini-3.6-flash',
-                    'gemini-2.5-pro',
-                    'gemini-flash-latest',
-                    'claude-3-5-sonnet-20241022',
-                    'claude-3-5-haiku-20241022',
-                    'deepseek-chat',
-                    'deepseek-reasoner',
-                ],
+                'allowed_models' => $allowedModels,
                 'overage_policy' => 'hard_stop',
             ]);
             return $defaultConfig;
@@ -62,7 +56,6 @@ final class AiQuotaService
 
         $now = now();
         $cycleStart = $now->copy()->startOfDay();
-        // Misalkan siklus bulanan, mengikuti konvensi typical (30 hari atau tgl ke tgl bulan depan)
         $cycleEnd = $now->copy()->addMonth()->startOfDay();
 
         return AiUsageCycle::firstOrCreate([

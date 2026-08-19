@@ -9,44 +9,21 @@ use RuntimeException;
 
 final class AiProviderResolver
 {
-    private const MODEL_PROVIDER_MAP = [
-        'gpt-'      => 'openai',
-        'o1-'       => 'openai',
-        'o3-'       => 'openai',
-        'text-'     => 'openai',
-        'claude-'   => 'anthropic',
-        'gemini-'   => 'gemini',
-        'deepseek-' => 'deepseek',
-    ];
-
-    public function resolveFor(string $model): AiProviderInterface
+    public function resolveFor(string $model = ''): AiProviderInterface
     {
-        foreach (self::MODEL_PROVIDER_MAP as $prefix => $providerKey) {
-            if (str_starts_with($model, $prefix)) {
-                return $this->build($providerKey);
+        $config = AiProviderConfig::where('is_active', true)->first();
+
+        if (!$config) {
+            $config = AiProviderConfig::first();
+            if (!$config || !$config->is_active) {
+                throw new RuntimeException("AI Gateway belum aktif atau belum dikonfigurasi. Silakan atur Base URL dan API Key pada Admin AI Console.");
             }
         }
 
-        // Direct provider key match or fallback
-        return $this->build('openai');
-    }
-
-    private function build(string $providerKey): AiProviderInterface
-    {
-        $config = AiProviderConfig::where('provider', $providerKey)
-            ->where('is_active', true)
-            ->first();
-
-        if (!$config) {
-            throw new RuntimeException("AI Provider [{$providerKey}] is not configured or is inactive. Please configure it in the Admin AI Console.");
+        if (empty($config->base_url)) {
+            throw new RuntimeException("Base URL AI Gateway belum diatur.");
         }
 
-        return match ($providerKey) {
-            'openai'    => new OpenAiProvider($config->api_key, $config->base_url),
-            'anthropic' => new AnthropicProvider($config->api_key, $config->base_url),
-            'gemini'    => new GeminiProvider($config->api_key, $config->base_url),
-            'deepseek'  => new DeepSeekProvider($config->api_key, $config->base_url),
-            default     => throw new RuntimeException("Unsupported AI provider '{$providerKey}'"),
-        };
+        return new OpenAiProvider($config->api_key ?? '', $config->base_url);
     }
 }

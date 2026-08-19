@@ -84,13 +84,19 @@ Route::prefix('wa/worker')->group(function () {
     Route::post('/update', [\App\Http\Controllers\Api\WhatsAppWorkerController::class, 'updateQueue']);
 });
 
-// Cooca AI Gateway Routes
-Route::prefix('v1/ai')
-    ->middleware([\App\Http\Middleware\Ai\AuthenticateAiApiKey::class, 'throttle:ai-gateway'])
-    ->group(function () {
-        Route::post('/chat/completions', [\App\Http\Controllers\Api\V1\Ai\ChatCompletionController::class, 'handle']);
-        Route::get('/models', [\App\Http\Controllers\Api\V1\Ai\ChatCompletionController::class, 'models']);
-        Route::get('/quota', [\App\Http\Controllers\Api\V1\Ai\ChatCompletionController::class, 'quota']);
+// Cooca AI Gateway Routes (OpenAI-Compatible API)
+Route::prefix('v1/ai')->group(function () {
+    // Model discovery endpoint (returns all available models configured on Cooca AI Gateway)
+    Route::get('/models', [\App\Http\Controllers\Api\V1\Ai\ChatCompletionController::class, 'models'])
+        ->name('api.ai.models');
+
+    // Authenticated Endpoints (Bearer AI API Key Auth)
+    Route::middleware([\App\Http\Middleware\Ai\AuthenticateAiApiKey::class, 'throttle:ai-gateway'])->group(function () {
+        Route::post('/chat/completions', [\App\Http\Controllers\Api\V1\Ai\ChatCompletionController::class, 'handle'])
+            ->name('api.ai.chat.completions');
+        Route::get('/quota', [\App\Http\Controllers\Api\V1\Ai\ChatCompletionController::class, 'quota'])
+            ->name('api.ai.quota');
     });
+});
 
 

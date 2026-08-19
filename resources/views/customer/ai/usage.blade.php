@@ -406,11 +406,16 @@
         </p>
 
         <div class="gateway-code-block mb-3">
-<pre style="margin: 0;"><code>curl -X POST https://cooca.id/api/v1/ai/chat/completions \
+<pre style="margin: 0;"><code># 1. Cek daftar model yang tersedia di Cooca AI Gateway:
+curl -X GET https://cooca.id/api/v1/ai/models \
+  -H "Authorization: Bearer YOUR_COOCA_AI_KEY"
+
+# 2. Kirim Chat Completion:
+curl -X POST https://cooca.id/api/v1/ai/chat/completions \
   -H "Authorization: Bearer YOUR_COOCA_AI_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gemini-3.6-flash",
+    "model": "gpt-4o-mini",
     "messages": [
       {"role": "system", "content": "You are a helpful assistant."},
       {"role": "user", "content": "Halo COOCA AI!"}

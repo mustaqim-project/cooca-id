@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AiPlanConfig;
 use App\Models\AiProviderConfig;
+use App\Models\AiTokenPackage;
+use App\Models\AiTokenPurchase;
 use App\Models\AiUsageCycle;
 use App\Models\AiUsageLog;
 use App\Models\SubscriptionPlan;
@@ -35,29 +37,34 @@ final class AiDashboardController extends Controller
         ->where('created_at', '>=', $currentMonthStart)
         ->first();
 
-        // Provider Status Discovery
-        $availableProviders = ['openai', 'anthropic', 'gemini', 'deepseek'];
-        $dbProviders = AiProviderConfig::all()->keyBy('provider');
-
-        $providers = [];
-        $defaultUrls = [
-            'openai' => 'https://api.openai.com/v1',
-            'anthropic' => 'https://api.anthropic.com',
-            'gemini' => 'https://generativelanguage.googleapis.com/v1beta',
-            'deepseek' => 'https://api.deepseek.com/v1',
-        ];
-
-        foreach ($availableProviders as $pKey) {
-            $conf = $dbProviders->get($pKey);
-            $providers[$pKey] = [
-                'provider' => $pKey,
-                'is_configured' => $conf !== null,
-                'is_active' => $conf ? $conf->is_active : false,
-                'base_url' => $conf ? $conf->base_url : ($defaultUrls[$pKey] ?? ''),
-                'has_key' => $conf && !empty($conf->api_key),
-                'updated_at' => $conf ? $conf->updated_at : null,
-            ];
+        // Single Unified AI Provider Configuration
+        $providerConfig = AiProviderConfig::first();
+        if (!$providerConfig) {
+            $providerConfig = new AiProviderConfig([
+                'provider'          => 'primary',
+                'base_url'          => 'https://r4g77gv.abc-tunnel.us/v1',
+                'models'            => [
+                    'cx/gpt-5.5-xhigh',
+                    'cx/gpt-5.5',
+                    'ag/claude-sonnet-4-6',
+                    'ag/claude-opus-4-6-thinking',
+                    'ag/gemini-pro-agent',
+                ],
+                'total_token_quota' => 10000000,
+                'is_active'         => true,
+            ]);
+            $hasKey = false;
+        } else {
+            $hasKey = !empty($providerConfig->api_key);
         }
+
+        $availableModels = $providerConfig->getModelsList();
+
+        // Master Gateway Token Tracking
+        $allTimeTokensUsed = (int) AiUsageLog::sum('total_tokens');
+        $masterQuota = (int) ($providerConfig->total_token_quota ?? 0);
+        $masterRemaining = $masterQuota > 0 ? max(0, $masterQuota - $allTimeTokensUsed) : null;
+        $masterPercentUsed = $masterQuota > 0 ? min(100, round(($allTimeTokensUsed / $masterQuota) * 100, 1)) : 0;
 
         // Subscription Plans with AI Config
         $plans = SubscriptionPlan::with('aiPlanConfig')->get();
@@ -70,8 +77,8 @@ final class AiDashboardController extends Controller
             ->paginate(15);
 
         // AI Token Packages & Recent Purchases
-        $tokenPackages = \App\Models\AiTokenPackage::orderBy('sort_order', 'asc')->get();
-        $recentPurchases = \App\Models\AiTokenPurchase::with(['customer', 'license.product', 'package'])
+        $tokenPackages = AiTokenPackage::orderBy('sort_order', 'asc')->get();
+        $recentPurchases = AiTokenPurchase::with(['customer', 'license.product', 'package'])
             ->latest()
             ->paginate(15);
 
@@ -83,7 +90,13 @@ final class AiDashboardController extends Controller
 
         return view('admin.ai.dashboard', compact(
             'monthlyUsage',
-            'providers',
+            'providerConfig',
+            'hasKey',
+            'availableModels',
+            'allTimeTokensUsed',
+            'masterQuota',
+            'masterRemaining',
+            'masterPercentUsed',
             'plans',
             'activeCycles',
             'recentLogs',
@@ -98,23 +111,54 @@ final class AiDashboardController extends Controller
             return redirect()->route('admin.ai.dashboard');
         }
 
+        if ($request->has('total_token_quota')) {
+            $request->merge([
+                'total_token_quota' => (int) str_replace(['.', ',', ' '], '', (string) $request->input('total_token_quota', 0)),
+            ]);
+        }
+
         $validated = $request->validate([
-            'provider' => 'required|string|in:openai,anthropic,gemini,deepseek',
-            'api_key'  => 'nullable|string',
-            'base_url' => 'required|url',
-            'is_active' => 'nullable|boolean',
+            'base_url'          => 'required|url',
+            'api_key'           => 'nullable|string',
+            'models'            => 'nullable|string',
+            'total_token_quota' => 'nullable|integer|min:0',
+            'is_active'         => 'nullable|boolean',
         ]);
 
-        $config = AiProviderConfig::firstOrNew(['provider' => $validated['provider']]);
-        
-        if (!empty($validated['api_key'])) {
-            $config->api_key = $validated['api_key'];
+        // Parse models string (newline, comma, semicolon separated)
+        $modelsInput = $validated['models'] ?? '';
+        $models = [];
+        if (!empty($modelsInput)) {
+            $parts = preg_split('/[\r\n,;]+/', (string) $modelsInput, -1, PREG_SPLIT_NO_EMPTY);
+            $models = array_values(array_unique(array_filter(array_map('trim', $parts))));
         }
-        $config->base_url = $validated['base_url'];
+
+        if (empty($models)) {
+            $models = [
+                'cx/gpt-5.5-xhigh',
+                'cx/gpt-5.5',
+                'ag/claude-sonnet-4-6',
+                'ag/claude-opus-4-6-thinking',
+                'ag/gemini-pro-agent',
+            ];
+        }
+
+        $config = AiProviderConfig::first();
+        if (!$config) {
+            $config = new AiProviderConfig();
+            $config->provider = 'primary';
+        }
+
+        if (!empty($validated['api_key'])) {
+            $config->api_key = trim($validated['api_key']);
+        }
+        $config->base_url = rtrim(trim($validated['base_url']), '/');
+        $config->models = $models;
+        $config->total_token_quota = (int) ($validated['total_token_quota'] ?? 0);
         $config->is_active = $request->boolean('is_active', true);
         $config->save();
 
-        return redirect()->route('admin.ai.dashboard')->with('success', "Konfigurasi AI Provider [{$validated['provider']}] berhasil disimpan.");
+        return redirect()->route('admin.ai.dashboard')->with('success', "Konfigurasi AI Gateway & Kuota Master berhasil disimpan.");
     }
 
     public function toggleProvider(Request $request)
@@ -123,18 +167,14 @@ final class AiDashboardController extends Controller
             return redirect()->route('admin.ai.dashboard');
         }
 
-        $validated = $request->validate([
-            'provider' => 'required|string|in:openai,anthropic,gemini,deepseek',
-        ]);
-
-        $config = AiProviderConfig::where('provider', $validated['provider'])->first();
+        $config = AiProviderConfig::first();
         if ($config) {
             $config->update(['is_active' => !$config->is_active]);
             $statusStr = $config->is_active ? 'Diaktifkan' : 'Dinonaktifkan';
-            return redirect()->route('admin.ai.dashboard')->with('success', "Provider [{$config->provider}] berhasil {$statusStr}.");
+            return redirect()->route('admin.ai.dashboard')->with('success', "AI Gateway berhasil {$statusStr}.");
         }
 
-        return redirect()->route('admin.ai.dashboard')->with('error', "Provider belum dikonfigurasi.");
+        return redirect()->route('admin.ai.dashboard')->with('error', "AI Gateway belum dikonfigurasi.");
     }
 
     public function testProvider(Request $request)
@@ -143,32 +183,30 @@ final class AiDashboardController extends Controller
             return redirect()->route('admin.ai.dashboard');
         }
 
-        $validated = $request->validate([
-            'provider' => 'required|string|in:openai,anthropic,gemini,deepseek',
-        ]);
+        $config = AiProviderConfig::first();
+        if (!$config || empty($config->base_url)) {
+            return redirect()->route('admin.ai.dashboard')->with('error', "Base URL AI Gateway belum diatur.");
+        }
 
-        $testModels = [
-            'openai' => 'gpt-4o-mini',
-            'anthropic' => 'claude-3-5-haiku-20241022',
-            'gemini' => 'gemini-3.6-flash',
-            'deepseek' => 'deepseek-chat',
-        ];
+        $models = $config->getModelsList();
+        $testModel = $request->input('model', $models[0] ?? 'cx/gpt-5.5-xhigh');
 
-        $model = $testModels[$validated['provider']] ?? 'gpt-4o-mini';
-
+        $started = microtime(true);
         try {
-            $provider = $this->providerResolver->resolveFor($model);
+            $provider = $this->providerResolver->resolveFor($testModel);
             $res = $provider->chatCompletion([
-                'model' => $model,
+                'model' => $testModel,
                 'messages' => [
                     ['role' => 'user', 'content' => 'Ping! Return only the word "OK".'],
                 ],
                 'max_tokens' => 10,
             ]);
 
-            return redirect()->route('admin.ai.dashboard')->with('success', "Test koneksi ke [{$validated['provider']}] BERHASIL! Model {$model} merespon dengan baik.");
+            $durationMs = round((microtime(true) - $started) * 1000);
+
+            return redirect()->route('admin.ai.dashboard')->with('success', "Test koneksi AI Gateway BERHASIL! Model [{$testModel}] merespon dalam {$durationMs}ms.");
         } catch (Throwable $e) {
-            return redirect()->route('admin.ai.dashboard')->with('error', "Test koneksi ke [{$validated['provider']}] GAGAL: " . $e->getMessage());
+            return redirect()->route('admin.ai.dashboard')->with('error', "Test koneksi AI Gateway GAGAL: " . $e->getMessage());
         }
     }
 
@@ -249,55 +287,44 @@ final class AiDashboardController extends Controller
             'name'         => 'required|string|max:100',
             'token_amount' => 'required|integer|min:1000',
             'price'        => 'required|numeric|min:0',
-            'description'  => 'nullable|string|max:500',
+            'description'  => 'nullable|string|max:255',
             'badge'        => 'nullable|string|max:50',
             'sort_order'   => 'required|integer|min:0',
             'is_active'    => 'nullable|boolean',
         ]);
 
-        $data = [
-            'name'         => $validated['name'],
-            'slug'         => \Illuminate\Support\Str::slug($validated['name']) . '-' . rand(100, 999),
-            'token_amount' => $validated['token_amount'],
-            'price'        => $validated['price'],
-            'description'  => $validated['description'] ?? null,
-            'badge'        => $validated['badge'] ?? null,
-            'sort_order'   => $validated['sort_order'],
-            'is_active'    => $request->boolean('is_active', true),
-        ];
+        $package = !empty($validated['id']) ? AiTokenPackage::find($validated['id']) : new AiTokenPackage();
+        $package->name = $validated['name'];
+        $package->token_amount = $validated['token_amount'];
+        $package->price = $validated['price'];
+        $package->description = $validated['description'] ?? null;
+        $package->badge = $validated['badge'] ?? null;
+        $package->sort_order = $validated['sort_order'];
+        $package->is_active = $request->boolean('is_active', true);
+        $package->save();
 
-        if (!empty($validated['id'])) {
-            unset($data['slug']); // keep existing slug
-            \App\Models\AiTokenPackage::where('id', $validated['id'])->update($data);
-            $msg = 'Paket token AI berhasil diperbarui.';
-        } else {
-            \App\Models\AiTokenPackage::create($data);
-            $msg = 'Paket token AI baru berhasil dibuat.';
-        }
-
+        $msg = !empty($validated['id']) ? 'Paket token berhasil diperbarui.' : 'Paket token baru berhasil ditambahkan.';
         return redirect()->route('admin.ai.dashboard')->with('success', $msg);
     }
 
-    public function togglePackage(Request $request, \App\Models\AiTokenPackage $package)
+    public function togglePackage(Request $request, AiTokenPackage $package)
     {
         if ($request->isMethod('get')) {
             return redirect()->route('admin.ai.dashboard');
         }
 
         $package->update(['is_active' => !$package->is_active]);
-        $statusStr = $package->is_active ? 'Diaktifkan' : 'Dinonaktifkan';
-
+        $statusStr = $package->is_active ? 'diaktifkan' : 'dinonaktifkan';
         return redirect()->route('admin.ai.dashboard')->with('success', "Paket [{$package->name}] berhasil {$statusStr}.");
     }
 
-    public function deletePackage(Request $request, \App\Models\AiTokenPackage $package)
+    public function deletePackage(Request $request, AiTokenPackage $package)
     {
         if ($request->isMethod('get')) {
             return redirect()->route('admin.ai.dashboard');
         }
 
         $package->delete();
-
         return redirect()->route('admin.ai.dashboard')->with('success', "Paket [{$package->name}] berhasil dihapus.");
     }
 }

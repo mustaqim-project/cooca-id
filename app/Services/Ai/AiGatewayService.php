@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Ai;
 
 use App\Models\AiApiKey;
+use App\Models\AiProviderConfig;
 use App\Models\License;
 use App\Services\Ai\Providers\AiProviderResolver;
 use Throwable;
@@ -21,15 +22,24 @@ final class AiGatewayService
     {
         $planConfig = $this->quota->planConfigFor($license);
 
-        if (!in_array($payload['model'], $planConfig->allowed_models, true)) {
-            return $this->errorResponse(403, "Model '{$payload['model']}' is not available on your current plan.");
+        $providerConfig = AiProviderConfig::first();
+        $configuredModels = $providerConfig ? $providerConfig->getModelsList() : ['gpt-4o-mini', 'gpt-4o'];
+
+        $allowedModels = !empty($planConfig->allowed_models) ? $planConfig->allowed_models : $configuredModels;
+        $requestedModel = $payload['model'] ?? ($configuredModels[0] ?? 'gpt-4o-mini');
+
+        // Check if model is allowed on this license or available in Cooca AI Gateway
+        if (!in_array($requestedModel, $allowedModels, true) && !in_array($requestedModel, $configuredModels, true)) {
+            return $this->errorResponse(403, "Model '{$requestedModel}' tidak tersedia pada layanan Cooca AI Gateway.", [
+                'available_models' => $allowedModels,
+            ]);
         }
 
         $cycle = $this->quota->currentCycleFor($license);
         
         if ($this->quota->isExhausted($cycle) && $planConfig->overage_policy === 'hard_stop') {
-            $this->metering->logRejected($apiKey, $license, $payload['model'], 'quota_exceeded');
-            return $this->errorResponse(429, 'Monthly AI token quota exceeded.', [
+            $this->metering->logRejected($apiKey, $license, $requestedModel, 'quota_exceeded');
+            return $this->errorResponse(429, 'Kuota bulanan token AI Anda telah habis.', [
                 'tokens_used' => $cycle->tokens_used,
                 'tokens_quota' => $cycle->token_quota,
             ]);
@@ -38,19 +48,23 @@ final class AiGatewayService
         $started = microtime(true);
 
         try {
-            $provider = $this->providers->resolveFor($payload['model']);
+            $provider = $this->providers->resolveFor($requestedModel);
             $providerResponse = $provider->chatCompletion($payload);
         } catch (Throwable $e) {
-            $this->metering->logError($apiKey, $license, $payload['model'], $e);
-            return $this->errorResponse(502, 'AI provider request failed: ' . $e->getMessage());
+            $this->metering->logError($apiKey, $license, $requestedModel, $e);
+            return $this->errorResponse(502, 'Permintaan ke AI Provider gagal: ' . $e->getMessage());
         }
 
         $durationMs = (int) ((microtime(true) - $started) * 1000);
 
-        $usage = $providerResponse['usage'];
-        $this->metering->logSuccess($apiKey, $license, $payload['model'], $usage, $durationMs);
+        $usage = $providerResponse['usage'] ?? [
+            'prompt_tokens' => 0,
+            'completion_tokens' => 0,
+            'total_tokens' => 0,
+        ];
+        $this->metering->logSuccess($apiKey, $license, $requestedModel, $usage, $durationMs);
         
-        $updatedCycle = $this->quota->increment($cycle, $usage['total_tokens']);
+        $updatedCycle = $this->quota->increment($cycle, $usage['total_tokens'] ?? 0);
 
         return [
             'payload' => $providerResponse['body'],

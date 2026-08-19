@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Ai\Providers;
 
 use Illuminate\Support\Facades\Http;
+use RuntimeException;
 
 final class OpenAiProvider implements AiProviderInterface
 {
@@ -15,11 +16,33 @@ final class OpenAiProvider implements AiProviderInterface
 
     public function chatCompletion(array $payload): array
     {
-        $response = Http::withToken($this->apiKey)
-            ->timeout(45) // limit timeout to 45s for shared hosting compatibility
-            ->post("{$this->baseUrl}/chat/completions", $payload);
+        $url = rtrim(trim($this->baseUrl), '/');
+        if (!str_ends_with($url, '/chat/completions')) {
+            $url = "{$url}/chat/completions";
+        }
 
-        $response->throw();
+        $headers = [
+            'Accept'       => 'application/json',
+            'Content-Type' => 'application/json',
+        ];
+
+        $request = Http::withHeaders($headers)->timeout(45);
+
+        if (!empty($this->apiKey)) {
+            $request = $request->withToken(trim($this->apiKey));
+        }
+
+        $response = $request->post($url, $payload);
+
+        if ($response->failed()) {
+            $errorJson = $response->json();
+            $errorMessage = $errorJson['error']['message'] 
+                ?? $errorJson['message'] 
+                ?? $errorJson['detail']
+                ?? $response->body();
+
+            throw new RuntimeException("AI Endpoint Error ({$response->status()}): {$errorMessage}");
+        }
 
         $body = $response->json();
 

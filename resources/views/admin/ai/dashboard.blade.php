@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'AI Gateway & LLM Routing Console — COOCA.ID Admin')
+@section('title', 'AI Gateway & Model Configuration — COOCA.ID Admin')
 
 @section('content')
 <div class="page-header">
@@ -10,21 +10,28 @@
             <span>/</span>
             <span>AI Platform</span>
             <span>/</span>
-            <span>Console</span>
+            <span>Gateway & Models</span>
         </div>
         <h1 class="page-title">
-            <i class="fa-solid fa-brain text-primary" style="margin-right: 6px;"></i> AI Gateway & Model Routing Console
+            <i class="fa-solid fa-brain text-primary" style="margin-right: 6px;"></i> AI Gateway & Model Configuration
         </h1>
-        <p class="page-subtitle">Pusat kontrol multi-provider AI (OpenAI, Anthropic, Gemini, DeepSeek), routing model LLM, kuota token, dan paket top-up.</p>
+        <p class="page-subtitle">Pusat konfigurasi Base URL, Master API Key, kuota token master (tracking), daftar model AI, dan paket top-up.</p>
     </div>
     <div class="page-actions flex items-center gap-2" style="flex-wrap: wrap;">
-        <button type="button" class="btn btn-outline btn-sm" onclick="openPackageModal()">
-            <i class="fa-solid fa-plus"></i> Tambah Paket Top-Up
+        <button type="button" class="btn btn-primary btn-sm" onclick="openGatewayModal()">
+            <i class="fa-solid fa-sliders"></i> Konfigurasi AI Gateway
         </button>
-        <div class="badge badge-success flex items-center gap-2" style="padding: 6px 12px; font-weight: 700;">
-            <span style="width: 8px; height: 8px; background: currentColor; border-radius: 50%; display: inline-block;"></span>
-            AI Gateway Live
-        </div>
+        @if($providerConfig->is_active && $hasKey)
+            <div class="badge badge-success flex items-center gap-2" style="padding: 6px 12px; font-weight: 700;">
+                <span style="width: 8px; height: 8px; background: currentColor; border-radius: 50%; display: inline-block;"></span>
+                AI Gateway Active
+            </div>
+        @else
+            <div class="badge badge-warning flex items-center gap-2" style="padding: 6px 12px; font-weight: 700;">
+                <span style="width: 8px; height: 8px; background: currentColor; border-radius: 50%; display: inline-block;"></span>
+                AI Gateway Inactive / Unset
+            </div>
+        @endif
     </div>
 </div>
 
@@ -36,19 +43,39 @@
     <div class="alert alert-danger mb-4"><i class="fa-solid fa-triangle-exclamation"></i> {{ session('error') }}</div>
 @endif
 
-{{-- Monthly KPI Cards --}}
+{{-- Monthly & Master Token KPI Cards --}}
 <div class="kpi-grid">
     <div class="kpi-card" style="--kpi-color1: var(--primary); --kpi-color2: var(--accent);">
         <div class="kpi-header">
-            <span class="kpi-label">Token Digunakan Bulan Ini</span>
+            <span class="kpi-label">Token Terpakai (Bulan Ini)</span>
             <div class="kpi-icon" style="background: var(--primary-soft); color: var(--primary);">
                 <i class="fa-solid fa-microchip"></i>
             </div>
         </div>
         <div class="kpi-value">{{ number_format($monthlyUsage->total_tokens ?? 0) }}</div>
         <div class="kpi-trend">
-            <span class="trend-label">Akumulasi seluruh customer</span>
+            <span class="trend-label">Akumulasi bulan berjalan</span>
         </div>
+    </div>
+
+    <div class="kpi-card" style="--kpi-color1: var(--accent); --kpi-color2: var(--primary);">
+        <div class="kpi-header">
+            <span class="kpi-label">Sisa Kuota Master AI</span>
+            <div class="kpi-icon" style="background: var(--accent-soft); color: var(--accent);">
+                <i class="fa-solid fa-gauge-high"></i>
+            </div>
+        </div>
+        @if($masterQuota > 0)
+            <div class="kpi-value" style="color: var(--accent);">{{ number_format($masterRemaining) }}</div>
+            <div class="kpi-trend">
+                <span class="trend-label">Dari total kuota {{ number_format($masterQuota) }}</span>
+            </div>
+        @else
+            <div class="kpi-value" style="color: var(--accent);">Unlimited</div>
+            <div class="kpi-trend">
+                <span class="trend-label">Kuota master belum dibatasi</span>
+            </div>
+        @endif
     </div>
 
     <div class="kpi-card" style="--kpi-color1: var(--success); --kpi-color2: #059669;">
@@ -71,97 +98,218 @@
                 <i class="fa-solid fa-stopwatch"></i>
             </div>
         </div>
-        <div class="kpi-value" style="color: var(--warning);">{{ number_format($monthlyUsage->avg_latency ?? 0) }} ms</div>
+        <div class="kpi-value" style="color: var(--warning);">{{ number_format($monthlyUsage->avg_latency_ms ?? 0) }} ms</div>
         <div class="kpi-trend">
-            <span class="trend-label">Rata-rata waktu respon model</span>
-        </div>
-    </div>
-
-    <div class="kpi-card" style="--kpi-color1: var(--accent); --kpi-color2: var(--primary);">
-        <div class="kpi-header">
-            <span class="kpi-label">Estimasi Biaya Provider</span>
-            <div class="kpi-icon" style="background: var(--accent-soft); color: var(--accent);">
-                <i class="fa-solid fa-dollar-sign"></i>
-            </div>
-        </div>
-        <div class="kpi-value" style="color: var(--accent);">${{ number_format((float)($monthlyUsage->total_cost ?? 0), 4) }}</div>
-        <div class="kpi-trend">
-            <span class="trend-label">Bulan berjalan (USD)</span>
+            <span class="trend-label">Waktu respon gateway</span>
         </div>
     </div>
 </div>
 
-{{-- Section: AI Provider Settings & Cards --}}
+{{-- Section: Master AI Gateway Settings & Tracking --}}
 <div class="card mb-4">
     <div class="card-header flex justify-between items-center">
         <div class="card-title">
-            <i class="fa-solid fa-server" style="color: var(--primary); margin-right: 6px;"></i> Provider LLM Terintegrasi
+            <i class="fa-solid fa-server" style="color: var(--primary); margin-right: 6px;"></i> Master AI Gateway & Token Tracking
         </div>
-        <span class="text-xs text-muted">Koneksi API Master Provider (Terenkripsi AES-256)</span>
+        <span class="text-xs text-muted">OpenAI-Compatible Standard • Terenkripsi AES-256</span>
     </div>
     <div class="card-body">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
-            @php
-                $providerMeta = [
-                    'openai' => ['title' => 'OpenAI', 'icon' => 'fa-brands fa-openid', 'color' => '#10A37F', 'models' => 'GPT-4o, GPT-4o Mini, O1'],
-                    'anthropic' => ['title' => 'Anthropic Claude', 'icon' => 'fa-solid fa-brain', 'color' => '#D97706', 'models' => 'Claude 3.5 Sonnet, Claude 3.5 Haiku'],
-                    'gemini' => ['title' => 'Google Gemini', 'icon' => 'fa-brands fa-google', 'color' => '#4285F4', 'models' => 'Gemini 3.6 Flash, Gemini 2.5 Pro'],
-                    'deepseek' => ['title' => 'DeepSeek', 'icon' => 'fa-solid fa-compass', 'color' => '#0D9488', 'models' => 'DeepSeek-V3, DeepSeek-R1'],
-                ];
-            @endphp
-
-            @foreach($providers as $pKey => $pData)
-                @php $meta = $providerMeta[$pKey] ?? ['title' => ucfirst($pKey), 'icon' => 'fa-solid fa-robot', 'color' => 'var(--primary)', 'models' => 'Standard Models']; @endphp
-                <div class="card" style="border: 1px solid var(--border); box-shadow: none; display: flex; flex-direction: column; padding: 18px; border-radius: var(--radius-sm);">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-3">
-                            <div style="width: 38px; height: 38px; border-radius: 8px; background: var(--bg-secondary); color: {{ $meta['color'] }}; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 1px solid var(--border);">
-                                <i class="{{ $meta['icon'] }}"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-sm" style="color: var(--text);">{{ $meta['title'] }}</div>
-                                <div class="text-xs text-muted">{{ $meta['models'] }}</div>
-                            </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            {{-- Left: Endpoint & Authentication Info --}}
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid var(--border);">
+                            <i class="fa-solid fa-network-wired"></i>
                         </div>
-
-                        @if($pData['is_active'])
-                            <span class="badge badge-success" style="font-weight: 700;">AKTIF</span>
-                        @elseif($pData['is_configured'])
-                            <span class="badge badge-muted">NONAKTIF</span>
-                        @else
-                            <span class="badge badge-warning">BELUM DISET</span>
-                        @endif
+                        <div>
+                            <div class="font-bold text-sm" style="color: var(--text);">AI Gateway Endpoint</div>
+                            <div class="text-xs text-muted">Universal Chat Completion Routing</div>
+                        </div>
                     </div>
 
-                    <div class="text-xs text-muted mb-3 font-mono" style="word-break: break-all; margin-top: 8px;">
-                        Base URL: <code style="color: var(--text-2);">{{ $pData['base_url'] }}</code>
+                    @if($providerConfig->is_active && $hasKey)
+                        <span class="badge badge-success" style="font-weight: 700;">AKTIF</span>
+                    @elseif($providerConfig->is_active)
+                        <span class="badge badge-warning" style="font-weight: 700;">KEY BELUM DISET</span>
+                    @else
+                        <span class="badge badge-muted" style="font-weight: 700;">NONAKTIF</span>
+                    @endif
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold uppercase text-muted" style="display: block; margin-bottom: 4px;">Base URL Endpoint:</label>
+                    <div style="background: var(--bg); padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-family: monospace; font-size: 13px; color: var(--text); word-break: break-all;">
+                        {{ $providerConfig->base_url ?: 'Belum dikonfigurasi' }}
                     </div>
+                </div>
 
-                    <div class="flex items-center gap-2 mt-auto" style="flex-wrap: wrap; pt-2; border-top: 1px solid var(--border); padding-top: 12px;">
-                        <button type="button" class="btn btn-outline btn-xs" onclick="openProviderModal('{{ $pKey }}', '{{ $meta['title'] }}', '{{ $pData['base_url'] }}', {{ $pData['is_active'] ? 'true' : 'false' }})">
-                            <i class="fa-solid fa-gear"></i> Konfigurasi
-                        </button>
-
-                        @if($pData['is_configured'])
-                            <form action="{{ \Illuminate\Support\Facades\Route::has('admin.ai.providers.toggle') ? route('admin.ai.providers.toggle') : url('/admin/ai/providers/toggle') }}" method="POST" style="display: inline;">
-                                @csrf
-                                <input type="hidden" name="provider" value="{{ $pKey }}">
-                                <button type="submit" class="btn btn-ghost btn-xs" title="Toggle Status">
-                                    <i class="fa-solid {{ $pData['is_active'] ? 'fa-toggle-on text-success' : 'fa-toggle-off text-muted' }}" style="font-size: 14px;"></i>
-                                </button>
-                            </form>
-
-                            <form action="{{ \Illuminate\Support\Facades\Route::has('admin.ai.providers.test') ? route('admin.ai.providers.test') : url('/admin/ai/providers/test') }}" method="POST" style="display: inline;">
-                                @csrf
-                                <input type="hidden" name="provider" value="{{ $pKey }}">
-                                <button type="submit" class="btn btn-outline btn-xs" title="Test Connection Ping">
-                                    <i class="fa-solid fa-vial"></i> Test Ping
-                                </button>
-                            </form>
+                <div>
+                    <label class="text-xs font-bold uppercase text-muted" style="display: block; margin-bottom: 4px;">API Key Status:</label>
+                    <div class="flex items-center justify-between" style="background: var(--bg); padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                        <span class="font-mono text-xs" style="color: var(--text-2);">
+                            @if($hasKey)
+                                ●●●●●●●●●●●●●●●● (Tersimpan aman)
+                            @else
+                                <span class="text-danger font-semibold"><i class="fa-solid fa-circle-exclamation"></i> API Key belum diisi</span>
+                            @endif
+                        </span>
+                        @if($hasKey)
+                            <span class="badge badge-success" style="font-size: 10px;"><i class="fa-solid fa-lock"></i> Encrypted</span>
                         @endif
                     </div>
                 </div>
-            @endforeach
+
+                {{-- Master Token Tracking Bar --}}
+                <div style="background: var(--bg); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                    <div class="flex justify-between items-center text-xs font-semibold mb-1">
+                        <span style="color: var(--text);">
+                            <i class="fa-solid fa-chart-pie text-primary" style="margin-right: 4px;"></i> Tracking Kuota Token Master
+                        </span>
+                        @if($masterQuota > 0)
+                            <span class="font-mono text-muted">{{ number_format($allTimeTokensUsed) }} / {{ number_format($masterQuota) }} ({{ $masterPercentUsed }}%)</span>
+                        @else
+                            <span class="font-mono text-muted">{{ number_format($allTimeTokensUsed) }} Terpakai (Unlimited)</span>
+                        @endif
+                    </div>
+                    @if($masterQuota > 0)
+                        @php
+                            $barColor = $masterPercentUsed > 90 ? 'var(--danger)' : ($masterPercentUsed > 75 ? 'var(--warning)' : 'var(--success)');
+                        @endphp
+                        <div style="height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); margin-top: 6px;">
+                            <div style="height: 100%; width: {{ $masterPercentUsed }}%; background: {{ $barColor }}; border-radius: 4px; transition: width 0.4s ease;"></div>
+                        </div>
+                        <div class="flex justify-between items-center text-xs mt-1" style="font-size: 11px;">
+                            <span class="text-muted">Sisa: <strong style="color: {{ $barColor }};">{{ number_format($masterRemaining) }} Token</strong></span>
+                            <span class="text-muted">Terpakai: {{ $masterPercentUsed }}%</span>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="flex items-center gap-2 mt-auto" style="padding-top: 8px; border-top: 1px solid var(--border);">
+                    <button type="button" class="btn btn-primary btn-xs" onclick="openGatewayModal()">
+                        <i class="fa-solid fa-gear"></i> Konfigurasi Gateway & Kuota
+                    </button>
+
+                    <form action="{{ route('admin.ai.providers.toggle') }}" method="POST" style="display: inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-outline btn-xs" title="Toggle Status Gateway">
+                            <i class="fa-solid {{ $providerConfig->is_active ? 'fa-toggle-on text-success' : 'fa-toggle-off text-muted' }}" style="font-size: 14px; margin-right: 4px;"></i>
+                            {{ $providerConfig->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                        </button>
+                    </form>
+
+                    <button type="button" class="btn btn-outline btn-xs" onclick="openTestModal()">
+                        <i class="fa-solid fa-vial" style="color: var(--accent);"></i> Test Ping
+                    </button>
+                </div>
+            </div>
+
+            {{-- Right: Available Models List --}}
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-sm" style="color: var(--text);">
+                            <i class="fa-solid fa-cubes" style="color: var(--primary); margin-right: 4px;"></i> Model yang Disediakan (Endpoint Models)
+                        </div>
+                        <div class="text-xs text-muted">Model AI aktif yang dapat diakses melalui API Cooca</div>
+                    </div>
+                    <span class="badge badge-primary font-mono text-xs">{{ count($availableModels) }} Model</span>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; min-height: 120px; align-content: flex-start; background: var(--bg); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                    @forelse($availableModels as $model)
+                        <div style="background: var(--primary-soft); color: var(--primary); border: 1px solid var(--primary); padding: 6px 12px; border-radius: 6px; font-family: monospace; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-robot"></i> {{ $model }}
+                        </div>
+                    @empty
+                        <div class="text-muted text-xs" style="padding: 10px;">
+                            Belum ada model yang didaftarkan. Klik tombol "Konfigurasi AI Gateway" untuk mendaftarkan nama model.
+                        </div>
+                    @endforelse
+                </div>
+
+                <div class="text-xs text-muted">
+                    <i class="fa-solid fa-circle-info text-primary" style="margin-right: 4px;"></i>
+                    Model-model ini diteruskan langsung ke Base URL upstream Anda sesuai input admin.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Section: Subscription Plans AI Quotas --}}
+<div class="card mb-4">
+    <div class="card-header flex justify-between items-center">
+        <div class="card-title">
+            <i class="fa-solid fa-layer-group" style="color: var(--primary); margin-right: 6px;"></i> Konfigurasi Kuota AI Per Paket Langganan (SaaS Plans)
+        </div>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        <div class="data-table-wrap" style="border: none; border-radius: 0;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Paket Langganan</th>
+                        <th>Kuota Token Bulanan</th>
+                        <th>Rate Limit (RPM)</th>
+                        <th>Model yang Diizinkan</th>
+                        <th>Kebijakan Overage</th>
+                        <th style="text-align: right;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($plans as $plan)
+                        @php
+                            $cfg = $plan->aiPlanConfig;
+                            $allowed = $cfg ? ($cfg->allowed_models ?? []) : $availableModels;
+                            $monthlyQuota = $cfg ? $cfg->monthly_token_quota : 100000;
+                            $rpm = $cfg ? $cfg->requests_per_minute : 60;
+                            $overage = $cfg ? $cfg->overage_policy : 'hard_stop';
+                        @endphp
+                        <tr>
+                            <td>
+                                <div class="font-bold text-sm" style="color: var(--text);">{{ $plan->name }}</div>
+                                <div class="text-xs text-muted">Rp {{ number_format($plan->price, 0, ',', '.') }} / {{ $plan->billing_cycle ?? 'bulan' }}</div>
+                            </td>
+                            <td>
+                                <span class="font-mono font-bold text-sm" style="color: var(--primary);">
+                                    {{ number_format($monthlyQuota) }} Token
+                                </span>
+                                <div class="text-xs text-muted">per siklus billing</div>
+                            </td>
+                            <td>
+                                <span class="font-mono text-xs font-bold">{{ $rpm }} Req/Menit</span>
+                            </td>
+                            <td>
+                                <div class="flex items-center gap-1" style="flex-wrap: wrap; max-width: 320px;">
+                                    @foreach($allowed as $am)
+                                        <span class="badge badge-primary font-mono" style="font-size: 10px;">{{ $am }}</span>
+                                    @endforeach
+                                </div>
+                            </td>
+                            <td>
+                                @if($overage === 'hard_stop')
+                                    <span class="badge badge-danger" style="font-size: 10px;">HARD STOP (Tolak)</span>
+                                @else
+                                    <span class="badge badge-warning" style="font-size: 10px;">SOFT STOP (Notifikasi)</span>
+                                @endif
+                            </td>
+                            <td style="text-align: right;">
+                                <button type="button" class="btn btn-outline btn-xs" onclick='openPlanModal(@json($plan), @json($cfg), @json($availableModels))'>
+                                    <i class="fa-solid fa-sliders"></i> Atur Kuota
+                                </button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-muted" style="padding: 40px;">
+                                Belum ada data Subscription Plan.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -414,7 +562,7 @@
                     <tr>
                         <th>Waktu</th>
                         <th>Customer / Key</th>
-                        <th>Model LLM</th>
+                        <th>Model AI</th>
                         <th>Prompt Tokens</th>
                         <th>Completion</th>
                         <th>Total Tokens</th>
@@ -467,36 +615,138 @@
     </div>
 </div>
 
-{{-- Modal: Provider Config --}}
-<div id="provider-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-    <div class="card" style="max-width: 480px; width: 90%; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-lg); border-radius: var(--radius-md);">
+{{-- Modal: Unified AI Gateway Configuration & Master Quota --}}
+<div id="gateway-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div class="card" style="max-width: 560px; width: 92%; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-lg); border-radius: var(--radius-md); max-height: 90vh; overflow-y: auto;">
         <div class="card-header flex justify-between items-center">
-            <div class="card-title" id="modal-provider-title">Konfigurasi Provider</div>
-            <button type="button" class="btn btn-ghost btn-xs" onclick="closeProviderModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="card-title">
+                <i class="fa-solid fa-sliders text-primary" style="margin-right: 6px;"></i> Konfigurasi Master AI Gateway & Kuota
+            </div>
+            <button type="button" class="btn btn-ghost btn-xs" onclick="closeGatewayModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <form action="{{ \Illuminate\Support\Facades\Route::has('admin.ai.providers.save') ? route('admin.ai.providers.save') : url('/admin/ai/providers/save') }}" method="POST">
+        <form action="{{ route('admin.ai.providers.save') }}" method="POST">
             @csrf
-            <input type="hidden" name="provider" id="modal-provider-key" value="">
-            <div class="card-body" style="display: flex; flex-direction: column; gap: 14px; padding: 20px;">
+            <div class="card-body" style="display: flex; flex-direction: column; gap: 16px; padding: 20px;">
                 <div class="form-group">
-                    <label class="form-label text-xs font-bold uppercase">API Key (Rahasia)</label>
-                    <input type="password" name="api_key" class="form-input" placeholder="Masukkan Secret API Key (Kosongkan bila tidak diubah)...">
-                    <small class="text-muted text-xs">Tersimpan dengan enkripsi standar AES-256 di database.</small>
+                    <label class="form-label text-xs font-bold uppercase">Base URL Endpoint *</label>
+                    <input type="url" name="base_url" id="modal-gateway-url" required value="{{ $providerConfig->base_url ?? 'https://r4g77gv.abc-tunnel.us/v1' }}" placeholder="https://r4g77gv.abc-tunnel.us/v1" class="form-input font-mono">
+                    <small class="text-muted text-xs" style="margin-top: 4px; display: block;">
+                        Base URL OpenAI-compatible master AI provider Anda.
+                    </small>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label text-xs font-bold uppercase">Base URL Endpoint</label>
-                    <input type="url" name="base_url" id="modal-provider-url" required class="form-input">
+                    <label class="form-label text-xs font-bold uppercase">Master API Key</label>
+                    <div style="position: relative;">
+                        <input type="password" name="api_key" id="modal-gateway-key" class="form-input font-mono" placeholder="{{ $hasKey ? '●●●●●●●● (Kosongkan bila tidak ingin mengubah)' : 'sk-...' }}">
+                        <button type="button" onclick="togglePasswordVisibility('modal-gateway-key')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer;">
+                            <i class="fa-solid fa-eye" id="eye-icon-modal-gateway-key"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted text-xs" style="margin-top: 4px; display: block;">
+                        Kunci API disimpan dengan enkripsi AES-256 di database.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label text-xs font-bold uppercase">Total Kuota Token Master (Tracking Limit)</label>
+                    <input type="number" name="total_token_quota" id="modal-gateway-quota" step="100000" min="0" value="{{ $providerConfig->total_token_quota ?? 0 }}" placeholder="Contoh: 10000000 (Isi 0 untuk Unlimited)" class="form-input font-mono">
+                    <small class="text-muted text-xs" style="margin-top: 4px; display: block;">
+                        Total kuota token yang Anda miliki pada akun provider master untuk memantau sisa token (isi 0 jika unlimited).
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label text-xs font-bold uppercase">Daftar Model yang Disediakan *</label>
+                    <textarea name="models" id="modal-gateway-models" rows="5" class="form-textarea font-mono" placeholder="cx/gpt-5.5-xhigh&#10;cx/gpt-5.5&#10;ag/claude-sonnet-4-6&#10;ag/claude-opus-4-6-thinking&#10;ag/gemini-pro-agent">{{ implode("\n", $availableModels) }}</textarea>
+                    <small class="text-muted text-xs" style="margin-top: 4px; display: block;">
+                        Tulis 1 nama model per baris (atau dipisahkan koma). Model-model ini yang akan tersedia untuk paket dan API request customer.
+                    </small>
                 </div>
 
                 <div class="form-group flex items-center gap-2">
-                    <input type="checkbox" name="is_active" id="modal-provider-active" value="1" style="cursor: pointer;">
-                    <label for="modal-provider-active" class="text-sm font-semibold" style="cursor: pointer; color: var(--text);">Aktifkan Provider Ini</label>
+                    <input type="checkbox" name="is_active" id="modal-gateway-active" value="1" {{ $providerConfig->is_active ? 'checked' : '' }} style="cursor: pointer;">
+                    <label for="modal-gateway-active" class="text-sm font-semibold" style="cursor: pointer; color: var(--text);">Aktifkan AI Gateway Service</label>
                 </div>
             </div>
             <div class="card-footer flex justify-end gap-2" style="padding: 14px 20px;">
-                <button type="button" class="btn btn-ghost btn-sm" onclick="closeProviderModal()">Batal</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="closeGatewayModal()">Batal</button>
                 <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-floppy-disk"></i> Simpan Konfigurasi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Modal: Test Ping Connection --}}
+<div id="test-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div class="card" style="max-width: 440px; width: 90%; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-lg); border-radius: var(--radius-md);">
+        <div class="card-header flex justify-between items-center">
+            <div class="card-title"><i class="fa-solid fa-vial text-accent" style="margin-right: 6px;"></i> Test Ping Koneksi Gateway</div>
+            <button type="button" class="btn btn-ghost btn-xs" onclick="closeTestModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form action="{{ route('admin.ai.providers.test') }}" method="POST">
+            @csrf
+            <div class="card-body" style="display: flex; flex-direction: column; gap: 14px; padding: 20px;">
+                <p class="text-xs text-muted">
+                    Sistem akan mengirimkan request ringan (ping) ke Base URL dengan model yang dipilih untuk memvalidasi otentikasi API Key dan respon endpoint.
+                </p>
+
+                <div class="form-group">
+                    <label class="form-label text-xs font-bold uppercase">Pilih Model untuk Test</label>
+                    <select name="model" class="form-select font-mono text-sm" required>
+                        @foreach($availableModels as $m)
+                            <option value="{{ $m }}">{{ $m }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="card-footer flex justify-end gap-2" style="padding: 14px 20px;">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="closeTestModal()">Batal</button>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-paper-plane"></i> Kirim Test Ping</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Modal: Plan AI Config --}}
+<div id="plan-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div class="card" style="max-width: 500px; width: 90%; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-lg); border-radius: var(--radius-md); max-height: 90vh; overflow-y: auto;">
+        <div class="card-header flex justify-between items-center">
+            <div class="card-title" id="modal-plan-title">Atur Kuota AI Plan</div>
+            <button type="button" class="btn btn-ghost btn-xs" onclick="closePlanModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form action="{{ route('admin.ai.plans.save') }}" method="POST">
+            @csrf
+            <input type="hidden" name="subscription_plan_id" id="modal-plan-id" value="">
+            <div class="card-body" style="display: flex; flex-direction: column; gap: 14px; padding: 20px;">
+                <div class="form-group">
+                    <label class="form-label text-xs font-bold uppercase">Kuota Token Bulanan *</label>
+                    <input type="number" name="monthly_token_quota" id="modal-plan-quota" required step="5000" min="1000" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label text-xs font-bold uppercase">Rate Limit (Requests per Minute) *</label>
+                    <input type="number" name="requests_per_minute" id="modal-plan-rpm" required min="5" max="600" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label text-xs font-bold uppercase">Kebijakan Jika Kuota Habis (Overage Policy)</label>
+                    <select name="overage_policy" id="modal-plan-overage" class="form-select">
+                        <option value="hard_stop">Hard Stop (Tolak request dengan status 429)</option>
+                        <option value="soft_stop">Soft Stop (Hanya beri notifikasi / toleransi)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label text-xs font-bold uppercase">Model yang Diizinkan untuk Paket Ini *</label>
+                    <div id="plan-models-checkboxes" style="display: flex; flex-direction: column; gap: 6px; background: var(--bg-secondary); padding: 12px; border-radius: var(--radius-sm); max-height: 160px; overflow-y: auto; border: 1px solid var(--border);">
+                        <!-- Dynamic checkboxes injected by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer flex justify-end gap-2" style="padding: 14px 20px;">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="closePlanModal()">Batal</button>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-floppy-disk"></i> Simpan Kuota Plan</button>
             </div>
         </form>
     </div>
@@ -593,18 +843,63 @@
 
 @push('scripts')
 <script>
-function openProviderModal(key, title, url, isActive) {
-    document.getElementById('modal-provider-key').value = key;
-    document.getElementById('modal-provider-title').innerText = 'Konfigurasi ' + title;
-    document.getElementById('modal-provider-url').value = url;
-    document.getElementById('modal-provider-active').checked = isActive;
-    
-    const modal = document.getElementById('provider-modal');
-    modal.style.display = 'flex';
+function openGatewayModal() {
+    document.getElementById('gateway-modal').style.display = 'flex';
 }
 
-function closeProviderModal() {
-    document.getElementById('provider-modal').style.display = 'none';
+function closeGatewayModal() {
+    document.getElementById('gateway-modal').style.display = 'none';
+}
+
+function openTestModal() {
+    document.getElementById('test-modal').style.display = 'flex';
+}
+
+function closeTestModal() {
+    document.getElementById('test-modal').style.display = 'none';
+}
+
+function togglePasswordVisibility(id) {
+    const input = document.getElementById(id);
+    const icon = document.getElementById('eye-icon-' + id);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function openPlanModal(plan, cfg, allModels) {
+    document.getElementById('modal-plan-title').innerText = 'Atur Kuota AI: ' + plan.name;
+    document.getElementById('modal-plan-id').value = plan.id;
+    document.getElementById('modal-plan-quota').value = cfg ? cfg.monthly_token_quota : 100000;
+    document.getElementById('modal-plan-rpm').value = cfg ? cfg.requests_per_minute : 60;
+    document.getElementById('modal-plan-overage').value = cfg ? cfg.overage_policy : 'hard_stop';
+
+    const currentAllowed = cfg && cfg.allowed_models ? cfg.allowed_models : (allModels || []);
+    const container = document.getElementById('plan-models-checkboxes');
+    container.innerHTML = '';
+
+    (allModels || []).forEach(m => {
+        const isChecked = currentAllowed.includes(m);
+        const div = document.createElement('div');
+        div.className = 'flex items-center gap-2';
+        div.innerHTML = `
+            <input type="checkbox" name="allowed_models[]" value="${m}" id="model_chk_${m}" ${isChecked ? 'checked' : ''} style="cursor: pointer;">
+            <label for="model_chk_${m}" class="font-mono text-xs" style="cursor: pointer; color: var(--text);">${m}</label>
+        `;
+        container.appendChild(div);
+    });
+
+    document.getElementById('plan-modal').style.display = 'flex';
+}
+
+function closePlanModal() {
+    document.getElementById('plan-modal').style.display = 'none';
 }
 
 function openBonusModal(cycleId, customerName) {

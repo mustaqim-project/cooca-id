@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\Ai;
 
 use App\Http\Controllers\Controller;
+use App\Models\AiProviderConfig;
 use App\Services\Ai\AiGatewayService;
 use App\Services\Ai\AiQuotaService;
 use Illuminate\Http\Request;
@@ -32,53 +33,47 @@ final class ChatCompletionController extends Controller
         $result = $this->gateway->handleChatCompletion($apiKey, $license, $validated);
 
         return response()->json($result['payload'], $result['status'])
-            ->header('X-Cooca-Tokens-Used', (string) $result['tokens_used_this_cycle'])
-            ->header('X-Cooca-Tokens-Remaining', (string) $result['tokens_remaining']);
+            ->header('X-Cooca-Model', (string) $validated['model'])
+            ->header('X-Cooca-Tokens-Used', (string) ($result['tokens_used_this_cycle'] ?? 0))
+            ->header('X-Cooca-Tokens-Remaining', (string) ($result['tokens_remaining'] ?? 0));
     }
 
     public function models(Request $request): JsonResponse
     {
         $license = $request->attributes->get('ai_license');
-        $planConfig = $this->quotaService->planConfigFor($license);
 
-        $modelDefinitions = [
-            'gpt-4o' => ['name' => 'GPT-4o', 'provider' => 'OpenAI', 'context' => '128k', 'description' => 'Flagship multi-modal model for high-complexity tasks.'],
-            'gpt-4o-mini' => ['name' => 'GPT-4o Mini', 'provider' => 'OpenAI', 'context' => '128k', 'description' => 'Fast, lightweight intelligence for everyday tasks.'],
-            'gemini-3.6-flash' => ['name' => 'Gemini 3.6 Flash', 'provider' => 'Google', 'context' => '1M', 'description' => 'Ultra high-speed, latest generation multimodal model for rapid workflows.'],
-            'gemini-2.5-pro' => ['name' => 'Gemini 2.5 Pro', 'provider' => 'Google', 'context' => '2M', 'description' => 'Massive context model for deep reasoning and code generation.'],
-            'gemini-flash-latest' => ['name' => 'Gemini Flash Latest', 'provider' => 'Google', 'context' => '1M', 'description' => 'Always points to the latest Gemini Flash release.'],
-            'claude-3-5-sonnet-20241022' => ['name' => 'Claude 3.5 Sonnet', 'provider' => 'Anthropic', 'context' => '200k', 'description' => 'State-of-the-art coding, analysis, and writing.'],
-            'claude-3-5-haiku-20241022' => ['name' => 'Claude 3.5 Haiku', 'provider' => 'Anthropic', 'context' => '200k', 'description' => 'Ultra fast performance at a fraction of the cost.'],
-            'deepseek-chat' => ['name' => 'DeepSeek-V3', 'provider' => 'DeepSeek', 'context' => '64k', 'description' => 'Powerful mixture-of-experts model for general reasoning.'],
-            'deepseek-reasoner' => ['name' => 'DeepSeek-R1', 'provider' => 'DeepSeek', 'context' => '64k', 'description' => 'Advanced chain-of-thought reasoning and mathematics.'],
-        ];
+        $providerConfig = AiProviderConfig::first();
+        $configuredModels = $providerConfig ? $providerConfig->getModelsList() : ['gpt-4o-mini', 'gpt-4o'];
+
+        if ($license) {
+            $planConfig = $this->quotaService->planConfigFor($license);
+            $allowed = $planConfig->allowed_models ?? [];
+            if (!empty($allowed)) {
+                $intersect = array_values(array_intersect($configuredModels, $allowed));
+                $configuredModels = !empty($intersect) ? $intersect : $allowed;
+            }
+        }
 
         $availableModels = [];
-        $allowed = $planConfig->allowed_models ?? [];
-
-        foreach ($allowed as $modelKey) {
-            $def = $modelDefinitions[$modelKey] ?? [
-                'name' => $modelKey,
-                'provider' => 'AI Provider',
-                'context' => '32k',
-                'description' => 'General purpose AI model',
-            ];
-
+        foreach ($configuredModels as $modelKey) {
             $availableModels[] = [
-                'id' => $modelKey,
-                'object' => 'model',
-                'created' => 1700000000,
-                'owned_by' => strtolower($def['provider']),
-                'name' => $def['name'],
-                'provider' => $def['provider'],
-                'context_window' => $def['context'],
-                'description' => $def['description'],
+                'id'             => $modelKey,
+                'object'         => 'model',
+                'created'        => 1700000000,
+                'owned_by'       => 'cooca',
+                'name'           => $modelKey,
+                'provider'       => 'Cooca AI Gateway',
+                'context_window' => '128k',
+                'description'    => "Model {$modelKey} via Cooca AI Gateway",
+                'permission'     => [],
+                'root'           => $modelKey,
+                'parent'         => null,
             ];
         }
 
         return response()->json([
             'object' => 'list',
-            'data' => $availableModels,
+            'data'   => $availableModels,
         ]);
     }
 
@@ -89,16 +84,17 @@ final class ChatCompletionController extends Controller
         $cycle = $this->quotaService->currentCycleFor($license);
 
         return response()->json([
-            'license_id' => $license->id,
-            'plan_id' => $license->subscription_plan_id,
-            'cycle_start' => $cycle->cycle_start?->toIso8601String(),
-            'cycle_end' => $cycle->cycle_end?->toIso8601String(),
-            'token_quota' => $cycle->token_quota,
-            'tokens_used' => $cycle->tokens_used,
-            'tokens_remaining' => max(0, $cycle->token_quota - $cycle->tokens_used),
-            'percent_used' => $cycle->token_quota > 0 ? round(($cycle->tokens_used / $cycle->token_quota) * 100, 2) : 0,
-            'overage_policy' => $planConfig->overage_policy ?? 'hard_stop',
+            'license_id'          => $license->id,
+            'plan_id'             => $license->subscription_plan_id,
+            'cycle_start'         => $cycle->cycle_start?->toIso8601String(),
+            'cycle_end'           => $cycle->cycle_end?->toIso8601String(),
+            'token_quota'         => $cycle->token_quota,
+            'tokens_used'         => $cycle->tokens_used,
+            'tokens_remaining'    => max(0, $cycle->token_quota - $cycle->tokens_used),
+            'percent_used'        => $cycle->token_quota > 0 ? round(($cycle->tokens_used / $cycle->token_quota) * 100, 2) : 0,
+            'overage_policy'      => $planConfig->overage_policy ?? 'hard_stop',
             'requests_per_minute' => $planConfig->requests_per_minute ?? 60,
+            'allowed_models'      => $planConfig->allowed_models ?? [],
         ]);
     }
 }
