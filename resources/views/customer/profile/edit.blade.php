@@ -14,9 +14,9 @@
 @php $customer = auth('customer')->user(); @endphp
 
 @if(!$customer->isCompanyProfileComplete())
-<div class="alert alert-warning mb-4" style="display:flex;align-items:center;justify-content:between;gap:12px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#b45309;padding:12px 16px;border-radius:var(--radius-md);margin-bottom:20px;">
-    <div style="display:flex;align-items:center;gap:10px;">
-        <i class="fa-solid fa-triangle-exclamation" style="font-size:18px;"></i>
+<div class="alert alert-warning mb-4 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+        <i class="fa-solid fa-triangle-exclamation"></i>
         <span class="text-sm font-medium">Profil Perusahaan Anda belum lengkap! Silakan lengkapi informasi perusahaan Anda agar dapat berlangganan produk secara lancar.</span>
     </div>
     <a href="{{ route('customer.company-profile.edit') }}" class="btn btn-warning btn-sm" style="flex-shrink:0;">Lengkapi Sekarang</a>

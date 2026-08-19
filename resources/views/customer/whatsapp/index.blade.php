@@ -20,7 +20,7 @@
 </div>
 
 @if(session('success'))
-    <div class="alert alert-success" style="margin-bottom: 20px; padding: 12px 16px; background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10B981; border-radius: 6px; color: #047857; font-size: 14px;">
+    <div class="alert alert-success mb-4">
         <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
     </div>
 @endif
@@ -50,19 +50,19 @@
                                         <i class="fa-brands fa-whatsapp"></i>
                                     </div>
                                     <div>
-                                        <div style="font-size: 14px;">{{ $device->name }}</div>
-                                        <div style="font-size: 11px; color: #94A3B8;">Created: {{ $device->created_at->format('d M Y, H:i') }}</div>
+                                        <div style="font-size: 14px; font-weight: 700; color: var(--text);">{{ $device->name }}</div>
+                                        <div class="text-xs text-muted">Created: {{ $device->created_at->format('d M Y, H:i') }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <code style="font-size: 12px; color: var(--primary); background: rgba(79, 70, 229, 0.08); padding: 3px 8px; border-radius: 4px;">{{ $device->session_id }}</code>
+                                <code>{{ $device->session_id }}</code>
                             </td>
                             <td>
                                 @if($device->phone_number)
-                                    <span class="font-semibold" style="color: #334155;">+{{ $device->phone_number }}</span>
+                                    <span class="font-semibold text-sm" style="color: var(--text);">+{{ $device->phone_number }}</span>
                                 @else
-                                    <span class="text-muted">-</span>
+                                    <span class="text-muted text-sm">—</span>
                                 @endif
                             </td>
                             <td>
@@ -87,16 +87,15 @@
                                         </button>
                                     </form>
                                 </div>
-
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="5">
-                                <div class="empty-state" style="padding: 40px; text-align: center;">
-                                    <div class="empty-state-icon" style="font-size: 40px; margin-bottom: 12px;">📱</div>
-                                    <div class="empty-state-title" style="font-size: 16px; font-weight: 700; color: #334155;">Belum Ada WhatsApp API Device</div>
-                                    <p style="font-size: 13px; color: #94A3B8; margin-top: 4px;">Klik tombol <strong style="color: var(--primary);">Generate WA API Baru</strong> di atas untuk menghubungkan akun WhatsApp Anda.</p>
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">📱</div>
+                                    <div class="empty-state-title">Belum Ada WhatsApp API Device</div>
+                                    <p class="empty-state-text">Klik tombol <strong style="color: var(--primary);">Generate WA API Baru</strong> di atas untuk menghubungkan akun WhatsApp Anda.</p>
                                 </div>
                             </td>
                         </tr>
@@ -108,26 +107,28 @@
 </div>
 
 <!-- Modal Create Device -->
-<div id="modalCreate" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 16px;">
-    <div style="background: white; border-radius: 16px; max-width: 480px; width: 100%; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid #E2E8F0;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-            <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #1E293B;">
-                <i class="fa-brands fa-whatsapp" style="color: #25D366; margin-right: 6px;"></i> Generate WA API Device
+<div id="modalCreate" class="portal-modal-backdrop" style="display: none;">
+    <div class="portal-modal">
+        <div class="portal-modal-header">
+            <h3 class="portal-modal-title">
+                <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> Generate WA API Device
             </h3>
-            <button type="button" onclick="document.getElementById('modalCreate').style.display='none'" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #64748B;">&times;</button>
+            <button type="button" onclick="document.getElementById('modalCreate').style.display='none'" class="portal-modal-close">&times;</button>
         </div>
-        <form action="{{ route('customer.whatsapp-devices.store') }}" method="POST" style="display: flex; flex-direction: column; gap: 16px;">
+        <form action="{{ route('customer.whatsapp-devices.store') }}" method="POST">
             @csrf
-            <div>
-                <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px;">Nama Device / Label *</label>
-                <input type="text" name="name" required placeholder="Contoh: Toko Saya / CS Customer" style="width: 100%; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+            <div class="portal-modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="form-group mb-0">
+                    <label class="form-label">Nama Device / Label <span class="text-danger">*</span></label>
+                    <input type="text" name="name" required placeholder="Contoh: Toko Saya / CS Customer" class="form-input">
+                </div>
+                <div class="form-group mb-0">
+                    <label class="form-label">Webhook URL (Opsional)</label>
+                    <input type="url" name="webhook_url" placeholder="https://tokoanda.com/api/wa/incoming" class="form-input">
+                    <small class="form-hint">URL untuk menerima callback pesan masuk.</small>
+                </div>
             </div>
-            <div>
-                <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px;">Webhook URL (Opsional)</label>
-                <input type="url" name="webhook_url" placeholder="https://tokoanda.com/api/wa/incoming" style="width: 100%; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
-                <small style="color: #94A3B8; font-size: 11px; margin-top: 4px; display: block;">URL untuk menerima callback pesan masuk.</small>
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px;">
+            <div class="portal-modal-footer">
                 <button type="button" onclick="document.getElementById('modalCreate').style.display='none'" class="btn btn-ghost">Batal</button>
                 <button type="submit" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i> Buat Device

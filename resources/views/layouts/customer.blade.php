@@ -29,6 +29,16 @@
 
     {{-- Customer Portal CSS --}}
     <link rel="stylesheet" href="{{ asset('css/customer.css') }}">
+    <script>
+        (function() {
+            try {
+                const saved = localStorage.getItem('cooca-customer-theme');
+                const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const theme = saved || (systemDark ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch(e) {}
+        })();
+    </script>
     @stack('styles')
     @yield('styles')
 </head>
@@ -325,21 +335,41 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // ── Theme Toggle ──
+    // ── Theme Toggle & OS Sync ──
     const html       = document.documentElement;
     const themeBtn   = document.getElementById('themeToggle');
     const themeIcon  = document.getElementById('themeIcon');
-    const savedTheme = localStorage.getItem('cooca-customer-theme') || 'light';
-    html.setAttribute('data-theme', savedTheme);
-    themeIcon.className = savedTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+
+    function syncThemeUI(theme) {
+        if (themeIcon) {
+            themeIcon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            if (themeBtn) {
+                themeBtn.setAttribute('title', theme === 'dark' ? 'Ganti ke Light Mode' : 'Ganti ke Dark Mode');
+            }
+        }
+    }
+
+    const currentTheme = html.getAttribute('data-theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    html.setAttribute('data-theme', currentTheme);
+    syncThemeUI(currentTheme);
 
     themeBtn?.addEventListener('click', () => {
-        const current = html.getAttribute('data-theme');
-        const next    = current === 'dark' ? 'light' : 'dark';
+        const active = html.getAttribute('data-theme');
+        const next   = active === 'dark' ? 'light' : 'dark';
         html.setAttribute('data-theme', next);
         localStorage.setItem('cooca-customer-theme', next);
-        themeIcon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        syncThemeUI(next);
     });
+
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('cooca-customer-theme')) {
+                const sysTheme = e.matches ? 'dark' : 'light';
+                html.setAttribute('data-theme', sysTheme);
+                syncThemeUI(sysTheme);
+            }
+        });
+    }
 
     // ── Sidebar Collapse ──
     const sidebar     = document.getElementById('portalSidebar');

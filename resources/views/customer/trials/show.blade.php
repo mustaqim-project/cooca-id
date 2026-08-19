@@ -42,7 +42,7 @@
                 @if($trial->notes)
                 <div class="mt-4">
                     <div class="text-xs font-bold text-muted mb-1">Notes:</div>
-                    <div class="text-xs text-muted background:var(--bg) padding:10px;border-radius:6px;">{{ $trial->notes }}</div>
+                    <div class="text-xs text-muted" style="background:var(--bg-secondary);padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);">{{ $trial->notes }}</div>
                 </div>
                 @endif
             </div>

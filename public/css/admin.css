@@ -1348,3 +1348,129 @@ ul, ol { list-style: none; }
 body::-webkit-scrollbar { width: 6px; }
 body::-webkit-scrollbar-track { background: transparent; }
 body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ─── PAGINATION DESIGN SYSTEM (LIGHT & DARK MODE) ─── */
+.portal-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+}
+
+.portal-pagination.simple {
+  justify-content: center;
+}
+
+.portal-pagination-info {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.portal-pagination-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+}
+
+.portal-page-item {
+  display: inline-flex;
+}
+
+.portal-page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: var(--transition);
+  user-select: none;
+  gap: 6px;
+}
+
+.portal-page-link i {
+  font-size: 11px;
+}
+
+.portal-page-item:not(.disabled):not(.active) .portal-page-link:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.portal-page-item.active .portal-page-link {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+  cursor: default;
+}
+
+.portal-page-item.disabled .portal-page-link {
+  color: var(--text-faint);
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.portal-page-link.dots {
+  border: none;
+  background: transparent;
+  cursor: default;
+  min-width: 24px;
+}
+
+/* Fallback & compatibility for standard Laravel tailwind pagination elements */
+nav[role="navigation"] svg.w-5.h-5 {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+
+/* Card footer pagination wrapper */
+.card-footer:has(.portal-pagination),
+.card-footer:has(nav[role="navigation"]) {
+  padding: 0;
+  background: var(--card);
+}
+
+@media (max-width: 640px) {
+  .portal-pagination {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+  
+  .portal-pagination-info {
+    font-size: 12px;
+  }
+  
+  .portal-page-link {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+}
+

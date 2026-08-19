@@ -54,7 +54,7 @@
         </div>
 
         @if($invoice->status === 'paid')
-            <div class="alert alert-success" style="text-align:center;padding:15px;background:#def7ec;color:#03543f;border-radius:var(--radius);font-weight:bold;">
+            <div class="alert alert-success" style="justify-content:center;font-weight:bold;">
                 <i class="fa-solid fa-circle-check"></i> Pembayaran Lunas
             </div>
         @else

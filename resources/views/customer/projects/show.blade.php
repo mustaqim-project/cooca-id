@@ -66,13 +66,13 @@
     </div>
     <div class="card-body">
         @if(session('success'))
-            <div class="alert alert-success" style="background:#def7ec;color:#03543f;padding:10px;border-radius:var(--radius);margin-bottom:15px;font-size:13px;font-weight:bold;">
-                {{ session('success') }}
+            <div class="alert alert-success mb-4">
+                <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
             </div>
         @endif
         @if(session('error'))
-            <div class="alert alert-danger" style="background:#fde8e8;color:#9b1c1c;padding:10px;border-radius:var(--radius);margin-bottom:15px;font-size:13px;font-weight:bold;">
-                {{ session('error') }}
+            <div class="alert alert-danger mb-4">
+                <i class="fa-solid fa-circle-xmark"></i> {{ session('error') }}
             </div>
         @endif
 

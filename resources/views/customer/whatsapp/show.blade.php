@@ -3,8 +3,8 @@
 @section('title', 'Detail WA Device - ' . $device->name)
 
 @section('breadcrumb')
-    <a href="{{ route('customer.whatsapp-devices.index') }}">WhatsApp API</a>
-    <span class="crumb-separator">/</span>
+    <a href="{{ route('customer.whatsapp-devices.index') }}" class="crumb-link">WhatsApp API</a>
+    <span class="crumb-sep"><i class="fa-solid fa-chevron-right" style="font-size:9px;"></i></span>
     <span class="crumb-current">{{ $device->name }}</span>
 @endsection
 
@@ -15,7 +15,7 @@
 <div class="page-header">
     <div>
         <h1 class="page-title"><i class="fa-brands fa-whatsapp" style="color:#25D366;margin-right:10px;"></i>{{ $device->name }}</h1>
-        <p class="page-subtitle">Session ID: <code style="font-family:monospace;color:var(--primary);">{{ $device->session_id }}</code></p>
+        <p class="page-subtitle">Session ID: <code>{{ $device->session_id }}</code></p>
     </div>
     <div class="page-actions">
         <a href="{{ route('customer.whatsapp-devices.index') }}" class="btn btn-outline">
@@ -28,13 +28,13 @@
 </div>
 
 @if(session('success'))
-    <div class="alert alert-success" style="margin-bottom: 20px; padding: 12px 16px; background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10B981; border-radius: 6px; color: #047857; font-size: 14px;">
+    <div class="alert alert-success mb-4">
         <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
     </div>
 @endif
 
 @if(session('error'))
-    <div class="alert alert-danger" style="margin-bottom: 20px; padding: 12px 16px; background: rgba(239, 68, 68, 0.1); border-left: 4px solid #EF4444; border-radius: 6px; color: #B91C1C; font-size: 14px;">
+    <div class="alert alert-danger mb-4">
         <i class="fa-solid fa-triangle-exclamation"></i> {{ session('error') }}
     </div>
 @endif
@@ -48,24 +48,24 @@
         <div class="card-body" style="padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center;">
             <div id="qrCodeContainer" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                 @if($device->status === 'connected')
-                    <div style="margin: 20px 0; padding: 20px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; width: 100%; box-sizing: border-box;">
-                        <div style="width: 56px; height: 56px; border-radius: 50%; background: #10B981; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 12px auto;">
+                    <div style="margin: 20px 0; padding: 20px; background: var(--success-soft); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; width: 100%; box-sizing: border-box;">
+                        <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--success); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 12px auto;">
                             <i class="fa-solid fa-check"></i>
                         </div>
-                        <div style="font-weight: 700; color: #047857; font-size: 16px;">WhatsApp Terhubung!</div>
-                        <div style="font-size: 13px; color: #475569; margin-top: 4px;">Nomor: {{ $device->phone_number ? '+'.$device->phone_number : 'Aktif' }}</div>
-                        <p style="font-size: 11px; color: #10B981; margin-top: 8px; font-weight: 600;">Kredensial API & Fitur Uji Coba Telah Aktif di Sebelah Kanan</p>
+                        <div style="font-weight: 700; color: var(--success); font-size: 16px;">WhatsApp Terhubung!</div>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Nomor: <strong style="color:var(--text);">{{ $device->phone_number ? '+'.$device->phone_number : 'Aktif' }}</strong></div>
+                        <p style="font-size: 11.5px; color: var(--success); margin-top: 8px; font-weight: 600;">Kredensial API & Fitur Uji Coba Telah Aktif di Sebelah Kanan</p>
                     </div>
                 @elseif($qrCodeDataUrl || $device->qr_code)
-                    <div style="background: white; padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                        <img id="qrImageElement" src="{{ $device->qr_code ?: $qrCodeDataUrl }}" alt="Scan QR Code" style="width: 220px; height: 220px; display: block;">
+                    <div style="background: #ffffff; padding: 14px; border-radius: 12px; border: 1px solid var(--border); margin: 16px 0; box-shadow: var(--shadow);">
+                        <img id="qrImageElement" src="{{ $device->qr_code ?: $qrCodeDataUrl }}" alt="Scan QR Code" style="width: 220px; height: 220px; display: block; margin: 0 auto;">
                     </div>
-                    <p style="font-size: 12px; color: #64748B; margin: 0;">Buka WhatsApp di HP &gt; Perangkat Tertaut &gt; Tautkan Perangkat</p>
-                    <p style="font-size: 11px; color: var(--primary); margin-top: 6px; font-weight: 500;">
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 0;">Buka WhatsApp di HP &gt; Perangkat Tertaut &gt; Tautkan Perangkat</p>
+                    <p style="font-size: 11.5px; color: var(--primary); margin-top: 6px; font-weight: 600;">
                         <i class="fa-solid fa-spinner fa-spin" style="margin-right: 4px;"></i> Memantau hasil scan barcode secara realtime...
                     </p>
                 @else
-                    <div style="margin: 30px 0; color: #94A3B8;">
+                    <div style="margin: 30px 0; color: var(--text-muted);">
                         <i class="fa-solid fa-spinner fa-spin" style="font-size: 28px; margin-bottom: 8px;"></i>
                         <p style="margin: 0; font-size: 13px;">Memuat Barcode QR...</p>
                     </div>
@@ -86,19 +86,19 @@
                 <div class="card-title"><i class="fa-solid fa-key" style="color:var(--primary);margin-right:6px;"></i> Kredensial WhatsApp API (Gunakan di ERP / Booking)</div>
             </div>
             <div class="card-body" style="padding: 24px;">
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 12px; font-weight: 600; color: #64748B; margin-bottom: 6px;">X-WA-API-KEY (Secret API Key Anda)</label>
+                <div class="form-group">
+                    <label class="form-label">X-WA-API-KEY (Secret API Key Anda)</label>
                     <div style="display: flex; gap: 8px;">
-                        <input type="text" readonly value="{{ $device->api_key }}" style="flex: 1; font-family: monospace; font-size: 13px; padding: 10px 12px; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; color: #334155;">
-                        <button type="button" onclick="navigator.clipboard.writeText('{{ $device->api_key }}'); alert('API Key berhasil disalin!');" class="btn btn-outline">
-                            <i class="fa-solid fa-copy"></i> Salin API Key
+                        <input type="text" readonly value="{{ $device->api_key }}" class="form-input font-mono font-bold" style="color:var(--primary);">
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ $device->api_key }}'); alert('API Key berhasil disalin!');" class="btn btn-primary">
+                            <i class="fa-solid fa-copy"></i> Salin Key
                         </button>
                     </div>
                 </div>
 
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 12px; font-weight: 600; color: #64748B; margin-bottom: 6px;">API Endpoint Pengiriman Pesan</label>
-                    <input type="text" readonly value="{{ url('/api/v1/wa/send') }}" style="width: 100%; font-family: monospace; font-size: 13px; padding: 10px 12px; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; color: #334155; box-sizing: border-box;">
+                <div class="form-group mb-0">
+                    <label class="form-label">API Endpoint Pengiriman Pesan</label>
+                    <input type="text" readonly value="{{ url('/api/v1/wa/send') }}" class="form-input font-mono">
                 </div>
             </div>
         </div>
@@ -112,33 +112,31 @@
                 <form id="testSendForm" onsubmit="handleTestSendAjax(event, this)" action="{{ route('customer.whatsapp-devices.test-send', $device->uuid) }}" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 16px;">
 
                     @csrf
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div>
-                            <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px;">Nomor Tujuan *</label>
-                            <input type="text" name="target" required placeholder="08123456789 / 628123456789" style="width: 100%; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                    <div class="grid-2">
+                        <div class="form-group mb-0">
+                            <label class="form-label">Nomor Tujuan <span class="text-danger">*</span></label>
+                            <input type="text" name="target" required placeholder="08123456789 / 628123456789" class="form-input">
                         </div>
-                        <div>
-                            <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px;">Unggah File Langsung (PDF, Office, Gambar, Video, Audio, Zip / Max 16MB)</label>
-
-                            <input type="file" name="file" onchange="validateFileSize(this)" style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 13px; box-sizing: border-box; background: white;">
-
+                        <div class="form-group mb-0">
+                            <label class="form-label">Unggah File Langsung (Max 16MB)</label>
+                            <input type="file" name="file" onchange="validateFileSize(this)" class="form-input" style="padding:7px 12px;">
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div>
-                            <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px;">ATAU Masukkan URL Media (Opsional)</label>
-                            <input type="url" name="media_url" placeholder="https://domain.com/storage/invoice-1002.pdf" style="width: 100%; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                    <div class="grid-2">
+                        <div class="form-group mb-0">
+                            <label class="form-label">ATAU Masukkan URL Media (Opsional)</label>
+                            <input type="url" name="media_url" placeholder="https://domain.com/storage/invoice-1002.pdf" class="form-input">
                         </div>
-                        <div>
-                            <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px;">Nama File Kustom (Opsional)</label>
-                            <input type="text" name="filename" placeholder="Contoh: Invoice_Pembayaran_#BK-902.pdf" style="width: 100%; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                        <div class="form-group mb-0">
+                            <label class="form-label">Nama File Kustom (Opsional)</label>
+                            <input type="text" name="filename" placeholder="Contoh: Invoice_Pembayaran_#BK-902.pdf" class="form-input">
                         </div>
                     </div>
 
-                    <div>
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px;">Isi Pesan / Caption *</label>
-                        <textarea name="message" rows="3" placeholder="Tulis isi pesan atau caption file..." style="width: 100%; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
+                    <div class="form-group mb-0">
+                        <label class="form-label">Isi Pesan / Caption <span class="text-danger">*</span></label>
+                        <textarea name="message" rows="3" placeholder="Tulis isi pesan atau caption file..." class="form-textarea"></textarea>
                     </div>
 
                     <div style="display: flex; justify-content: flex-end;">
@@ -156,56 +154,60 @@
                 <div class="card-title"><i class="fa-solid fa-book" style="color:var(--primary);margin-right:6px;"></i> Dokumentasi API Integrasi Lengkap (ERP / Booking / Website)</div>
             </div>
             <div class="card-body" style="padding: 24px;">
-                <div style="margin-bottom: 20px;">
-                    <h4 style="font-size: 14px; font-weight: 700; color: #334155; margin-bottom: 8px;">1. Parameter Request API (`POST /api/v1/wa/send`)</h4>
-                    <table class="data-table" style="font-size: 13px; width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: #F8FAFC; text-align: left;">
-                                <th style="padding: 8px 12px; border: 1px solid #E2E8F0;">Parameter</th>
-                                <th style="padding: 8px 12px; border: 1px solid #E2E8F0;">Tipe</th>
-                                <th style="padding: 8px 12px; border: 1px solid #E2E8F0;">Status</th>
-                                <th style="padding: 8px 12px; border: 1px solid #E2E8F0;">Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;"><code style="color: var(--primary);">target</code></td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;">String</td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;"><span class="badge badge-danger">Wajib</span></td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;">Nomor tujuan WhatsApp (misal: 08123456789 atau 628123456789).</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;"><code style="color: var(--primary);">message</code></td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;">String</td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;"><span class="badge badge-warning">Opsional</span></td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;">Isi pesan teks atau caption media/file. Wajib jika tidak mengirim file.</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;"><code style="color: var(--primary);">url</code> / <code style="color: var(--primary);">file</code></td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;">String (URL)</td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;"><span class="badge badge-warning">Opsional</span></td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;">URL publik berkas (PDF, DOCX, XLSX, ZIP, Gambar, Audio, Video). <strong style="color: #EF4444;">Maksimal 16 MB per file</strong> (Otomatis rejected jika melebihi limit).</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;"><code style="color: var(--primary);">filename</code></td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;">String</td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;"><span class="badge badge-warning">Opsional</span></td>
-                                <td style="padding: 8px 12px; border: 1px solid #E2E8F0;">Nama lampiran berkas saat diterima pengguna (misal: <code style="font-size:11px;">Nota_#902.pdf</code>).</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div style="margin-bottom: 24px;">
+                    <h4 class="font-bold text-sm mb-2" style="color: var(--text);">1. Parameter Request API (<code>POST /api/v1/wa/send</code>)</h4>
+                    <div class="data-table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Tipe</th>
+                                    <th>Status</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>target</code></td>
+                                    <td>String</td>
+                                    <td><span class="badge badge-danger">Wajib</span></td>
+                                    <td>Nomor tujuan WhatsApp (misal: 08123456789 atau 628123456789).</td>
+                                </tr>
+                                <tr>
+                                    <td><code>message</code></td>
+                                    <td>String</td>
+                                    <td><span class="badge badge-warning">Opsional</span></td>
+                                    <td>Isi pesan teks atau caption media/file. Wajib jika tidak mengirim file.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>url</code> / <code>file</code></td>
+                                    <td>String (URL)</td>
+                                    <td><span class="badge badge-warning">Opsional</span></td>
+                                    <td>URL publik berkas (PDF, DOCX, XLSX, ZIP, Gambar, Audio, Video). <strong class="text-danger">Maksimal 16 MB per file</strong>.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>filename</code></td>
+                                    <td>String</td>
+                                    <td><span class="badge badge-warning">Opsional</span></td>
+                                    <td>Nama lampiran berkas saat diterima pengguna (misal: <code>Nota_#902.pdf</code>).</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     
-                    <div style="margin-top: 12px; padding: 10px 14px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #EF4444; border-radius: 6px; font-size: 12px; color: #991B1B;">
-                        <i class="fa-solid fa-shield-halved" style="margin-right: 4px;"></i> <strong>Ketentuan Ukuran Berkas:</strong> Seluruh pengiriman berkas/media dibatasi maksimal <strong>16 MB</strong>. Gateway akan memeriksa ukuran berkas via HTTP Header sebelum mengunduh. Jika berkas melebihi 16 MB, request API akan ditolak secara otomatis dengan HTTP Response 422/500.
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <div>
+                            <strong>Ketentuan Ukuran Berkas:</strong> Seluruh pengiriman berkas/media dibatasi maksimal <strong>16 MB</strong>. Gateway akan memeriksa ukuran berkas via HTTP Header sebelum mengunduh. Jika berkas melebihi 16 MB, request API akan ditolak secara otomatis dengan HTTP Response 422.
+                        </div>
                     </div>
                 </div>
 
-
                 <div>
-                    <h4 style="font-size: 14px; font-weight: 700; color: #334155; margin-bottom: 8px;">2. Contoh Kode Integrasi Berbagai Bahasa Program</h4>
+                    <h4 class="font-bold text-sm mb-2" style="color: var(--text);">2. Contoh Kode Integrasi Berbagai Bahasa Program</h4>
 
-                    <div style="background: #0F172A; border-radius: 12px; padding: 16px; color: #F8FAFC;">
-                        <div style="font-size: 12px; color: #94A3B8; margin-bottom: 8px; font-weight: 600;">a) cURL / Terminal:</div>
+                    <div style="background: #090D16; border: 1px solid var(--border); border-radius: 12px; padding: 18px; color: #F8FAFC;">
+                        <div style="font-size: 12px; color: var(--text-faint); margin-bottom: 8px; font-weight: 600;">a) cURL / Terminal:</div>
                         <pre style="color: #34D399; font-size: 12px; font-family: monospace; margin: 0 0 16px 0; overflow-x: auto;">
 curl -X POST "{{ url('/api/v1/wa/send') }}" \
   -H "X-WA-API-KEY: {{ $device->api_key }}" \
@@ -217,7 +219,7 @@ curl -X POST "{{ url('/api/v1/wa/send') }}" \
     "filename": "Invoice_Reservasi_#1002.pdf"
   }'</pre>
 
-                        <div style="font-size: 12px; color: #94A3B8; margin-bottom: 8px; font-weight: 600;">b) PHP (Laravel Http Client):</div>
+                        <div style="font-size: 12px; color: var(--text-faint); margin-bottom: 8px; font-weight: 600;">b) PHP (Laravel Http Client):</div>
                         <pre style="color: #60A5FA; font-size: 12px; font-family: monospace; margin: 0 0 16px 0; overflow-x: auto;">
 use Illuminate\Support\Facades\Http;
 
@@ -230,14 +232,13 @@ $response = Http::withHeaders([
     'filename' => 'Invoice_#10089.pdf',
 ]);</pre>
 
-                        <div style="font-size: 12px; color: #94A3B8; margin-bottom: 8px; font-weight: 600;">c) JavaScript (Node.js / Axios):</div>
+                        <div style="font-size: 12px; color: var(--text-faint); margin-bottom: 8px; font-weight: 600;">c) JavaScript (Node.js / Axios):</div>
                         <pre style="color: #FBBF24; font-size: 12px; font-family: monospace; margin: 0; overflow-x: auto;">
 const axios = require('axios');
 
 axios.post('{{ url('/api/v1/wa/send') }}', {
   target: '08123456789',
   message: 'Booking konfirmasi diterima!',
-  url: 'https://domain.com/proof.png'
 }, {
   headers: { 'X-WA-API-KEY': '{{ $device->api_key }}' }
 });</pre>
