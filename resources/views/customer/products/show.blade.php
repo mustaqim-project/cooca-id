@@ -220,11 +220,11 @@
                             <i class="fa-solid fa-globe" style="color:var(--primary);"></i> Tipe Domain
                         </label>
                         <div class="flex gap-4" style="flex-wrap: wrap;">
-                            <label class="flex items-center gap-2 cursor-pointer p-2 rounded" style="border:1px solid var(--border); background:var(--card-bg, var(--bg));">
+                            <label class="flex items-center gap-2 cursor-pointer p-2 rounded" style="border:1px solid var(--border); background:var(--card); color:var(--text);">
                                 <input type="radio" name="domain_type" value="subdomain" checked onchange="toggleDomainType()">
                                 <span class="font-medium text-sm">Subdomain COOCA.ID <span class="badge badge-success" style="font-size:10px; margin-left:4px;">Gratis</span></span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer p-2 rounded" style="border:1px solid var(--border); background:var(--card-bg, var(--bg));">
+                            <label class="flex items-center gap-2 cursor-pointer p-2 rounded" style="border:1px solid var(--border); background:var(--card); color:var(--text);">
                                 <input type="radio" name="domain_type" value="custom" onchange="toggleDomainType()">
                                 <span class="font-medium text-sm">Custom Domain Sendiri</span>
                             </label>
@@ -253,7 +253,7 @@
                     <div id="custom_domain_container" class="form-group mb-4" style="display:none;">
                         
                         {{-- Custom Domain Sub-Tabs --}}
-                        <div class="flex gap-2 mb-3 p-1 rounded-lg" style="background:color-mix(in srgb, var(--primary) 6%, transparent); border:1px solid var(--border);">
+                        <div class="flex gap-2 mb-3 p-1 rounded-lg" style="background:var(--primary-soft); border:1px solid var(--border);">
                             <button type="button" id="tabBtnBuy" onclick="switchCustomDomainTab('buy')"
                                 class="btn btn-sm flex-1 font-bold"
                                 style="border-radius:6px; transition:all .2s; background:var(--primary); color:#fff; border:none;">
@@ -261,7 +261,7 @@
                             </button>
                             <button type="button" id="tabBtnConnect" onclick="switchCustomDomainTab('connect')"
                                 class="btn btn-sm flex-1 font-medium"
-                                style="border-radius:6px; transition:all .2s; background:transparent; color:var(--text-muted, #666); border:none;">
+                                style="border-radius:6px; transition:all .2s; background:transparent; color:var(--text-muted); border:none;">
                                 <i class="fa-solid fa-link"></i> Hubungkan Domain Sendiri
                             </button>
                         </div>
@@ -273,7 +273,7 @@
 
                         {{-- TAB 1: Search & Buy Domain via Hostinger --}}
                         <div id="tab_buy_domain" style="display:block;">
-                            <div class="p-3 rounded-lg mb-3" style="background:var(--card-bg, #fff); border:1px solid var(--border);">
+                            <div class="p-3 rounded-lg mb-3" style="background:var(--surface); border:1px solid var(--border);">
                                 <label class="form-label text-xs font-semibold text-muted mb-2">Cari Ketersediaan & Harga Domain (Live Kurs)</label>
                                 <div class="flex gap-2">
                                     <div style="position:relative; flex:1;">
@@ -306,7 +306,7 @@
                                 <div class="text-xs font-bold mb-2 text-muted uppercase tracking-wider" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
                                     <span>Hasil Pengecekan Domain:</span>
                                     <div style="display:flex; align-items:center; gap:8px;">
-                                        <span id="hostinger_rate_badge" class="badge" style="background:var(--bg); border:1px solid var(--border); font-size:10px; color:var(--text-muted, #666); font-weight:normal;">
+                                        <span id="hostinger_rate_badge" class="badge" style="background:var(--bg-secondary); border:1px solid var(--border); font-size:10px; color:var(--text-muted); font-weight:normal;">
                                             <i class="fa-solid fa-coins" style="color:#F59E0B;"></i> Kurs Live
                                         </span>
                                         <span class="text-primary font-normal text-xs"><i class="fa-solid fa-bolt"></i> Realtime Catalog</span>
@@ -318,7 +318,7 @@
 
                                 {{-- Selected Domain Alert Banner --}}
                                 <div id="selected_domain_banner" class="mt-3 p-3 rounded-lg"
-                                    style="display:none; background:color-mix(in srgb, var(--success, #10B981) 12%, transparent); border:1px solid var(--success, #10B981);">
+                                    style="display:none; background:var(--success-soft); border:1px solid var(--success);">
                                     <div style="display:flex; justify-content:space-between; align-items:center;">
                                         <div>
                                             <div class="text-xs text-muted">Domain yang dipilih untuk didaftarkan:</div>
@@ -335,20 +335,20 @@
 
                         {{-- TAB 2: Connect Existing Domain --}}
                         <div id="tab_connect_domain" style="display:none;">
-                            <div class="p-3 rounded-lg" style="background:var(--card-bg, #fff); border:1px solid var(--border);">
+                            <div class="p-3 rounded-lg" style="background:var(--surface); border:1px solid var(--border);">
                                 <label class="form-label text-xs font-semibold mb-1">Nama Custom Domain yang Sudah Anda Miliki <span style="color:var(--danger);">*</span></label>
                                 <input type="text" id="manual_custom_domain_input" class="form-input w-full mb-3"
                                     placeholder="contoh: erp.perusahaananda.com atau bisnisanda.com"
                                     oninput="onManualDomainInput(this.value)">
 
-                                <div style="padding:12px; border-radius:8px; background:color-mix(in srgb, var(--primary) 5%, transparent); border:1px dashed var(--primary);">
+                                <div style="padding:12px; border-radius:8px; background:var(--primary-soft); border:1px dashed var(--primary);">
                                     <div class="text-xs font-bold mb-1" style="color:var(--primary); display:flex; align-items:center; gap:6px;">
                                         <i class="fa-solid fa-server"></i> Panduan Pengaturan DNS (Arahkan ke COOCA.ID)
                                     </div>
                                     <div class="text-xs text-muted mb-2" style="line-height:1.5;">
                                         Arahkan DNS domain Anda di registrar domain Anda saat ini dengan salah satu konfigurasi berikut:
                                     </div>
-                                    <div class="grid-2 gap-2 text-xs" style="font-family:monospace; background:var(--bg); padding:8px; border-radius:6px;">
+                                    <div class="grid-2 gap-2 text-xs" style="font-family:monospace; background:var(--bg-secondary); padding:8px; border-radius:6px; border:1px solid var(--border);">
                                         <div><strong>Type:</strong> CNAME<br><strong>Host:</strong> @ atau subdomain<br><strong>Value:</strong> <code>cname.cooca.id</code></div>
                                         <div><strong>Type:</strong> A Record<br><strong>Host:</strong> @<br><strong>Value:</strong> <code>103.187.146.10</code></div>
                                     </div>
@@ -405,7 +405,7 @@
                                 btnBuy.style.background = 'var(--primary)';
                                 btnBuy.style.color = '#fff';
                                 btnConnect.style.background = 'transparent';
-                                btnConnect.style.color = 'var(--text-muted, #666)';
+                                btnConnect.style.color = 'var(--text-muted)';
 
                                 if (selectedHostingerDomain) {
                                     document.getElementById('final_custom_domain').value = selectedHostingerDomain;
@@ -419,7 +419,7 @@
                                 btnConnect.style.background = 'var(--primary)';
                                 btnConnect.style.color = '#fff';
                                 btnBuy.style.background = 'transparent';
-                                btnBuy.style.color = 'var(--text-muted, #666)';
+                                btnBuy.style.color = 'var(--text-muted)';
 
                                 selectedHostingerPrice = 0;
                                 document.getElementById('selected_domain_price').value = 0;
@@ -486,7 +486,7 @@
                                     const card = document.createElement('div');
                                     card.className = 'p-2 rounded-lg flex items-center justify-between';
                                     card.style.border = isSelected ? '2px solid var(--primary)' : '1px solid var(--border)';
-                                    card.style.background = isSelected ? 'color-mix(in srgb, var(--primary) 8%, transparent)' : 'var(--bg)';
+                                    card.style.background = isSelected ? 'var(--primary-soft)' : 'var(--surface)';
                                     card.style.transition = 'all .15s';
 
                                     let actionHtml = '';
@@ -495,14 +495,14 @@
                                             ? `<button type="button" class="btn btn-sm btn-success" style="font-size:11px; padding:4px 10px;" disabled><i class="fa-solid fa-check"></i> Terpilih</button>`
                                             : `<button type="button" onclick="selectHostingerDomain('${item.domain}', ${item.price_idr}, '${item.price_formatted}')" class="btn btn-primary btn-sm" style="font-size:11px; padding:4px 10px;">Pilih Domain</button>`;
                                     } else {
-                                        actionHtml = `<span class="badge" style="background:#EF4444; color:#fff; font-size:10px; padding:3px 8px;">Terpakai</span>`;
+                                        actionHtml = `<span class="badge badge-danger" style="font-size:10px; padding:3px 8px;">Terpakai</span>`;
                                     }
 
                                     card.innerHTML = `
                                         <div style="display:flex; align-items:center; gap:8px;">
                                             <i class="fa-solid fa-${item.is_available ? 'circle-check text-success' : 'circle-xmark text-danger'}"></i>
                                             <div>
-                                                <span class="font-bold text-sm">${item.domain}</span>
+                                                <span class="font-bold text-sm" style="color:var(--text);">${item.domain}</span>
                                                 <div class="text-xs text-muted">${item.is_available ? '<span class="text-success font-semibold">Tersedia untuk didaftarkan</span>' : '<span class="text-danger">Sudah digunakan orang lain</span>'}</div>
                                             </div>
                                         </div>
@@ -529,13 +529,13 @@
                                         const card = document.createElement('div');
                                         card.className = 'p-2 rounded-lg flex items-center justify-between';
                                         card.style.border = isSelected ? '2px solid var(--primary)' : '1px solid var(--border)';
-                                        card.style.background = isSelected ? 'color-mix(in srgb, var(--primary) 8%, transparent)' : 'var(--bg)';
+                                        card.style.background = isSelected ? 'var(--primary-soft)' : 'var(--surface)';
 
                                         card.innerHTML = `
                                             <div style="display:flex; align-items:center; gap:8px;">
                                                 <i class="fa-solid fa-sparkles text-primary"></i>
                                                 <div>
-                                                    <span class="font-bold text-sm">${alt.domain}</span>
+                                                    <span class="font-bold text-sm" style="color:var(--text);">${alt.domain}</span>
                                                     <span class="badge badge-success" style="font-size:9px;">Tersedia</span>
                                                 </div>
                                             </div>
@@ -676,12 +676,14 @@
     border-radius: var(--radius-lg);
     padding: 14px 16px;
     cursor: pointer;
-    transition: border-color .15s, background .15s;
+    transition: var(--transition);
     position: relative;
     display: block;
+    background: var(--card);
+    color: var(--text);
 }
-.plan-card-select:hover { border-color: var(--primary); background: var(--bg); }
-.plan-card-select.selected { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 6%, transparent); }
+.plan-card-select:hover { border-color: var(--primary); background: var(--surface-hover); }
+.plan-card-select.selected { border-color: var(--primary); background: var(--primary-soft); }
 .plan-card-select input[type=radio] { position: absolute; opacity: 0; pointer-events: none; }
 </style>
 

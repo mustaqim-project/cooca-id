@@ -183,10 +183,10 @@
 </div>
 
 {{-- MODAL CREATE REKENING --}}
-<div id="createModal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
-    <div class="modal-card" style="background:#fff;border-radius:var(--radius);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 40px rgba(0,0,0,0.2);margin:20px;">
+<div id="createModal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;">
+    <div class="modal-card" style="background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-lg);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-xl);margin:20px;">
         <div class="modal-header flex justify-between items-center" style="padding:20px 24px;border-bottom:1px solid var(--border);">
-            <div class="font-bold text-lg"><i class="fa-solid fa-building-columns" style="color:var(--primary);margin-right:8px;"></i> Tambah Rekening Bank Baru</div>
+            <div class="font-bold text-lg" style="color:var(--text);"><i class="fa-solid fa-building-columns" style="color:var(--primary);margin-right:8px;"></i> Tambah Rekening Bank Baru</div>
             <button type="button" class="btn btn-ghost btn-sm" onclick="closeCreateModal()" style="font-size:18px;">&times;</button>
         </div>
         <form method="POST" action="{{ route('admin.bank-accounts.store') }}" enctype="multipart/form-data">
@@ -248,7 +248,7 @@
                     <textarea name="instructions" class="form-textarea" rows="2" placeholder="Contoh: Transfer tepat hingga digit terakhir agar otomatis terdeteksi."></textarea>
                 </div>
 
-                <div class="grid-3" style="align-items:center;background:var(--bg);padding:12px;border-radius:var(--radius);border:1px solid var(--border);">
+                <div class="grid-3" style="align-items:center;background:var(--bg-secondary);padding:12px 14px;border-radius:var(--radius-md);border:1px solid var(--border);">
                     <div>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" name="is_active" value="1" checked>
@@ -276,10 +276,10 @@
 </div>
 
 {{-- MODAL EDIT REKENING --}}
-<div id="editModal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
-    <div class="modal-card" style="background:#fff;border-radius:var(--radius);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 40px rgba(0,0,0,0.2);margin:20px;">
+<div id="editModal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;">
+    <div class="modal-card" style="background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-lg);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-xl);margin:20px;">
         <div class="modal-header flex justify-between items-center" style="padding:20px 24px;border-bottom:1px solid var(--border);">
-            <div class="font-bold text-lg"><i class="fa-solid fa-pen-to-square" style="color:var(--primary);margin-right:8px;"></i> Edit Rekening Bank</div>
+            <div class="font-bold text-lg" style="color:var(--text);"><i class="fa-solid fa-pen-to-square" style="color:var(--primary);margin-right:8px;"></i> Edit Rekening Bank</div>
             <button type="button" class="btn btn-ghost btn-sm" onclick="closeEditModal()" style="font-size:18px;">&times;</button>
         </div>
         <form id="editForm" method="POST" action="" enctype="multipart/form-data">
@@ -331,7 +331,7 @@
                     <textarea name="instructions" id="edit_instructions" class="form-textarea" rows="2"></textarea>
                 </div>
 
-                <div class="grid-3" style="align-items:center;background:var(--bg);padding:12px;border-radius:var(--radius);border:1px solid var(--border);">
+                <div class="grid-3" style="align-items:center;background:var(--bg-secondary);padding:12px 14px;border-radius:var(--radius-md);border:1px solid var(--border);">
                     <div>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" name="is_active" id="edit_is_active" value="1">
