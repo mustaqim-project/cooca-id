@@ -231,27 +231,34 @@ class HostingerDomainService
                         $prices = [];
 
                         if (is_array($items)) {
+                            // Sort TLDs by length descending so '.co.id' is matched before '.id'
+                            $sortedTlds = $this->defaultTlds;
+                            usort($sortedTlds, fn($a, $b) => strlen($b) <=> strlen($a));
+
                             foreach ($items as $item) {
                                 $name = strtolower($item['name'] ?? '');
-                                // Match .COM, .ID, etc.
-                                foreach ($this->defaultTlds as $tld) {
-                                    if (str_contains($name, '.' . $tld)) {
+                                
+                                foreach ($sortedTlds as $tld) {
+                                    // Match exact pattern like '.co.id ' or '.id ' or '.com '
+                                    if (preg_match('/(^|\s|\.)' . preg_quote($tld, '/') . '(\s|\/|$)/i', $name)) {
                                         $priceItem = $item['prices'][0] ?? null;
                                         if ($priceItem) {
-                                            $cents = (int) ($priceItem['price'] ?? 1500);
+                                            $cents = (int) ($priceItem['first_period_price'] ?? $priceItem['price'] ?? 0);
                                             $currency = strtoupper($priceItem['currency'] ?? 'USD');
 
-                                            if ($currency === 'USD') {
-                                                $priceIdr = (int) round(($cents / 100) * $this->exchangeRate);
-                                            } elseif ($currency === 'IDR') {
-                                                $priceIdr = $cents;
+                                            // In Hostinger Billing API, all amounts are in sub-units (cents / 100)
+                                            if ($currency === 'IDR') {
+                                                $priceIdr = (int) round($cents / 100);
                                             } else {
                                                 $priceIdr = (int) round(($cents / 100) * $this->exchangeRate);
                                             }
 
-                                            // Round to thousands
-                                            $prices[$tld] = (int) (round($priceIdr / 1000) * 1000);
+                                            // Round to nearest thousands for clean display
+                                            if ($priceIdr > 0) {
+                                                $prices[$tld] = (int) (round($priceIdr / 1000) * 1000);
+                                            }
                                         }
+                                        break; // Matched the most specific TLD for this catalog item
                                     }
                                 }
                             }

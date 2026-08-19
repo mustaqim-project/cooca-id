@@ -214,21 +214,25 @@
                         $waCustomDomainMsg = urlencode("Halo COOCA.ID, saya ingin request setup custom domain untuk langganan {$product->name} saya.");
                     @endphp
                     
+                    {{-- Step 3: Domain Selection with Hostinger Integration --}}
                     <div class="form-group mb-3">
-                        <label class="form-label">Tipe Domain</label>
-                        <div class="flex gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer">
+                        <label class="form-label font-bold text-sm" style="display:flex; align-items:center; gap:8px;">
+                            <i class="fa-solid fa-globe" style="color:var(--primary);"></i> Tipe Domain
+                        </label>
+                        <div class="flex gap-4" style="flex-wrap: wrap;">
+                            <label class="flex items-center gap-2 cursor-pointer p-2 rounded" style="border:1px solid var(--border); background:var(--card-bg, var(--bg));">
                                 <input type="radio" name="domain_type" value="subdomain" checked onchange="toggleDomainType()">
-                                <span>Subdomain COOCA.ID</span>
+                                <span class="font-medium text-sm">Subdomain COOCA.ID <span class="badge badge-success" style="font-size:10px; margin-left:4px;">Gratis</span></span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
+                            <label class="flex items-center gap-2 cursor-pointer p-2 rounded" style="border:1px solid var(--border); background:var(--card-bg, var(--bg));">
                                 <input type="radio" name="domain_type" value="custom" onchange="toggleDomainType()">
-                                <span>Custom Domain Sendiri</span>
+                                <span class="font-medium text-sm">Custom Domain Sendiri</span>
                             </label>
                         </div>
                     </div>
 
-                    <div id="subdomain_container" class="form-group">
+                    {{-- Subdomain Container --}}
+                    <div id="subdomain_container" class="form-group mb-4">
                         <label class="form-label">Subdomain Instance <span style="color:var(--danger);">*</span></label>
                         <div class="flex items-center gap-2">
                             <input type="text" name="domain" id="subdomain_input" class="form-input" placeholder="namabisnisanda"
@@ -245,41 +249,345 @@
                         @endif
                     </div>
 
-                    <div id="custom_domain_container" class="form-group" style="display:none;">
-                        <label class="form-label">Custom Domain <span style="color:var(--danger);">*</span></label>
-                        <input type="text" name="custom_domain_ignore" id="custom_domain_input" class="form-input" placeholder="contoh: erp.bisnisanda.com" autocomplete="off">
+                    {{-- Custom Domain Container with Hostinger Integration --}}
+                    <div id="custom_domain_container" class="form-group mb-4" style="display:none;">
                         
-                        <div style="margin-top: 12px; padding: 12px; border-radius: 8px; background: color-mix(in srgb, var(--primary) 5%, transparent); border: 1px dashed var(--primary);">
-                            <div class="text-xs text-muted mb-2">
-                                <i class="fa-solid fa-circle-info" style="color:var(--primary);"></i>
-                                Gunakan domain Anda sendiri. Setelah pembayaran berhasil, silakan hubungi CS kami. <strong>Catatan:</strong> Jika Anda belum memiliki domain sendiri, akan dikenakan biaya tambahan untuk pembelian domain dan Anda akan dihubungi oleh admin untuk proses lebih lanjut.
+                        {{-- Custom Domain Sub-Tabs --}}
+                        <div class="flex gap-2 mb-3 p-1 rounded-lg" style="background:color-mix(in srgb, var(--primary) 6%, transparent); border:1px solid var(--border);">
+                            <button type="button" id="tabBtnBuy" onclick="switchCustomDomainTab('buy')"
+                                class="btn btn-sm flex-1 font-bold"
+                                style="border-radius:6px; transition:all .2s; background:var(--primary); color:#fff; border:none;">
+                                <i class="fa-solid fa-cart-shopping"></i> Cari & Beli Domain Baru <span class="badge" style="background:rgba(255,255,255,0.2); font-size:9px; margin-left:4px;">Hostinger API</span>
+                            </button>
+                            <button type="button" id="tabBtnConnect" onclick="switchCustomDomainTab('connect')"
+                                class="btn btn-sm flex-1 font-medium"
+                                style="border-radius:6px; transition:all .2s; background:transparent; color:var(--text-muted, #666); border:none;">
+                                <i class="fa-solid fa-link"></i> Hubungkan Domain Sendiri
+                            </button>
+                        </div>
+
+                        {{-- Hidden inputs for selected domain & custom domain mode --}}
+                        <input type="hidden" name="custom_domain_action" id="custom_domain_action" value="buy">
+                        <input type="hidden" name="domain_price" id="selected_domain_price" value="0">
+                        <input type="hidden" name="custom_domain_ignore" id="final_custom_domain" value="">
+
+                        {{-- TAB 1: Search & Buy Domain via Hostinger --}}
+                        <div id="tab_buy_domain" style="display:block;">
+                            <div class="p-3 rounded-lg mb-3" style="background:var(--card-bg, #fff); border:1px solid var(--border);">
+                                <label class="form-label text-xs font-semibold text-muted mb-2">Cari Ketersediaan & Harga Domain (Live Kurs)</label>
+                                <div class="flex gap-2">
+                                    <div style="position:relative; flex:1;">
+                                        <input type="text" id="hostinger_search_input" class="form-input w-full"
+                                            placeholder="Ketik nama bisnis (contoh: tokoku, erpbinsis)"
+                                            onkeypress="if(event.key === 'Enter'){ event.preventDefault(); searchHostingerDomain(); }">
+                                    </div>
+                                    <button type="button" id="btnCheckHostinger" onclick="searchHostingerDomain()"
+                                        class="btn btn-primary btn-sm px-4" style="font-weight:600; white-space:nowrap;">
+                                        <i class="fa-solid fa-magnifying-glass"></i> Cek Domain
+                                    </button>
+                                </div>
+                                <div class="text-xs text-muted mt-2" style="display:flex; align-items:center; gap:6px;">
+                                    <span>Populer:</span>
+                                    <span class="badge cursor-pointer" onclick="setSearchQuery('bisnisku')">.com</span>
+                                    <span class="badge cursor-pointer" onclick="setSearchQuery('bisnisku')">.id</span>
+                                    <span class="badge cursor-pointer" onclick="setSearchQuery('bisnisku')">.co.id</span>
+                                    <span class="badge cursor-pointer" onclick="setSearchQuery('bisnisku')">.shop</span>
+                                    <span class="badge cursor-pointer" onclick="setSearchQuery('bisnisku')">.online</span>
+                                </div>
                             </div>
-                            <a href="https://wa.me/{{ $waNumber }}?text={{ $waCustomDomainMsg }}" target="_blank" class="btn btn-outline btn-sm w-full" style="justify-content:center; border-color:#25D366; color:#25D366;">
-                                <i class="fa-brands fa-whatsapp"></i> Hubungi CS via WhatsApp
-                            </a>
+
+                            {{-- Search Results / State --}}
+                            <div id="hostinger_loading" style="display:none; text-align:center; padding:20px; color:var(--primary);">
+                                <i class="fa-solid fa-circle-notch fa-spin fa-2x mb-2"></i>
+                                <div class="text-xs font-semibold">Mengecek ketersediaan & harga domain di Hostinger...</div>
+                            </div>
+
+                            <div id="hostinger_results_container" style="display:none;">
+                                <div class="text-xs font-bold mb-2 text-muted uppercase tracking-wider" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+                                    <span>Hasil Pengecekan Domain:</span>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <span id="hostinger_rate_badge" class="badge" style="background:var(--bg); border:1px solid var(--border); font-size:10px; color:var(--text-muted, #666); font-weight:normal;">
+                                            <i class="fa-solid fa-coins" style="color:#F59E0B;"></i> Kurs Live
+                                        </span>
+                                        <span class="text-primary font-normal text-xs"><i class="fa-solid fa-bolt"></i> Realtime Catalog</span>
+                                    </div>
+                                </div>
+                                <div id="hostinger_domain_list" style="display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto; padding-right:4px;">
+                                    {{-- Rendered via JS --}}
+                                </div>
+
+                                {{-- Selected Domain Alert Banner --}}
+                                <div id="selected_domain_banner" class="mt-3 p-3 rounded-lg"
+                                    style="display:none; background:color-mix(in srgb, var(--success, #10B981) 12%, transparent); border:1px solid var(--success, #10B981);">
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <div>
+                                            <div class="text-xs text-muted">Domain yang dipilih untuk didaftarkan:</div>
+                                            <div class="font-bold text-sm text-success" id="selected_domain_text">tokosaya.com</div>
+                                            <div class="text-xs font-semibold" style="color:var(--text);" id="selected_domain_price_text">+ Rp 159.000 / tahun</div>
+                                        </div>
+                                        <button type="button" onclick="clearSelectedDomain()" class="btn btn-outline btn-sm text-danger" style="border-color:var(--danger); padding:4px 8px; font-size:11px;">
+                                            <i class="fa-solid fa-xmark"></i> Batal
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- TAB 2: Connect Existing Domain --}}
+                        <div id="tab_connect_domain" style="display:none;">
+                            <div class="p-3 rounded-lg" style="background:var(--card-bg, #fff); border:1px solid var(--border);">
+                                <label class="form-label text-xs font-semibold mb-1">Nama Custom Domain yang Sudah Anda Miliki <span style="color:var(--danger);">*</span></label>
+                                <input type="text" id="manual_custom_domain_input" class="form-input w-full mb-3"
+                                    placeholder="contoh: erp.perusahaananda.com atau bisnisanda.com"
+                                    oninput="onManualDomainInput(this.value)">
+
+                                <div style="padding:12px; border-radius:8px; background:color-mix(in srgb, var(--primary) 5%, transparent); border:1px dashed var(--primary);">
+                                    <div class="text-xs font-bold mb-1" style="color:var(--primary); display:flex; align-items:center; gap:6px;">
+                                        <i class="fa-solid fa-server"></i> Panduan Pengaturan DNS (Arahkan ke COOCA.ID)
+                                    </div>
+                                    <div class="text-xs text-muted mb-2" style="line-height:1.5;">
+                                        Arahkan DNS domain Anda di registrar domain Anda saat ini dengan salah satu konfigurasi berikut:
+                                    </div>
+                                    <div class="grid-2 gap-2 text-xs" style="font-family:monospace; background:var(--bg); padding:8px; border-radius:6px;">
+                                        <div><strong>Type:</strong> CNAME<br><strong>Host:</strong> @ atau subdomain<br><strong>Value:</strong> <code>cname.cooca.id</code></div>
+                                        <div><strong>Type:</strong> A Record<br><strong>Host:</strong> @<br><strong>Value:</strong> <code>103.187.146.10</code></div>
+                                    </div>
+                                    <div class="mt-2 text-right">
+                                        <a href="https://wa.me/{{ $waNumber }}?text={{ $waCustomDomainMsg }}" target="_blank"
+                                            class="btn btn-outline btn-sm" style="border-color:#25D366; color:#25D366; font-size:11px; padding:4px 10px;">
+                                            <i class="fa-brands fa-whatsapp"></i> Butuh bantuan CS WhatsApp
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <script>
+                        let selectedHostingerDomain = null;
+                        let selectedHostingerPrice = 0;
+
                         function toggleDomainType() {
                             const type = document.querySelector('input[name="domain_type"]:checked').value;
                             const subInput = document.getElementById('subdomain_input');
-                            const cusInput = document.getElementById('custom_domain_input');
+                            const finalCustom = document.getElementById('final_custom_domain');
                             
                             if (type === 'subdomain') {
                                 document.getElementById('subdomain_container').style.display = 'block';
                                 document.getElementById('custom_domain_container').style.display = 'none';
                                 subInput.required = true;
                                 subInput.name = 'domain';
-                                cusInput.required = false;
-                                cusInput.name = 'custom_domain_ignore';
+                                finalCustom.required = false;
+                                finalCustom.name = 'custom_domain_ignore';
+                                selectedHostingerPrice = 0;
                             } else {
                                 document.getElementById('subdomain_container').style.display = 'none';
                                 document.getElementById('custom_domain_container').style.display = 'block';
                                 subInput.required = false;
                                 subInput.name = 'subdomain_ignore';
-                                cusInput.required = true;
-                                cusInput.name = 'domain';
+                                finalCustom.required = true;
+                                finalCustom.name = 'domain';
+                            }
+                        }
+
+                        function switchCustomDomainTab(tab) {
+                            const btnBuy = document.getElementById('tabBtnBuy');
+                            const btnConnect = document.getElementById('tabBtnConnect');
+                            const tabBuy = document.getElementById('tab_buy_domain');
+                            const tabConnect = document.getElementById('tab_connect_domain');
+                            const actionInput = document.getElementById('custom_domain_action');
+
+                            if (tab === 'buy') {
+                                actionInput.value = 'buy';
+                                tabBuy.style.display = 'block';
+                                tabConnect.style.display = 'none';
+
+                                btnBuy.style.background = 'var(--primary)';
+                                btnBuy.style.color = '#fff';
+                                btnConnect.style.background = 'transparent';
+                                btnConnect.style.color = 'var(--text-muted, #666)';
+
+                                if (selectedHostingerDomain) {
+                                    document.getElementById('final_custom_domain').value = selectedHostingerDomain;
+                                    document.getElementById('selected_domain_price').value = selectedHostingerPrice;
+                                }
+                            } else {
+                                actionInput.value = 'connect';
+                                tabBuy.style.display = 'none';
+                                tabConnect.style.display = 'block';
+
+                                btnConnect.style.background = 'var(--primary)';
+                                btnConnect.style.color = '#fff';
+                                btnBuy.style.background = 'transparent';
+                                btnBuy.style.color = 'var(--text-muted, #666)';
+
+                                selectedHostingerPrice = 0;
+                                document.getElementById('selected_domain_price').value = 0;
+                                const manualVal = document.getElementById('manual_custom_domain_input').value.trim();
+                                document.getElementById('final_custom_domain').value = manualVal;
+                            }
+                        }
+
+                        function onManualDomainInput(val) {
+                            document.getElementById('final_custom_domain').value = val.trim();
+                        }
+
+                        function setSearchQuery(q) {
+                            const input = document.getElementById('hostinger_search_input');
+                            input.value = q;
+                            searchHostingerDomain();
+                        }
+
+                        function searchHostingerDomain() {
+                            const input = document.getElementById('hostinger_search_input');
+                            const query = input.value.trim();
+                            if (!query) {
+                                alert('Silakan masukkan nama domain terlebih dahulu.');
+                                input.focus();
+                                return;
+                            }
+
+                            const loading = document.getElementById('hostinger_loading');
+                            const container = document.getElementById('hostinger_results_container');
+                            const list = document.getElementById('hostinger_domain_list');
+                            const btn = document.getElementById('btnCheckHostinger');
+
+                            loading.style.display = 'block';
+                            container.style.display = 'none';
+                            btn.disabled = true;
+
+                            fetch(`{{ route('customer.subscriptions.check-hostinger-domain', [], false) }}?domain=${encodeURIComponent(query)}`, {
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                loading.style.display = 'none';
+                                btn.disabled = false;
+                                container.style.display = 'block';
+                                list.innerHTML = '';
+
+                                if (data.rate_info) {
+                                    const rateBadge = document.getElementById('hostinger_rate_badge');
+                                    if (rateBadge) {
+                                        rateBadge.innerHTML = `<i class="fa-solid fa-coins" style="color:#F59E0B;"></i> Kurs: ${data.rate_info}`;
+                                    }
+                                }
+
+                                if (!data.success || !data.results || data.results.length === 0) {
+                                    list.innerHTML = `<div class="p-3 text-xs text-muted text-center">${data.message || 'Tidak ada data domain ditemukan.'}</div>`;
+                                    return;
+                                }
+
+                                data.results.forEach(item => {
+                                    const isSelected = selectedHostingerDomain === item.domain;
+                                    const card = document.createElement('div');
+                                    card.className = 'p-2 rounded-lg flex items-center justify-between';
+                                    card.style.border = isSelected ? '2px solid var(--primary)' : '1px solid var(--border)';
+                                    card.style.background = isSelected ? 'color-mix(in srgb, var(--primary) 8%, transparent)' : 'var(--bg)';
+                                    card.style.transition = 'all .15s';
+
+                                    let actionHtml = '';
+                                    if (item.is_available) {
+                                        actionHtml = isSelected
+                                            ? `<button type="button" class="btn btn-sm btn-success" style="font-size:11px; padding:4px 10px;" disabled><i class="fa-solid fa-check"></i> Terpilih</button>`
+                                            : `<button type="button" onclick="selectHostingerDomain('${item.domain}', ${item.price_idr}, '${item.price_formatted}')" class="btn btn-primary btn-sm" style="font-size:11px; padding:4px 10px;">Pilih Domain</button>`;
+                                    } else {
+                                        actionHtml = `<span class="badge" style="background:#EF4444; color:#fff; font-size:10px; padding:3px 8px;">Terpakai</span>`;
+                                    }
+
+                                    card.innerHTML = `
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <i class="fa-solid fa-${item.is_available ? 'circle-check text-success' : 'circle-xmark text-danger'}"></i>
+                                            <div>
+                                                <span class="font-bold text-sm">${item.domain}</span>
+                                                <div class="text-xs text-muted">${item.is_available ? '<span class="text-success font-semibold">Tersedia untuk didaftarkan</span>' : '<span class="text-danger">Sudah digunakan orang lain</span>'}</div>
+                                            </div>
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:12px;">
+                                            <div class="text-right">
+                                                <div class="font-bold text-sm" style="color:var(--primary);">${item.price_formatted}</div>
+                                                <div class="text-xs text-muted" style="font-size:10px;">/${item.period}</div>
+                                            </div>
+                                            ${actionHtml}
+                                        </div>
+                                    `;
+                                    list.appendChild(card);
+                                });
+
+                                // Render Alternative suggestions if available
+                                if (data.alternatives && data.alternatives.length > 0) {
+                                    const altHeader = document.createElement('div');
+                                    altHeader.className = 'text-xs font-bold text-muted uppercase mt-2 mb-1';
+                                    altHeader.innerHTML = '<i class="fa-solid fa-lightbulb text-warning"></i> Alternatif Rekomendasi Nama:';
+                                    list.appendChild(altHeader);
+
+                                    data.alternatives.forEach(alt => {
+                                        const isSelected = selectedHostingerDomain === alt.domain;
+                                        const card = document.createElement('div');
+                                        card.className = 'p-2 rounded-lg flex items-center justify-between';
+                                        card.style.border = isSelected ? '2px solid var(--primary)' : '1px solid var(--border)';
+                                        card.style.background = isSelected ? 'color-mix(in srgb, var(--primary) 8%, transparent)' : 'var(--bg)';
+
+                                        card.innerHTML = `
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <i class="fa-solid fa-sparkles text-primary"></i>
+                                                <div>
+                                                    <span class="font-bold text-sm">${alt.domain}</span>
+                                                    <span class="badge badge-success" style="font-size:9px;">Tersedia</span>
+                                                </div>
+                                            </div>
+                                            <div style="display:flex; align-items:center; gap:12px;">
+                                                <div class="text-right">
+                                                    <div class="font-bold text-sm" style="color:var(--primary);">${alt.price_formatted}</div>
+                                                </div>
+                                                <button type="button" onclick="selectHostingerDomain('${alt.domain}', ${alt.price_idr}, '${alt.price_formatted}')" class="btn btn-outline btn-sm" style="font-size:11px; padding:4px 10px;">Pilih</button>
+                                            </div>
+                                        `;
+                                        list.appendChild(card);
+                                    });
+                                }
+                            })
+                            .catch(err => {
+                                loading.style.display = 'none';
+                                btn.disabled = false;
+                                container.style.display = 'block';
+                                list.innerHTML = `<div class="p-3 text-xs text-danger text-center">Gagal menghubungi API Hostinger: ${err.message}</div>`;
+                            });
+                        }
+
+                        function selectHostingerDomain(domain, priceIdr, priceFormatted) {
+                            selectedHostingerDomain = domain;
+                            selectedHostingerPrice = priceIdr;
+
+                            document.getElementById('final_custom_domain').value = domain;
+                            document.getElementById('selected_domain_price').value = priceIdr;
+
+                            const banner = document.getElementById('selected_domain_banner');
+                            document.getElementById('selected_domain_text').innerText = domain;
+                            document.getElementById('selected_domain_price_text').innerText = `+ ${priceFormatted} / tahun (Biaya Pendaftaran Domain)`;
+                            banner.style.display = 'block';
+
+                            // Refresh list cards active states
+                            const searchInput = document.getElementById('hostinger_search_input');
+                            if (searchInput.value.trim()) {
+                                searchHostingerDomain();
+                            }
+                        }
+
+                        function clearSelectedDomain() {
+                            selectedHostingerDomain = null;
+                            selectedHostingerPrice = 0;
+
+                            document.getElementById('final_custom_domain').value = '';
+                            document.getElementById('selected_domain_price').value = 0;
+                            document.getElementById('selected_domain_banner').style.display = 'none';
+
+                            const searchInput = document.getElementById('hostinger_search_input');
+                            if (searchInput.value.trim()) {
+                                searchHostingerDomain();
                             }
                         }
                     </script>

@@ -281,8 +281,8 @@
                         </div>
 
                         <script>
-                            let selectedHostingerDomain = null;
-                            let selectedHostingerPrice = 0;
+                            let selectedHostingerDomain = {!! json_encode(request('custom_domain_action') === 'buy' ? request('domain') : null) !!};
+                            let selectedHostingerPrice = {{ (int) request('domain_price', 0) }};
 
                             function toggleDomainType() {
                                 const type = document.querySelector('input[name="domain_type"]:checked').value;
