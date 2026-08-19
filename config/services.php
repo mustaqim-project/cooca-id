@@ -61,5 +61,11 @@ return [
         'secret' => env('COOCA_SECRET', 'cooca-license-shared-secret-key-2026'),
     ],
 
+    'hostinger' => [
+        'api_token' => env('HOSTINGER_API_TOKEN'),
+        'api_url' => env('HOSTINGER_API_URL', 'https://developers.hostinger.com/api'),
+        'usd_to_idr_rate' => env('HOSTINGER_USD_TO_IDR_RATE', 16000),
+    ],
+
 ];
 

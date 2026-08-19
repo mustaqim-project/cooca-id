@@ -39,6 +39,7 @@ Route::prefix('customer')->name('customer.')->middleware(['auth:customer', 'veri
     // Subscriptions - Using scoped route model binding for IDOR prevention
     Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::get('/subscriptions/check-domain', [SubscriptionController::class, 'checkDomain'])->name('subscriptions.check-domain');
+    Route::get('/subscriptions/check-hostinger-domain', [SubscriptionController::class, 'checkHostingerDomain'])->name('subscriptions.check-hostinger-domain');
     Route::get('/subscriptions/create', [SubscriptionController::class, 'create'])->name('subscriptions.create');
     Route::post('/subscriptions', [SubscriptionController::class, 'store'])->name('subscriptions.store');
     Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');

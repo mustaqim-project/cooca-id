@@ -22,6 +22,7 @@
     <div class="tabs">
         <div class="tab-item active" onclick="switchTab('general', this)">General Branding</div>
         <div class="tab-item" onclick="switchTab('payment', this)">Bank & Manual Transfer</div>
+        <div class="tab-item" onclick="switchTab('hostinger', this)">🌐 Hostinger Domain API</div>
         <div class="tab-item" onclick="switchTab('contact', this)">Contact & Social</div>
         <div class="tab-item" onclick="switchTab('affiliate', this)">Affiliate Rules</div>
         <div class="tab-item" onclick="switchTab('seo', this)">Global SEO</div>
@@ -180,6 +181,43 @@
                 <div class="form-group mt-4">
                     <label class="form-label">Petunjuk / Instruksi Pembayaran Transfer Global</label>
                     <textarea name="bank_transfer_instructions" class="form-textarea" rows="3" placeholder="Petunjuk langkah transfer untuk pelanggan...">{{ $settings['bank_transfer_instructions'] ?? 'Silakan transfer sesuai nominal tagihan hingga digit terakhir. Setelah transfer, wajib upload bukti pembayaran agar dapat diverifikasi.' }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- HOSTINGER DOMAIN API TAB --}}
+    <div id="tab-hostinger" class="tab-content" style="display: none;">
+        <div class="card mb-6">
+            <div class="card-header">
+                <div class="card-title">🌐 Hostinger Domain Availability & Catalog Pricing API</div>
+                <div class="text-xs text-muted mt-1">Konfigurasi API Hostinger untuk pengecekan ketersediaan domain dan katalog harga otomatis pada halaman registrasi custom domain pelanggan. Data ini disimpan langsung di database (tabel settings).</div>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label font-bold">Hostinger API Token (Bearer Token)</label>
+                    <input type="password" name="hostinger_api_token" class="form-input font-mono" placeholder="Masukkan Hostinger API Token Anda..." value="{{ $settings['hostinger_api_token'] ?? '' }}" autocomplete="off">
+                    <div class="text-xs text-muted mt-1">Dapatkan API Token dari <a href="https://developers.hostinger.com" target="_blank" style="color:var(--primary);text-decoration:underline;">Hostinger Developer Portal</a>. Jika dikosongkan, sistem akan menggunakan simulasi DNS checker dan fallback katalog.</div>
+                </div>
+
+                <div class="grid-2 mt-4">
+                    <div class="form-group">
+                        <label class="form-label font-bold">Hostinger API Base URL</label>
+                        <input type="text" name="hostinger_api_url" class="form-input font-mono" value="{{ $settings['hostinger_api_url'] ?? 'https://developers.hostinger.com/api' }}">
+                        <div class="text-xs text-muted mt-1">Default: <code>https://developers.hostinger.com/api</code></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label font-bold">Kurs Konversi USD ke IDR (Rupiah)</label>
+                        <input type="number" name="hostinger_usd_to_idr_rate" class="form-input" value="{{ $settings['hostinger_usd_to_idr_rate'] ?? 16000 }}" min="1000" step="100">
+                        <div class="text-xs text-muted mt-1">Digunakan untuk mengonversi harga domain dari dollar (Hostinger Catalog) ke Rupiah untuk ditampilkan ke pelanggan.</div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 rounded" style="background:color-mix(in srgb, var(--primary) 5%, transparent);border:1px dashed var(--primary);">
+                    <div class="font-bold text-xs" style="color:var(--primary);"><i class="fa-solid fa-circle-info"></i> Info Integrasi Domain:</div>
+                    <div class="text-xs text-muted mt-1" style="line-height:1.5;">
+                        Ekstensi domain yang otomatis dicek meliputi: <code>.com</code>, <code>.id</code>, <code>.co.id</code>, <code>.net</code>, <code>.org</code>, <code>.shop</code>, <code>.online</code>, <code>.tech</code>, <code>.store</code>, <code>.site</code>, <code>.xyz</code>, <code>.biz</code>.
+                    </div>
                 </div>
             </div>
         </div>

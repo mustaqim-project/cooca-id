@@ -70,6 +70,11 @@ class SettingsController extends Controller
             'bank_transfer_account_number' => Setting::get('payment.bank_transfer.account_number', '8830-8899-8800'),
             'bank_transfer_account_name' => Setting::get('payment.bank_transfer.account_name', 'PT COOCA TECHNOLOGIES INDONESIA'),
             'bank_transfer_instructions' => Setting::get('payment.bank_transfer.instructions', 'Silakan transfer sesuai jumlah total tagihan hingga digit terakhir. Setelah melakukan transfer, wajib mengunggah foto / screenshot / file bukti bayar agar verifikasi dapat diproses oleh tim kami.'),
+
+            // Hostinger API Settings
+            'hostinger_api_token' => Setting::get('hostinger.api_token', ''),
+            'hostinger_api_url' => Setting::get('hostinger.api_url', 'https://developers.hostinger.com/api'),
+            'hostinger_usd_to_idr_rate' => Setting::get('hostinger.usd_to_idr_rate', 16000),
         ];
 
         $seoPages = ['home', 'about', 'pricing', 'contact', 'solutions', 'features', 'affiliate', 'faq', 'docs', 'terms', 'privacy'];
@@ -162,6 +167,11 @@ class SettingsController extends Controller
             'bank_transfer_account_number' => ['sometimes', 'nullable', 'string', 'max:100'],
             'bank_transfer_account_name' => ['sometimes', 'nullable', 'string', 'max:255'],
             'bank_transfer_instructions' => ['sometimes', 'nullable', 'string'],
+
+            // Hostinger API Settings
+            'hostinger_api_token' => ['sometimes', 'nullable', 'string'],
+            'hostinger_api_url' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'hostinger_usd_to_idr_rate' => ['sometimes', 'nullable', 'numeric', 'min:1'],
         ]);
 
         // Handle File Uploads
@@ -249,6 +259,10 @@ class SettingsController extends Controller
             'bank_transfer_account_number' => ['payment.bank_transfer.account_number', 'string', 'payment'],
             'bank_transfer_account_name' => ['payment.bank_transfer.account_name', 'string', 'payment'],
             'bank_transfer_instructions' => ['payment.bank_transfer.instructions', 'text', 'payment'],
+
+            'hostinger_api_token' => ['hostinger.api_token', 'string', 'hostinger'],
+            'hostinger_api_url' => ['hostinger.api_url', 'string', 'hostinger'],
+            'hostinger_usd_to_idr_rate' => ['hostinger.usd_to_idr_rate', 'integer', 'hostinger'],
 
             'google_no_follow' => ['seo.google_no_follow', 'boolean', 'seo'],
         ];

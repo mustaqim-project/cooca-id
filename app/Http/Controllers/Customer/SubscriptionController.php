@@ -90,6 +90,21 @@ final class SubscriptionController extends Controller
         ]);
     }
 
+    public function checkHostingerDomain(Request $request, \App\Services\Hostinger\HostingerDomainService $hostingerService): JsonResponse
+    {
+        $domain = (string) $request->input('domain', '');
+        if (empty($domain)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Silakan masukkan nama domain yang ingin dicari.',
+                'results' => [],
+            ], 422);
+        }
+
+        $data = $hostingerService->checkDomainWithPrices($domain);
+        return response()->json($data);
+    }
+
     public function show(string $subscription)
     {
         $subscription = Subscription::where('id', $subscription)
