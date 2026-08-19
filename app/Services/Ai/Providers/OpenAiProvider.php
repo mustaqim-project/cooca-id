@@ -26,7 +26,7 @@ final class OpenAiProvider implements AiProviderInterface
             'Content-Type' => 'application/json',
         ];
 
-        $request = Http::withHeaders($headers)->timeout(45);
+        $request = Http::withHeaders($headers)->timeout(500);
 
         if (!empty($this->apiKey)) {
             $request = $request->withToken(trim($this->apiKey));
@@ -36,8 +36,8 @@ final class OpenAiProvider implements AiProviderInterface
 
         if ($response->failed()) {
             $errorJson = $response->json();
-            $errorMessage = $errorJson['error']['message'] 
-                ?? $errorJson['message'] 
+            $errorMessage = $errorJson['error']['message']
+                ?? $errorJson['message']
                 ?? $errorJson['detail']
                 ?? $response->body();
 
