@@ -39,7 +39,9 @@ final class DirectPaymentController extends Controller
 
         $discountPercent = (float) ($plan?->discount_percent ?? 0);
         $discountAmount = round($price * ($discountPercent / 100), 2);
-        $netAmount = round($price - $discountAmount, 2);
+        $subtotal = round($price - $discountAmount, 2);
+        $taxAmount = round($subtotal * 0.11, 2);
+        $netAmount = round($subtotal + $taxAmount, 2);
 
         // Check if there is already a pending transaction
         $pendingTransaction = Transaction::where('subscription_id', $subscriptionModel->id)
@@ -53,7 +55,7 @@ final class DirectPaymentController extends Controller
         // If there's no pending transaction, generate one automatically
         if (!$pendingTransaction) {
             try {
-                $snapData = DB::transaction(function () use ($customer, $subscriptionModel, $price, $discountAmount, $netAmount) {
+                $snapData = DB::transaction(function () use ($customer, $subscriptionModel, $price, $discountAmount, $subtotal, $taxAmount, $netAmount) {
                     $yearMonth = now()->format('Ym');
                     $lastTxn = Transaction::where('invoice_number', 'like', "INV/{$yearMonth}%")
                         ->orderBy('invoice_number', 'desc')
@@ -69,6 +71,8 @@ final class DirectPaymentController extends Controller
                         'invoice_number'   => $invoiceNumber,
                         'gross_amount'     => $price,
                         'voucher_discount' => $discountAmount, // Only plan discount applied here automatically
+                        'subtotal_amount'  => $subtotal,
+                        'tax_amount'       => $taxAmount,
                         'voucher_id'       => null,
                         'net_amount'       => $netAmount,
                         'payment_method'   => 'midtrans',
@@ -77,13 +81,15 @@ final class DirectPaymentController extends Controller
                     ]);
 
                     Invoice::create([
-                        'transaction_id' => $transaction->id,
-                        'invoice_number' => $invoiceNumber,
-                        'customer_id'    => $customer->id,
-                        'amount'         => $netAmount,
-                        'status'         => 'issued',
-                        'issued_at'      => now(),
-                        'due_at'         => now()->addDays(3),
+                        'transaction_id'  => $transaction->id,
+                        'invoice_number'  => $invoiceNumber,
+                        'customer_id'     => $customer->id,
+                        'subtotal_amount' => $subtotal,
+                        'tax_amount'      => $taxAmount,
+                        'amount'          => $netAmount,
+                        'status'          => 'issued',
+                        'issued_at'       => now(),
+                        'due_at'          => now()->addDays(3),
                     ]);
 
                     return $this->paymentService->createSnapTransaction($transaction);

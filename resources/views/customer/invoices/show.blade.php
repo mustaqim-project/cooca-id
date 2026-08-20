@@ -77,8 +77,16 @@
                 </div>
             </div>
 
+            @php
+                $gross = (float) ($tx?->gross_amount ?? $invoice->amount);
+                $discount = (float) ($tx?->voucher_discount ?? 0);
+                $subtotal = (float) ($invoice->subtotal_amount > 0 ? $invoice->subtotal_amount : ($tx?->subtotal_amount > 0 ? $tx->subtotal_amount : max(0, $gross - $discount)));
+                $tax = (float) ($invoice->tax_amount > 0 ? $invoice->tax_amount : ($tx?->tax_amount > 0 ? $tx->tax_amount : round($subtotal * 0.11, 2)));
+                $grandTotal = (float) $invoice->amount;
+            @endphp
+
             {{-- Table --}}
-            <table class="data-table mb-6">
+            <table class="data-table mb-4">
                 <thead>
                     <tr>
                         <th>Deskripsi Item</th>
@@ -89,23 +97,39 @@
                     <tr>
                         <td>
                             <div class="font-bold text-sm" style="color: var(--text);">
-                                {{ $invoice->transaction?->subscription?->product?->name ?? 'COOCA SaaS Subscription' }}
+                                {{ $invoice->transaction?->subscription?->product?->name ?? ($invoice->transaction?->description ?? 'COOCA SaaS Subscription') }}
                             </div>
                             <div class="text-xs text-muted">
                                 {{ $invoice->transaction?->subscription?->subscriptionPlan?->name ?? 'Service Plan' }}
                             </div>
                         </td>
                         <td class="text-right font-bold text-base" style="color: var(--text);">
-                            Rp {{ number_format($invoice->amount, 0, ',', '.') }}
+                            Rp {{ number_format($gross, 0, ',', '.') }}
                         </td>
                     </tr>
                 </tbody>
             </table>
 
-            <div class="flex justify-between items-center pt-4" style="border-top:2px solid var(--border);">
-                <div class="text-sm font-bold" style="color: var(--text);">Total Tagihan:</div>
-                <div class="text-2xl font-bold" style="color:var(--primary);">
-                    Rp {{ number_format($invoice->amount, 0, ',', '.') }}
+            <div style="display:flex; flex-direction:column; gap:8px; padding-top:12px; border-top:1px solid var(--border); margin-bottom:16px;">
+                @if($discount > 0)
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-muted">Potongan Diskon / Voucher:</span>
+                        <span class="font-bold text-success">- Rp {{ number_format($discount, 0, ',', '.') }}</span>
+                    </div>
+                @endif
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-muted">Dasar Pengenaan Pajak (DPP / Subtotal):</span>
+                    <span class="font-bold" style="color:var(--text);">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-muted">Pajak Pertambahan Nilai (PPN 11%):</span>
+                    <span class="font-bold" style="color:var(--danger);">+ Rp {{ number_format($tax, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between items-center pt-3" style="border-top:2px solid var(--border);">
+                    <div class="text-base font-bold" style="color: var(--text);">Total Tagihan:</div>
+                    <div class="text-2xl font-bold" style="color:var(--primary);">
+                        Rp {{ number_format($grandTotal, 0, ',', '.') }}
+                    </div>
                 </div>
             </div>
 

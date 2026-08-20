@@ -69,8 +69,22 @@
                         <span class="font-semibold text-success">- Rp {{ number_format($transaction->voucher_discount, 0, ',', '.') }}</span>
                     </div>
                 @endif
+                @php
+                    $adminGross = (float) $transaction->gross_amount;
+                    $adminDiscount = (float) ($transaction->voucher_discount ?? 0);
+                    $adminSubtotal = (float) ($transaction->subtotal_amount > 0 ? $transaction->subtotal_amount : max(0, $adminGross - $adminDiscount));
+                    $adminTax = (float) ($transaction->tax_amount > 0 ? $transaction->tax_amount : round($adminSubtotal * 0.11, 2));
+                @endphp
+                <div class="stats-row">
+                    <span class="text-sm text-muted">Subtotal (DPP)</span>
+                    <span class="font-semibold">Rp {{ number_format($adminSubtotal, 0, ',', '.') }}</span>
+                </div>
+                <div class="stats-row">
+                    <span class="text-sm text-muted">Pajak (PPN 11%)</span>
+                    <span class="font-semibold text-danger">+ Rp {{ number_format($adminTax, 0, ',', '.') }}</span>
+                </div>
                 <div class="divider"></div>
-                <div class="stats-row" style="padding:12px;background:var(--bg);border-radius:var(--radius);">
+                <div class="stats-row" style="padding:12px;background:var(--bg-secondary);border-radius:var(--radius);border:1px solid var(--border);">
                     <span class="font-bold text-base">Total Bayar (Net Amount)</span>
                     <span class="font-bold text-2xl" style="color:var(--primary);">
                         Rp {{ number_format($transaction->net_amount, 0, ',', '.') }}

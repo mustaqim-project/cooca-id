@@ -144,7 +144,7 @@
 
                     @if (($discountPercent ?? 0) > 0)
                         <div class="stats-row">
-                            <span class="text-sm" style="color:var(--success);">Diskon ({{ $discountPercent }}%)</span>
+                            <span class="text-sm" style="color:var(--success);">Diskon Plan ({{ $discountPercent }}%)</span>
                             <span class="font-bold" style="color:var(--success);">- Rp
                                 {{ number_format($discountAmount ?? 0, 0, ',', '.') }}</span>
                         </div>
@@ -172,12 +172,25 @@
 
                     <div class="divider"></div>
 
-                    <div class="stats-row" style="padding:12px;background:var(--bg);border-radius:var(--radius);">
+                    <div class="stats-row">
+                        <span class="text-sm text-muted">Subtotal (DPP)</span>
+                        <span class="font-bold text-sm">Rp <span id="display-subtotal-amount">{{ number_format($subtotal ?? ($price - ($discountAmount ?? 0)), 0, ',', '.') }}</span></span>
+                    </div>
+
+                    <div class="stats-row">
+                        <span class="text-sm text-muted">Pajak (PPN 11%)</span>
+                        <span class="font-bold text-sm" style="color:var(--danger);">+ Rp <span id="display-tax-amount">{{ number_format($taxAmount ?? round(($subtotal ?? ($price - ($discountAmount ?? 0))) * 0.11), 0, ',', '.') }}</span></span>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="stats-row" style="padding:12px;background:var(--bg-secondary);border-radius:var(--radius);border:1px solid var(--border);">
                         <span class="font-bold text-base">Total Bayar</span>
                         <span class="font-bold text-xl" style="color:var(--primary);">
                             Rp <span id="display-net-amount">{{ number_format($netAmount, 0, ',', '.') }}</span>
                         </span>
-                    </div                    <div class="text-xs text-muted" style="text-align:center;line-height:1.5;">
+                    </div>
+                    <div class="text-xs text-muted" style="text-align:center;line-height:1.5;">
                         <i class="fa-solid fa-shield-halved" style="color:var(--success);"></i>
                         Pilih metode pembayaran aman melalui <strong>Midtrans</strong> atau <strong>Transfer Bank Manual</strong>
                     </div>
@@ -535,6 +548,13 @@
                             document.getElementById('voucher-discount-row').style.display = 'flex';
                             document.getElementById('applied-voucher-code').textContent = data.voucher_code;
                             document.getElementById('voucher-discount-amount').textContent = new Intl.NumberFormat('id-ID').format(data.discount);
+
+                            if (document.getElementById('display-subtotal-amount')) {
+                                document.getElementById('display-subtotal-amount').textContent = new Intl.NumberFormat('id-ID').format(data.subtotal);
+                            }
+                            if (document.getElementById('display-tax-amount')) {
+                                document.getElementById('display-tax-amount').textContent = new Intl.NumberFormat('id-ID').format(data.tax);
+                            }
 
                             const newTotalFormatted = new Intl.NumberFormat('id-ID').format(data.new_total);
                             document.getElementById('display-net-amount').textContent = newTotalFormatted;

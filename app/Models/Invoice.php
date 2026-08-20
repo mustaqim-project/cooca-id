@@ -19,6 +19,8 @@ final class Invoice extends Model
         'transaction_id',
         'invoice_number',
         'customer_id',
+        'subtotal_amount',
+        'tax_amount',
         'amount',
         'status',
         'issued_at',
@@ -28,6 +30,8 @@ final class Invoice extends Model
     ];
 
     protected $casts = [
+        'subtotal_amount' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
         'amount' => 'decimal:2',
         'issued_at' => 'datetime',
         'due_at' => 'datetime',

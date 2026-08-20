@@ -101,6 +101,9 @@ final class AiUsageController extends Controller
 
         $invoice = \Illuminate\Support\Facades\DB::transaction(function () use ($customer, $license, $package) {
             $invoiceNumber = 'INV-AI-' . strtoupper(date('Ymd')) . '-' . strtoupper(\Illuminate\Support\Str::random(6));
+            $subtotal = (float) $package->price;
+            $taxAmount = round($subtotal * 0.11, 2);
+            $netAmount = round($subtotal + $taxAmount, 2);
 
             $transaction = \App\Models\Transaction::create([
                 'customer_id'      => $customer->getKey(),
@@ -110,20 +113,24 @@ final class AiUsageController extends Controller
                 'invoice_number'   => $invoiceNumber,
                 'gross_amount'     => $package->price,
                 'voucher_discount' => 0,
-                'net_amount'       => $package->price,
+                'subtotal_amount'  => $subtotal,
+                'tax_amount'       => $taxAmount,
+                'net_amount'       => $netAmount,
                 'payment_method'   => 'pending',
                 'payment_gateway'  => 'midtrans',
                 'status'           => 'pending',
             ]);
 
             $invoice = \App\Models\Invoice::create([
-                'transaction_id' => $transaction->id,
-                'invoice_number' => $invoiceNumber,
-                'customer_id'    => $customer->getKey(),
-                'amount'         => $package->price,
-                'status'         => 'issued',
-                'issued_at'      => now(),
-                'due_at'         => now()->addDays(3),
+                'transaction_id'  => $transaction->id,
+                'invoice_number'  => $invoiceNumber,
+                'customer_id'     => $customer->getKey(),
+                'subtotal_amount' => $subtotal,
+                'tax_amount'      => $taxAmount,
+                'amount'          => $netAmount,
+                'status'          => 'issued',
+                'issued_at'       => now(),
+                'due_at'          => now()->addDays(3),
             ]);
 
             \App\Models\AiTokenPurchase::create([

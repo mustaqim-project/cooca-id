@@ -670,6 +670,11 @@
                 </div>
                 <div class="card-body" style="display:flex;flex-direction:column;gap:8px;" id="summaryContent">
                     @if ($selectedProduct && $selectedPlan)
+                        @php
+                            $initPlanPrice = (float) $selectedPlan->price;
+                            $initTax = round($initPlanPrice * 0.11, 2);
+                            $initGrandTotal = round($initPlanPrice + $initTax, 2);
+                        @endphp
                         <div class="stats-row"><span class="text-sm text-muted">Produk</span><span
                                 class="font-bold text-sm">{{ $selectedProduct->name }}</span></div>
                         <div class="stats-row"><span class="text-sm text-muted">Paket</span><span
@@ -677,9 +682,14 @@
                         <div class="stats-row"><span class="text-sm text-muted">Durasi</span><span
                                 class="font-bold text-sm">{{ $selectedPlan->duration_months ?? 1 }} bulan</span></div>
                         <div class="divider"></div>
-                        <div class="stats-row"><span class="font-bold">Total</span><span
+                        <div class="stats-row"><span class="text-sm text-muted">Subtotal (DPP)</span><span
+                                class="font-bold text-sm">Rp {{ number_format($initPlanPrice, 0, ',', '.') }}</span></div>
+                        <div class="stats-row"><span class="text-sm text-muted">Pajak (PPN 11%)</span><span
+                                class="font-bold text-sm" style="color:var(--danger);">+ Rp {{ number_format($initTax, 0, ',', '.') }}</span></div>
+                        <div class="divider"></div>
+                        <div class="stats-row"><span class="font-bold">Total Pembayaran</span><span
                                 class="font-bold text-primary">Rp
-                                {{ number_format($selectedPlan->price, 0, ',', '.') }}</span></div>
+                                {{ number_format($initGrandTotal, 0, ',', '.') }}</span></div>
                     @else
                         <p class="text-xs text-muted text-center py-2">Pilih produk & paket untuk melihat ringkasan.</p>
                     @endif
@@ -825,8 +835,13 @@
             }
 
             const planPrice = Number(plan.price);
-            const grandTotal = planPrice + domainCost;
+            const subtotal = planPrice + domainCost;
+            const taxAmount = Math.round(subtotal * 0.11);
+            const grandTotal = subtotal + taxAmount;
+
             const planPriceStr = new Intl.NumberFormat('id-ID').format(planPrice);
+            const subtotalStr = new Intl.NumberFormat('id-ID').format(subtotal);
+            const taxAmountStr = new Intl.NumberFormat('id-ID').format(taxAmount);
             const grandTotalStr = new Intl.NumberFormat('id-ID').format(grandTotal);
 
             box.innerHTML =
@@ -836,6 +851,9 @@
         <div class="stats-row"><span class="text-sm text-muted">Durasi Paket</span><span class="font-bold text-sm">${plan.duration_months || 1} bulan</span></div>
         <div class="stats-row"><span class="text-sm text-muted">Biaya Paket</span><span class="font-bold text-sm">Rp ${planPriceStr}</span></div>
         <div class="stats-row" style="align-items:flex-start;"><span class="text-sm text-muted">Domain</span><div class="text-right">${domainInfo}</div></div>
+        <div class="divider"></div>
+        <div class="stats-row"><span class="text-sm text-muted">Subtotal (DPP)</span><span class="font-bold text-sm">Rp ${subtotalStr}</span></div>
+        <div class="stats-row"><span class="text-sm text-muted">Pajak (PPN 11%)</span><span class="font-bold text-sm" style="color:var(--danger);">+ Rp ${taxAmountStr}</span></div>
         <div class="divider"></div>
         <div class="stats-row"><span class="font-bold">Total Pembayaran</span><span class="font-bold text-primary" style="font-size:16px;">Rp ${grandTotalStr}</span></div>`;
         }

@@ -44,6 +44,8 @@ final class Transaction extends Model
         'invoice_number',
         'gross_amount',
         'voucher_discount',
+        'subtotal_amount',
+        'tax_amount',
         'net_amount',
         'voucher_id',
         'payment_method',
@@ -67,6 +69,8 @@ final class Transaction extends Model
     protected $casts = [
         'gross_amount' => 'decimal:2',
         'voucher_discount' => 'decimal:2',
+        'subtotal_amount' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
         'net_amount' => 'decimal:2',
         'payment_proof_uploaded_at' => 'datetime',
         'paid_at' => 'datetime',

@@ -20,8 +20,10 @@ final class FinanceController extends Controller
         $netAmount = (float) $tx->net_amount;
         $paymentType = $tx->midtransTransaction?->payment_type ?? 'unknown';
 
-        // Tax calculation: 11% PPN 
-        $tax = round($netAmount * 0.11, 2);
+        $grossAmount = (float) $tx->gross_amount;
+        $voucherDiscount = (float) $tx->voucher_discount;
+        $subtotal = (float) ($tx->subtotal_amount > 0 ? $tx->subtotal_amount : max(0, $grossAmount - $voucherDiscount));
+        $tax = (float) ($tx->tax_amount > 0 ? $tx->tax_amount : round($subtotal * 0.11, 2));
 
         // Affiliate commission
         $affiliateCommission = 0.0;
@@ -51,11 +53,12 @@ final class FinanceController extends Controller
             }
         }
 
-        $netProfit = $netAmount - $tax - $midtransFee - $affiliateCommission;
+        $netProfit = $subtotal - $midtransFee - $affiliateCommission;
 
         return [
-            'gross_amount' => (float) $tx->gross_amount,
-            'voucher_discount' => (float) $tx->voucher_discount,
+            'gross_amount' => $grossAmount,
+            'voucher_discount' => $voucherDiscount,
+            'subtotal' => $subtotal,
             'net_amount' => $netAmount,
             'tax' => $tax,
             'midtrans_fee' => $midtransFee,

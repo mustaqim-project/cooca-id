@@ -337,7 +337,9 @@ final class SubscriptionController extends Controller
         $price           = (float) ($plan?->price ?? 0);
         $discountPercent = (float) ($plan?->discount_percent ?? 0);
         $discountAmount  = round($price * ($discountPercent / 100), 2);
-        $netAmount       = round($price - $discountAmount, 2);
+        $subtotal        = round($price - $discountAmount, 2);
+        $taxAmount       = round($subtotal * 0.11, 2);
+        $netAmount       = round($subtotal + $taxAmount, 2);
 
         // Show warning if there's already a pending unpaid renewal transaction
         $pendingTransaction = Transaction::where('subscription_id', $subscription->id)
@@ -360,6 +362,8 @@ final class SubscriptionController extends Controller
             'price',
             'discountPercent',
             'discountAmount',
+            'subtotal',
+            'taxAmount',
             'netAmount',
             'pendingTransaction',
             'bankSettings',
@@ -399,12 +403,16 @@ final class SubscriptionController extends Controller
             }
 
             $voucherDiscount = $this->voucherService->calculateDiscount($voucherData, $basePurchaseAmount);
-            $newTotal = max(0, $basePurchaseAmount - $voucherDiscount);
+            $subtotal = max(0, round($basePurchaseAmount - $voucherDiscount, 2));
+            $taxAmount = round($subtotal * 0.11, 2);
+            $newTotal = round($subtotal + $taxAmount, 2);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Voucher berhasil diterapkan.',
                 'discount' => $voucherDiscount,
+                'subtotal' => $subtotal,
+                'tax' => $taxAmount,
                 'new_total' => $newTotal,
                 'voucher_code' => $voucherData->code,
             ]);
@@ -458,7 +466,9 @@ final class SubscriptionController extends Controller
         }
 
         $totalDiscount = $planDiscountAmount + $voucherDiscountAmount;
-        $netAmount = max(0, round($price - $totalDiscount, 2));
+        $subtotal = max(0, round($price - $totalDiscount, 2));
+        $taxAmount = round($subtotal * 0.11, 2);
+        $netAmount = round($subtotal + $taxAmount, 2);
 
         $paymentType = $request->input('payment_type', 'midtrans');
 
@@ -477,7 +487,7 @@ final class SubscriptionController extends Controller
             $proofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
 
             try {
-                $invoice = DB::transaction(function () use ($customer, $subscription, $price, $totalDiscount, $netAmount, $voucherId, $proofPath, $request) {
+                $invoice = DB::transaction(function () use ($customer, $subscription, $price, $totalDiscount, $subtotal, $taxAmount, $netAmount, $voucherId, $proofPath, $request) {
                     $yearMonth     = now()->format('Ym');
                     $lastTxn       = Transaction::where('invoice_number', 'like', "INV/{$yearMonth}%")
                         ->orderBy('invoice_number', 'desc')
@@ -493,6 +503,8 @@ final class SubscriptionController extends Controller
                         'invoice_number'            => $invoiceNumber,
                         'gross_amount'              => $price,
                         'voucher_discount'          => $totalDiscount,
+                        'subtotal_amount'           => $subtotal,
+                        'tax_amount'                => $taxAmount,
                         'voucher_id'                => $voucherId,
                         'net_amount'                => $netAmount,
                         'payment_method'            => 'bank_transfer_manual',
@@ -505,13 +517,15 @@ final class SubscriptionController extends Controller
                     ]);
 
                     return Invoice::create([
-                        'transaction_id' => $transaction->id,
-                        'invoice_number' => $invoiceNumber,
-                        'customer_id'    => $customer->getKey(),
-                        'amount'         => $netAmount,
-                        'status'         => 'issued',
-                        'issued_at'      => now(),
-                        'due_at'         => now()->addDays(3),
+                        'transaction_id'  => $transaction->id,
+                        'invoice_number'  => $invoiceNumber,
+                        'customer_id'     => $customer->getKey(),
+                        'subtotal_amount' => $subtotal,
+                        'tax_amount'      => $taxAmount,
+                        'amount'          => $netAmount,
+                        'status'          => 'issued',
+                        'issued_at'       => now(),
+                        'due_at'          => now()->addDays(3),
                     ]);
                 });
 
@@ -524,7 +538,7 @@ final class SubscriptionController extends Controller
 
         // TIPE 1: MIDTRANS GATEWAY
         try {
-            $snapData = DB::transaction(function () use ($customer, $subscription, $price, $totalDiscount, $netAmount, $voucherId) {
+            $snapData = DB::transaction(function () use ($customer, $subscription, $price, $totalDiscount, $subtotal, $taxAmount, $netAmount, $voucherId) {
                 // Generate unique invoice number
                 $yearMonth     = now()->format('Ym');
                 $lastTxn       = Transaction::where('invoice_number', 'like', "INV/{$yearMonth}%")
@@ -542,6 +556,8 @@ final class SubscriptionController extends Controller
                     'invoice_number'   => $invoiceNumber,
                     'gross_amount'     => $price,
                     'voucher_discount' => $totalDiscount,
+                    'subtotal_amount'  => $subtotal,
+                    'tax_amount'       => $taxAmount,
                     'voucher_id'       => $voucherId,
                     'net_amount'       => $netAmount,
                     'payment_method'   => 'midtrans',
@@ -551,13 +567,15 @@ final class SubscriptionController extends Controller
 
                 // Create corresponding pending invoice
                 Invoice::create([
-                    'transaction_id' => $transaction->id,
-                    'invoice_number' => $invoiceNumber,
-                    'customer_id'    => $customer->getKey(),
-                    'amount'         => $netAmount,
-                    'status'         => 'issued',
-                    'issued_at'      => now(),
-                    'due_at'         => now()->addDays(3),
+                    'transaction_id'  => $transaction->id,
+                    'invoice_number'  => $invoiceNumber,
+                    'customer_id'     => $customer->getKey(),
+                    'subtotal_amount' => $subtotal,
+                    'tax_amount'      => $taxAmount,
+                    'amount'          => $netAmount,
+                    'status'          => 'issued',
+                    'issued_at'       => now(),
+                    'due_at'          => now()->addDays(3),
                 ]);
 
                 return $this->paymentService->createSnapTransaction($transaction);
