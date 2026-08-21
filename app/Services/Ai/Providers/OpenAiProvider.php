@@ -26,7 +26,9 @@ final class OpenAiProvider implements AiProviderInterface
             'Content-Type' => 'application/json',
         ];
 
-        $request = Http::withHeaders($headers)->timeout(500);
+        $request = Http::withHeaders($headers)
+            ->timeout(600)
+            ->connectTimeout(30);
 
         if (!empty($this->apiKey)) {
             $request = $request->withToken(trim($this->apiKey));

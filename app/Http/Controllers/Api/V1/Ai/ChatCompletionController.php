@@ -20,6 +20,9 @@ final class ChatCompletionController extends Controller
 
     public function handle(Request $request): JsonResponse
     {
+        @ini_set('max_execution_time', '600');
+        @set_time_limit(600);
+
         $validated = $request->validate([
             'model'       => 'required|string',
             'messages'    => 'required|array|min:1',

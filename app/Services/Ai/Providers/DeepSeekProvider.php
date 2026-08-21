@@ -22,7 +22,8 @@ final class DeepSeekProvider implements AiProviderInterface
             'Authorization' => 'Bearer ' . $this->apiKey,
             'Content-Type'  => 'application/json',
         ])
-        ->timeout(60)
+        ->timeout(600)
+        ->connectTimeout(30)
         ->post($url, $payload);
 
         if (!$response->successful()) {

@@ -24,7 +24,8 @@ final class GeminiProvider implements AiProviderInterface
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
         ])
-        ->timeout(60)
+        ->timeout(600)
+        ->connectTimeout(30)
         ->post($url, $geminiPayload);
 
         if (!$response->successful()) {
