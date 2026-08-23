@@ -18,6 +18,7 @@ final class ValidateLicenseRequest extends FormRequest
         return [
             'license_code' => ['required', 'string'],
             'license_key' => ['nullable', 'string'],
+            'email' => ['nullable', 'string', 'email', 'max:255'],
             'product' => ['required', 'string'],
             'domain' => ['required', 'string', 'max:255'],
             'installation_id' => ['required', 'string'],

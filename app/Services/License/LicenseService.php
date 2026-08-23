@@ -249,6 +249,22 @@ final class LicenseService
     }
 
     /**
+     * Normalize domain string by removing protocol, port, www, and trailing path.
+     */
+    private function normalizeDomain(?string $domain): string
+    {
+        if (empty($domain)) {
+            return '';
+        }
+        $domain = preg_replace('#^https?://#i', '', trim($domain));
+        $domain = explode('/', $domain)[0];
+        $domain = explode(':', $domain)[0];
+        $domain = preg_replace('#^www\.#i', '', $domain);
+
+        return strtolower(trim($domain));
+    }
+
+    /**
      * Activate license from ERP client
      */
     public function activateErpLicense(array $data): array
@@ -259,39 +275,75 @@ final class LicenseService
             return ['valid' => false, 'message' => 'License code not found'];
         }
 
-        if ($license->status !== 'active' && $license->status !== 'pending') {
-            return ['valid' => false, 'message' => 'License is ' . $license->status];
+        // Validate License Key / Token Code if provided
+        if (!empty($data['license_key']) && $license->token_code !== trim($data['license_key'])) {
+            return ['valid' => false, 'message' => 'Invalid License Key (Token Code)'];
         }
 
-        if ($license->expires_at && $license->expires_at->isPast()) {
-            return ['valid' => false, 'message' => 'License has expired'];
-        }
-
-        // Validate customer registered URL if exists
-        $customerDomain = $license->customer?->domain;
-        if (!empty($customerDomain)) {
-            $normalizedCustomerDomain = str_replace(['http://', 'https://'], '', $customerDomain);
-            $normalizedCustomerDomain = rtrim($normalizedCustomerDomain, '/');
-
-            $normalizedRequestDomain = str_replace(['http://', 'https://'], '', $data['domain']);
-            $normalizedRequestDomain = rtrim($normalizedRequestDomain, '/');
-
-            if ($normalizedCustomerDomain !== $normalizedRequestDomain) {
-                return ['valid' => false, 'message' => 'Customer URL mismatch'];
+        // Validate customer email if provided and license has customer
+        if (!empty($data['email']) && $license->customer && !empty($license->customer->email)) {
+            if (strtolower(trim($license->customer->email)) !== strtolower(trim($data['email']))) {
+                return ['valid' => false, 'message' => 'Email does not match license owner'];
             }
         }
 
-        // If domain is not set, bind it. If set, it must match.
-        if (empty($license->domain)) {
-            $this->licenseRepository->update($license->id, [
+        // Check revoked
+        if ($license->status === 'revoked') {
+            return ['valid' => false, 'message' => 'License has been revoked: ' . ($license->revocation_reason ?? 'Administrative action')];
+        }
+
+        // Check expired
+        if ($license->status === 'expired' || ($license->expires_at && $license->expires_at->isPast())) {
+            return ['valid' => false, 'message' => 'License has expired'];
+        }
+
+        $requestDomain = $this->normalizeDomain($data['domain'] ?? '');
+        if (empty($requestDomain)) {
+            return ['valid' => false, 'message' => 'Domain is required'];
+        }
+
+        // Validate customer registered domain if exists
+        $customerDomain = $this->normalizeDomain($license->customer?->domain);
+        if (!empty($customerDomain) && $customerDomain !== 'localhost' && $requestDomain !== 'localhost') {
+            if ($customerDomain !== $requestDomain) {
+                return ['valid' => false, 'message' => 'Customer domain mismatch'];
+            }
+        }
+
+        $licenseDomain = $this->normalizeDomain($license->domain);
+
+        // If domain is not set or placeholder, bind the incoming domain and activate
+        if (empty($licenseDomain) || empty($license->domain)) {
+            $updateData = [
                 'domain' => $data['domain'],
-                'status' => 'active'
-            ]);
-            $license->domain = $data['domain'];
-            $license->status = 'active';
+                'status' => 'active',
+            ];
+            if (!$license->activated_at) {
+                $updateData['activated_at'] = now();
+            }
+            if (!$license->starts_at) {
+                $updateData['starts_at'] = now();
+            }
+            if (!$license->expires_at) {
+                $updateData['expires_at'] = $license->subscription?->expires_at ?? now()->addYear();
+            }
+
+            $this->licenseRepository->update($license->id, $updateData);
+            $license = $this->licenseRepository->find($license->id);
             $this->clearLicenseCache($license);
-        } elseif ($license->domain !== $data['domain']) {
-            return ['valid' => false, 'message' => 'License is already bound to another domain'];
+        } elseif ($licenseDomain !== $requestDomain) {
+            return ['valid' => false, 'message' => 'License is already bound to another domain (' . $license->domain . ')'];
+        } else {
+            // Domain matches — ensure status is active if it was inactive or pending
+            if ($license->status === 'inactive' || $license->status === 'pending') {
+                $this->licenseRepository->update($license->id, [
+                    'status' => 'active',
+                    'activated_at' => $license->activated_at ?? now(),
+                    'starts_at' => $license->starts_at ?? now(),
+                ]);
+                $license = $this->licenseRepository->find($license->id);
+                $this->clearLicenseCache($license);
+            }
         }
 
         // Generate response payload
@@ -309,7 +361,10 @@ final class LicenseService
             return ['valid' => false, 'message' => 'License code not found'];
         }
 
-        if ($license->domain !== $data['domain']) {
+        $licenseDomain = $this->normalizeDomain($license->domain);
+        $requestDomain = $this->normalizeDomain($data['domain'] ?? '');
+
+        if ($licenseDomain !== $requestDomain && !empty($licenseDomain)) {
             return ['valid' => false, 'message' => 'Domain mismatch'];
         }
 
@@ -338,9 +393,9 @@ final class LicenseService
 
         $data = [
             'license_code' => $license->license_code,
-            'license_key' => $license->license_key ?? null,
+            'license_key' => $license->token_code,
             'subscription_status' => strtolower($license->status),
-            'subscription_plan' => $license->product->name ?? 'Standard',
+            'subscription_plan' => $license->subscriptionPlan->name ?? $license->product->name ?? 'Standard',
             'subscription_started_at' => $startedAt ? $startedAt->toIso8601String() : null,
             'subscription_expired_at' => $expiredAt ? $expiredAt->toIso8601String() : null,
             'license_status' => strtolower($license->status),
@@ -350,7 +405,7 @@ final class LicenseService
             'payload' => $payload,
         ];
 
-        $secret = config('services.cooca.secret', config('app.key'));
+        $secret = config('services.cooca.secret', 'cooca-license-shared-secret-key-2026');
         // The signature signs the payload part
         $data['signature'] = hash_hmac('sha256', json_encode($payload), $secret);
 

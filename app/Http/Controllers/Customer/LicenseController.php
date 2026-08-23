@@ -26,13 +26,15 @@ final class LicenseController extends Controller
     public function index()
     {
         $customer = Auth::user();
-        $licenses = \App\Models\License::where('customer_id', $customer->getKey())
+        $licenses = \App\Models\License::with(['product', 'subscriptionPlan', 'subscription', 'customer'])
+            ->where('customer_id', $customer->getKey())
             ->where(function ($query) {
                 $query->where('status', '!=', 'inactive')
                       ->orWhereHas('subscription', function ($q) {
-                          $q->where('status', 'active');
+                          $q->whereIn('status', ['active', 'trialing']);
                       });
             })
+            ->latest()
             ->get();
 
         return view('customer.licenses.index', [
@@ -46,7 +48,10 @@ final class LicenseController extends Controller
     public function show(string $id)
     {
         $customer = Auth::user();
-        $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->first();
+        $license = \App\Models\License::with(['product', 'subscriptionPlan', 'subscription', 'customer'])
+            ->where('id', $id)
+            ->where('customer_id', $customer->getKey())
+            ->first();
 
         if (!$license) {
             abort(404, 'License not found');
@@ -100,7 +105,10 @@ final class LicenseController extends Controller
     public function credentials(string $id)
     {
         $customer = Auth::user();
-        $license = \App\Models\License::where('id', $id)->where('customer_id', $customer->getKey())->first();
+        $license = \App\Models\License::with(['product', 'subscriptionPlan', 'subscription', 'customer'])
+            ->where('id', $id)
+            ->where('customer_id', $customer->getKey())
+            ->first();
 
         if (!$license) {
             abort(404, 'License not found');

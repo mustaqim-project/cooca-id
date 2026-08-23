@@ -45,13 +45,26 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <label class="form-label font-semibold">Registered Email</label>
+            <p class="text-xs text-muted mb-2">Email akun pemilik lisensi pada portal COOCA.ID.</p>
+            <div class="flex gap-2">
+                <input type="text" class="form-input font-mono font-bold" readonly value="{{ $license->customer->email ?? $license['customer']['email'] ?? auth()->user()->email ?? '—' }}" id="emailInput">
+                <button onclick="copyField('emailInput')" class="btn btn-outline">Copy Email</button>
+            </div>
+        </div>
+
         <div class="stats-row">
             <span class="text-sm text-muted">Assigned Domain</span>
-            <span class="font-bold text-sm">{{ $license->domain ?? $license['domain'] ?? 'Not set' }}</span>
+            <span class="font-bold text-sm">{{ $license->domain ?? $license['domain'] ?? 'Not set (auto-binds on activation)' }}</span>
         </div>
         <div class="stats-row">
             <span class="text-sm text-muted">Product</span>
             <span class="font-bold text-sm">{{ $license->product->name ?? $license['product']['name'] ?? 'COOCA SaaS' }}</span>
+        </div>
+        <div class="stats-row">
+            <span class="text-sm text-muted">Plan</span>
+            <span class="font-bold text-sm">{{ $license->subscriptionPlan->name ?? $license['subscription_plan']['name'] ?? 'Standard' }}</span>
         </div>
     </div>
 </div>
