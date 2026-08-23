@@ -591,7 +591,7 @@ final class SubscriptionController extends Controller
                         'status'                    => 'pending',
                     ]);
 
-                    return Invoice::create([
+                    $inv = Invoice::create([
                         'transaction_id'  => $transaction->id,
                         'invoice_number'  => $invoiceNumber,
                         'customer_id'     => $customer->getKey(),
@@ -602,6 +602,16 @@ final class SubscriptionController extends Controller
                         'issued_at'       => now(),
                         'due_at'          => now()->addDays(3),
                     ]);
+
+                    // Send email notification to agungmustaqim15@gmail.com and cooca.idn@gmail.com
+                    try {
+                        \Illuminate\Support\Facades\Mail::to(['agungmustaqim15@gmail.com', 'cooca.idn@gmail.com'])
+                            ->send(new \App\Mail\Admin\SubscriptionPaymentReceivedMail($transaction, 'Bukti Transfer Baru Diunggah (Menunggu Verifikasi)'));
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::error('[SubscriptionController] Failed to send admin payment proof email: ' . $e->getMessage());
+                    }
+
+                    return $inv;
                 });
 
                 return redirect()->route('customer.invoices.show', $invoice->id)

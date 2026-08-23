@@ -176,8 +176,47 @@
                 </tr>
             </table>
 
+            @if($transaction->payment_proof)
+            <div class="section-title" style="color:#b45309; border-color:#fef3c7;">📸 Bukti Pembayaran / Struk Transfer</div>
+            <table class="data-table">
+                @if($transaction->sender_name)
+                <tr>
+                    <td class="label">Nama Pemilik Rekening:</td>
+                    <td class="value">{{ $transaction->sender_name }}</td>
+                </tr>
+                @endif
+                @if($transaction->payment_notes)
+                <tr>
+                    <td class="label">Catatan Pengirim:</td>
+                    <td class="value">{{ $transaction->payment_notes }}</td>
+                </tr>
+                @endif
+                <tr>
+                    <td class="label">Waktu Upload:</td>
+                    <td class="value">{{ $transaction->payment_proof_uploaded_at ? $transaction->payment_proof_uploaded_at->translatedFormat('d M Y, H:i:s') . ' WIB' : '—' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">File Bukti:</td>
+                    <td class="value">
+                        <a href="{{ asset('storage/' . $transaction->payment_proof) }}" target="_blank" style="display:inline-block; background:#0284c7; color:#ffffff; padding:6px 12px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:700;">
+                            Lihat / Unduh Bukti Transfer &rarr;
+                        </a>
+                    </td>
+                </tr>
+            </table>
+
+            @php
+                $ext = strtolower(pathinfo($transaction->payment_proof, PATHINFO_EXTENSION));
+            @endphp
+            @if(in_array($ext, ['jpg', 'jpeg', 'png', 'webp']))
+            <div style="margin-top:12px; text-align:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px;">
+                <img src="{{ asset('storage/' . $transaction->payment_proof) }}" alt="Bukti Transfer" style="max-width:100%; max-height:350px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+            </div>
+            @endif
+            @endif
+
             <div style="text-align: center;">
-                <a href="{{ route('admin.payments.index') }}" class="btn-action">Buka Menu Pembayaran Admin</a>
+                <a href="{{ route('admin.payments.index') }}" class="btn-action">Buka Menu Verifikasi Pembayaran Admin</a>
             </div>
         </div>
 
