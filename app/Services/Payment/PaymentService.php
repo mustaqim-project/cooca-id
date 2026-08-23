@@ -153,21 +153,55 @@ final class PaymentService
                 ActivateSubscriptionJob::dispatch($transaction);
             }
 
-            // Credit AI Token Purchase if this is an AI Top-up transaction
+            // Credit AI Token Lot if this is an AI Top-up transaction
             $aiPurchase = \App\Models\AiTokenPurchase::where('transaction_id', (string) $transaction->id)
                 ->where('status', 'pending')
                 ->first();
 
             if ($aiPurchase) {
-                $license = $aiPurchase->license;
-                if ($license) {
-                    $cycle = app(\App\Services\Ai\AiQuotaService::class)->currentCycleFor($license);
-                    $cycle->increment('token_quota', (int) $aiPurchase->tokens_amount);
+                $customer = $transaction->customer ?? \App\Models\Customer::find($transaction->customer_id);
+                if ($customer) {
+                    $packageName = $aiPurchase->package?->name ?? 'AI Token Top Up';
+                    app(\App\Services\Ai\AiTokenWalletService::class)->creditTokenLot(
+                        customer: $customer,
+                        tokens: (int) $aiPurchase->tokens_amount,
+                        sourceType: \App\Models\AiTokenLot::SOURCE_TOPUP,
+                        sourceId: (string) $transaction->id,
+                        name: "Top-Up: {$packageName} (" . number_format((int) $aiPurchase->tokens_amount) . " Tokens)",
+                        license: $aiPurchase->license,
+                        startsAt: now(),
+                        expiresAt: now()->addDays(30), // Rule: 30 days validity from purchase date!
+                        idempotencyKey: "topup_{$transaction->id}"
+                    );
                 }
+
                 $aiPurchase->update([
                     'status' => 'completed',
                     'credited_at' => Carbon::now(),
                 ]);
+            }
+
+            // If subscription has AI plan quota, credit separate Subscription Token Lot
+            if ($transaction->subscription && $transaction->subscription->subscriptionPlan) {
+                $plan = $transaction->subscription->subscriptionPlan;
+                $aiPlanConfig = $plan->aiPlanConfig;
+                if ($aiPlanConfig && $aiPlanConfig->monthly_token_quota > 0) {
+                    $customer = $transaction->customer ?? \App\Models\Customer::find($transaction->customer_id);
+                    if ($customer) {
+                        $subExpiresAt = $transaction->subscription->expires_at ? Carbon::parse($transaction->subscription->expires_at) : now()->addMonth();
+                        app(\App\Services\Ai\AiTokenWalletService::class)->creditTokenLot(
+                            customer: $customer,
+                            tokens: (int) $aiPlanConfig->monthly_token_quota,
+                            sourceType: \App\Models\AiTokenLot::SOURCE_SUBSCRIPTION,
+                            sourceId: (string) $transaction->subscription->id,
+                            name: "Subscription: {$plan->name} (" . number_format((int) $aiPlanConfig->monthly_token_quota) . " Tokens)",
+                            license: $transaction->subscription->license,
+                            startsAt: now(),
+                            expiresAt: $subExpiresAt,
+                            idempotencyKey: "sub_{$transaction->subscription->id}_{$transaction->id}"
+                        );
+                    }
+                }
             }
 
             // Record voucher usage if applicable
@@ -243,21 +277,55 @@ final class PaymentService
                 ActivateSubscriptionJob::dispatch($transaction);
             }
 
-            // Credit AI Token Purchase if this is an AI Top-up transaction
+            // Credit AI Token Lot if this is an AI Top-up transaction
             $aiPurchase = \App\Models\AiTokenPurchase::where('transaction_id', (string) $transaction->id)
                 ->where('status', 'pending')
                 ->first();
 
             if ($aiPurchase) {
-                $license = $aiPurchase->license;
-                if ($license) {
-                    $cycle = app(\App\Services\Ai\AiQuotaService::class)->currentCycleFor($license);
-                    $cycle->increment('token_quota', (int) $aiPurchase->tokens_amount);
+                $customer = $transaction->customer ?? \App\Models\Customer::find($transaction->customer_id);
+                if ($customer) {
+                    $packageName = $aiPurchase->package?->name ?? 'AI Token Top Up';
+                    app(\App\Services\Ai\AiTokenWalletService::class)->creditTokenLot(
+                        customer: $customer,
+                        tokens: (int) $aiPurchase->tokens_amount,
+                        sourceType: \App\Models\AiTokenLot::SOURCE_TOPUP,
+                        sourceId: (string) $transaction->id,
+                        name: "Top-Up: {$packageName} (" . number_format((int) $aiPurchase->tokens_amount) . " Tokens)",
+                        license: $aiPurchase->license,
+                        startsAt: now(),
+                        expiresAt: now()->addDays(30), // Rule: 30 days validity from purchase date!
+                        idempotencyKey: "topup_{$transaction->id}"
+                    );
                 }
+
                 $aiPurchase->update([
                     'status' => 'completed',
                     'credited_at' => Carbon::now(),
                 ]);
+            }
+
+            // If subscription has AI plan quota, credit separate Subscription Token Lot
+            if ($transaction->subscription && $transaction->subscription->subscriptionPlan) {
+                $plan = $transaction->subscription->subscriptionPlan;
+                $aiPlanConfig = $plan->aiPlanConfig;
+                if ($aiPlanConfig && $aiPlanConfig->monthly_token_quota > 0) {
+                    $customer = $transaction->customer ?? \App\Models\Customer::find($transaction->customer_id);
+                    if ($customer) {
+                        $subExpiresAt = $transaction->subscription->expires_at ? Carbon::parse($transaction->subscription->expires_at) : now()->addMonth();
+                        app(\App\Services\Ai\AiTokenWalletService::class)->creditTokenLot(
+                            customer: $customer,
+                            tokens: (int) $aiPlanConfig->monthly_token_quota,
+                            sourceType: \App\Models\AiTokenLot::SOURCE_SUBSCRIPTION,
+                            sourceId: (string) $transaction->subscription->id,
+                            name: "Subscription: {$plan->name} (" . number_format((int) $aiPlanConfig->monthly_token_quota) . " Tokens)",
+                            license: $transaction->subscription->license,
+                            startsAt: now(),
+                            expiresAt: $subExpiresAt,
+                            idempotencyKey: "sub_{$transaction->subscription->id}_{$transaction->id}"
+                        );
+                    }
+                }
             }
 
             // Record voucher usage if applicable

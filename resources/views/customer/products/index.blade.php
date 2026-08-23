@@ -193,13 +193,19 @@
 
                         {{-- Subscribe / Manage button --}}
                         @if($hasActive)
-                        <a href="{{ route('customer.products.show', $product->slug ?? $product->id) }}"
-                           class="btn btn-outline btn-sm w-full" style="justify-content:center;">
-                            <i class="fa-solid fa-gear"></i> Kelola
-                        </a>
+                        <div style="display:flex;gap:6px;width:100%;">
+                            <a href="{{ route('customer.subscriptions.index') }}"
+                               class="btn btn-outline btn-sm" style="flex:1;justify-content:center;" title="Kelola Langganan Aktif">
+                                <i class="fa-solid fa-list-check"></i> Kelola
+                            </a>
+                            <a href="{{ route('customer.products.show', $product->slug ?? $product->id) }}"
+                               class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" title="Order instance baru dengan domain berbeda">
+                                <i class="fa-solid fa-plus"></i> Order Baru
+                            </a>
+                        </div>
                         @else
                         <a href="{{ route('customer.products.show', $product->slug ?? $product->id) }}"
-                           class="btn btn-primary btn-sm" style="flex:1;justify-content:center;">
+                           class="btn btn-primary btn-sm w-full" style="justify-content:center;">
                             <i class="fa-solid fa-rocket"></i> Subscribe
                         </a>
                         @endif

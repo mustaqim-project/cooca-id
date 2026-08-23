@@ -1,38 +1,60 @@
 @extends('layouts.customer')
 
-@section('title', 'AI Gateway, Kuota & Tracking Penggunaan Token — COOCA.ID')
+@section('title', 'AI Token Wallet & Usage Tracking — COOCA.ID')
 
 @push('styles')
 <style>
-.gateway-param-grid {
+.wallet-hero {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    border-radius: var(--radius-lg);
+    padding: 24px 28px;
+    color: #ffffff;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.kpi-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
+    gap: 16px;
 }
-.gateway-code-block {
-    position: relative;
-    background: #090d16;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+.kpi-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
     padding: 16px;
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
-    font-size: 12px;
-    color: #e2e8f0;
-    overflow-x: auto;
+    backdrop-filter: blur(8px);
 }
-.gateway-token-badge {
-    background: var(--primary-soft);
-    color: var(--primary);
-    padding: 4px 8px;
-    border-radius: 6px;
+.kpi-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
     font-weight: 700;
-    font-family: monospace;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.kpi-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #ffffff;
+}
+.breakdown-bar {
+    height: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    background: #334155;
+    margin-top: 14px;
+    margin-bottom: 12px;
 }
 .package-card {
     border: 2px solid var(--border);
     border-radius: var(--radius-md);
     background: var(--card);
-    padding: 20px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -49,409 +71,665 @@
     border-color: var(--primary);
     background: var(--primary-soft);
 }
+.tab-nav {
+    display: flex;
+    gap: 6px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: all .15s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
 </style>
 @endpush
 
 @section('content')
-<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+{{-- Header --}}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
     <div>
-        <h1 style="font-size: 24px; font-weight: 800; color: var(--text); margin: 0; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-brain" style="color: var(--primary);"></i> AI Gateway & Tracking Token
+        <h1 style="font-size: 24px; font-weight: 800; color: var(--text); margin: 0; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-wallet" style="color: var(--primary);"></i> AI Token Wallet & Analytics
         </h1>
-        <p style="color: var(--text-muted); margin: 4px 0 0; font-size: 14px;">
-            Pantau penggunaan token, sisa kuota, riwayat pemanggilan API, serta akses multi-model AI (OpenAI GPT, Gemini, Claude, DeepSeek).
+        <p style="color: var(--text-muted); margin: 4px 0 0; font-size: 13px;">
+            Kelola saldo token AI, batch/lot pembelian (30 hari masa aktif), mutasi transaksi, dan integrasi multi-model AI.
         </p>
     </div>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-        @if($licenses->isNotEmpty())
-            <button type="button" class="btn btn-outline" onclick="openTopUpModal()" style="border-color: var(--primary); color: var(--primary); font-weight: 700;">
-                <i class="fa-solid fa-bolt" style="color: var(--accent);"></i> Top-Up Kuota Token
-            </button>
-            <button type="button" class="btn btn-primary" onclick="openNewKeyModal()">
-                <i class="fa-solid fa-plus"></i> Buat API Key Baru
-            </button>
-        @endif
+        <button type="button" class="btn btn-primary" onclick="openTopUpModal()">
+            <i class="fa-solid fa-bolt" style="color: #FACC15;"></i> + Top-Up AI Token
+        </button>
+        <button type="button" class="btn btn-outline" onclick="openNewKeyModal()">
+            <i class="fa-solid fa-key"></i> Buat API Key
+        </button>
     </div>
 </div>
 
+{{-- Flash Messages --}}
 @if(session('success'))
     <div class="alert alert-success mb-4"><i class="fa-solid fa-circle-check"></i> {{ session('success') }}</div>
 @endif
-
 @if(session('error'))
     <div class="alert alert-danger mb-4"><i class="fa-solid fa-triangle-exclamation"></i> {{ session('error') }}</div>
 @endif
 
-{{-- Monthly KPI Cards for Customer --}}
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
-    <div class="card" style="border: 1px solid var(--border); padding: 18px; border-radius: var(--radius-md);">
-        <div class="flex justify-between items-center mb-2">
-            <span class="text-xs font-bold uppercase text-muted">Token Terpakai Bulan Ini</span>
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 14px;">
-                <i class="fa-solid fa-microchip"></i>
+{{-- Expiration Warnings Banner --}}
+@if(!empty($walletSummary['warnings']))
+    @foreach($walletSummary['warnings'] as $warn)
+        <div class="alert alert-{{ $warn['severity'] }} mb-3" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-clock-rotate-left fs-5"></i>
+                <div>
+                    <strong>Peringatan Kedaluwarsa Token:</strong> {{ $warn['message'] }}
+                </div>
             </div>
+            <button type="button" class="btn btn-sm btn-outline" onclick="openTopUpModal()" style="font-size: 11px; padding: 4px 10px;">
+                <i class="fa-solid fa-rotate"></i> Top-Up Sekarang
+            </button>
         </div>
-        <div class="font-extrabold text-2xl" style="color: var(--text);">
-            {{ number_format($currentMonthUsage->total_tokens ?? 0) }}
-        </div>
-        <div class="text-xs text-muted mt-1">Akumulasi input & output token</div>
-    </div>
-
-    <div class="card" style="border: 1px solid var(--border); padding: 18px; border-radius: var(--radius-md);">
-        <div class="flex justify-between items-center mb-2">
-            <span class="text-xs font-bold uppercase text-muted">Total Permintaan API</span>
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--success-soft); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 14px;">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-        </div>
-        <div class="font-extrabold text-2xl" style="color: var(--success);">
-            {{ number_format($currentMonthUsage->total_requests ?? 0) }}
-        </div>
-        <div class="text-xs text-muted mt-1">Panggilan chat/completions</div>
-    </div>
-
-    <div class="card" style="border: 1px solid var(--border); padding: 18px; border-radius: var(--radius-md);">
-        <div class="flex justify-between items-center mb-2">
-            <span class="text-xs font-bold uppercase text-muted">Rata-rata Waktu Respon</span>
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--warning-soft); color: var(--warning); display: flex; align-items: center; justify-content: center; font-size: 14px;">
-                <i class="fa-solid fa-stopwatch"></i>
-            </div>
-        </div>
-        <div class="font-extrabold text-2xl" style="color: var(--warning);">
-            {{ number_format((float)($currentMonthUsage->avg_latency ?? 0)) }} ms
-        </div>
-        <div class="text-xs text-muted mt-1">Kecepatan latensi gateway</div>
-    </div>
-
-    <div class="card" style="border: 1px solid var(--border); padding: 18px; border-radius: var(--radius-md);">
-        <div class="flex justify-between items-center mb-2">
-            <span class="text-xs font-bold uppercase text-muted">Status AI Gateway</span>
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 14px;">
-                <i class="fa-solid fa-shield-check"></i>
-            </div>
-        </div>
-        <div class="font-extrabold text-2xl" style="color: var(--accent);">
-            Aktif & Siap
-        </div>
-        <div class="text-xs text-muted mt-1">Protokol OpenAI 100% Kompatibel</div>
-    </div>
-</div>
-
-{{-- One-Time Reveal Flash Card --}}
-@if(session('new_api_key'))
-    <div class="card mb-4" style="border: 2px solid var(--success); background: var(--success-soft);">
-        <div class="card-body" style="padding: 20px;">
-            <div class="flex items-center gap-2 mb-2" style="color: var(--success); font-weight: 800; font-size: 15px;">
-                <i class="fa-solid fa-key"></i> Simpan API Key Anda Sekarang!
-            </div>
-            <p class="text-xs text-muted mb-3" style="color: var(--text);">
-                Demi keamanan akun Anda, kunci API rahasia ini <strong>hanya ditampilkan satu kali</strong> dan tidak dapat dilihat kembali setelah halaman ditutup.
-            </p>
-            <div class="flex items-center gap-2" style="flex-wrap: wrap;">
-                <code id="new-plain-key" style="font-family: monospace; font-size: 14px; font-weight: 700; background: var(--card); color: var(--text); padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); flex: 1; min-width: 280px; word-break: break-all;">{{ session('new_api_key')['plain_key'] }}</code>
-                <button type="button" class="btn btn-primary" onclick="copyNewKey()" style="padding: 10px 18px;">
-                    <i class="fa-solid fa-copy"></i> Salin API Key
-                </button>
-            </div>
-        </div>
-    </div>
+    @endforeach
 @endif
 
-{{-- Active License & AI Token Quotas --}}
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-bottom: 24px;">
-    @forelse($licenses as $lic)
-        @php
-            $cycle = $cycles->get($lic->id);
-            $tokensUsed = $cycle ? $cycle->tokens_used : 0;
-            $tokenQuota = $cycle ? $cycle->token_quota : 100000;
-            $pct = $tokenQuota > 0 ? ($tokensUsed / $tokenQuota) * 100 : 0;
-            $barColor = $pct > 90 ? 'var(--danger)' : ($pct > 75 ? 'var(--warning)' : 'var(--success)');
-        @endphp
-        <div class="card" style="border: 1px solid var(--border); box-shadow: var(--shadow-xs);">
-            <div class="card-body" style="padding: 20px;">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="badge badge-primary font-bold text-xs">
-                        {{ $lic->product->name ?? 'Paket SaaS' }}
-                    </span>
-                    <button type="button" class="btn btn-ghost btn-xs" onclick="openTopUpModal('{{ $lic->id }}')" style="color: var(--primary); font-weight: 700;">
-                        <i class="fa-solid fa-bolt"></i> + Top-Up Kuota
-                    </button>
-                </div>
-
-                <div class="text-xs text-muted mb-3">
-                    Domain: <strong>{{ $lic->domain ?? 'Semua Domain' }}</strong>
-                </div>
-
-                <div class="mb-3">
-                    <div class="flex justify-between text-xs font-bold mb-1">
-                        <span style="color: var(--text);">Pemakaian Token Siklus Ini</span>
-                        <span style="color: {{ $barColor }};">{{ number_format($pct, 1) }}%</span>
-                    </div>
-                    <div style="height: 8px; background: var(--bg-secondary); border-radius: 6px; overflow: hidden; border: 1px solid var(--border);">
-                        <div style="height: 100%; width: {{ min(100, $pct) }}%; background: {{ $barColor }}; border-radius: 6px; transition: width 0.3s ease;"></div>
-                    </div>
-                    <div class="flex justify-between text-xs text-muted mt-1 font-mono">
-                        <span>{{ number_format($tokensUsed) }} terpakai</span>
-                        <span>{{ number_format($tokenQuota) }} kuota</span>
-                    </div>
-                </div>
-
-                <div class="text-xs text-muted font-mono" style="border-top: 1px solid var(--border); padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
-                    <span>
-                        <i class="fa-regular fa-clock" style="margin-right: 4px;"></i> Reset: 
-                        <strong>{{ $cycle?->cycle_end ? $cycle->cycle_end->format('d M Y') : 'Akhir Bulan' }}</strong>
-                    </span>
-                    <span class="text-xs font-mono text-muted">Lic: {{ substr($lic->id, 0, 8) }}...</span>
+{{-- ══════════════════════════════ HERO WALLET STATS ══════════════════════════════ --}}
+<div class="wallet-hero">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(59, 130, 246, 0.2); color: #60A5FA; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(96, 165, 250, 0.3);">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <div>
+                <div style="font-size: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Saldo AI Token Tersedia (Wallet)</div>
+                <div style="font-size: 32px; font-weight: 900; color: #ffffff; line-height: 1.2;">
+                    {{ number_format($walletSummary['total_available']) }} <span style="font-size: 16px; font-weight: 600; color: #94a3b8;">Tokens</span>
                 </div>
             </div>
         </div>
-    @empty
-        <div class="card" style="grid-column: 1 / -1;">
-            <div class="card-body text-center text-muted" style="padding: 40px;">
-                <i class="fa-solid fa-brain" style="font-size: 40px; color: var(--primary); opacity: 0.4; margin-bottom: 12px; display: block;"></i>
-                <div class="font-bold text-base" style="color: var(--text);">Belum Ada Lisensi SaaS Aktif</div>
-                <div class="text-xs text-muted mt-1">Berlangganan salah satu paket SaaS untuk mendapatkan akses AI Gateway & kuota token bulanan.</div>
+        <div style="text-align: right;">
+            <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.3); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 20px;">
+                <i class="fa-solid fa-circle-check"></i> FEFO Consumption Active
+            </span>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 6px;">
+                Top-Up berlaku <strong>30 Hari</strong> per batch
             </div>
         </div>
-    @endforelse
-</div>
+    </div>
 
-{{-- API Keys Table --}}
-<div class="card mb-4">
-    <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
-        <div class="card-title font-bold text-sm" style="color: var(--text);">
-            <i class="fa-solid fa-key" style="color: var(--primary); margin-right: 6px;"></i> Kunci API AI (API Keys)
+    <div class="kpi-grid">
+        <div class="kpi-box">
+            <div class="kpi-label">
+                <span>Terpakai Bulan Ini</span>
+                <i class="fa-solid fa-chart-line" style="color: #60A5FA;"></i>
+            </div>
+            <div class="kpi-value" style="color: #60A5FA;">
+                {{ number_format($walletSummary['used_this_month']) }}
+            </div>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Akumulasi pemakaian AI</div>
         </div>
-        @if($licenses->isNotEmpty())
-            <button type="button" class="btn btn-outline btn-xs" onclick="openNewKeyModal()">
-                <i class="fa-solid fa-plus"></i> Tambah Key
-            </button>
+
+        <div class="kpi-box">
+            <div class="kpi-label">
+                <span>Expiring Soon (H-7)</span>
+                <i class="fa-solid fa-hourglass-half" style="color: #FBBF24;"></i>
+            </div>
+            <div class="kpi-value" style="color: {{ $walletSummary['expiring_soon'] > 0 ? '#FBBF24' : '#ffffff' }};">
+                {{ number_format($walletSummary['expiring_soon']) }}
+            </div>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Kedaluwarsa dlm 7 hari</div>
+        </div>
+
+        <div class="kpi-box">
+            <div class="kpi-label">
+                <span>Next Expiration</span>
+                <i class="fa-solid fa-calendar-day" style="color: #A78BFA;"></i>
+            </div>
+            <div class="kpi-value" style="font-size: 18px; margin-top: 4px;">
+                {{ $walletSummary['next_expiration_date'] ? $walletSummary['next_expiration_date']->translatedFormat('d M Y') : 'Tidak Ada' }}
+            </div>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">
+                {{ $walletSummary['next_expiration_date'] ? $walletSummary['next_expiration_date']->diffForHumans() : 'Semua lot aman' }}
+            </div>
+        </div>
+
+        <div class="kpi-box">
+            <div class="kpi-label">
+                <span>Total Lot Aktif</span>
+                <i class="fa-solid fa-layer-group" style="color: #34D399;"></i>
+            </div>
+            <div class="kpi-value" style="color: #34D399;">
+                {{ $walletSummary['active_lots']->count() }} Lot
+            </div>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Diproses otomatis FEFO</div>
+        </div>
+    </div>
+
+    {{-- Breakdown Progress Bar --}}
+    @php
+        $totalAvail = max(1, $walletSummary['total_available']);
+        $subPct = ($walletSummary['breakdown']['subscription'] / $totalAvail) * 100;
+        $topupPct = ($walletSummary['breakdown']['topup'] / $totalAvail) * 100;
+        $bonusPct = ($walletSummary['breakdown']['bonus'] / $totalAvail) * 100;
+    @endphp
+    <div class="breakdown-bar">
+        @if($walletSummary['breakdown']['subscription'] > 0)
+            <div style="width: {{ $subPct }}%; background: #3B82F6;" title="Subscription: {{ number_format($walletSummary['breakdown']['subscription']) }}"></div>
+        @endif
+        @if($walletSummary['breakdown']['topup'] > 0)
+            <div style="width: {{ $topupPct }}%; background: #10B981;" title="Top Up: {{ number_format($walletSummary['breakdown']['topup']) }}"></div>
+        @endif
+        @if($walletSummary['breakdown']['bonus'] > 0)
+            <div style="width: {{ $bonusPct }}%; background: #F59E0B;" title="Bonus/Promo: {{ number_format($walletSummary['breakdown']['bonus']) }}"></div>
         @endif
     </div>
-    <div class="card-body" style="padding: 0;">
-        <div class="table-responsive">
-            <table class="table" style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background: var(--bg-secondary); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; color: var(--text-muted);">
-                        <th style="padding: 12px 18px;">Nama Kunci</th>
-                        <th style="padding: 12px 18px;">API Key Rahasia</th>
-                        <th style="padding: 12px 18px;">Lisensi Terkait</th>
-                        <th style="padding: 12px 18px;">Status</th>
-                        <th style="padding: 12px 18px;">Terakhir Digunakan</th>
-                        <th style="padding: 12px 18px; text-align: right;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($keys as $k)
-                        <tr style="border-bottom: 1px solid var(--border);">
-                            <td style="padding: 14px 18px;">
-                                <strong style="color: var(--text); font-size: 13px;">{{ $k->name }}</strong>
-                                <div class="text-xs text-muted font-mono">{{ $k->id }}</div>
-                            </td>
-                            <td style="padding: 14px 18px;">
-                                @php
-                                    $hasPlain = !empty($k->plain_key);
-                                    $masked = $k->key_prefix . '••••••••••••••••••••••••';
-                                    $full = $hasPlain ? $k->plain_key : $masked;
-                                @endphp
-                                <div class="flex items-center gap-2" style="max-width: 320px;">
-                                    <code id="key-text-{{ $k->id }}" 
-                                          data-full="{{ $full }}" 
-                                          data-masked="{{ $masked }}" 
-                                          data-state="masked"
-                                          class="font-mono text-xs font-bold" 
-                                          style="background: var(--bg-secondary); color: var(--text); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); word-break: break-all; flex: 1;">
-                                        {{ $masked }}
-                                    </code>
-                                    
-                                    @if($hasPlain)
-                                        <button type="button" class="btn btn-ghost btn-xs" onclick="toggleKeyVisibility('{{ $k->id }}')" title="Tampilkan / Sembunyikan Kunci" style="padding: 4px 6px;">
-                                            <i id="key-eye-{{ $k->id }}" class="fa-regular fa-eye"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-ghost btn-xs" onclick="copyKeyText('{{ $k->id }}')" title="Salin API Key" style="padding: 4px 6px;">
-                                            <i class="fa-solid fa-copy"></i>
-                                        </button>
+
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 10px; height: 10px; border-radius: 3px; background: #3B82F6; display: inline-block;"></span>
+            <span>Subscription: <strong>{{ number_format($walletSummary['breakdown']['subscription']) }}</strong></span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 10px; height: 10px; border-radius: 3px; background: #10B981; display: inline-block;"></span>
+            <span>Top Up: <strong>{{ number_format($walletSummary['breakdown']['topup']) }}</strong></span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 10px; height: 10px; border-radius: 3px; background: #F59E0B; display: inline-block;"></span>
+            <span>Bonus & Promo: <strong>{{ number_format($walletSummary['breakdown']['bonus']) }}</strong></span>
+        </div>
+    </div>
+</div>
+
+{{-- ══════════════════════════════ TABS NAVIGATION ══════════════════════════════ --}}
+<div class="tab-nav">
+    <button type="button" class="tab-btn active" onclick="switchTab('lots')">
+        <i class="fa-solid fa-layer-group"></i> Token Lots / Batch ({{ $tokenLots->total() }})
+    </button>
+    <button type="button" class="tab-btn" onclick="switchTab('transactions')">
+        <i class="fa-solid fa-list-check"></i> Mutasi Transaksi Ledger ({{ $transactions->total() }})
+    </button>
+    <button type="button" class="tab-btn" onclick="switchTab('keys')">
+        <i class="fa-solid fa-key"></i> AI API Keys ({{ $keys->count() }})
+    </button>
+    <button type="button" class="tab-btn" onclick="switchTab('telemetry')">
+        <i class="fa-solid fa-microchip"></i> Riwayat Request AI ({{ $recentLogs->total() }})
+    </button>
+    <button type="button" class="tab-btn" onclick="switchTab('analytics')">
+        <i class="fa-solid fa-chart-pie"></i> Multi-Model Analytics
+    </button>
+</div>
+
+{{-- ══════════════════════════════ TAB 1: TOKEN LOTS ══════════════════════════════ --}}
+<div class="tab-pane active" id="pane-lots">
+    <div class="card mb-4">
+        <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
+            <div class="card-title font-bold text-sm" style="color: var(--text);">
+                <i class="fa-solid fa-boxes-stacked" style="color: var(--primary); margin-right: 6px;"></i> Daftar Token Lot / Batch Pembelian
+            </div>
+            <span class="text-xs text-muted">Setiap Top-Up memiliki masa berlaku 30 hari tersendiri</span>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--bg-secondary); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; color: var(--text-muted);">
+                            <th style="padding: 12px 18px;">Nomor Lot & Nama</th>
+                            <th style="padding: 12px 18px;">Jenis Sumber</th>
+                            <th style="padding: 12px 18px;">Sisa Token</th>
+                            <th style="padding: 12px 18px;">Total Awal</th>
+                            <th style="padding: 12px 18px;">Tgl Beli</th>
+                            <th style="padding: 12px 18px;">Tgl Kedaluwarsa</th>
+                            <th style="padding: 12px 18px; text-align: right;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($tokenLots as $lot)
+                            @php
+                                $daysLeft = $lot->daysUntilExpiration();
+                                $pctLeft = $lot->original_tokens > 0 ? ($lot->remaining_tokens / $lot->original_tokens) * 100 : 0;
+                            @endphp
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 14px 18px;">
+                                    <strong style="color: var(--text); font-size: 13px;">{{ $lot->name }}</strong>
+                                    <div class="font-mono text-xs text-muted">{{ $lot->lot_number }}</div>
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    @if($lot->source_type === 'subscription')
+                                        <span class="badge badge-primary" style="font-size: 10px;">SUBSCRIPTION</span>
+                                    @elseif($lot->source_type === 'topup')
+                                        <span class="badge badge-success" style="font-size: 10px;">TOP-UP (30 HARI)</span>
+                                    @elseif($lot->source_type === 'bonus')
+                                        <span class="badge badge-warning" style="font-size: 10px;">BONUS</span>
+                                    @else
+                                        <span class="badge badge-secondary" style="font-size: 10px;">{{ strtoupper($lot->source_type) }}</span>
                                     @endif
-                                </div>
-                            </td>
-                            <td style="padding: 14px 18px;">
-                                <span class="font-bold text-xs" style="color: var(--text);">
-                                    {{ $k->license->product->name ?? 'Paket SaaS' }}
-                                </span>
-                                <div class="text-xs text-muted font-mono">
-                                    {{ $k->license->domain ?? 'Semua Domain' }}
-                                </div>
-                            </td>
-                            <td style="padding: 14px 18px;">
-                                @if($k->status === 'active')
-                                    <span class="badge badge-success" style="font-size: 10px;">AKTIF</span>
-                                @else
-                                    <span class="badge badge-danger" style="font-size: 10px;">REVOKED</span>
-                                @endif
-                            </td>
-                            <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">
-                                {{ $k->last_used_at ? $k->last_used_at->diffForHumans() : 'Belum pernah' }}
-                            </td>
-                            <td style="padding: 14px 18px; text-align: right;">
-                                @if($k->status === 'active')
-                                    <form action="{{ \Illuminate\Support\Facades\Route::has('customer.ai-usage.keys.revoke') ? route('customer.ai-usage.keys.revoke', $k->id) : url('/customer/ai-usage/keys/' . $k->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menonaktifkan API Key ini? Aksi ini tidak dapat dibatalkan.');" style="display: inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-ghost btn-xs" style="color: var(--danger);" title="Revoke Key">
-                                            <i class="fa-solid fa-ban"></i> Nonaktifkan
-                                        </button>
-                                    </form>
-                                @else
-                                    <span class="text-xs text-muted">—</span>
-                                @endif
-                            </td>
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    <div class="font-mono font-bold text-sm" style="color: {{ $lot->remaining_tokens > 0 ? 'var(--primary)' : 'var(--text-muted)' }};">
+                                        {{ number_format($lot->remaining_tokens) }}
+                                    </div>
+                                    <div style="font-size: 10px; color: var(--text-muted);">{{ number_format($pctLeft, 1) }}% tersisa</div>
+                                </td>
+                                <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">
+                                    {{ number_format($lot->original_tokens) }}
+                                </td>
+                                <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">
+                                    {{ $lot->purchased_at->translatedFormat('d M Y') }}
+                                </td>
+                                <td style="padding: 14px 18px;" class="font-mono text-xs">
+                                    <div style="color: {{ $daysLeft <= 3 && $lot->status === 'active' ? 'var(--danger)' : 'var(--text)' }}; font-weight: 700;">
+                                        {{ $lot->expires_at->translatedFormat('d M Y, H:i') }}
+                                    </div>
+                                    @if($lot->status === 'active')
+                                        <div style="font-size: 10px; color: {{ $daysLeft <= 3 ? 'var(--danger)' : 'var(--text-muted)' }};">
+                                            {{ $daysLeft > 0 ? "Sisa {$daysLeft} hari" : 'Kedaluwarsa hari ini' }}
+                                        </div>
+                                    @endif
+                                </td>
+                                <td style="padding: 14px 18px; text-align: right;">
+                                    @if($lot->status === 'active')
+                                        <span class="badge badge-success" style="font-size: 10px;">AKTIF</span>
+                                    @elseif($lot->status === 'depleted')
+                                        <span class="badge badge-secondary" style="font-size: 10px;">HABIS</span>
+                                    @elseif($lot->status === 'expired')
+                                        <span class="badge badge-danger" style="font-size: 10px;">EXPIRED</span>
+                                    @else
+                                        <span class="badge badge-dark" style="font-size: 10px;">{{ strtoupper($lot->status) }}</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted" style="padding: 40px;">
+                                    Belum ada riwayat Token Lot. Lakukan Top-Up atau aktifkan paket SaaS untuk memulai.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @if($tokenLots->hasPages())
+            <div class="card-footer" style="padding: 14px 20px; border-top: 1px solid var(--border);">
+                {{ $tokenLots->appends(['tab' => 'lots'])->links() }}
+            </div>
+        @endif
+    </div>
+</div>
+
+{{-- ══════════════════════════════ TAB 2: TRANSACTIONS LEDGER ══════════════════════════════ --}}
+<div class="tab-pane" id="pane-transactions">
+    <div class="card mb-4">
+        <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
+            <div class="card-title font-bold text-sm" style="color: var(--text);">
+                <i class="fa-solid fa-receipt" style="color: var(--primary); margin-right: 6px;"></i> Ledger Mutasi Saldo AI Token
+            </div>
+            <span class="text-xs text-muted">Audit trail perubahan saldo token transparan</span>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--bg-secondary); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; color: var(--text-muted);">
+                            <th style="padding: 12px 18px;">Waktu</th>
+                            <th style="padding: 12px 18px;">Jenis Transaksi</th>
+                            <th style="padding: 12px 18px;">Mutasi Token</th>
+                            <th style="padding: 12px 18px;">Saldo Sebelum</th>
+                            <th style="padding: 12px 18px;">Saldo Sesudah</th>
+                            <th style="padding: 12px 18px;">Keterangan & Lot</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="text-center text-muted" style="padding: 40px;">
-                                Belum ada AI API Key. Buat kunci pertama Anda untuk mulai memanggil API.
-                            </td>
+                    </thead>
+                    <tbody>
+                        @forelse($transactions as $tx)
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">
+                                    {{ $tx->created_at?->translatedFormat('d M Y, H:i:s') }}
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    @if($tx->type === 'purchase')
+                                        <span class="badge badge-success" style="font-size: 10px;">TOP-UP PURCHASE</span>
+                                    @elseif($tx->type === 'subscription')
+                                        <span class="badge badge-primary" style="font-size: 10px;">SUBSCRIPTION</span>
+                                    @elseif($tx->type === 'usage')
+                                        <span class="badge badge-info" style="font-size: 10px;">USAGE (AI CHAT)</span>
+                                    @elseif($tx->type === 'expiration')
+                                        <span class="badge badge-danger" style="font-size: 10px;">EXPIRED (30 DAYS)</span>
+                                    @elseif($tx->type === 'bonus')
+                                        <span class="badge badge-warning" style="font-size: 10px;">BONUS</span>
+                                    @else
+                                        <span class="badge badge-secondary" style="font-size: 10px;">{{ strtoupper($tx->type) }}</span>
+                                    @endif
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    <div class="font-mono font-bold text-sm" style="color: {{ $tx->tokens > 0 ? 'var(--success)' : 'var(--danger)' }};">
+                                        {{ $tx->tokens > 0 ? '+' . number_format($tx->tokens) : number_format($tx->tokens) }}
+                                    </div>
+                                </td>
+                                <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">
+                                    {{ number_format($tx->balance_before) }}
+                                </td>
+                                <td style="padding: 14px 18px;" class="font-mono text-xs font-bold" style="color: var(--text);">
+                                    {{ number_format($tx->balance_after) }}
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    <div class="text-xs" style="color: var(--text);">{{ $tx->description }}</div>
+                                    @if($tx->tokenLot)
+                                        <div class="font-mono text-xs text-muted">Lot: {{ $tx->tokenLot->lot_number }}</div>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center text-muted" style="padding: 40px;">
+                                    Belum ada riwayat mutasi transaksi token.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @if($transactions->hasPages())
+            <div class="card-footer" style="padding: 14px 20px; border-top: 1px solid var(--border);">
+                {{ $transactions->appends(['tab' => 'transactions'])->links() }}
+            </div>
+        @endif
+    </div>
+</div>
+
+{{-- ══════════════════════════════ TAB 3: API KEYS ══════════════════════════════ --}}
+<div class="tab-pane" id="pane-keys">
+    <div class="card mb-4">
+        <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
+            <div class="card-title font-bold text-sm" style="color: var(--text);">
+                <i class="fa-solid fa-key" style="color: var(--primary); margin-right: 6px;"></i> Kunci API AI (API Keys)
+            </div>
+            @if($licenses->isNotEmpty())
+                <button type="button" class="btn btn-primary btn-xs" onclick="openNewKeyModal()">
+                    <i class="fa-solid fa-plus"></i> Tambah Key Baru
+                </button>
+            @endif
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--bg-secondary); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; color: var(--text-muted);">
+                            <th style="padding: 12px 18px;">Nama Kunci</th>
+                            <th style="padding: 12px 18px;">API Key Rahasia</th>
+                            <th style="padding: 12px 18px;">Lisensi Terkait</th>
+                            <th style="padding: 12px 18px;">Status</th>
+                            <th style="padding: 12px 18px;">Terakhir Digunakan</th>
+                            <th style="padding: 12px 18px; text-align: right;">Aksi</th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse($keys as $k)
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 14px 18px;">
+                                    <strong style="color: var(--text); font-size: 13px;">{{ $k->name }}</strong>
+                                    <div class="text-xs text-muted font-mono">{{ $k->id }}</div>
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    @php
+                                        $hasPlain = !empty($k->plain_key);
+                                        $masked = $k->key_prefix . '••••••••••••••••••••••••';
+                                        $full = $hasPlain ? $k->plain_key : $masked;
+                                    @endphp
+                                    <div class="flex items-center gap-2" style="max-width: 320px;">
+                                        <code id="key-text-{{ $k->id }}" 
+                                              data-full="{{ $full }}" 
+                                              data-masked="{{ $masked }}" 
+                                              data-state="masked"
+                                              class="font-mono text-xs font-bold" 
+                                              style="background: var(--bg-secondary); color: var(--text); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); word-break: break-all; flex: 1;">
+                                            {{ $masked }}
+                                        </code>
+                                        @if($hasPlain)
+                                            <button type="button" class="btn btn-ghost btn-xs" onclick="toggleKeyVisibility('{{ $k->id }}')" title="Tampilkan / Sembunyikan Kunci" style="padding: 4px 6px;">
+                                                <i id="key-eye-{{ $k->id }}" class="fa-regular fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-ghost btn-xs" onclick="copyKeyText('{{ $k->id }}')" title="Salin API Key" style="padding: 4px 6px;">
+                                                <i class="fa-solid fa-copy"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    <span class="font-bold text-xs" style="color: var(--text);">
+                                        {{ $k->license->product->name ?? 'Paket SaaS' }}
+                                    </span>
+                                    <div class="text-xs text-muted font-mono">
+                                        {{ $k->license->domain ?? 'Semua Domain' }}
+                                    </div>
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    @if($k->status === 'active')
+                                        <span class="badge badge-success" style="font-size: 10px;">AKTIF</span>
+                                    @else
+                                        <span class="badge badge-danger" style="font-size: 10px;">REVOKED</span>
+                                    @endif
+                                </td>
+                                <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">
+                                    {{ $k->last_used_at ? $k->last_used_at->diffForHumans() : 'Belum pernah' }}
+                                </td>
+                                <td style="padding: 14px 18px; text-align: right;">
+                                    @if($k->status === 'active')
+                                        <form action="{{ route('customer.ai-usage.keys.revoke', $k->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menonaktifkan API Key ini? Aksi ini tidak dapat dibatalkan.');" style="display: inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-ghost btn-xs" style="color: var(--danger);" title="Revoke Key">
+                                                <i class="fa-solid fa-ban"></i> Nonaktifkan
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="text-xs text-muted">—</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center text-muted" style="padding: 40px;">
+                                    Belum ada AI API Key. Buat kunci pertama Anda untuk menghubungkan ERP dengan COOCA AI Gateway.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
-{{-- Live Token Tracking & Telemetry Logs --}}
-<div class="card mb-4">
-    <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
-        <div class="card-title font-bold text-sm" style="color: var(--text);">
-            <i class="fa-solid fa-list-check" style="color: var(--primary); margin-right: 6px;"></i> Live Tracking & Riwayat Penggunaan Token
+{{-- ══════════════════════════════ TAB 4: TELEMETRY ══════════════════════════════ --}}
+<div class="tab-pane" id="pane-telemetry">
+    <div class="card mb-4">
+        <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
+            <div class="card-title font-bold text-sm" style="color: var(--text);">
+                <i class="fa-solid fa-microchip" style="color: var(--primary); margin-right: 6px;"></i> Telemetri & Log Permintaan AI
+            </div>
+            <span class="text-xs text-muted">Pencatatan real-time per panggilan chat/completions</span>
         </div>
-        <span class="text-xs text-muted">Pencatatan real-time setiap request AI</span>
-    </div>
-    <div class="card-body" style="padding: 0;">
-        <div class="table-responsive">
-            <table class="table" style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background: var(--bg-secondary); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; color: var(--text-muted);">
-                        <th style="padding: 12px 18px;">Waktu</th>
-                        <th style="padding: 12px 18px;">API Key</th>
-                        <th style="padding: 12px 18px;">Model LLM</th>
-                        <th style="padding: 12px 18px;">Prompt (Input)</th>
-                        <th style="padding: 12px 18px;">Completion (Output)</th>
-                        <th style="padding: 12px 18px;">Total Token</th>
-                        <th style="padding: 12px 18px;">Latensi</th>
-                        <th style="padding: 12px 18px; text-align: right;">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($recentLogs as $log)
-                        <tr style="border-bottom: 1px solid var(--border);">
-                            <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">
-                                {{ $log->created_at?->format('d M Y') }}
-                                <div style="font-size: 11px; color: var(--text);">{{ $log->created_at?->format('H:i:s') }}</div>
-                            </td>
-                            <td style="padding: 14px 18px;">
-                                <div class="font-bold text-xs" style="color: var(--text);">{{ $log->apiKey->name ?? 'API Key' }}</div>
-                                <div class="font-mono text-xs text-muted">{{ substr($log->ai_api_key_id, 0, 8) }}...</div>
-                            </td>
-                            <td style="padding: 14px 18px;">
-                                <code style="background: var(--primary-soft); color: var(--primary); padding: 3px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">
-                                    {{ $log->model }}
-                                </code>
-                            </td>
-                            <td style="padding: 14px 18px;" class="font-mono text-xs">{{ number_format($log->prompt_tokens) }}</td>
-                            <td style="padding: 14px 18px;" class="font-mono text-xs">{{ number_format($log->completion_tokens) }}</td>
-                            <td style="padding: 14px 18px;" class="font-mono text-xs font-bold" style="color: var(--text);">
-                                <span class="badge badge-primary font-mono text-xs">{{ number_format($log->total_tokens) }}</span>
-                            </td>
-                            <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">{{ $log->duration_ms }} ms</td>
-                            <td style="padding: 14px 18px; text-align: right;">
-                                @if($log->status === 'success')
-                                    <span class="badge badge-success" style="font-size: 10px;">200 OK</span>
-                                @elseif($log->status === 'quota_exceeded')
-                                    <span class="badge badge-warning" style="font-size: 10px;">429 QUOTA</span>
-                                @else
-                                    <span class="badge badge-danger" style="font-size: 10px;">{{ strtoupper($log->status) }}</span>
-                                @endif
-                            </td>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--bg-secondary); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; color: var(--text-muted);">
+                            <th style="padding: 12px 18px;">Waktu</th>
+                            <th style="padding: 12px 18px;">Model & Provider</th>
+                            <th style="padding: 12px 18px;">Input Token</th>
+                            <th style="padding: 12px 18px;">Output Token</th>
+                            <th style="padding: 12px 18px;">Total Token</th>
+                            <th style="padding: 12px 18px;">Lot Terpakai</th>
+                            <th style="padding: 12px 18px;">Latensi</th>
+                            <th style="padding: 12px 18px; text-align: right;">Status</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="text-center text-muted" style="padding: 40px;">
-                                Belum ada riwayat panggilan API atau penggunaan token yang tercatat.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse($recentLogs as $log)
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">
+                                    {{ $log->created_at?->translatedFormat('d M Y') }}
+                                    <div style="font-size: 11px; color: var(--text);">{{ $log->created_at?->format('H:i:s') }} WIB</div>
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    <code style="background: var(--primary-soft); color: var(--primary); padding: 3px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">
+                                        {{ $log->model }}
+                                    </code>
+                                    <div class="text-xs text-muted" style="font-size: 10px; margin-top: 2px;">{{ strtoupper($log->provider) }}</div>
+                                </td>
+                                <td style="padding: 14px 18px;" class="font-mono text-xs">{{ number_format($log->input_tokens ?: $log->prompt_tokens) }}</td>
+                                <td style="padding: 14px 18px;" class="font-mono text-xs">{{ number_format($log->output_tokens ?: $log->completion_tokens) }}</td>
+                                <td style="padding: 14px 18px;" class="font-mono text-xs font-bold">
+                                    <span class="badge badge-primary font-mono text-xs">{{ number_format($log->total_tokens) }}</span>
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    @if($log->tokenLot)
+                                        <span class="badge badge-outline" style="font-size: 10px;" title="{{ $log->tokenLot->name }}">
+                                            {{ $log->tokenLot->lot_number }}
+                                        </span>
+                                    @else
+                                        <span class="text-xs text-muted">—</span>
+                                    @endif
+                                </td>
+                                <td style="padding: 14px 18px;" class="font-mono text-xs text-muted">{{ $log->duration_ms }} ms</td>
+                                <td style="padding: 14px 18px; text-align: right;">
+                                    @if($log->status === 'success')
+                                        <span class="badge badge-success" style="font-size: 10px;">200 OK</span>
+                                    @elseif($log->status === 'quota_exceeded')
+                                        <span class="badge badge-warning" style="font-size: 10px;">429 QUOTA</span>
+                                    @else
+                                        <span class="badge badge-danger" style="font-size: 10px;">{{ strtoupper($log->status) }}</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="text-center text-muted" style="padding: 40px;">
+                                    Belum ada log penggunaan AI yang tercatat.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-    @if($recentLogs->hasPages())
-        <div class="card-footer" style="padding: 14px 20px; border-top: 1px solid var(--border);">
-            {{ $recentLogs->links() }}
-        </div>
-    @endif
-</div>
-
-{{-- Quick Integration Guide --}}
-<div class="card mb-4">
-    <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
-        <div class="card-title font-bold text-sm" style="color: var(--text);">
-            <i class="fa-solid fa-code" style="color: var(--primary); margin-right: 6px;"></i> Panduan Integrasi (OpenAI-Compatible SDK & cURL)
-        </div>
-        <span class="text-xs text-muted">Base URL: <code style="color: var(--primary); font-weight: bold;">https://cooca.id/api/v1/ai</code></span>
-    </div>
-    <div class="card-body" style="padding: 20px;">
-        <p class="text-xs text-muted mb-3" style="color: var(--text-muted);">
-            COOCA AI Gateway 100% kompatibel dengan protokol format OpenAI. Cukup ubah <code>baseURL</code> pada library resmi OpenAI (Node.js, Python, PHP, Go) atau kirim cURL langsung.
-        </p>
-
-        <div class="gateway-code-block mb-3">
-<pre style="margin: 0;"><code># 1. Cek daftar model yang tersedia di Cooca AI Gateway:
-curl -X GET https://cooca.id/api/v1/ai/models \
-  -H "Authorization: Bearer YOUR_COOCA_AI_KEY"
-
-# 2. Kirim Chat Completion:
-curl -X POST https://cooca.id/api/v1/ai/chat/completions \
-  -H "Authorization: Bearer YOUR_COOCA_AI_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "gpt-4o-mini",
-    "messages": [
-      {"role": "system", "content": "You are a helpful assistant."},
-      {"role": "user", "content": "Halo COOCA AI!"}
-    ],
-    "temperature": 0.7,
-    "max_tokens": 1000
-  }'</code></pre>
-        </div>
+        @if($recentLogs->hasPages())
+            <div class="card-footer" style="padding: 14px 20px; border-top: 1px solid var(--border);">
+                {{ $recentLogs->appends(['tab' => 'telemetry'])->links() }}
+            </div>
+        @endif
     </div>
 </div>
 
-{{-- Modal: Top-Up Token AI --}}
+{{-- ══════════════════════════════ TAB 5: ANALYTICS ══════════════════════════════ --}}
+<div class="tab-pane" id="pane-analytics">
+    <div class="card mb-4">
+        <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
+            <div class="card-title font-bold text-sm" style="color: var(--text);">
+                <i class="fa-solid fa-chart-pie" style="color: var(--primary); margin-right: 6px;"></i> Distribusi Penggunaan Multi-Model AI (Bulan Ini)
+            </div>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--bg-secondary); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; color: var(--text-muted);">
+                            <th style="padding: 12px 18px;">Model LLM</th>
+                            <th style="padding: 12px 18px;">Provider</th>
+                            <th style="padding: 12px 18px;">Jumlah Request</th>
+                            <th style="padding: 12px 18px;">Total Token Terpakai</th>
+                            <th style="padding: 12px 18px;">Porsi (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            $grandTotalTokens = $modelBreakdown->sum('total_tokens');
+                        @endphp
+                        @forelse($modelBreakdown as $mb)
+                            @php
+                                $portion = $grandTotalTokens > 0 ? ($mb->total_tokens / $grandTotalTokens) * 100 : 0;
+                            @endphp
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 14px 18px;">
+                                    <code style="background: var(--primary-soft); color: var(--primary); padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 12px;">
+                                        {{ $mb->model }}
+                                    </code>
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    <span class="badge badge-outline text-xs font-bold">{{ strtoupper($mb->provider) }}</span>
+                                </td>
+                                <td style="padding: 14px 18px;" class="font-mono text-sm font-bold">
+                                    {{ number_format($mb->total_requests) }}
+                                </td>
+                                <td style="padding: 14px 18px;" class="font-mono text-sm font-bold" style="color: var(--primary);">
+                                    {{ number_format($mb->total_tokens) }}
+                                </td>
+                                <td style="padding: 14px 18px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="flex: 1; height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden;">
+                                            <div style="width: {{ min(100, $portion) }}%; height: 100%; background: var(--primary); border-radius: 4px;"></div>
+                                        </div>
+                                        <span class="font-mono text-xs font-bold text-muted">{{ number_format($portion, 1) }}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center text-muted" style="padding: 40px;">
+                                    Belum ada riwayat pemakaian model AI pada bulan ini.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ══════════════════════════════ TOP-UP MODAL ══════════════════════════════ --}}
 <div id="topup-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
     <div class="card" style="max-width: 680px; width: 90%; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-lg); border-radius: var(--radius-md); max-height: 90vh; overflow-y: auto;">
         <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
             <div class="card-title font-bold" style="color: var(--text); display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-bolt" style="color: var(--accent);"></i> Top-Up Kuota Token AI
+                <i class="fa-solid fa-bolt" style="color: #FACC15;"></i> Top-Up Kuota Token AI (30 Hari Masa Aktif)
             </div>
             <button type="button" class="btn btn-ghost btn-xs" onclick="closeTopUpModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <form action="{{ route('customer.ai-usage.packages.purchase') }}" method="POST">
             @csrf
             <div class="card-body" style="display: flex; flex-direction: column; gap: 18px; padding: 20px;">
-                <div class="form-group">
-                    <label class="form-label text-xs font-bold uppercase">1. Pilih Lisensi SaaS yang Akan Diisi</label>
-                    <select name="license_id" id="topup-license-select" required class="form-select" style="width: 100%;">
-                        @foreach($licenses as $lic)
-                            <option value="{{ $lic->id }}">
-                                {{ $lic->product->name ?? 'Paket SaaS' }} — Lisensi: #{{ substr($lic->id, 0, 8) }} ({{ $lic->domain ?? 'Semua Domain' }})
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                @if($licenses->isNotEmpty())
+                    <div class="form-group">
+                        <label class="form-label text-xs font-bold uppercase">1. Hubungkan dengan Lisensi SaaS (Opsional)</label>
+                        <select name="license_id" id="topup-license-select" class="form-select" style="width: 100%;">
+                            <option value="">Semua Lisensi / Akun Utama Customer</option>
+                            @foreach($licenses as $lic)
+                                <option value="{{ $lic->id }}">
+                                    {{ $lic->product->name ?? 'Paket SaaS' }} ({{ $lic->domain ?? 'Semua Domain' }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
 
                 <div>
-                    <label class="form-label text-xs font-bold uppercase mb-2" style="display: block;">2. Pilih Paket Kuota Token</label>
+                    <label class="form-label text-xs font-bold uppercase mb-2" style="display: block;">Pilih Paket Kuota Token AI</label>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
                         @forelse($tokenPackages as $idx => $pkg)
                             <label class="package-card {{ $idx === 0 ? 'selected' : '' }}" onclick="selectPackageRadio('pkg-{{ $pkg->id }}', this)">
@@ -462,10 +740,12 @@ curl -X POST https://cooca.id/api/v1/ai/chat/completions \
                                     @endif
                                 </div>
                                 <div class="mb-2">
-                                    <div class="font-mono font-extrabold text-base" style="color: var(--primary);">
+                                    <div class="font-mono font-extrabold text-lg" style="color: var(--primary);">
                                         +{{ number_format($pkg->token_amount) }} Token
                                     </div>
-                                    <div class="text-xs text-muted mt-1">{{ $pkg->description ?? 'Tambahan kuota token instan' }}</div>
+                                    <div class="text-xs text-muted mt-1">
+                                        <i class="fa-regular fa-clock"></i> Berlaku <strong>30 Hari</strong> sejak tanggal pembelian
+                                    </div>
                                 </div>
                                 <div class="flex justify-between items-center pt-2" style="border-top: 1px solid var(--border); margin-top: auto;">
                                     <span class="font-extrabold text-sm" style="color: var(--text);">
@@ -484,29 +764,29 @@ curl -X POST https://cooca.id/api/v1/ai/chat/completions \
 
                 <div class="card" style="background: var(--bg-secondary); border: 1px solid var(--border); padding: 14px; border-radius: var(--radius-sm);">
                     <div class="flex items-center gap-2 text-xs font-semibold" style="color: var(--text);">
-                        <i class="fa-solid fa-shield-halved" style="color: var(--success);"></i> Pembayaran Aman & Instan
+                        <i class="fa-solid fa-shield-halved" style="color: var(--success);"></i> Pembayaran Otomatis & Token Instan
                     </div>
                     <p class="text-xs text-muted mb-0 mt-1">
-                        Mendukung pembayaran otomatis melalui <strong>QRIS, Virtual Account BCA/Mandiri/BNI/BRI</strong> via Midtrans atau <strong>Transfer Bank Manual</strong>. Kuota otomatis bertambah segera setelah pembayaran berstatus Lunas.
+                        Token langsung ditambahkan ke <strong>Token Lot Baru</strong> segera setelah pembayaran berhasil (QRIS, VA BCA/Mandiri/BNI/BRI, atau Transfer Manual).
                     </p>
                 </div>
             </div>
             <div class="card-footer flex justify-end gap-2" style="padding: 14px 20px; border-top: 1px solid var(--border);">
                 <button type="button" class="btn btn-ghost btn-sm" onclick="closeTopUpModal()">Batal</button>
-                <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-cart-shopping"></i> Lanjutkan Pembayaran</button>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-cart-shopping"></i> Lanjut ke Pembayaran &rarr;</button>
             </div>
         </form>
     </div>
 </div>
 
-{{-- Modal: Create API Key --}}
+{{-- ══════════════════════════════ MODAL CREATE API KEY ══════════════════════════════ --}}
 <div id="new-key-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
     <div class="card" style="max-width: 460px; width: 90%; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-lg); border-radius: var(--radius-md);">
         <div class="card-header flex justify-between items-center" style="padding: 16px 20px;">
             <div class="card-title font-bold" style="color: var(--text);">Buat AI API Key Baru</div>
             <button type="button" class="btn btn-ghost btn-xs" onclick="closeNewKeyModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <form action="{{ \Illuminate\Support\Facades\Route::has('customer.ai-usage.keys.store') ? route('customer.ai-usage.keys.store') : url('/customer/ai-usage/keys') }}" method="POST">
+        <form action="{{ route('customer.ai-usage.keys.store') }}" method="POST">
             @csrf
             <div class="card-body" style="display: flex; flex-direction: column; gap: 14px; padding: 20px;">
                 <div class="form-group">
@@ -536,6 +816,28 @@ curl -X POST https://cooca.id/api/v1/ai/chat/completions \
 
 @push('scripts')
 <script>
+function switchTab(tabKey) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+    const btn = document.querySelector(`.tab-btn[onclick="switchTab('${tabKey}')"]`);
+    const pane = document.getElementById('pane-' + tabKey);
+
+    if (btn) btn.classList.add('active');
+    if (pane) pane.classList.add('active');
+
+    // Update URL hash
+    window.location.hash = tabKey;
+}
+
+// Auto open tab from URL hash if present
+document.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && ['lots', 'transactions', 'keys', 'telemetry', 'analytics'].includes(hash)) {
+        switchTab(hash);
+    }
+});
+
 function openTopUpModal(licenseId = null) {
     if (licenseId) {
         const select = document.getElementById('topup-license-select');
@@ -562,14 +864,6 @@ function openNewKeyModal() {
 
 function closeNewKeyModal() {
     document.getElementById('new-key-modal').style.display = 'none';
-}
-
-function copyNewKey() {
-    const el = document.getElementById('new-plain-key');
-    if (!el) return;
-    navigator.clipboard.writeText(el.innerText).then(() => {
-        alert('API Key berhasil disalin ke clipboard!');
-    });
 }
 
 function toggleKeyVisibility(id) {

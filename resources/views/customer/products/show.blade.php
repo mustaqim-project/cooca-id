@@ -55,16 +55,20 @@
 
 {{-- ── ACTIVE SUBSCRIPTION NOTICE ── --}}
 @if($activeSub)
-<div class="alert alert-success mb-4" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+<div class="alert alert-success mb-4" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
     <div>
-        <i class="fa-solid fa-circle-check"></i>
-        <strong>Langganan Aktif</strong> — {{ $activeSub->subscriptionPlan?->name }}
-        @if($activeSub->expires_at) · Berakhir {{ $activeSub->expires_at->format('d M Y') }} @endif
+        <div style="font-size:14px;font-weight:700;">
+            <i class="fa-solid fa-circle-check"></i> Langganan Aktif: {{ $activeSub->subscriptionPlan?->name }} (<code>{{ $activeSub->license?->domain }}</code>)
+        </div>
+        <div class="text-xs mt-1" style="color:var(--text-muted);">
+            @if($activeSub->expires_at) Masa aktif s/d <strong>{{ $activeSub->expires_at->format('d M Y') }}</strong> · @endif
+            💡 Ingin memesan <strong>instance / cabang tambahan</strong>? Pilih paket dan tentukan <strong>nama domain baru</strong> pada formulir di bawah.
+        </div>
     </div>
     <div class="flex gap-2">
         @if($activeSub->license?->domain)
         <a href="https://{{ $activeSub->license->domain }}" target="_blank" class="btn btn-primary btn-sm">
-            <i class="fa-solid fa-rocket"></i> Launch
+            <i class="fa-solid fa-rocket"></i> Buka ERP
         </a>
         @endif
         <a href="{{ route('customer.subscriptions.checkout', $activeSub->id) }}" class="btn btn-outline btn-sm">
@@ -746,6 +750,9 @@ if (form) {
                         if (data.available) {
                             hint.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${data.message}`;
                             hint.style.color = 'var(--success)';
+                        } else if (data.is_pending_mine && data.transaction_id) {
+                            hint.innerHTML = `<i class="fa-solid fa-clock text-warning"></i> ${data.message} <a href="/customer/payments/${data.transaction_id}" class="text-primary font-bold" style="margin-left:4px; text-decoration:underline;">Lanjutkan Bayar &rarr;</a>`;
+                            hint.style.color = '#B45309';
                         } else {
                             hint.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${data.message}`;
                             hint.style.color = 'var(--danger)';

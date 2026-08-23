@@ -44,6 +44,7 @@ Schedule::command('affiliates:calculate-monthly')->monthlyOn(1, '00:00')->name('
 Schedule::command('backup:clean')->dailyAt('01:00');
 Schedule::command('backup:run')->dailyAt('01:30');
 
-// AI Quota Lifecycle
+// AI Token & Quota Lifecycle
+Schedule::command('ai:expire-tokens')->everyThirtyMinutes()->name('Scan and expire AI token lots past 30 days');
 Schedule::command('ai:reset-usage-cycles')->daily();
 Schedule::command('ai:check-quota-thresholds')->hourly();

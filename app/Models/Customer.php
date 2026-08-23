@@ -158,6 +158,47 @@ final class Customer extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(VoucherUsage::class, 'customer_id');
     }
 
+    public function aiWallet(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(AiWallet::class, 'customer_id');
+    }
+
+    public function aiTokenLots(): HasMany
+    {
+        return $this->hasMany(AiTokenLot::class, 'customer_id');
+    }
+
+    public function aiTokenTransactions(): HasMany
+    {
+        return $this->hasMany(AiTokenTransaction::class, 'customer_id');
+    }
+
+    public function aiUsageLogs(): HasMany
+    {
+        return $this->hasMany(AiUsageLog::class, 'customer_id');
+    }
+
+    public function getOrCreateAiWallet(): AiWallet
+    {
+        return $this->aiWallet()->firstOrCreate([
+            'customer_id' => $this->getKey(),
+        ], [
+            'total_balance'   => 0,
+            'total_purchased' => 0,
+            'total_used'      => 0,
+            'total_expired'   => 0,
+        ]);
+    }
+
+    public function getAvailableAiTokens(): int
+    {
+        return (int) $this->aiTokenLots()
+            ->where('status', AiTokenLot::STATUS_ACTIVE)
+            ->where('remaining_tokens', '>', 0)
+            ->where('expires_at', '>', now())
+            ->sum('remaining_tokens');
+    }
+
     public function auditLogs(): MorphMany
     {
         return $this->morphMany(AuditLog::class, 'user', 'user_type', 'user_id');

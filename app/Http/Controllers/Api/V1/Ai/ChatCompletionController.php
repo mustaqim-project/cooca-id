@@ -83,21 +83,35 @@ final class ChatCompletionController extends Controller
     public function quota(Request $request): JsonResponse
     {
         $license = $request->attributes->get('ai_license');
+        $customer = $license?->customer;
+
+        $walletService = app(\App\Services\Ai\AiTokenWalletService::class);
+        $summary = $customer ? $walletService->getWalletSummary($customer) : null;
+
         $planConfig = $this->quotaService->planConfigFor($license);
-        $cycle = $this->quotaService->currentCycleFor($license);
+        $totalAvailable = $summary ? $summary['total_available'] : $customer?->getAvailableAiTokens() ?? 0;
+        $usedThisMonth = $summary ? $summary['used_this_month'] : 0;
+        $totalPurchased = $summary ? (int) $summary['wallet']->total_purchased : $totalAvailable;
 
         return response()->json([
-            'license_id'          => $license->id,
-            'plan_id'             => $license->subscription_plan_id,
-            'cycle_start'         => $cycle->cycle_start?->toIso8601String(),
-            'cycle_end'           => $cycle->cycle_end?->toIso8601String(),
-            'token_quota'         => $cycle->token_quota,
-            'tokens_used'         => $cycle->tokens_used,
-            'tokens_remaining'    => max(0, $cycle->token_quota - $cycle->tokens_used),
-            'percent_used'        => $cycle->token_quota > 0 ? round(($cycle->tokens_used / $cycle->token_quota) * 100, 2) : 0,
-            'overage_policy'      => $planConfig->overage_policy ?? 'hard_stop',
-            'requests_per_minute' => $planConfig->requests_per_minute ?? 60,
-            'allowed_models'      => $planConfig->allowed_models ?? [],
+            'license_id'           => $license->id,
+            'plan_id'              => $license->subscription_plan_id,
+            'token_quota'          => $totalPurchased > 0 ? $totalPurchased : ($totalAvailable + $usedThisMonth),
+            'tokens_used'          => $usedThisMonth,
+            'tokens_remaining'     => $totalAvailable,
+            'available_tokens'     => $totalAvailable,
+            'expiring_soon'        => $summary ? $summary['expiring_soon'] : 0,
+            'next_expiration_date' => $summary && $summary['next_expiration_date'] ? $summary['next_expiration_date']->toIso8601String() : null,
+            'breakdown'            => $summary ? $summary['breakdown'] : [
+                'subscription' => 0,
+                'topup'        => $totalAvailable,
+                'bonus'        => 0,
+            ],
+            'warnings'             => $summary ? $summary['warnings'] : [],
+            'percent_used'         => ($totalPurchased > 0) ? min(100, round(($usedThisMonth / $totalPurchased) * 100, 2)) : 0,
+            'overage_policy'       => $planConfig->overage_policy ?? 'hard_stop',
+            'requests_per_minute'  => $planConfig->requests_per_minute ?? 60,
+            'allowed_models'       => $planConfig->allowed_models ?? [],
         ]);
     }
 }

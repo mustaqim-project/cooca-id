@@ -24,25 +24,49 @@ final class CreateSubscriptionRequest extends FormRequest
                 'string', 
                 'max:255',
                 function ($attribute, $value, $fail) {
-                    $domainStr = str_contains($value, '.') ? $value : $value . '.cooca.id';
+                    $domainStr = trim((string) $value);
+                    if (!str_contains($domainStr, '.')) {
+                        $domainStr .= '.cooca.id';
+                    }
                     
                     if (!preg_match('/^[a-zA-Z0-9.-]+$/', $domainStr)) {
-                        $fail('Format domain tidak valid.');
+                        $fail('Format domain tidak valid. Hanya huruf, angka, dan tanda hubung yang diperbolehkan.');
                         return;
                     }
 
-                    $existsInLicenses = \App\Models\License::where('domain', $domainStr)
-                        ->where('customer_id', '!=', auth('customer')->id())
+                    // 1. Cek lisensi aktif/suspended global
+                    $activeLicenseExists = \App\Models\License::where('domain', $domainStr)
+                        ->whereIn('status', [\App\Models\License::STATUS_ACTIVE, \App\Models\License::STATUS_SUSPENDED])
                         ->exists();
 
+                    if ($activeLicenseExists) {
+                        $fail("Domain '{$domainStr}' sudah aktif digunakan. Silakan gunakan nama domain/subdomain lain.");
+                        return;
+                    }
+
+                    // 2. Cek ERP Request aktif
                     $subdomainOnly = str_replace('.cooca.id', '', $domainStr);
                     $existsInRequests = \App\Models\ErpRequest::where('requested_subdomain', $subdomainOnly)
-                        ->where('customer_id', '!=', auth('customer')->id())
                         ->whereNotIn('status', [\App\Models\ErpRequest::STATUS_REJECTED, \App\Models\ErpRequest::STATUS_TRIAL_EXPIRED])
                         ->exists();
 
-                    if ($existsInLicenses || $existsInRequests) {
-                        $fail('Domain sudah digunakan oleh pengguna lain.');
+                    if ($existsInRequests) {
+                        $fail("Subdomain '{$subdomainOnly}' sedang aktif dalam proses uji coba / setup ERP.");
+                        return;
+                    }
+
+                    // 3. Cek Pending Payment Transaction (< 1 jam)
+                    $pendingLicense = \App\Models\License::where('domain', $domainStr)
+                        ->where('status', \App\Models\License::STATUS_INACTIVE)
+                        ->whereHas('subscription.transactions', function ($query) {
+                            $query->where('status', 'pending')
+                                ->where('created_at', '>=', now()->subHours(1));
+                        })
+                        ->exists();
+
+                    if ($pendingLicense) {
+                        $fail("Domain '{$domainStr}' sedang dalam proses pemesanan dan menunggu pembayaran (Batas waktu 1 jam).");
+                        return;
                     }
                 }
             ],

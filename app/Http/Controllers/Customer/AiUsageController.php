@@ -6,26 +6,35 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\AiApiKey;
-use App\Models\AiUsageCycle;
+use App\Models\AiTokenLot;
+use App\Models\AiTokenPackage;
+use App\Models\AiTokenTransaction;
 use App\Models\AiUsageLog;
 use App\Models\License;
 use App\Services\Ai\AiApiKeyService;
 use App\Services\Ai\AiQuotaService;
+use App\Services\Ai\AiTokenWalletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 final class AiUsageController extends Controller
 {
     public function __construct(
         private readonly AiApiKeyService $apiKeyService,
         private readonly AiQuotaService $quotaService,
+        private readonly AiTokenWalletService $walletService,
     ) {}
 
     public function index(Request $request)
     {
         $customer = Auth::guard('customer')->user() ?? Auth::user();
 
-        // Customer's Active Licenses
+        // 1. AI Wallet Summary (Available, Used this month, Expiring Soon, Breakdown, Warnings)
+        $walletSummary = $this->walletService->getWalletSummary($customer);
+
+        // 2. Customer's Active Licenses
         $licenses = License::with(['product', 'subscriptionPlan.aiPlanConfig'])
             ->where('customer_id', $customer->getKey())
             ->where('status', License::STATUS_ACTIVE)
@@ -33,50 +42,60 @@ final class AiUsageController extends Controller
 
         $licenseIds = $licenses->pluck('id')->toArray();
 
-        // API Keys
+        // 3. API Keys
         $keys = AiApiKey::with('license.product')
             ->where('customer_id', $customer->getKey())
             ->latest()
             ->get();
 
-        // Active Usage Cycles for these licenses
-        $cycles = AiUsageCycle::with('license.product')
-            ->whereIn('license_id', $licenseIds)
-            ->where('cycle_start', '<=', now())
-            ->where('cycle_end', '>=', now())
-            ->get()
-            ->keyBy('license_id');
-
         $apiKeyIds = $keys->pluck('id')->toArray();
 
-        // Recent Usage Logs for this customer
-        $recentLogs = AiUsageLog::with('apiKey')
-            ->where(function ($query) use ($licenseIds, $apiKeyIds) {
-                $query->whereIn('license_id', $licenseIds)
+        // 4. Token Lots History (Top Up, Subscription, Bonus, Promo)
+        $tokenLots = AiTokenLot::where('customer_id', $customer->getKey())
+            ->orderByRaw("FIELD(status, 'active', 'depleted', 'expired', 'cancelled') ASC")
+            ->orderBy('expires_at', 'asc')
+            ->paginate(10, ['*'], 'lots_page');
+
+        // 5. Token Transaction Ledger History
+        $transactions = AiTokenTransaction::with('tokenLot')
+            ->where('customer_id', $customer->getKey())
+            ->latest('created_at')
+            ->paginate(15, ['*'], 'tx_page');
+
+        // 6. Recent Usage Logs for this customer
+        $recentLogs = AiUsageLog::with(['apiKey', 'tokenLot'])
+            ->where(function ($query) use ($customer, $licenseIds, $apiKeyIds) {
+                $query->where('customer_id', $customer->getKey())
+                      ->orWhereIn('license_id', $licenseIds)
                       ->orWhereIn('ai_api_key_id', $apiKeyIds);
             })
             ->latest('created_at')
-            ->paginate(25);
+            ->paginate(20, ['*'], 'logs_page');
 
-        // Aggregates for current month
-        $currentMonthUsage = AiUsageLog::where(function ($query) use ($licenseIds, $apiKeyIds) {
-                $query->whereIn('license_id', $licenseIds)
+        // 7. Multi-Model Usage Breakdown
+        $modelBreakdown = AiUsageLog::where(function ($query) use ($customer, $licenseIds, $apiKeyIds) {
+                $query->where('customer_id', $customer->getKey())
+                      ->orWhereIn('license_id', $licenseIds)
                       ->orWhereIn('ai_api_key_id', $apiKeyIds);
             })
             ->where('created_at', '>=', now()->startOfMonth())
-            ->selectRaw('SUM(total_tokens) as total_tokens, COUNT(*) as total_requests, AVG(duration_ms) as avg_latency')
-            ->first();
+            ->select('model', 'provider', DB::raw('SUM(total_tokens) as total_tokens'), DB::raw('COUNT(*) as total_requests'))
+            ->groupBy('model', 'provider')
+            ->orderByDesc('total_tokens')
+            ->get();
 
-        // AI Token Packages
-        $tokenPackages = \App\Models\AiTokenPackage::active()->get();
+        // 8. AI Token Packages Available for Top Up
+        $tokenPackages = AiTokenPackage::active()->get();
 
         return view('customer.ai.usage', compact(
             'customer',
+            'walletSummary',
             'licenses',
             'keys',
-            'cycles',
+            'tokenLots',
+            'transactions',
             'recentLogs',
-            'currentMonthUsage',
+            'modelBreakdown',
             'tokenPackages'
         ));
     }
@@ -86,30 +105,33 @@ final class AiUsageController extends Controller
         $customer = Auth::guard('customer')->user() ?? Auth::user();
 
         $validated = $request->validate([
-            'license_id' => 'required|uuid|exists:licenses,id',
+            'license_id' => 'nullable|uuid|exists:licenses,id',
             'package_id' => 'required|uuid|exists:ai_token_packages,id',
         ]);
 
-        $license = License::where('id', $validated['license_id'])
-            ->where('customer_id', $customer->getKey())
-            ->where('status', License::STATUS_ACTIVE)
-            ->firstOrFail();
+        $license = null;
+        if (!empty($validated['license_id'])) {
+            $license = License::where('id', $validated['license_id'])
+                ->where('customer_id', $customer->getKey())
+                ->where('status', License::STATUS_ACTIVE)
+                ->first();
+        }
 
-        $package = \App\Models\AiTokenPackage::where('id', $validated['package_id'])
+        $package = AiTokenPackage::where('id', $validated['package_id'])
             ->where('is_active', true)
             ->firstOrFail();
 
-        $invoice = \Illuminate\Support\Facades\DB::transaction(function () use ($customer, $license, $package) {
-            $invoiceNumber = 'INV-AI-' . strtoupper(date('Ymd')) . '-' . strtoupper(\Illuminate\Support\Str::random(6));
+        $invoice = DB::transaction(function () use ($customer, $license, $package) {
+            $invoiceNumber = 'INV-AI-' . strtoupper(date('Ymd')) . '-' . strtoupper(Str::random(6));
             $subtotal = (float) $package->price;
             $taxAmount = round($subtotal * 0.11, 2);
             $netAmount = round($subtotal + $taxAmount, 2);
 
             $transaction = \App\Models\Transaction::create([
                 'customer_id'      => $customer->getKey(),
-                'subscription_id'  => $license->subscription_id ?? null,
+                'subscription_id'  => $license?->subscription_id,
                 'type'             => 'ai_token_topup',
-                'description'      => "Top-Up Kuota Token AI: {$package->name} (+" . number_format($package->token_amount) . " Token)",
+                'description'      => "Top-Up AI Token: {$package->name} (+" . number_format($package->token_amount) . " Token, Berlaku 30 Hari)",
                 'invoice_number'   => $invoiceNumber,
                 'gross_amount'     => $package->price,
                 'voucher_discount' => 0,
@@ -135,7 +157,7 @@ final class AiUsageController extends Controller
 
             \App\Models\AiTokenPurchase::create([
                 'customer_id'         => $customer->getKey(),
-                'license_id'          => $license->id,
+                'license_id'          => $license?->id,
                 'ai_token_package_id' => $package->id,
                 'transaction_id'      => $transaction->id,
                 'tokens_amount'       => $package->token_amount,
