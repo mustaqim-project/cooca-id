@@ -30,10 +30,19 @@ final class SendPaymentConfirmationJob implements ShouldQueue
                 return;
             }
 
-            // Dispatch email notification
+            // Dispatch email notification to customer
             $customer->notify(
                 new \App\Notifications\Customer\PaymentConfirmedNotification($this->transaction)
             );
+
+            // Dispatch notification email to Administrator emails (agungmustaqim15@gmail.com & cooca.idn@gmail.com)
+            $adminEmails = ['agungmustaqim15@gmail.com', 'cooca.idn@gmail.com'];
+            try {
+                \Illuminate\Support\Facades\Mail::to($adminEmails)
+                    ->send(new \App\Mail\Admin\SubscriptionPaymentReceivedMail($this->transaction, 'Pembayaran Langganan Diterima & Lunas'));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('[SendPaymentConfirmationJob] Failed to send admin payment notification email: ' . $e->getMessage());
+            }
 
             // Dispatch WhatsApp notification via service
             $whatsappService = app(\App\Services\Notification\WhatsAppService::class);

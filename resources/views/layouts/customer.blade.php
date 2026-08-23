@@ -78,10 +78,17 @@
                 <div class="sidebar-section-label">Products & Services</div>
 
                 <a href="{{ route('customer.products.index') }}"
-                   class="sidebar-item {{ request()->routeIs('customer.products.*', 'customer.subscriptions.*', 'customer.trials.*', 'customer.licenses.*') ? 'active' : '' }}"
+                   class="sidebar-item {{ request()->routeIs('customer.products.*', 'customer.subscriptions.*', 'customer.trials.*') ? 'active' : '' }}"
                    data-tooltip="My Services">
                     <span class="s-icon"><i class="fa-solid fa-cube"></i></span>
                     <span class="s-label">My Services</span>
+                </a>
+
+                <a href="{{ route('customer.licenses.index') }}"
+                   class="sidebar-item {{ request()->routeIs('customer.licenses.*') ? 'active' : '' }}"
+                   data-tooltip="Licenses & Credentials">
+                    <span class="s-icon"><i class="fa-solid fa-key"></i></span>
+                    <span class="s-label">Licenses</span>
                 </a>
 
                 <a href="{{ route('customer.domains.index') }}"

@@ -41,6 +41,12 @@ final class InvoiceService
 
     public function generateInvoicePdf(Invoice $invoice): string
     {
+        $invoice->loadMissing([
+            'transaction.subscription.subscriptionPlan.product',
+            'transaction.subscription.license',
+            'customer'
+        ]);
+
         $yearMonth = $invoice->created_at->format('Y/m');
         $safeInvoiceNumber = preg_replace('/[^A-Za-z0-9_-]+/', '_', $invoice->invoice_number);
         $filename = "{$safeInvoiceNumber}.pdf";

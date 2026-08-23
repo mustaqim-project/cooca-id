@@ -20,7 +20,7 @@ final class LiveChatService
     }
 
     /**
-     * Automatically end live chat sessions that have been inactive for >= 2 minutes (120 seconds).
+     * Automatically end live chat sessions that have been inactive for >= 30 minutes.
      *
      * @return int Number of sessions ended
      */
@@ -37,11 +37,11 @@ final class LiveChatService
 
             $lastActivityTime = $lastMessage ? $lastMessage->created_at : $chat->updated_at;
 
-            if ($lastActivityTime && $lastActivityTime->lte(now()->subMinutes(2))) {
+            if ($lastActivityTime && $lastActivityTime->lte(now()->subMinutes(30))) {
                 $this->endChatSession(
                     $chat,
                     'system',
-                    'Percakapan otomatis diakhiri karena tidak ada aktivitas selama 2 menit.'
+                    'Percakapan otomatis diakhiri karena tidak ada aktivitas selama 30 menit.'
                 );
                 $endedCount++;
             }
@@ -51,7 +51,7 @@ final class LiveChatService
     }
 
     /**
-     * End a live chat session and send WhatsApp transcript.
+     * End a live chat session and send WhatsApp and Email transcript.
      */
     public function endChatSession(LiveChat $chat, string $endedBy = 'admin', ?string $systemMsgText = null): bool
     {
@@ -66,7 +66,7 @@ final class LiveChatService
 
         $defaultMsg = match ($endedBy) {
             'customer' => 'Percakapan telah diakhiri oleh Customer.',
-            'system'   => 'Percakapan otomatis diakhiri karena tidak ada aktivitas selama 2 menit.',
+            'system'   => 'Percakapan otomatis diakhiri karena tidak ada aktivitas.',
             default    => 'Percakapan diakhiri oleh Admin.',
         };
 
@@ -77,7 +77,41 @@ final class LiveChatService
             'message'      => $systemMsgText ?? $defaultMsg,
         ]);
 
-        // Send Transcript via WA
+        // 1. Send Email Transcript to Customer & Admin
+        $this->sendEmailTranscript($chat);
+
+        // 2. Send Transcript via WhatsApp
+        $this->sendWhatsAppTranscript($chat);
+
+        return true;
+    }
+
+    /**
+     * Send email transcript to customer and admin.
+     */
+    protected function sendEmailTranscript(LiveChat $chat): void
+    {
+        try {
+            if (!empty($chat->customer_email)) {
+                \Illuminate\Support\Facades\Mail::to($chat->customer_email)
+                    ->send(new \App\Mail\LiveChatTranscriptMail($chat, 'customer'));
+            }
+
+            $adminEmail = \App\Models\Setting::get('mail.admin_email', config('mail.from.address'));
+            if ($adminEmail && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+                \Illuminate\Support\Facades\Mail::to($adminEmail)
+                    ->send(new \App\Mail\LiveChatTranscriptMail($chat, 'admin'));
+            }
+        } catch (\Throwable $e) {
+            Log::error("[LiveChatService] Failed to send email transcript: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send WhatsApp transcript.
+     */
+    protected function sendWhatsAppTranscript(LiveChat $chat): void
+    {
         $messages = $chat->messages()->get();
         $dateStr = now()->translatedFormat('d M Y, H:i') . ' WIB';
 
@@ -94,26 +128,25 @@ final class LiveChatService
         $waTranscriptMessage = "📄 *RIWAYAT PERCAKAPAN LIVE CHAT — COOCA.ID*\n"
                              . "═════════════════════════\n"
                              . "📅 *Waktu*: {$dateStr}\n"
-                             . "👤 *Customer*: {$chat->customer_name} (+{$chat->customer_phone})\n\n"
+                             . "👤 *Customer*: {$chat->customer_name} (+{$chat->customer_phone})\n"
+                             . ($chat->customer_email ? "📧 *Email*: {$chat->customer_email}\n\n" : "\n")
                              . "💬 *TRANSKRIP PERCAKAPAN*:\n"
                              . "─────────────────────────\n"
                              . "{$transcriptText}\n"
                              . "─────────────────────────\n\n"
-                             . "Terima kasih telah berkonsultasi dengan *Cooca.id*! Sesi percakapan ini telah resmi diakhiri. 😊";
+                             . "Terima kasih telah berkonsultasi dengan *Cooca.id*! Sesi percakapan ini telah resmi diakhiri. Transkrip juga telah dikirimkan ke email Anda. 😊";
 
         $device = WhatsAppDevice::where('owner_type', 'admin')
             ->where('status', 'connected')
             ->latest()
             ->first();
 
-        if ($device) {
+        if ($device && !empty($chat->customer_phone)) {
             try {
                 $this->gatewayService->sendMessage($device->session_id, $chat->customer_phone, $waTranscriptMessage);
             } catch (\Throwable $e) {
                 Log::error("[LiveChatService] Failed to send WA transcript: " . $e->getMessage());
             }
         }
-
-        return true;
     }
 }

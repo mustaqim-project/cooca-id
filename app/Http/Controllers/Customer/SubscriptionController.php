@@ -61,7 +61,7 @@ final class SubscriptionController extends Controller
 
     public function checkDomain(Request $request): \Illuminate\Http\JsonResponse
     {
-        $domain = $request->input('domain');
+        $domain = trim((string) $request->input('domain'));
         if (!$domain) {
             return response()->json(['available' => false, 'message' => 'Domain/Subdomain is required.']);
         }
@@ -72,21 +72,67 @@ final class SubscriptionController extends Controller
             return response()->json(['available' => false, 'message' => 'Hanya huruf, angka, dan strip yang diperbolehkan.']);
         }
 
-        $existsInLicenses = \App\Models\License::where('domain', $domainStr)
-            ->where('customer_id', '!=', auth('customer')->id())
-            ->exists();
+        // 1. Cek apakah domain terdaftar pada Lisensi yang aktif / valid
+        $activeLicense = \App\Models\License::where('domain', $domainStr)
+            ->whereIn('status', [\App\Models\License::STATUS_ACTIVE, \App\Models\License::STATUS_SUSPENDED])
+            ->first();
 
+        if ($activeLicense) {
+            return response()->json([
+                'available' => false,
+                'message' => 'Domain ini sudah aktif digunakan oleh lisensi lain. Silakan pilih nama domain/subdomain berbeda.'
+            ]);
+        }
+
+        // 2. Cek apakah domain ada di ERP Request yang sedang aktif
         $subdomainOnly = str_replace('.cooca.id', '', $domainStr);
-        $existsInRequests = \App\Models\ErpRequest::where('requested_subdomain', $subdomainOnly)
-            ->where('customer_id', '!=', auth('customer')->id())
+        $activeRequest = \App\Models\ErpRequest::where('requested_subdomain', $subdomainOnly)
             ->whereNotIn('status', [\App\Models\ErpRequest::STATUS_REJECTED, \App\Models\ErpRequest::STATUS_TRIAL_EXPIRED])
-            ->exists();
+            ->first();
 
-        $exists = $existsInLicenses || $existsInRequests;
+        if ($activeRequest) {
+            return response()->json([
+                'available' => false,
+                'message' => 'Subdomain ini sedang aktif dalam proses uji coba / setup ERP.'
+            ]);
+        }
+
+        // 3. Cek apakah domain ini sedang dalam proses pembayaran pending yang belum expired (< 1 jam)
+        $pendingLicense = \App\Models\License::where('domain', $domainStr)
+            ->where('status', \App\Models\License::STATUS_INACTIVE)
+            ->whereHas('subscription.transactions', function ($query) {
+                $query->where('status', 'pending')
+                    ->where('created_at', '>=', now()->subHours(1));
+            })
+            ->with(['subscription.transactions' => function ($query) {
+                $query->where('status', 'pending')
+                    ->where('created_at', '>=', now()->subHours(1))
+                    ->latest();
+            }])
+            ->first();
+
+        if ($pendingLicense) {
+            $pendingTx = $pendingLicense->subscription?->transactions?->first();
+            $isMine = ($pendingLicense->customer_id === auth('customer')->id());
+
+            if ($isMine) {
+                return response()->json([
+                    'available' => false,
+                    'is_pending_mine' => true,
+                    'transaction_id' => $pendingTx?->id,
+                    'message' => 'Domain ini sudah Anda pesan dan sedang menunggu pembayaran (Batas waktu 1 jam). Silakan lanjutkan pembayaran pesanan sebelumnya.'
+                ]);
+            }
+
+            return response()->json([
+                'available' => false,
+                'message' => 'Domain ini sedang dalam proses pemesanan oleh pelanggan lain (Menunggu pembayaran).'
+            ]);
+        }
 
         return response()->json([
-            'available' => !$exists,
-            'message' => $exists ? 'Domain Tidak Tersedia' : 'Domain tersedia.'
+            'available' => true,
+            'message' => 'Domain/Subdomain tersedia untuk dipesan.'
         ]);
     }
 
@@ -148,13 +194,51 @@ final class SubscriptionController extends Controller
             $customer->load('companyProfile');
         }
 
-        $data     = $request->validated();
-
+        $data = $request->validated();
         $product = \App\Models\Product::where('slug', $data['product_slug'])->firstOrFail();
 
-        $domainStr = $data['domain'];
+        $domainStr = trim($data['domain']);
         if (!str_contains($domainStr, '.')) {
             $domainStr .= '.cooca.id';
+        }
+
+        // 1. Validasi Domain: Tidak boleh duplicate dengan lisensi yang sudah aktif/suspended
+        $activeLicenseExists = \App\Models\License::where('domain', $domainStr)
+            ->whereIn('status', [\App\Models\License::STATUS_ACTIVE, \App\Models\License::STATUS_SUSPENDED])
+            ->exists();
+
+        if ($activeLicenseExists) {
+            return back()->withInput()->with('error', "Domain '{$domainStr}' sudah aktif digunakan. Silakan pilih domain atau subdomain lain.");
+        }
+
+        // 2. Validasi Domain: Tidak boleh duplicate dengan ERP Request yang sedang aktif
+        $subdomainOnly = str_replace('.cooca.id', '', $domainStr);
+        $requestExists = \App\Models\ErpRequest::where('requested_subdomain', $subdomainOnly)
+            ->whereNotIn('status', [\App\Models\ErpRequest::STATUS_REJECTED, \App\Models\ErpRequest::STATUS_TRIAL_EXPIRED])
+            ->exists();
+
+        if ($requestExists) {
+            return back()->withInput()->with('error', "Subdomain '{$subdomainOnly}' sedang aktif dalam proses uji coba / setup ERP. Silakan gunakan subdomain lain.");
+        }
+
+        // 3. Validasi Pending Payment: Tidak boleh duplicate pending payment dengan domain yang sama (< 1 jam)
+        $pendingLicense = \App\Models\License::where('domain', $domainStr)
+            ->where('status', \App\Models\License::STATUS_INACTIVE)
+            ->whereHas('subscription.transactions', function ($query) {
+                $query->where('status', 'pending')
+                    ->where('created_at', '>=', now()->subHours(1));
+            })
+            ->first();
+
+        if ($pendingLicense) {
+            if ($pendingLicense->customer_id === $customer->getKey()) {
+                $pendingTx = $pendingLicense->subscription?->transactions()->where('status', 'pending')->latest()->first();
+                if ($pendingTx) {
+                    return redirect()->route('customer.payments.show', $pendingTx->id)
+                        ->with('error', "Anda sudah memiliki pesanan yang menunggu pembayaran untuk domain '{$domainStr}'. Silakan selesaikan pembayaran tagihan yang ada.");
+                }
+            }
+            return back()->withInput()->with('error', "Domain '{$domainStr}' sedang dalam proses pembayaran oleh pengguna lain (Batas waktu 1 jam).");
         }
 
         $domain = \App\Models\Domain::firstOrCreate(
@@ -172,15 +256,6 @@ final class SubscriptionController extends Controller
             ->where('domain_id', $domain->id)
             ->where('product_id', $product->id)
             ->first();
-
-        // Prevent creating a license for a domain that is already taken by another customer
-        $domainTaken = \App\Models\License::where('domain', $domain->domain)
-            ->where('customer_id', '!=', $customer->getKey())
-            ->exists();
-
-        if ($domainTaken) {
-            return back()->with('error', 'Domain sudah digunakan oleh pelanggan lain. Silakan pilih domain lain.');
-        }
 
         if (!$license) {
             do {

@@ -7,7 +7,38 @@
 <div class="page-header">
     <div>
         <h1 class="page-title"><i class="fa-solid fa-key" style="color:var(--primary);margin-right:10px;"></i>License Management</h1>
-        <p class="page-subtitle">View, activate, and manage your product license keys.</p>
+        <p class="page-subtitle">Kelola kode lisensi resmi Anda dan aktifkan pada instans ERP.</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ route('customer.products.index') }}" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Tambah Lisensi / Trial
+        </a>
+    </div>
+</div>
+
+{{-- Activation Guide Banner --}}
+<div class="card mb-4" style="background:var(--bg-secondary);border:1px solid var(--border);box-shadow:none;">
+    <div class="card-body" style="padding:16px 20px;">
+        <div class="flex items-center gap-3 mb-2">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <div class="font-bold text-sm" style="color:var(--text);">Cara Aktivasi Lisensi pada Instans ERP Anda:</div>
+        </div>
+        <div class="grid-3 text-xs" style="gap:12px;margin-top:8px;">
+            <div style="background:var(--card);padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);">
+                <div class="font-bold text-primary mb-1">Langkah 1: Salin Kredensial</div>
+                <div class="text-muted">Klik tombol copy pada <strong>License Code</strong> dan <strong>License Key</strong> di bawah ini.</div>
+            </div>
+            <div style="background:var(--card);padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);">
+                <div class="font-bold text-primary mb-1">Langkah 2: Buka Menu Aktivasi ERP</div>
+                <div class="text-muted">Login ke ERP Anda dan buka halaman <code>/admin/license/activate</code>.</div>
+            </div>
+            <div style="background:var(--card);padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);">
+                <div class="font-bold text-primary mb-1">Langkah 3: Masukkan Kredensial</div>
+                <div class="text-muted">Tempelkan Code, Key, dan Email Anda. Sistem akan mengaktivasi lisensi secara instan.</div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -23,7 +54,7 @@
                         <th>Domain</th>
                         <th>Status</th>
                         <th>Expires</th>
-                        <th>Actions</th>
+                        <th class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,7 +89,7 @@
                             <div class="font-semibold text-sm">{{ $license->product?->name ?? '—' }}</div>
                         </td>
                         <td>
-                            <span class="badge badge-primary">{{ $license->subscriptionPlan?->name ?? '—' }}</span>
+                            <span class="badge badge-primary">{{ $license->subscriptionPlan?->name ?? 'Standard' }}</span>
                         </td>
                         <td>
                             @if($license->domain)
@@ -66,7 +97,7 @@
                                     {{ $license->domain }} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px;"></i>
                                 </a>
                             @else
-                                <span class="text-muted text-sm">Not assigned</span>
+                                <span class="text-muted text-xs">Auto-bind saat aktivasi ERP</span>
                             @endif
                         </td>
                         <td>
@@ -90,21 +121,14 @@
                                 Lifetime
                             @endif
                         </td>
-                        <td>
-                            <div class="flex gap-1">
-                                <a href="{{ route('customer.licenses.show', $license->id) }}" class="btn btn-ghost btn-sm">
+                        <td class="text-right">
+                            <div class="flex gap-1 justify-end">
+                                <a href="{{ route('customer.licenses.credentials', $license->id) }}" class="btn btn-primary btn-sm" title="Lihat Kredensial Lengkap">
+                                    <i class="fa-solid fa-key"></i> Kredensial
+                                </a>
+                                <a href="{{ route('customer.licenses.show', $license->id) }}" class="btn btn-ghost btn-sm" title="Lihat Detail">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
-                                @if($license->status === 'inactive' && $license->subscription?->status === 'active')
-                                    <a href="{{ route('customer.licenses.activate', $license->id) }}" class="btn btn-primary btn-sm">
-                                        Activate
-                                    </a>
-                                @endif
-                                @if($license->status === 'expired' || $license->status === 'revoked')
-                                    <button onclick="showAppeal('{{ $license->id }}')" class="btn btn-outline btn-sm">
-                                        Appeal
-                                    </button>
-                                @endif
                             </div>
                         </td>
                     </tr>
@@ -113,9 +137,9 @@
                         <td colspan="7">
                             <div class="empty-state">
                                 <div class="empty-state-icon">🔑</div>
-                                <div class="empty-state-title">No Licenses Found</div>
-                                <div class="empty-state-text">Your license keys will appear here after subscribing to a product.</div>
-                                <a href="{{ route('customer.subscriptions.create') }}" class="btn btn-primary">Subscribe Now</a>
+                                <div class="empty-state-title">Belum Ada Lisensi</div>
+                                <div class="empty-state-text">Lisensi Anda akan otomatis muncul di sini setelah berlangganan atau disetujui untuk trial.</div>
+                                <a href="{{ route('customer.products.index') }}" class="btn btn-primary">Lihat Katalog Produk</a>
                             </div>
                         </td>
                     </tr>
@@ -130,14 +154,9 @@
 </div>
 
 <script>
-function copyToClipboard(text) {
+function copyToClipboard(text, label = 'Teks') {
     navigator.clipboard.writeText(text).then(() => {
-        // simple feedback
-        const el = document.createElement('div');
-        el.className = 'toast-wrap';
-        el.innerHTML = '<div class="toast toast-success"><span class="toast-icon"><i class="fa-solid fa-check" style="color:var(--success);"></i></span><div><div class="toast-title">Copied!</div><div class="toast-msg">License key copied to clipboard.</div></div></div>';
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 2500);
+        alert(label + ' berhasil disalin ke clipboard!');
     });
 }
 </script>

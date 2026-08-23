@@ -52,8 +52,11 @@
                                 <span class="badge badge-muted" style="font-size: 10px;">BERAKHIR</span>
                             @endif
                         </div>
-                        <div class="text-xs font-semibold mb-1" style="color: var(--success);">
-                            <i class="fa-brands fa-whatsapp"></i> +{{ $chat->customer_phone }}
+                        <div class="text-xs font-semibold mb-1" style="color: var(--success); display:flex; flex-direction:column; gap:2px;">
+                            <span><i class="fa-brands fa-whatsapp"></i> +{{ $chat->customer_phone }}</span>
+                            @if($chat->customer_email)
+                                <span class="text-muted" style="font-weight:normal;"><i class="fa-regular fa-envelope text-primary"></i> {{ $chat->customer_email }}</span>
+                            @endif
                         </div>
                         <div class="text-xs text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 290px;">
                             {{ $chat->messages->first()?->message ?? 'Belum ada pesan' }}
@@ -79,7 +82,7 @@
                 </div>
                 <div id="activeActions" style="display: none;">
                     <button type="button" class="btn btn-outline btn-sm" onclick="endCurrentChat()" style="color: var(--danger); border-color: var(--border);">
-                        <i class="fa-solid fa-flag-checkered"></i> Akhiri & Kirim Transkrip ke WA
+                        <i class="fa-solid fa-flag-checkered"></i> Akhiri & Kirim Transkrip (WA & Email)
                     </button>
                 </div>
             </div>
@@ -100,7 +103,7 @@
                         <i class="fa-solid fa-bolt" style="color: var(--warning);"></i> Balas Cepat:
                     </span>
                     @forelse($templatesList as $tmpl)
-                        <button type="button" class="btn btn-outline btn-xs" onclick="insertTemplateReply('{{ addslashes($tmpl->shortcut) }}')" title="{{ $tmpl->content }}">
+                        <button type="button" class="btn btn-outline btn-xs" onclick="insertTemplateReply('{{ addslashes($tmpl->content) }}')" title="{{ $tmpl->content }}">
                             {{ $tmpl->title }}
                         </button>
                     @empty
@@ -115,7 +118,7 @@
                     @csrf
                     <textarea id="adminReplyInput" required rows="2" class="form-textarea" placeholder="Ketik balasan pesan atau klik template cepat di atas..." style="flex: 1; resize: none;"></textarea>
                     <button type="submit" id="adminReplyBtn" class="btn btn-primary" style="height: 44px; padding: 0 20px; display: flex; align-items: center; gap: 8px;">
-                        <i class="fa-solid fa-paper-plane"></i> <span>Balas</span>
+                        <i class="fa-solid fa-paper-plane"></i> <span>Kirim Balasan</span>
                     </button>
                 </form>
             </div>
@@ -126,9 +129,23 @@
 @endsection
 
 @push('scripts')
+<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 <script>
 let activeChatId = null;
 let pollInterval = null;
+let pusherAdmin = null;
+
+function initAdminPusher() {
+    const pusherKey = "{{ env('PUSHER_APP_KEY', '') }}";
+    const pusherCluster = "{{ env('PUSHER_APP_CLUSTER', 'ap1') }}";
+    if (pusherKey && typeof Pusher !== 'undefined') {
+        try {
+            pusherAdmin = new Pusher(pusherKey, { cluster: pusherCluster, forceTLS: true });
+        } catch (e) {
+            console.warn('Pusher init skipped:', e);
+        }
+    }
+}
 
 function escapeHtml(text) {
     if (!text) return '';
@@ -165,8 +182,9 @@ function fetchSessionsList() {
                             <div class="font-bold text-sm" style="color: var(--text);">${escapeHtml(chat.customer_name)}</div>
                             <span class="badge ${badgeClass}" style="font-size: 10px; font-weight: 700;">${badgeText}</span>
                         </div>
-                        <div class="text-xs font-semibold mb-1" style="color: var(--success);">
-                            <i class="fa-brands fa-whatsapp"></i> +${escapeHtml(chat.customer_phone)}
+                        <div class="text-xs font-semibold mb-1" style="color: var(--success); display:flex; flex-direction:column; gap:2px;">
+                            <span><i class="fa-brands fa-whatsapp"></i> +${escapeHtml(chat.customer_phone)}</span>
+                            ${chat.customer_email ? `<span class="text-muted" style="font-weight:normal;"><i class="fa-regular fa-envelope text-primary"></i> ${escapeHtml(chat.customer_email)}</span>` : ''}
                         </div>
                         <div class="text-xs text-muted" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 290px;">
                             ${escapeHtml(chat.last_message)}
@@ -198,9 +216,13 @@ function loadChatMessages(id) {
         // Update Header
         document.getElementById('activeCustomerName').innerText = chat.customer_name;
         document.getElementById('activeCustomerPhone').innerHTML = `
-            <a href="https://wa.me/${chat.customer_phone.replace(/[^0-9]/g, '')}" target="_blank" style="color: var(--success); font-weight: 700; text-decoration: none;">
-                <i class="fa-brands fa-whatsapp"></i> +${chat.customer_phone}
-            </a> · Status: <span class="badge ${chat.status === 'active' ? 'badge-success' : 'badge-muted'}" style="font-size: 10px;">${chat.status.toUpperCase()}</span>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:2px;">
+                <a href="https://wa.me/${chat.customer_phone.replace(/[^0-9]/g, '')}" target="_blank" style="color: var(--success); font-weight: 700; text-decoration: none;">
+                    <i class="fa-brands fa-whatsapp"></i> +${chat.customer_phone}
+                </a>
+                ${chat.customer_email ? `<span class="text-muted">· <i class="fa-regular fa-envelope text-primary"></i> ${chat.customer_email}</span>` : ''}
+                <span>· Status: <span class="badge ${chat.status === 'active' ? 'badge-success' : 'badge-muted'}" style="font-size: 10px;">${chat.status.toUpperCase()}</span></span>
+            </div>
         `;
         document.getElementById('activeActions').style.display = chat.status === 'active' ? 'block' : 'none';
         document.getElementById('chatFooter').style.display = chat.status === 'active' ? 'block' : 'none';
@@ -260,7 +282,8 @@ function submitAdminReply(e) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+            'Accept': 'application/json'
         },
         body: JSON.stringify({ message: message })
     })
@@ -283,42 +306,42 @@ function submitAdminReply(e) {
 
 function endCurrentChat() {
     if (!activeChatId) return;
-    if (!confirm('Apakah Anda yakin ingin mengakhiri sesi chat ini dan mengirimkan transkrip percakapan ke WhatsApp customer?')) return;
+    if (!confirm('Apakah Anda yakin ingin mengakhiri sesi chat ini dan mengirimkan transkrip percakapan ke WhatsApp & Email customer?')) return;
 
     fetch('/admin/live-chats/' + activeChatId + '/end', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+            'Accept': 'application/json'
         }
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
+            alert(data.message || 'Sesi berhasil diakhiri & transkrip telah dikirimkan.');
             loadChatMessages(activeChatId);
             fetchSessionsList();
         }
     });
 }
 
-function insertTemplateReply(shortcut) {
+function insertTemplateReply(content) {
     const input = document.getElementById('adminReplyInput');
     if (!input) return;
-    
-    // If shortcut, fetch template text from API or append shortcut
-    input.value = (input.value ? input.value + ' ' : '') + shortcut;
+    input.value = (input.value ? input.value + "\n" : '') + content;
     input.focus();
 }
 
-// Auto polling loop
+// Fast realtime polling loop (2000ms)
 document.addEventListener('DOMContentLoaded', function() {
+    initAdminPusher();
     pollInterval = setInterval(function() {
         fetchSessionsList();
         if (activeChatId) {
             loadChatMessages(activeChatId);
         }
-    }, 4000);
+    }, 2000);
 });
 </script>
 @endpush

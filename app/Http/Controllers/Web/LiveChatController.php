@@ -58,16 +58,20 @@ final class LiveChatController extends Controller
         $request->validate([
             'name'    => 'required|string|max:100',
             'phone'   => 'required|string|max:25',
+            'email'   => 'required|email|max:100',
             'message' => 'required|string|max:1000',
         ], [
             'name.required'    => 'Harap isi nama lengkap Anda.',
             'phone.required'   => 'Harap isi nomor WhatsApp Anda.',
+            'email.required'   => 'Harap isi alamat email Anda.',
+            'email.email'      => 'Format alamat email tidak valid.',
             'message.required' => 'Harap tuliskan pesan awal Anda.',
         ]);
 
-        $name = trim($request->input('name'));
-        $phoneInput = trim($request->input('phone'));
-        $messageText = trim($request->input('message'));
+        $name = trim((string) $request->input('name'));
+        $phoneInput = trim((string) $request->input('phone'));
+        $email = strtolower(trim((string) $request->input('email')));
+        $messageText = trim((string) $request->input('message'));
 
         $cleanPhone = preg_replace('/\D/', '', $phoneInput);
         if (str_starts_with($cleanPhone, '0')) {
@@ -80,6 +84,7 @@ final class LiveChatController extends Controller
             'session_token'  => $token,
             'customer_name'  => $name,
             'customer_phone' => $cleanPhone,
+            'customer_email' => $email,
             'status'         => 'active',
         ]);
 
@@ -91,6 +96,14 @@ final class LiveChatController extends Controller
             'message'      => $messageText,
         ]);
 
+        // Send email alert to agungmustaqim15@gmail.com & cooca.idn@gmail.com
+        try {
+            \Illuminate\Support\Facades\Mail::to(['agungmustaqim15@gmail.com', 'cooca.idn@gmail.com'])
+                ->send(new \App\Mail\Admin\NewLiveChatAlertMail($liveChat, $messageText));
+        } catch (\Throwable $e) {
+            Log::error("[LiveChatController] Failed to send new live chat email alert: " . $e->getMessage());
+        }
+
         // Find active Admin WhatsApp Device
         $device = WhatsAppDevice::where('owner_type', 'admin')
             ->where('status', 'connected')
@@ -100,7 +113,7 @@ final class LiveChatController extends Controller
         if ($device) {
             try {
                 // 1. Send automated welcome & instructions to Customer WhatsApp
-                $welcomeText = "Halo *{$name}*! 👋\n\nSesi *Live Chat Website Cooca.id* Anda telah aktif.\n\nPesan awal Anda:\n\"_{$messageText}_\"\n\nTim Admin kami sedang membalas percakapan Anda secara *realtime di widget website*. Setelah percakapan selesai, *riwayat lengkap (transkrip chat)* akan otomatis dikirimkan ke nomor WhatsApp ini! 😊";
+                $welcomeText = "Halo *{$name}*! 👋\n\nSesi *Live Chat Website Cooca.id* Anda telah aktif.\n\nPesan awal Anda:\n\"_{$messageText}_\"\n\nTim Support kami siap membalas percakapan Anda secara *realtime di widget website*. Setelah percakapan selesai, riwayat transkrip lengkap akan otomatis dikirimkan ke nomor WhatsApp ini dan email *{$email}*! 😊";
                 $this->gatewayService->sendMessage($device->session_id, $cleanPhone, $welcomeText);
 
                 // 2. Alert Admin Mobile WA with link to Admin Live Chat Panel
@@ -108,6 +121,7 @@ final class LiveChatController extends Controller
                     $adminMsg = "🔔 *PERCAKAPAN LIVE CHAT BARU*\n\n"
                         . "👤 *Customer*: {$name}\n"
                         . "📱 *No. WA*: +{$cleanPhone}\n"
+                        . "📧 *Email*: {$email}\n"
                         . "💬 *Pesan*: {$messageText}\n\n"
                         . "👉 *Balas Realtime di Admin Panel*:\n" . route('admin.live-chats.index');
 
@@ -125,6 +139,7 @@ final class LiveChatController extends Controller
             'customer'      => [
                 'name'  => $name,
                 'phone' => $cleanPhone,
+                'email' => $email,
             ],
             'messages'      => [$initialMsg],
         ]);

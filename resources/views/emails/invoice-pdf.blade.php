@@ -358,6 +358,50 @@
         }
 
         /* =========================
+           LICENSE BOX (PAID ONLY)
+        ========================= */
+
+        .license-box {
+            margin-top: 20px;
+            padding: 12px 15px;
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 4px;
+        }
+
+        .license-box-title {
+            margin: 0 0 8px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #15803d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .license-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .license-table td {
+            padding: 4px 0;
+            font-size: 9px;
+            vertical-align: top;
+        }
+
+        .license-label {
+            width: 130px;
+            color: #4b5563;
+            font-weight: normal;
+        }
+
+        .license-val {
+            font-family: DejaVu Sans Mono, monospace;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        /* =========================
            UTILITIES
         ========================= */
 
@@ -541,12 +585,30 @@
              INVOICE DETAIL
         ========================================================== --}}
 
+        @php
+            $subscription = $invoice->transaction?->subscription;
+            $license = $subscription?->license ?? \App\Models\License::where('subscription_id', $subscription?->id)->first();
+            $plan = $subscription?->subscriptionPlan;
+            $product = $plan?->product ?? $subscription?->product ?? $invoice->transaction?->project;
+
+            $durationText = '1 Bulan';
+            if ($plan && $plan->duration_months) {
+                if ($plan->duration_months % 12 === 0) {
+                    $years = (int) ($plan->duration_months / 12);
+                    $durationText = $years . ' Tahun (' . $plan->duration_months . ' Bulan)';
+                } else {
+                    $durationText = $plan->duration_months . ' Bulan';
+                }
+            } elseif ($subscription && $subscription->started_at && $subscription->expires_at) {
+                $durationText = $subscription->started_at->diffForHumans($subscription->expires_at, true);
+            }
+        @endphp
+
         <div class="section">
 
             <div class="section-title">
-                Detail Tagihan
+                Detail Tagihan & Layanan
             </div>
-
 
             <table class="invoice-table">
 
@@ -555,15 +617,15 @@
                     <tr>
 
                         <th class="description">
-                            Description
+                            Deskripsi Item & Durasi
                         </th>
 
                         <th class="product">
-                            Product / Plan
+                            Produk / Paket
                         </th>
 
                         <th class="amount">
-                            Amount
+                            Jumlah (IDR)
                         </th>
 
                     </tr>
@@ -576,7 +638,16 @@
 
                         <td class="description">
 
-                            {{ $invoice->transaction?->description ?? 'Pembayaran langganan SaaS Cooca' }}
+                            <div style="font-weight: bold; color: #111827;">
+                                {{ $invoice->transaction?->description ?? 'Pembayaran Layanan SaaS COOCA.ID' }}
+                            </div>
+
+                            <div style="margin-top: 4px; font-size: 9px; color: #4b5563;">
+                                <strong>Durasi:</strong> {{ $durationText }}
+                                @if($subscription && $subscription->started_at && $subscription->expires_at)
+                                    <br><strong>Masa Aktif:</strong> {{ $subscription->started_at->format('d M Y') }} s/d {{ $subscription->expires_at->format('d M Y') }}
+                                @endif
+                            </div>
 
                         </td>
 
@@ -585,15 +656,15 @@
 
                             <div class="product-name">
 
-                                {{ $invoice->transaction?->subscription?->product?->name ?? 'COOCA SaaS Subscription' }}
+                                {{ $product?->name ?? 'COOCA SaaS' }}
 
                             </div>
 
 
-                            @if ($invoice->transaction?->subscription?->subscriptionPlan?->name)
+                            @if ($plan?->name)
                                 <div class="plan-name">
 
-                                    {{ $invoice->transaction->subscription->subscriptionPlan->name }}
+                                    Paket: {{ $plan->name }}
 
                                 </div>
                             @endif
@@ -663,6 +734,43 @@
             </table>
 
         </div>
+
+        {{-- =========================================================
+             LICENSE CREDENTIALS (PAID INVOICE ONLY)
+        ========================================================== --}}
+        @if ($invoice->isPaid() && $license)
+        <div class="license-box">
+            <div class="license-box-title">
+                Kredensial Lisensi Resmi (License Credentials)
+            </div>
+            <table class="license-table">
+                <tr>
+                    <td class="license-label">License Code:</td>
+                    <td class="license-val">{{ $license->license_code }}</td>
+                </tr>
+                <tr>
+                    <td class="license-label">License Key (Token):</td>
+                    <td class="license-val">{{ $license->token_code }}</td>
+                </tr>
+                <tr>
+                    <td class="license-label">Registered Email:</td>
+                    <td class="license-val">{{ $customer->email ?? ($invoice->customer?->email ?? '-') }}</td>
+                </tr>
+                @if($license->domain)
+                <tr>
+                    <td class="license-label">Assigned Domain:</td>
+                    <td class="license-val">{{ $license->domain }}</td>
+                </tr>
+                @endif
+                @if($license->expires_at)
+                <tr>
+                    <td class="license-label">Valid Until:</td>
+                    <td class="license-val">{{ $license->expires_at->format('d M Y') }}</td>
+                </tr>
+                @endif
+            </table>
+        </div>
+        @endif
 
 
         {{-- =========================================================

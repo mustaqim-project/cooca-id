@@ -66,6 +66,7 @@ final class AdminLiveChatController extends Controller
                 'id'             => $chat->id,
                 'customer_name'  => $chat->customer_name,
                 'customer_phone' => $chat->customer_phone,
+                'customer_email' => $chat->customer_email,
                 'status'         => $chat->status,
                 'last_message'   => $chat->messages->first()?->message ?? 'Belum ada pesan',
                 'updated_at_fmt' => $chat->updated_at ? $chat->updated_at->diffForHumans() : '',

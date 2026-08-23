@@ -113,21 +113,17 @@
                             @endif
                         </td>
                         <td>
-                            <div class="flex gap-1">
-                                <a href="{{ route('customer.invoices.show', $invoice->id) }}" class="btn btn-ghost btn-sm" title="View">
+                            <div class="flex gap-1 items-center">
+                                <a href="{{ route('customer.invoices.show', $invoice->id) }}" class="btn btn-ghost btn-sm" title="Lihat Rincian Tagihan">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
-                                <a href="{{ route('customer.invoices.download', $invoice->id) }}" class="btn btn-ghost btn-sm" title="Download">
-                                    <i class="fa-solid fa-download"></i>
+                                <a href="{{ route('customer.invoices.download', $invoice->id) }}" class="btn btn-ghost btn-sm" title="Download PDF Invoice">
+                                    <i class="fa-solid fa-file-pdf text-danger"></i>
                                 </a>
                                 @if(!$isPaid && !$isVerifying && in_array($invoice->status, ['issued', 'overdue', 'pending', 'unpaid']))
-                                    <form method="POST" action="{{ route('customer.payments.store') }}" style="display:inline;">
-                                        @csrf
-                                        <input type="hidden" name="invoice_id" value="{{ $invoice->id }}">
-                                        <button type="submit" class="btn btn-primary btn-sm">
-                                            <i class="fa-solid fa-credit-card"></i> Pay Now
-                                        </button>
-                                    </form>
+                                    <a href="{{ route('customer.invoices.show', $invoice->id) }}" class="btn btn-primary btn-sm" title="Bayar Tagihan">
+                                        <i class="fa-solid fa-credit-card"></i> Bayar
+                                    </a>
                                 @endif
                             </div>
                         </td>

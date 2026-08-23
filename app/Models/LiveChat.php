@@ -16,6 +16,7 @@ final class LiveChat extends Model
         'session_token',
         'customer_name',
         'customer_phone',
+        'customer_email',
         'status',
         'ended_at',
     ];

@@ -340,6 +340,10 @@
                             <input type="tel" name="phone" required placeholder="Contoh: 081234567890" style="width: 100%; padding: 9px 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 13px; outline: none; box-sizing: border-box;">
                         </div>
                         <div>
+                            <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Alamat Email *</label>
+                            <input type="email" name="email" required placeholder="Contoh: budi@gmail.com" style="width: 100%; padding: 9px 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 13px; outline: none; box-sizing: border-box;">
+                        </div>
+                        <div>
                             <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Pesan Awal Anda *</label>
                             <textarea name="message" id="waFormInitialMessage" required rows="3" placeholder="Tuliskan pertanyaan Anda..." style="width: 100%; padding: 9px 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 13px; outline: none; box-sizing: border-box; resize: none;"></textarea>
                         </div>
@@ -350,9 +354,8 @@
                 </div>
             </div>
 
-
             {{-- 2. Live Conversation Screen (Hidden by Default) --}}
-            <div id="waLiveChatConversationScreen" style="display: none; flex-direction: column; height: 400px; background: #ECE5DD;">
+            <div id="waLiveChatConversationScreen" style="display: none; flex-direction: column; height: 420px; background: #ECE5DD;">
                 {{-- Message Container --}}
                 <div id="lcMessageContainer" style="flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
                     <!-- Messages will be rendered dynamically here -->
@@ -360,7 +363,7 @@
 
                 {{-- Reply Bar --}}
                 <form id="lcCustomerReplyForm" onsubmit="submitCustomerReply(event)" style="padding: 10px; background: #F0F2F5; display: flex; gap: 8px; align-items: center; border-top: 1px solid #CBD5E1;">
-                    <input type="text" id="lcCustomerReplyInput" required placeholder="Tulis pesan..." style="flex: 1; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 20px; font-size: 13px; outline: none; background: white;">
+                    <input type="text" id="lcCustomerReplyInput" required placeholder="Tulis pesan Anda..." style="flex: 1; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 20px; font-size: 13px; outline: none; background: white;">
                     <button type="submit" id="lcCustomerSendBtn" style="background: #128C7E; color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
@@ -369,7 +372,7 @@
         </div>
 
         {{-- Floating Trigger Button --}}
-        <button type="button" onclick="toggleWaChatbot()" class="wa-floating-btn" aria-label="Hubungi kami via WhatsApp" style="border: none; cursor: pointer;">
+        <button type="button" onclick="toggleWaChatbot()" class="wa-floating-btn" aria-label="Hubungi kami via Live Chat" style="border: none; cursor: pointer;">
             <span class="wa-floating-badge"></span>
             <svg class="wa-floating-icon" viewBox="0 0 24 24">
                 <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
@@ -378,10 +381,30 @@
         </button>
     </div>
 
+    {{-- Pusher JS (Optional Realtime Websocket) --}}
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+
     <script>
     var loadedFaqsList = [];
+    var lcToken = localStorage.getItem('cooca_lc_token') || null;
+    var lcLastMessageId = 0;
+    var lcPollTimer = null;
+    var pusherInstance = null;
 
-
+    function initPusherIfAvailable() {
+        var pusherKey = "{{ env('PUSHER_APP_KEY', '') }}";
+        var pusherCluster = "{{ env('PUSHER_APP_CLUSTER', 'ap1') }}";
+        if (pusherKey && typeof Pusher !== 'undefined' && !pusherInstance) {
+            try {
+                pusherInstance = new Pusher(pusherKey, {
+                    cluster: pusherCluster,
+                    forceTLS: true
+                });
+            } catch (e) {
+                console.warn('Pusher init skipped:', e);
+            }
+        }
+    }
 
     function fetchChatbotHelpdeskOptions() {
         fetch("{{ route('live-chat.options') }}")
@@ -406,6 +429,9 @@
                     optLive.textContent = '💬 Hubungi Admin Realtime (Live Chat)';
                     select.appendChild(optLive);
                 }
+            })
+            .catch(function(err) {
+                console.error('Failed to load FAQs:', err);
             });
     }
 
@@ -453,6 +479,10 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         fetchChatbotHelpdeskOptions();
+        initPusherIfAvailable();
+        if (lcToken) {
+            resumeLiveChatSession();
+        }
     });
 
     function toggleWaChatbot() {
@@ -466,7 +496,6 @@
             win.style.display = 'none';
         }
     }
-
 
     function startLiveChatSession(e) {
         e.preventDefault();
@@ -503,13 +532,13 @@
                 renderWidgetMessages(data.messages, true);
                 startLcPolling();
             } else {
-                alert(data.message || 'Gagal memulai chat.');
+                alert(data.message || (data.errors ? Object.values(data.errors).flat().join("\n") : 'Gagal memulai chat.'));
             }
         })
         .catch(function(err) {
             btn.disabled = false;
             btn.innerHTML = origHtml;
-            alert('Gagal menghubungkan ke server live chat.');
+            alert('Gagal menghubungkan ke server live chat. Silakan periksa koneksi internet Anda.');
         });
     }
 
@@ -526,7 +555,8 @@
 
     function startLcPolling() {
         if (lcPollTimer) clearInterval(lcPollTimer);
-        lcPollTimer = setInterval(fetchLiveChatMessages, 2500);
+        // Fast realtime polling (1.5 seconds)
+        lcPollTimer = setInterval(fetchLiveChatMessages, 1500);
     }
 
     function fetchLiveChatMessages() {
@@ -544,11 +574,16 @@
                     renderWidgetMessages(data.messages, false);
                 }
             }
+        })
+        .catch(function(err) {
+            console.warn('Poll error:', err);
         });
     }
 
     function renderWidgetMessages(messages, isInitial) {
         var container = document.getElementById('lcMessageContainer');
+        if (!container) return;
+
         if (isInitial) {
             container.innerHTML = '';
             lcLastMessageId = 0;
@@ -566,12 +601,12 @@
             if (isSystem) {
                 div.style.textAlign = 'center';
                 div.style.margin = '6px 0';
-                div.innerHTML = '<span style="background: rgba(0,0,0,0.08); padding: 3px 10px; border-radius: 10px; font-size: 11px; color: #475569; font-weight: 600;">' + m.message + '</span>';
+                div.innerHTML = '<span style="background: rgba(0,0,0,0.08); padding: 4px 10px; border-radius: 10px; font-size: 11px; color: #475569; font-weight: 600;">' + m.message + '</span>';
             } else if (isCustomer) {
                 div.style.display = 'flex';
                 div.style.flexDirection = 'column';
                 div.style.alignItems = 'flex-end';
-                div.innerHTML = '<div style="background: #DCF8C6; color: #1E293B; border-radius: 12px 12px 2px 12px; padding: 8px 12px; max-width: 82%; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 12px; line-height: 1.4; white-space: pre-wrap;">' +
+                div.innerHTML = '<div style="background: #DCF8C6; color: #1E293B; border-radius: 12px 12px 2px 12px; padding: 8px 12px; max-width: 84%; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 12px; line-height: 1.4; white-space: pre-wrap; word-break: break-word;">' +
                                 '<div style="font-weight: 700; font-size: 10px; color: #128C7E; margin-bottom: 2px;">Anda</div>' +
                                 m.message +
                                 '</div>';
@@ -579,7 +614,7 @@
                 div.style.display = 'flex';
                 div.style.flexDirection = 'column';
                 div.style.alignItems = 'flex-start';
-                div.innerHTML = '<div style="background: white; color: #1E293B; border-radius: 12px 12px 12px 2px; padding: 8px 12px; max-width: 82%; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 12px; line-height: 1.4; white-space: pre-wrap;">' +
+                div.innerHTML = '<div style="background: white; color: #1E293B; border-radius: 12px 12px 12px 2px; padding: 8px 12px; max-width: 84%; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 12px; line-height: 1.4; white-space: pre-wrap; word-break: break-word;">' +
                                 '<div style="font-weight: 700; font-size: 10px; color: #075E54; margin-bottom: 2px;">Admin Cooca</div>' +
                                 m.message +
                                 '</div>';
@@ -596,16 +631,19 @@
         if (!lcToken) return;
 
         var input = document.getElementById('lcCustomerReplyInput');
+        var btn = document.getElementById('lcCustomerSendBtn');
         var messageText = input.value.trim();
         if (!messageText) return;
 
         input.value = '';
+        btn.disabled = true;
 
         fetch("{{ route('live-chat.send') }}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({
                 session_token: lcToken,
@@ -614,34 +652,45 @@
         })
         .then(function(res) { return res.json(); })
         .then(function(data) {
+            btn.disabled = false;
             if (data.success) {
                 fetchLiveChatMessages();
             } else {
                 alert(data.error || 'Gagal mengirim pesan.');
+                input.value = messageText;
             }
+        })
+        .catch(function(err) {
+            btn.disabled = false;
+            alert('Gagal mengirim pesan. Periksa koneksi internet.');
+            input.value = messageText;
         });
     }
 
     function endLiveChatSession() {
         if (!lcToken) return;
-        if (!confirm('Apakah Anda yakin ingin mengakhiri sesi percakapan ini? Transkrip lengkap percakapan akan otomatis dikirimkan ke WhatsApp Anda.')) return;
+        if (!confirm('Apakah Anda yakin ingin mengakhiri sesi percakapan ini? Transkrip lengkap percakapan akan otomatis dikirimkan ke WhatsApp dan Email Anda.')) return;
 
         fetch("{{ route('live-chat.end') }}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({ session_token: lcToken })
         })
         .then(function(res) { return res.json(); })
         .then(function(data) {
             if (data.success) {
+                alert('Sesi percakapan telah berakhir. Ringkasan transkrip telah dikirimkan ke WhatsApp dan Email Anda.');
                 handleChatEndedLocally();
             }
+        })
+        .catch(function(err) {
+            handleChatEndedLocally();
         });
     }
-
 
     function handleChatEndedLocally() {
         if (lcPollTimer) clearInterval(lcPollTimer);

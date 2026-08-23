@@ -42,14 +42,33 @@
                             @endif
                         </td>
                         <td>
-                            <a href="{{ route('customer.payments.show', $payment->id) }}" class="btn btn-ghost btn-sm" title="View Detail">
-                                <i class="fa-solid fa-eye"></i>
-                            </a>
-                            @if($payment->status === 'failed' && $payment->created_at->diffInHours(now()) <= 24 && $payment->subscription_id)
-                                <a href="{{ route('customer.subscriptions.checkout', $payment->subscription_id) }}" class="btn btn-primary btn-sm ml-2" title="Ulangi Pembayaran">
-                                    <i class="fa-solid fa-rotate-right"></i>
+                            <div class="flex items-center gap-1">
+                                <a href="{{ route('customer.payments.show', $payment->id) }}" class="btn btn-ghost btn-sm" title="Lihat Rincian Transaksi">
+                                    <i class="fa-solid fa-eye"></i>
                                 </a>
-                            @endif
+
+                                @if(in_array($payment->status, ['pending', 'unpaid', 'issued']))
+                                    @if($payment->invoice)
+                                        <a href="{{ route('customer.invoices.show', $payment->invoice->id) }}" class="btn btn-warning btn-sm" title="Lanjutkan Pembayaran">
+                                            <i class="fa-solid fa-credit-card"></i> Lanjutkan Bayar
+                                        </a>
+                                    @elseif($payment->subscription_id)
+                                        <a href="{{ route('customer.subscriptions.checkout', $payment->subscription_id) }}" class="btn btn-warning btn-sm" title="Lanjutkan Pembayaran">
+                                            <i class="fa-solid fa-credit-card"></i> Lanjutkan Bayar
+                                        </a>
+                                    @endif
+                                @elseif(in_array($payment->status, ['paid', 'settlement', 'success']))
+                                    @if($payment->invoice)
+                                        <a href="{{ route('customer.invoices.show', $payment->invoice->id) }}" class="btn btn-outline btn-sm" title="Lihat Invoice & Lisensi">
+                                            <i class="fa-solid fa-file-invoice"></i> Invoice
+                                        </a>
+                                    @endif
+                                @elseif($payment->status === 'failed' && $payment->created_at->diffInHours(now()) <= 24 && $payment->subscription_id)
+                                    <a href="{{ route('customer.subscriptions.checkout', $payment->subscription_id) }}" class="btn btn-primary btn-sm" title="Ulangi Pembayaran">
+                                        <i class="fa-solid fa-rotate-right"></i> Ulangi
+                                    </a>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty

@@ -24,6 +24,9 @@ Schedule::command('subscriptions:remind --days=3')->dailyAt('09:00');
 // Affiliate
 Schedule::command('affiliate:clear-commissions')->dailyAt('00:00');
 
+// Payment expiration tasks (Every 5 minutes to expire pending payments > 1 hour)
+Schedule::command('payments:expire-pending')->everyFiveMinutes()->name('Expire pending transactions older than 1 hour');
+
 // Daily Tasks
 Schedule::command('licenses:expire')->dailyAt('01:00')->name('Expire expired licenses');
 Schedule::command('vouchers:deactivate')->dailyAt('03:00')->name('Deactivate expired vouchers');

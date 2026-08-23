@@ -46,6 +46,63 @@
 </div>
 @endif
 
+@if($pendingInvoicesCount > 0)
+<div class="alert alert-warning mb-4 flex items-center justify-between gap-3" style="background:var(--warning-soft);border:1px solid var(--warning);border-radius:var(--radius);">
+    <div class="flex items-center gap-3">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--warning);color:white;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
+        <div>
+            <div class="font-bold text-sm" style="color:var(--text);">Anda memiliki {{ $pendingInvoicesCount }} Tagihan yang Belum Dibayar</div>
+            <div class="text-xs text-muted">Selesaikan pembayaran agar layanan dan lisensi ERP Anda tetap aktif tanpa kendala.</div>
+        </div>
+    </div>
+    <a href="{{ route('customer.invoices.index', ['status' => 'issued']) }}" class="btn btn-primary btn-sm" style="flex-shrink:0;">
+        <i class="fa-solid fa-credit-card"></i> Bayar Tagihan Sekarang
+    </a>
+</div>
+@endif
+
+{{-- ══════════════ QUICK ACTIONS HUB ══════════════ --}}
+<div class="grid-4 mb-4" style="gap:12px;">
+    <a href="{{ route('customer.products.index') }}" class="card card-hover" style="padding:14px;display:flex;align-items:center;gap:12px;text-decoration:none;border:1px solid var(--border);">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--primary),#7C3AED);color:white;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+            <i class="fa-solid fa-cube"></i>
+        </div>
+        <div>
+            <div class="font-bold text-sm" style="color:var(--text);">Katalog & Trial</div>
+            <div class="text-xs text-muted">Jelajahi modul & trial gratis</div>
+        </div>
+    </a>
+    <a href="{{ route('customer.licenses.index') }}" class="card card-hover" style="padding:14px;display:flex;align-items:center;gap:12px;text-decoration:none;border:1px solid var(--border);">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#059669,#10B981);color:white;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+            <i class="fa-solid fa-key"></i>
+        </div>
+        <div>
+            <div class="font-bold text-sm" style="color:var(--text);">Kredensial Lisensi</div>
+            <div class="text-xs text-muted">Salin kode lisensi ERP</div>
+        </div>
+    </a>
+    <a href="{{ route('customer.invoices.index') }}" class="card card-hover" style="padding:14px;display:flex;align-items:center;gap:12px;text-decoration:none;border:1px solid var(--border);">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#D97706,#F59E0B);color:white;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+            <i class="fa-solid fa-file-invoice"></i>
+        </div>
+        <div>
+            <div class="font-bold text-sm" style="color:var(--text);">Tagihan & Invoice</div>
+            <div class="text-xs text-muted">Lihat histori & unduh PDF</div>
+        </div>
+    </a>
+    <a href="https://wa.me/{{ setting('contact.whatsapp', '6282134566667') }}?text={{ urlencode('Halo COOCA.ID, saya butuh bantuan terkait layanan.') }}" target="_blank" class="card card-hover" style="padding:14px;display:flex;align-items:center;gap:12px;text-decoration:none;border:1px solid var(--border);">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
+            <i class="fa-brands fa-whatsapp"></i>
+        </div>
+        <div>
+            <div class="font-bold text-sm" style="color:var(--text);">Support 24/7</div>
+            <div class="text-xs text-muted">Bantuan WhatsApp instan</div>
+        </div>
+    </a>
+</div>
+
 {{-- ══════════════ HERO BANNER ══════════════ --}}
 <div class="hero-banner">
     <div style="position:relative;z-index:1;">
@@ -157,37 +214,45 @@
                                 <th>Domain</th>
                                 <th>Status</th>
                                 <th>Expires</th>
+                                <th class="text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($licList->take(5) as $license)
                             <tr>
                                 <td>
-                                    <div style="display:flex;flex-direction:column;gap:2px;">
+                                    <div style="display:flex;flex-direction:column;gap:4px;">
                                         <div class="flex items-center gap-1">
-                                            <span class="text-xs text-muted" style="min-width:30px;font-size:10px;font-weight:600;">Code:</span>
+                                            <span class="text-xs text-muted" style="min-width:32px;font-size:10px;font-weight:600;">Code:</span>
                                             <code style="font-size:11px;background:var(--bg);padding:2px 5px;border-radius:4px;border:1px solid var(--border);color:var(--primary);font-weight:bold;">
                                                 {{ $license->license_code }}
                                             </code>
+                                            <button type="button" class="btn btn-ghost btn-xs" style="padding:2px 5px;" onclick="navigator.clipboard.writeText('{{ $license->license_code }}');alert('License Code disalin!')" title="Salin License Code">
+                                                <i class="fa-solid fa-copy"></i>
+                                            </button>
                                         </div>
                                         <div class="flex items-center gap-1">
-                                            <span class="text-xs text-muted" style="min-width:30px;font-size:10px;font-weight:600;">Key:</span>
+                                            <span class="text-xs text-muted" style="min-width:32px;font-size:10px;font-weight:600;">Key:</span>
                                             <code style="font-size:11px;background:var(--bg);padding:2px 5px;border-radius:4px;border:1px solid var(--border);color:var(--text);font-weight:bold;">
                                                 {{ $license->token_code }}
                                             </code>
+                                            <button type="button" class="btn btn-ghost btn-xs" style="padding:2px 5px;" onclick="navigator.clipboard.writeText('{{ $license->token_code }}');alert('License Key disalin!')" title="Salin License Key">
+                                                <i class="fa-solid fa-copy"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="font-semibold text-sm">{{ $license->product?->name ?? $license->subscriptionPlan?->name ?? 'License' }}</div>
+                                    <div class="font-semibold text-sm">{{ $license->product?->name ?? $license->subscriptionPlan?->name ?? 'COOCA SaaS' }}</div>
+                                    <div class="text-xs text-muted">{{ $license->subscriptionPlan?->name ?? 'Standard' }}</div>
                                 </td>
                                 <td>
                                     @if($license->domain)
                                         <a href="https://{{ $license->domain }}" target="_blank" class="text-primary text-xs font-semibold">
-                                            {{ $license->domain }}
+                                            {{ $license->domain }} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;"></i>
                                         </a>
                                     @else
-                                        <span class="text-muted text-xs">—</span>
+                                        <span class="text-muted text-xs">Auto-bind ERP</span>
                                     @endif
                                 </td>
                                 <td>
@@ -199,10 +264,17 @@
                                 <td class="text-xs text-muted">
                                     {{ $license->expires_at?->format('d M Y') ?? 'Lifetime' }}
                                 </td>
+                                <td class="text-right">
+                                    <a href="{{ route('customer.licenses.credentials', $license->id) }}" class="btn btn-outline btn-sm" title="Kredensial Lengkap">
+                                        <i class="fa-solid fa-key"></i> Kredensial
+                                    </a>
+                                </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted" style="padding:28px;">No active licenses found.</td>
+                                <td colspan="6" class="text-center text-muted" style="padding:28px;">
+                                    Belum ada lisensi aktif. <a href="{{ route('customer.products.index') }}" class="text-primary font-bold">Mulai berlangganan / coba trial</a>
+                                </td>
                             </tr>
                             @endforelse
                         </tbody>

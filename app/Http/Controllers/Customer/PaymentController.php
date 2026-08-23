@@ -21,7 +21,9 @@ final class PaymentController extends Controller
 
     public function index()
     {
-        $payments = \App\Models\Transaction::where('customer_id', Auth::id())
+        $payments = \App\Models\Transaction::with(['invoice', 'subscription.subscriptionPlan.product', 'subscription.license'])
+            ->where('customer_id', Auth::id())
+            ->latest('created_at')
             ->paginate(15);
 
         return view('customer.payments.index', [
@@ -31,15 +33,17 @@ final class PaymentController extends Controller
 
     public function show(string $payment)
     {
-        $transaction = \App\Models\Transaction::where('id', $payment)
+        $transaction = \App\Models\Transaction::with(['invoice', 'subscription.subscriptionPlan.product', 'subscription.license.domainRecord'])
+            ->where('id', $payment)
             ->where('customer_id', Auth::id())
-            ->first();
-
-        if (!$transaction) {
-            abort(404);
-        }
+            ->firstOrFail();
 
         Gate::authorize('view', $transaction);
+
+        // Check if transaction has expired (> 1 hour) and unpaid without proof
+        if ($transaction->status === 'pending' && $transaction->created_at->lt(now()->subHours(1)) && empty($transaction->payment_proof)) {
+            $this->expireTransactionRecord($transaction);
+        }
 
         return view('customer.payments.show', [
             'payment' => $transaction
@@ -73,6 +77,18 @@ final class PaymentController extends Controller
             return back()->with('error', 'Invoice sudah dibayar.');
         }
 
+        // Cek apakah transaksi sudah kedaluwarsa (> 1 jam)
+        if ($transaction->status === 'pending' && $transaction->created_at->lt(now()->subHours(1)) && empty($transaction->payment_proof)) {
+            $this->expireTransactionRecord($transaction);
+            return redirect()->route('customer.products.index')
+                ->with('error', 'Batas waktu pembayaran (1 jam) telah berakhir. Transaksi ini telah kedaluwarsa dan domain Anda telah dibebaskan. Silakan lakukan pemesanan ulang.');
+        }
+
+        if (in_array($transaction->status, ['failed', 'expire', 'cancel'], true)) {
+            return redirect()->route('customer.products.index')
+                ->with('error', 'Transaksi ini telah dibatalkan / kedaluwarsa. Silakan lakukan pemesanan ulang.');
+        }
+
         $paymentType = $data['payment_type'] ?? ($request->hasFile('payment_proof') ? 'manual_transfer' : 'midtrans');
 
         // TIPE 2: TRANSFER BANK MANUAL
@@ -94,6 +110,14 @@ final class PaymentController extends Controller
                 'status' => 'pending',
                 'rejection_reason' => null, // reset in case of re-upload
             ]);
+
+            // Kirim notifikasi email ke agungmustaqim15@gmail.com dan cooca.idn@gmail.com
+            try {
+                \Illuminate\Support\Facades\Mail::to(['agungmustaqim15@gmail.com', 'cooca.idn@gmail.com'])
+                    ->send(new \App\Mail\Admin\SubscriptionPaymentReceivedMail($transaction, 'Bukti Pembayaran Manual Diunggah (Menunggu Verifikasi)'));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('[PaymentController] Failed to send admin payment proof email: ' . $e->getMessage());
+            }
 
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
@@ -167,4 +191,41 @@ final class PaymentController extends Controller
     {
         return view('customer.payments.failed');
     }
+
+    /**
+     * Expire transaction record and release domain.
+     */
+    private function expireTransactionRecord(\App\Models\Transaction $transaction): void
+    {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($transaction) {
+            $transaction->update([
+                'status' => 'failed',
+                'failed_at' => now(),
+                'rejection_reason' => 'Batas waktu pembayaran 1 jam telah berakhir (Expired).',
+            ]);
+
+            if ($transaction->invoice) {
+                $transaction->invoice->update([
+                    'status' => 'cancelled',
+                ]);
+            }
+
+            $subscription = $transaction->subscription;
+            if ($subscription) {
+                $license = $subscription->license;
+                if ($license && $license->status === \App\Models\License::STATUS_INACTIVE) {
+                    $domainRecord = $license->domainRecord;
+                    if ($domainRecord && $domainRecord->status === \App\Models\Domain::STATUS_PENDING) {
+                        $domainRecord->delete();
+                    }
+                    $license->delete();
+                }
+
+                if (in_array($subscription->status, ['trial', 'unpaid', 'pending', 'inactive'], true)) {
+                    $subscription->delete();
+                }
+            }
+        });
+    }
 }
+

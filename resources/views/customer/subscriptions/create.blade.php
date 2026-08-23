@@ -902,6 +902,10 @@
                                     hint.innerHTML =
                                         `<i class="fa-solid fa-circle-check"></i> ${data.message}`;
                                     hint.style.color = 'var(--success)';
+                                } else if (data.is_pending_mine && data.transaction_id) {
+                                    hint.innerHTML =
+                                        `<i class="fa-solid fa-clock text-warning"></i> ${data.message} <a href="/customer/payments/${data.transaction_id}" class="text-primary font-bold" style="margin-left:4px; text-decoration:underline;">Lanjutkan Bayar &rarr;</a>`;
+                                    hint.style.color = '#B45309';
                                 } else {
                                     hint.innerHTML =
                                         `<i class="fa-solid fa-circle-xmark"></i> ${data.message}`;

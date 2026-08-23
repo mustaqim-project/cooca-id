@@ -85,11 +85,31 @@
                 $grandTotal = (float) $invoice->amount;
             @endphp
 
+            @php
+                $subscription = $invoice->transaction?->subscription;
+                $license = $subscription?->license ?? \App\Models\License::where('subscription_id', $subscription?->id)->first();
+                $plan = $subscription?->subscriptionPlan;
+                $product = $plan?->product ?? $subscription?->product ?? $invoice->transaction?->project;
+                
+                $durationText = '1 Bulan';
+                if ($plan && $plan->duration_months) {
+                    if ($plan->duration_months % 12 === 0) {
+                        $years = (int) ($plan->duration_months / 12);
+                        $durationText = $years . ' Tahun (' . $plan->duration_months . ' Bulan)';
+                    } else {
+                        $durationText = $plan->duration_months . ' Bulan';
+                    }
+                } elseif ($subscription && $subscription->started_at && $subscription->expires_at) {
+                    $durationText = $subscription->started_at->diffForHumans($subscription->expires_at, true);
+                }
+            @endphp
+
             {{-- Table --}}
             <table class="data-table mb-4">
                 <thead>
                     <tr>
-                        <th>Deskripsi Item</th>
+                        <th>Deskripsi Produk & Layanan</th>
+                        <th>Durasi & Periode</th>
                         <th class="text-right">Jumlah</th>
                     </tr>
                 </thead>
@@ -97,11 +117,25 @@
                     <tr>
                         <td>
                             <div class="font-bold text-sm" style="color: var(--text);">
-                                {{ $invoice->transaction?->subscription?->product?->name ?? ($invoice->transaction?->description ?? 'COOCA SaaS Subscription') }}
+                                {{ $product?->name ?? ($invoice->transaction?->description ?? 'COOCA SaaS Subscription') }}
                             </div>
                             <div class="text-xs text-muted">
-                                {{ $invoice->transaction?->subscription?->subscriptionPlan?->name ?? 'Service Plan' }}
+                                Paket: <span class="font-semibold text-primary">{{ $plan?->name ?? 'Standard Plan' }}</span>
                             </div>
+                        </td>
+                        <td>
+                            <div class="text-xs font-bold" style="color:var(--text);">
+                                <i class="fa-solid fa-hourglass-half text-primary me-1"></i>{{ $durationText }}
+                            </div>
+                            @if($subscription && $subscription->started_at && $subscription->expires_at)
+                                <div class="text-xs text-muted mt-1">
+                                    {{ $subscription->started_at->format('d M Y') }} s/d {{ $subscription->expires_at->format('d M Y') }}
+                                </div>
+                            @elseif($subscription && $subscription->started_at)
+                                <div class="text-xs text-muted mt-1">
+                                    Mulai: {{ $subscription->started_at->format('d M Y') }} (Lifetime)
+                                </div>
+                            @endif
                         </td>
                         <td class="text-right font-bold text-base" style="color: var(--text);">
                             Rp {{ number_format($gross, 0, ',', '.') }}
@@ -136,21 +170,28 @@
             {{-- Condition A: Invoice is PAID --}}
             @if ($isPaid)
                 <div class="divider my-6" style="height:1px;background:var(--border);"></div>
-                <div class="card" style="border: 1px solid var(--success); background: var(--success-soft); box-shadow: none;">
-                    <div class="card-body" style="padding: 24px;">
-                        <div class="flex items-center gap-3">
-                            <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--success); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
-                                <i class="fa-solid fa-check"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-base" style="color: var(--success);">Tagihan Ini Telah Lunas (PAID)</div>
-                                <div class="text-xs text-muted" style="color: var(--text-2); margin-top: 2px;">
-                                    Pembayaran telah dikonfirmasi dan layanan SaaS Anda telah aktif.
+                
+                {{-- Payment Confirmed Banner --}}
+                <div class="card mb-4" style="border: 1px solid var(--success); background: var(--success-soft); box-shadow: none;">
+                    <div class="card-body" style="padding: 20px;">
+                        <div class="flex items-center justify-between" style="flex-wrap:wrap;gap:12px;">
+                            <div class="flex items-center gap-3">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--success); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-base" style="color: var(--success);">Pembayaran Tagihan Telah Lunas (PAID)</div>
+                                    <div class="text-xs text-muted" style="color: var(--text-2); margin-top: 2px;">
+                                        Layanan SaaS & Lisensi Anda telah aktif. Gunakan kredensial di bawah untuk aktivasi instans ERP Anda.
+                                    </div>
                                 </div>
                             </div>
+                            <a href="{{ route('customer.invoices.download', $invoice->id) }}" class="btn btn-primary btn-sm">
+                                <i class="fa-solid fa-file-pdf"></i> Download PDF Invoice
+                            </a>
                         </div>
 
-                        <div class="grid-2 mt-4 text-xs" style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; gap: 12px;">
+                        <div class="grid-2 mt-3 text-xs" style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; gap: 12px;">
                             <div>
                                 <span class="text-muted">Metode Pembayaran:</span>
                                 <div class="font-bold mt-1" style="color: var(--text);">
@@ -163,25 +204,65 @@
                                     {{ $invoice->paid_at ? $invoice->paid_at->format('d M Y, H:i') : ($tx?->paid_at ? $tx->paid_at->format('d M Y, H:i') : '—') }}
                                 </div>
                             </div>
-                            @if($tx?->sender_name)
-                                <div>
-                                    <span class="text-muted">Nama Pengirim Rekening:</span>
-                                    <div class="font-bold mt-1" style="color: var(--text);">{{ $tx->sender_name }}</div>
-                                </div>
-                            @endif
-                            @if($tx?->payment_proof)
-                                <div>
-                                    <span class="text-muted">Bukti Pembayaran:</span>
-                                    <div class="mt-1">
-                                        <a href="{{ $tx->payment_proof_url }}" target="_blank" class="btn btn-ghost btn-xs" style="color: var(--primary);">
-                                            <i class="fa-solid fa-file-invoice"></i> Buka Bukti Bayar
-                                        </a>
-                                    </div>
-                                </div>
-                            @endif
                         </div>
                     </div>
                 </div>
+
+                {{-- License Credentials Box --}}
+                @if($license)
+                <div class="card" style="border:1px solid var(--primary);box-shadow:none;margin-top:16px;">
+                    <div class="card-header" style="background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+                        <div class="card-title text-sm font-bold" style="color:var(--primary);">
+                            <i class="fa-solid fa-key me-2"></i>Kredensial Lisensi ERP Anda
+                        </div>
+                        <span class="badge badge-success">ACTIVE</span>
+                    </div>
+                    <div class="card-body" style="padding:20px;">
+                        <p class="text-xs text-muted mb-3">
+                            Salin kredensial berikut dan masukkan pada halaman aktivasi ERP Anda (<strong>/admin/license/activate</strong>).
+                        </p>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label text-xs font-bold uppercase">License Code</label>
+                            <div class="flex gap-2">
+                                <input type="text" class="form-input font-mono font-bold text-primary" readonly value="{{ $license->license_code }}" id="invLicCode">
+                                <button type="button" onclick="copyFieldToClipboard('invLicCode', 'License Code')" class="btn btn-primary btn-sm">
+                                    <i class="fa-solid fa-copy"></i> Salin Code
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label text-xs font-bold uppercase">License Key (Token Code)</label>
+                            <div class="flex gap-2">
+                                <input type="text" class="form-input font-mono font-bold" readonly value="{{ $license->token_code }}" id="invTokCode">
+                                <button type="button" onclick="copyFieldToClipboard('invTokCode', 'License Key')" class="btn btn-outline btn-sm">
+                                    <i class="fa-solid fa-copy"></i> Salin Key
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label text-xs font-bold uppercase">Registered Email</label>
+                            <div class="flex gap-2">
+                                <input type="text" class="form-input font-mono font-bold" readonly value="{{ auth('customer')->user()->email }}" id="invEmail">
+                                <button type="button" onclick="copyFieldToClipboard('invEmail', 'Email')" class="btn btn-outline btn-sm">
+                                    <i class="fa-solid fa-copy"></i> Salin Email
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-2" style="border-top:1px solid var(--border);">
+                            <span class="text-xs text-muted">
+                                Assigned Domain: <strong>{{ $license->domain ?? 'Auto-binds on ERP activation' }}</strong>
+                            </span>
+                            <a href="{{ route('customer.licenses.credentials', $license->id) }}" class="btn btn-outline btn-sm">
+                                <i class="fa-solid fa-shield-key"></i> Kredensial Lengkap
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
             {{-- Condition B: Invoice is UNPAID / PENDING --}}
             @else
@@ -359,6 +440,14 @@ function previewInvProof(input) {
             preview.style.display = 'none';
         }
     }
+}
+
+function copyFieldToClipboard(inputId, label) {
+    const el = document.getElementById(inputId);
+    if (!el) return;
+    navigator.clipboard.writeText(el.value).then(() => {
+        alert(label + ' berhasil disalin ke clipboard!');
+    });
 }
 </script>
 @endpush
