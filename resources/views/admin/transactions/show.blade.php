@@ -128,7 +128,7 @@
             </div>
         </div>
 
-        {{-- Subscription / Project Card --}}
+        {{-- Subscription / Project / AI Top Up Card --}}
         @if($transaction->subscription)
             @php
                 $subPlan = $transaction->subscription->subscriptionPlan;
@@ -150,6 +150,45 @@
                     <div class="stats-row">
                         <span class="text-sm text-muted">Status Langganan</span>
                         <span><span class="badge badge-success">{{ strtoupper($transaction->subscription->status) }}</span></span>
+                    </div>
+                </div>
+            </div>
+        @elseif($transaction->type === 'ai_token_topup' || $transaction->aiTokenPurchase)
+            @php
+                $aiPur = $transaction->aiTokenPurchase ?? \App\Models\AiTokenPurchase::where('transaction_id', $transaction->id)->first();
+            @endphp
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fa-solid fa-brain text-primary" style="margin-right: 6px;"></i> Informasi Top-Up AI Token</div>
+                </div>
+                <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+                    <div class="stats-row">
+                        <span class="text-sm text-muted">Paket Top-Up</span>
+                        <span class="font-bold text-primary">{{ $aiPur?->package?->name ?? 'AI Token Package' }}</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="text-sm text-muted">Jumlah Kuota Token</span>
+                        <span class="font-mono font-bold text-success">+{{ number_format($aiPur?->tokens_amount ?? 0) }} Token</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="text-sm text-muted">Masa Berlaku Token</span>
+                        <span class="font-semibold">30 Hari sejak pembayaran disetujui</span>
+                    </div>
+                    @if($aiPur?->license)
+                        <div class="stats-row">
+                            <span class="text-sm text-muted">Terkait Lisensi</span>
+                            <span>{{ $aiPur->license->product->name ?? 'Produk' }} ({{ substr($aiPur->license_id, 0, 8) }}...)</span>
+                        </div>
+                    @endif
+                    <div class="stats-row">
+                        <span class="text-sm text-muted">Status Kredit Kuota</span>
+                        <span>
+                            @if($aiPur?->status === 'completed')
+                                <span class="badge badge-success">SUDAH DIKREDITKAN KE WALLET</span>
+                            @else
+                                <span class="badge badge-warning">MENUNGGU VERIFIKASI ADMIN</span>
+                            @endif
+                        </span>
                     </div>
                 </div>
             </div>
@@ -298,7 +337,7 @@
 
                     <div style="display:flex;gap:10px;flex-direction:column;">
                         {{-- Approve Button --}}
-                        <form method="POST" action="{{ route('admin.transactions.verify', $transaction->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menyetujui dan memverifikasi pembayaran ini? Layanan subscription/proyek pelanggan akan langsung diaktifkan.');">
+                        <form method="POST" action="{{ route('admin.transactions.verify', $transaction->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menyetujui dan memverifikasi pembayaran ini? {{ $transaction->type === 'ai_token_topup' ? 'Kuota token AI sebesar +' . number_format($aiPur?->tokens_amount ?? 0) . ' Token akan langsung dikreditkan ke wallet pelanggan.' : 'Layanan subscription/proyek pelanggan akan langsung diaktifkan.' }}');">
                             @csrf
                             <button type="submit" class="btn btn-success btn-lg w-full" style="justify-content:center;font-size:15px;padding:14px;">
                                 <i class="fa-solid fa-check-circle"></i> Setujui & Verifikasi Pembayaran

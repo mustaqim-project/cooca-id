@@ -34,7 +34,7 @@ class SubscriptionPaymentReceivedMail extends Mailable
 
     public function content(): Content
     {
-        $this->transaction->loadMissing(['customer', 'subscription.subscriptionPlan.product', 'subscription.license', 'invoice']);
+        $this->transaction->loadMissing(['customer', 'subscription.subscriptionPlan.product', 'subscription.license', 'invoice', 'aiTokenPurchase.package', 'project']);
 
         return new Content(
             view: 'emails.admin-subscription-payment-received',
@@ -45,6 +45,7 @@ class SubscriptionPaymentReceivedMail extends Mailable
                 'plan'        => $this->transaction->subscription?->subscriptionPlan,
                 'product'     => $this->transaction->subscription?->subscriptionPlan?->product,
                 'license'     => $this->transaction->subscription?->license,
+                'eventTitle'  => $this->eventTitle,
                 'siteName'    => setting('site.name', 'COOCA.ID'),
             ],
         );

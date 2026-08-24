@@ -586,13 +586,18 @@
         ========================================================== --}}
 
         @php
+            $tx = $invoice->transaction;
+            $isAiTopup = $tx && $tx->type === 'ai_token_topup';
+            $aiPurchase = $isAiTopup ? ($tx->aiTokenPurchase ?? \App\Models\AiTokenPurchase::where('transaction_id', $tx->id)->first()) : null;
             $subscription = $invoice->transaction?->subscription;
             $license = $subscription?->license ?? \App\Models\License::where('subscription_id', $subscription?->id)->first();
             $plan = $subscription?->subscriptionPlan;
             $product = $plan?->product ?? $subscription?->product ?? $invoice->transaction?->project;
 
             $durationText = '1 Bulan';
-            if ($plan && $plan->duration_months) {
+            if ($isAiTopup) {
+                $durationText = '30 Hari (Masa Berlaku Kuota Top-Up)';
+            } elseif ($plan && $plan->duration_months) {
                 if ($plan->duration_months % 12 === 0) {
                     $years = (int) ($plan->duration_months / 12);
                     $durationText = $years . ' Tahun (' . $plan->duration_months . ' Bulan)';
@@ -639,12 +644,16 @@
                         <td class="description">
 
                             <div style="font-weight: bold; color: #111827;">
-                                {{ $invoice->transaction?->description ?? 'Pembayaran Layanan SaaS COOCA.ID' }}
+                                @if($isAiTopup)
+                                    Top-Up Kuota Token AI (+{{ number_format($aiPurchase?->tokens_amount ?? 0) }} Tokens)
+                                @else
+                                    {{ $invoice->transaction?->description ?? 'Pembayaran Layanan SaaS COOCA.ID' }}
+                                @endif
                             </div>
 
                             <div style="margin-top: 4px; font-size: 9px; color: #4b5563;">
                                 <strong>Durasi:</strong> {{ $durationText }}
-                                @if($subscription && $subscription->started_at && $subscription->expires_at)
+                                @if(!$isAiTopup && $subscription && $subscription->started_at && $subscription->expires_at)
                                     <br><strong>Masa Aktif:</strong> {{ $subscription->started_at->format('d M Y') }} s/d {{ $subscription->expires_at->format('d M Y') }}
                                 @endif
                             </div>
@@ -656,12 +665,20 @@
 
                             <div class="product-name">
 
-                                {{ $product?->name ?? 'COOCA SaaS' }}
+                                @if($isAiTopup)
+                                    AI Token Top-Up
+                                @else
+                                    {{ $product?->name ?? 'COOCA SaaS' }}
+                                @endif
 
                             </div>
 
 
-                            @if ($plan?->name)
+                            @if ($isAiTopup)
+                                <div class="plan-name">
+                                    Paket: {{ $aiPurchase?->package?->name ?? 'AI Package' }}
+                                </div>
+                            @elseif ($plan?->name)
                                 <div class="plan-name">
 
                                     Paket: {{ $plan->name }}
@@ -738,7 +755,7 @@
         {{-- =========================================================
              LICENSE CREDENTIALS (PAID INVOICE ONLY)
         ========================================================== --}}
-        @if ($invoice->isPaid() && $license)
+        @if ($invoice->isPaid() && !$isAiTopup && $license)
         <div class="license-box">
             <div class="license-box-title">
                 Kredensial Lisensi Resmi (License Credentials)

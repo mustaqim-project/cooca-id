@@ -89,17 +89,31 @@
             </tr>
         </thead>
         <tbody>
+            @php
+                $isAiTopup = $transaction->type === 'ai_token_topup';
+                $aiPur = $isAiTopup ? ($transaction->aiTokenPurchase ?? \App\Models\AiTokenPurchase::where('transaction_id', $transaction->id)->first()) : null;
+            @endphp
             <tr>
                 <td>
-                    <div class="font-bold">
-                        {{ $transaction->subscription?->subscriptionPlan?->product?->name ?? 'Layanan COOCA SaaS' }}
-                    </div>
-                    <div class="text-gray">
-                        Paket: {{ $transaction->subscription?->subscriptionPlan?->name ?? 'Subscription Plan' }}
-                        @if($transaction->subscription?->starts_at && $transaction->subscription?->ends_at)
-                            ({{ $transaction->subscription->starts_at->format('d M Y') }} - {{ $transaction->subscription->ends_at->format('d M Y') }})
-                        @endif
-                    </div>
+                    @if($isAiTopup)
+                        <div class="font-bold">Top-Up Kuota Token AI: {{ $aiPur?->package?->name ?? 'AI Token Package' }}</div>
+                        <div class="text-gray">
+                            Kuota: +{{ number_format($aiPur?->tokens_amount ?? 0) }} Token (Masa Berlaku 30 Hari)
+                            @if($aiPur?->license)
+                                · Lisensi: {{ $aiPur->license->product->name ?? 'SaaS ERP' }}
+                            @endif
+                        </div>
+                    @else
+                        <div class="font-bold">
+                            {{ $transaction->subscription?->subscriptionPlan?->product?->name ?? ($transaction->description ?? 'Layanan COOCA SaaS') }}
+                        </div>
+                        <div class="text-gray">
+                            Paket: {{ $transaction->subscription?->subscriptionPlan?->name ?? 'Subscription Plan' }}
+                            @if($transaction->subscription?->starts_at && $transaction->subscription?->ends_at)
+                                ({{ $transaction->subscription->starts_at->format('d M Y') }} - {{ $transaction->subscription->ends_at->format('d M Y') }})
+                            @endif
+                        </div>
+                    @endif
                 </td>
                 <td class="text-right font-bold">
                     Rp {{ number_format((float) ($transaction->gross_amount ?? $transaction->amount ?? 0), 0, ',', '.') }}

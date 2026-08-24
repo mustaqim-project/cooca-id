@@ -109,16 +109,20 @@
 <body>
     <div class="card">
         <div class="header">
-            <h2 style="margin:0; font-size:18px;">🔔 Notifikasi Pembayaran Langganan Masuk</h2>
-            <div class="badge-success">Pembayaran Berhasil / Dikonfirmasi</div>
+            <h2 style="margin:0; font-size:18px;">🔔 Notifikasi Pembayaran: {{ $eventTitle ?? 'Pembayaran Masuk' }}</h2>
+            @if($transaction->status === 'paid')
+                <div class="badge-success">Pembayaran Lunas (PAID)</div>
+            @else
+                <div class="badge-success" style="background: #f59e0b;">Menunggu Verifikasi Admin</div>
+            @endif
         </div>
 
         <div class="body">
             <div class="amount-box">
-                <div style="font-size: 12px; color: #166534; font-weight: 600;">TOTAL PEMBAYARAN DITERIMA</div>
-                <div class="amount-val">Rp {{ number_format((float) ($transaction->net_amount ?? $transaction->gross_amount), 0, ',', '.') }}</div>
+                <div style="font-size: 12px; color: #166534; font-weight: 600;">TOTAL PEMBAYARAN</div>
+                <div class="amount-val">Rp {{ number_format((float) ($transaction->net_amount ?? $transaction->gross_amount ?? $transaction->amount), 0, ',', '.') }}</div>
                 <div style="font-size: 11px; color: #4b5563; margin-top: 4px;">
-                    Metode: <strong>{{ strtoupper($transaction->payment_method ?? $transaction->payment_gateway ?? 'Online Payment') }}</strong>
+                    Metode: <strong>{{ $transaction->isManualTransfer() ? 'Transfer Bank Manual' : strtoupper($transaction->payment_method ?? $transaction->payment_gateway ?? 'Midtrans') }}</strong>
                 </div>
             </div>
 
@@ -152,20 +156,40 @@
                 @endif
             </table>
 
-            <div class="section-title">📦 Rincian Produk & Langganan</div>
+            @php
+                $isAi = $transaction->type === 'ai_token_topup';
+                $aiPurchase = $isAi ? ($transaction->aiTokenPurchase ?? \App\Models\AiTokenPurchase::where('transaction_id', $transaction->id)->first()) : null;
+            @endphp
+
+            <div class="section-title">📦 Rincian Transaksi & Layanan</div>
             <table class="data-table">
-                <tr>
-                    <td class="label">Produk:</td>
-                    <td class="value">{{ $product?->name ?? 'Langganan SaaS' }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Paket Langganan:</td>
-                    <td class="value">{{ $plan?->name ?? 'Standar' }} ({{ $plan?->duration_months ?? 1 }} Bulan)</td>
-                </tr>
-                <tr>
-                    <td class="label">Domain / Subdomain:</td>
-                    <td class="value" style="color:#0284c7;">{{ $license?->domain ?? $subscription?->domain ?? '—' }}</td>
-                </tr>
+                @if($isAi)
+                    <tr>
+                        <td class="label">Jenis Transaksi:</td>
+                        <td class="value" style="color:#7c3aed;">Top-Up Kuota Token AI</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Paket Token:</td>
+                        <td class="value">{{ $aiPurchase?->package?->name ?? 'AI Token Top Up' }} (+{{ number_format($aiPurchase?->tokens_amount ?? 0) }} Token)</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Masa Berlaku:</td>
+                        <td class="value">30 Hari sejak persetujuan</td>
+                    </tr>
+                @else
+                    <tr>
+                        <td class="label">Produk:</td>
+                        <td class="value">{{ $product?->name ?? ($transaction->project?->project_name ?? 'Langganan SaaS') }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Paket Langganan:</td>
+                        <td class="value">{{ $plan?->name ?? ($transaction->description ?? 'Standar') }} @if($plan)({{ $plan->duration_months ?? 1 }} Bulan)@endif</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Domain / Subdomain:</td>
+                        <td class="value" style="color:#0284c7;">{{ $license?->domain ?? $subscription?->domain ?? '—' }}</td>
+                    </tr>
+                @endif
                 <tr>
                     <td class="label">No. Invoice:</td>
                     <td class="value">{{ $transaction->invoice_number ?? $transaction->invoice?->invoice_number ?? ('#' . $transaction->id) }}</td>
@@ -198,7 +222,7 @@
                 <tr>
                     <td class="label">File Bukti:</td>
                     <td class="value">
-                        <a href="{{ asset('storage/' . $transaction->payment_proof) }}" target="_blank" style="display:inline-block; background:#0284c7; color:#ffffff; padding:6px 12px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:700;">
+                        <a href="{{ $transaction->payment_proof_url }}" target="_blank" style="display:inline-block; background:#0284c7; color:#ffffff; padding:6px 12px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:700;">
                             Lihat / Unduh Bukti Transfer &rarr;
                         </a>
                     </td>
@@ -206,17 +230,17 @@
             </table>
 
             @php
-                $ext = strtolower(pathinfo($transaction->payment_proof, PATHINFO_EXTENSION));
+                $ext = strtolower(pathinfo((string)$transaction->payment_proof, PATHINFO_EXTENSION));
             @endphp
             @if(in_array($ext, ['jpg', 'jpeg', 'png', 'webp']))
             <div style="margin-top:12px; text-align:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px;">
-                <img src="{{ asset('storage/' . $transaction->payment_proof) }}" alt="Bukti Transfer" style="max-width:100%; max-height:350px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                <img src="{{ $transaction->payment_proof_url }}" alt="Bukti Transfer" style="max-width:100%; max-height:350px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
             </div>
             @endif
             @endif
 
             <div style="text-align: center;">
-                <a href="{{ route('admin.payments.index') }}" class="btn-action">Buka Menu Verifikasi Pembayaran Admin</a>
+                <a href="{{ route('admin.transactions.show', $transaction->id) }}" class="btn-action">Buka Menu Verifikasi Transaksi Admin</a>
             </div>
         </div>
 

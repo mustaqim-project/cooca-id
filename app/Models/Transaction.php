@@ -139,6 +139,11 @@ final class Transaction extends Model
         return $this->hasOne(MidtransTransaction::class, 'transaction_id');
     }
 
+    public function aiTokenPurchase(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(AiTokenPurchase::class, 'transaction_id');
+    }
+
     public function scopePaid($query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('status', self::STATUS_PAID);

@@ -75,8 +75,10 @@
                         <tr>
                             <td>
                                 <code class="font-bold text-primary">{{ $tx->invoice_number ?? ('INV-'.$tx->id) }}</code>
-                                @if($tx->type)
-                                    <div class="text-xs text-muted">{{ ucfirst($tx->type) }}</div>
+                                @if($tx->type === 'ai_token_topup')
+                                    <div class="mt-1"><span class="badge badge-purple" style="font-size:10px;"><i class="fa-solid fa-brain"></i> AI Top Up</span></div>
+                                @elseif($tx->type)
+                                    <div class="text-xs text-muted">{{ ucfirst(str_replace('_', ' ', $tx->type)) }}</div>
                                 @endif
                             </td>
                             <td>

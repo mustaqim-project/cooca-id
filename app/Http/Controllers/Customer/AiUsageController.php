@@ -129,7 +129,7 @@ final class AiUsageController extends Controller
 
             $transaction = \App\Models\Transaction::create([
                 'customer_id'      => $customer->getKey(),
-                'subscription_id'  => $license?->subscription_id,
+                'subscription_id'  => null,
                 'type'             => 'ai_token_topup',
                 'description'      => "Top-Up AI Token: {$package->name} (+" . number_format($package->token_amount) . " Token, Berlaku 30 Hari)",
                 'invoice_number'   => $invoiceNumber,

@@ -148,8 +148,8 @@ final class PaymentService
                 ]);
             }
 
-            // Activate subscription via queued job for reliability
-            if ($transaction->subscription) {
+            // Activate subscription via queued job for reliability (only for actual subscription transactions)
+            if ($transaction->subscription && $transaction->type !== 'ai_token_topup') {
                 ActivateSubscriptionJob::dispatch($transaction);
             }
 
@@ -181,8 +181,8 @@ final class PaymentService
                 ]);
             }
 
-            // If subscription has AI plan quota, credit separate Subscription Token Lot
-            if ($transaction->subscription && $transaction->subscription->subscriptionPlan) {
+            // If subscription has AI plan quota, credit separate Subscription Token Lot (only for actual subscription transactions)
+            if ($transaction->subscription && $transaction->subscription->subscriptionPlan && $transaction->type !== 'ai_token_topup') {
                 $plan = $transaction->subscription->subscriptionPlan;
                 $aiPlanConfig = $plan->aiPlanConfig;
                 if ($aiPlanConfig && $aiPlanConfig->monthly_token_quota > 0) {
@@ -272,8 +272,8 @@ final class PaymentService
                 ]);
             }
 
-            // Activate subscription via queued job for reliability
-            if ($transaction->subscription) {
+            // Activate subscription via queued job for reliability (only for actual subscription transactions)
+            if ($transaction->subscription && $transaction->type !== 'ai_token_topup') {
                 ActivateSubscriptionJob::dispatch($transaction);
             }
 
@@ -305,8 +305,8 @@ final class PaymentService
                 ]);
             }
 
-            // If subscription has AI plan quota, credit separate Subscription Token Lot
-            if ($transaction->subscription && $transaction->subscription->subscriptionPlan) {
+            // If subscription has AI plan quota, credit separate Subscription Token Lot (only for actual subscription transactions)
+            if ($transaction->subscription && $transaction->subscription->subscriptionPlan && $transaction->type !== 'ai_token_topup') {
                 $plan = $transaction->subscription->subscriptionPlan;
                 $aiPlanConfig = $plan->aiPlanConfig;
                 if ($aiPlanConfig && $aiPlanConfig->monthly_token_quota > 0) {

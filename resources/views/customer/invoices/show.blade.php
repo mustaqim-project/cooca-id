@@ -86,13 +86,17 @@
             @endphp
 
             @php
+                $isAiTopup = $tx && $tx->type === 'ai_token_topup';
+                $aiPurchase = $isAiTopup ? ($tx->aiTokenPurchase ?? \App\Models\AiTokenPurchase::where('transaction_id', $tx->id)->first()) : null;
                 $subscription = $invoice->transaction?->subscription;
                 $license = $subscription?->license ?? \App\Models\License::where('subscription_id', $subscription?->id)->first();
                 $plan = $subscription?->subscriptionPlan;
                 $product = $plan?->product ?? $subscription?->product ?? $invoice->transaction?->project;
                 
                 $durationText = '1 Bulan';
-                if ($plan && $plan->duration_months) {
+                if ($isAiTopup) {
+                    $durationText = '30 Hari (Masa Aktif Top-Up)';
+                } elseif ($plan && $plan->duration_months) {
                     if ($plan->duration_months % 12 === 0) {
                         $years = (int) ($plan->duration_months / 12);
                         $durationText = $years . ' Tahun (' . $plan->duration_months . ' Bulan)';
@@ -116,24 +120,40 @@
                 <tbody>
                     <tr>
                         <td>
-                            <div class="font-bold text-sm" style="color: var(--text);">
-                                {{ $product?->name ?? ($invoice->transaction?->description ?? 'COOCA SaaS Subscription') }}
-                            </div>
-                            <div class="text-xs text-muted">
-                                Paket: <span class="font-semibold text-primary">{{ $plan?->name ?? 'Standard Plan' }}</span>
-                            </div>
+                            @if($isAiTopup)
+                                <div class="font-bold text-sm" style="color: var(--text);">
+                                    <i class="fa-solid fa-brain text-primary me-1"></i> Top-Up Token AI: {{ $aiPurchase?->package?->name ?? 'AI Token Top Up' }}
+                                </div>
+                                <div class="text-xs text-muted">
+                                    Kuota: <span class="font-semibold text-primary">+{{ number_format($aiPurchase?->tokens_amount ?? 0) }} Token</span>
+                                    @if($aiPurchase?->license)
+                                        · Lisensi: {{ $aiPurchase->license->product->name ?? 'SaaS ERP' }}
+                                    @endif
+                                </div>
+                            @else
+                                <div class="font-bold text-sm" style="color: var(--text);">
+                                    {{ $product?->name ?? ($invoice->transaction?->description ?? 'COOCA SaaS Subscription') }}
+                                </div>
+                                <div class="text-xs text-muted">
+                                    Paket: <span class="font-semibold text-primary">{{ $plan?->name ?? 'Standard Plan' }}</span>
+                                </div>
+                            @endif
                         </td>
                         <td>
                             <div class="text-xs font-bold" style="color:var(--text);">
                                 <i class="fa-solid fa-hourglass-half text-primary me-1"></i>{{ $durationText }}
                             </div>
-                            @if($subscription && $subscription->started_at && $subscription->expires_at)
+                            @if(!$isAiTopup && $subscription && $subscription->started_at && $subscription->expires_at)
                                 <div class="text-xs text-muted mt-1">
                                     {{ $subscription->started_at->format('d M Y') }} s/d {{ $subscription->expires_at->format('d M Y') }}
                                 </div>
-                            @elseif($subscription && $subscription->started_at)
+                            @elseif(!$isAiTopup && $subscription && $subscription->started_at)
                                 <div class="text-xs text-muted mt-1">
                                     Mulai: {{ $subscription->started_at->format('d M Y') }} (Lifetime)
+                                </div>
+                            @elseif($isAiTopup)
+                                <div class="text-xs text-muted mt-1">
+                                    Berlaku 30 hari sejak tanggal pembelian
                                 </div>
                             @endif
                         </td>
@@ -180,15 +200,32 @@
                                     <i class="fa-solid fa-check"></i>
                                 </div>
                                 <div>
-                                    <div class="font-bold text-base" style="color: var(--success);">Pembayaran Tagihan Telah Lunas (PAID)</div>
+                                    <div class="font-bold text-base" style="color: var(--success);">
+                                        @if($isAiTopup)
+                                            Pembayaran Top-Up Token AI Berhasil (PAID)
+                                        @else
+                                            Pembayaran Tagihan Telah Lunas (PAID)
+                                        @endif
+                                    </div>
                                     <div class="text-xs text-muted" style="color: var(--text-2); margin-top: 2px;">
-                                        Layanan SaaS & Lisensi Anda telah aktif. Gunakan kredensial di bawah untuk aktivasi instans ERP Anda.
+                                        @if($isAiTopup)
+                                            Token AI Anda telah berhasil ditambahkan ke saldo AI Wallet Anda dan siap digunakan.
+                                        @else
+                                            Layanan SaaS & Lisensi Anda telah aktif. Gunakan kredensial di bawah untuk aktivasi instans ERP Anda.
+                                        @endif
                                     </div>
                                 </div>
                             </div>
-                            <a href="{{ route('customer.invoices.download', $invoice->id) }}" class="btn btn-primary btn-sm">
-                                <i class="fa-solid fa-file-pdf"></i> Download PDF Invoice
-                            </a>
+                            <div class="flex gap-2">
+                                @if($isAiTopup)
+                                    <a href="{{ route('customer.ai-usage.index') }}" class="btn btn-primary btn-sm">
+                                        <i class="fa-solid fa-brain"></i> Buka AI Dashboard
+                                    </a>
+                                @endif
+                                <a href="{{ route('customer.invoices.download', $invoice->id) }}" class="btn btn-outline btn-sm">
+                                    <i class="fa-solid fa-file-pdf"></i> Download PDF
+                                </a>
+                            </div>
                         </div>
 
                         <div class="grid-2 mt-3 text-xs" style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; gap: 12px;">
@@ -208,8 +245,8 @@
                     </div>
                 </div>
 
-                {{-- License Credentials Box --}}
-                @if($license)
+                {{-- License Credentials Box (Only for SaaS Subscription, not Top-up) --}}
+                @if(!$isAiTopup && $license)
                 <div class="card" style="border:1px solid var(--primary);box-shadow:none;margin-top:16px;">
                     <div class="card-header" style="background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
                         <div class="card-title text-sm font-bold" style="color:var(--primary);">
@@ -364,8 +401,9 @@
                                 @endif
                             </div>
 
-                            <form method="POST" action="{{ route('customer.subscriptions.checkout.process', $invoice->transaction?->subscription_id ?? $invoice->id) }}" enctype="multipart/form-data">
+                            <form method="POST" action="{{ route('customer.payments.store') }}" enctype="multipart/form-data">
                                 @csrf
+                                <input type="hidden" name="invoice_id" value="{{ $invoice->id }}">
                                 <input type="hidden" name="payment_type" value="manual_transfer">
                                 <input type="hidden" name="transaction_id" value="{{ $invoice->transaction_id }}">
 

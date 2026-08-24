@@ -417,11 +417,14 @@
                 <thead>
                     <tr>
                         <th>Waktu Order</th>
+                        <th>Invoice / Transaksi</th>
                         <th>Customer</th>
                         <th>Paket / Tambahan Token</th>
                         <th>Harga Dibayar</th>
+                        <th>Metode & Bukti</th>
                         <th>Status</th>
-                        <th>Waktu Kredit Kuota</th>
+                        <th>Waktu Kredit</th>
+                        <th style="text-align: right;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -429,6 +432,15 @@
                         <tr>
                             <td class="font-mono text-xs text-muted">
                                 {{ $pur->created_at?->format('d M Y, H:i') }}
+                            </td>
+                            <td>
+                                @if($pur->transaction)
+                                    <a href="{{ route('admin.transactions.show', $pur->transaction_id) }}" class="font-mono font-bold text-xs text-primary" title="Buka Detail Transaksi">
+                                        {{ $pur->transaction->invoice_number ?? ('INV-'.$pur->transaction_id) }}
+                                    </a>
+                                @else
+                                    <span class="font-mono text-xs text-muted">—</span>
+                                @endif
                             </td>
                             <td>
                                 <div class="font-bold text-xs" style="color: var(--text);">{{ $pur->customer->name ?? 'Customer' }}</div>
@@ -442,21 +454,66 @@
                                 <strong style="color: var(--text);">Rp {{ number_format($pur->price_paid, 0, ',', '.') }}</strong>
                             </td>
                             <td>
+                                @if($pur->transaction?->isManualTransfer())
+                                    <span class="badge badge-warning" style="font-size: 10px;">
+                                        <i class="fa-solid fa-building-columns"></i> Transfer Manual
+                                    </span>
+                                    @if($pur->transaction->payment_proof)
+                                        <div class="mt-1">
+                                            <a href="{{ $pur->transaction->payment_proof_url }}" target="_blank" class="btn btn-ghost btn-xs text-primary" style="padding: 2px 6px; font-size: 11px;">
+                                                <i class="fa-solid fa-image"></i> Lihat Bukti
+                                            </a>
+                                        </div>
+                                    @else
+                                        <div class="text-xs text-danger mt-1">Belum Upload</div>
+                                    @endif
+                                @elseif($pur->transaction)
+                                    <span class="badge badge-purple" style="font-size: 10px;">
+                                        <i class="fa-solid fa-bolt"></i> Midtrans
+                                    </span>
+                                @else
+                                    <span class="text-xs text-muted">—</span>
+                                @endif
+                            </td>
+                            <td>
                                 @if($pur->status === 'completed')
-                                    <span class="badge badge-success" style="font-size: 10px;">LUNAS (COMPLETED)</span>
+                                    <span class="badge badge-success" style="font-size: 10px;"><i class="fa-solid fa-circle-check"></i> LUNAS</span>
                                 @elseif($pur->status === 'cancelled')
                                     <span class="badge badge-danger" style="font-size: 10px;">DIBATALKAN</span>
                                 @else
-                                    <span class="badge badge-warning" style="font-size: 10px;">MENUNGGU PEMBAYARAN</span>
+                                    @if($pur->transaction?->isManualTransfer() && $pur->transaction?->payment_proof)
+                                        <span class="badge badge-warning" style="font-size: 10px; background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa;">
+                                            <i class="fa-solid fa-clock"></i> BUTUH VERIFIKASI
+                                        </span>
+                                    @else
+                                        <span class="badge badge-warning" style="font-size: 10px;">PENDING</span>
+                                    @endif
                                 @endif
                             </td>
                             <td class="font-mono text-xs text-muted">
                                 {{ $pur->credited_at ? $pur->credited_at->format('d M Y, H:i') : '—' }}
                             </td>
+                            <td style="text-align: right;">
+                                <div class="flex items-center justify-end gap-1">
+                                    @if($pur->status !== 'completed' && $pur->transaction_id)
+                                        <form action="{{ route('admin.transactions.verify', $pur->transaction_id) }}" method="POST" onsubmit="return confirm('Verifikasi pembayaran Top-Up AI sebesar Rp {{ number_format($pur->price_paid, 0, ',', '.') }} dan kreditkan +{{ number_format($pur->tokens_amount) }} token ke akun pelanggan?');" style="display: inline;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success btn-xs" title="Setujui Pembayaran">
+                                                <i class="fa-solid fa-check"></i> Approve
+                                            </button>
+                                        </form>
+                                    @endif
+                                    @if($pur->transaction_id)
+                                        <a href="{{ route('admin.transactions.show', $pur->transaction_id) }}" class="btn btn-ghost btn-xs" title="Lihat Rincian Transaksi">
+                                            <i class="fa-solid fa-eye"></i> Detail
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted" style="padding: 40px;">
+                            <td colspan="9" class="text-center text-muted" style="padding: 40px;">
                                 Belum ada riwayat pembelian top-up token AI dari customer.
                             </td>
                         </tr>

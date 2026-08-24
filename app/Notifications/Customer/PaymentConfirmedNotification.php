@@ -28,16 +28,43 @@ final class PaymentConfirmedNotification extends Notification implements ShouldQ
 
     public function toMail(object $notifiable): MailMessage
     {
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.invoice', ['transaction' => $this->transaction]);
+        $this->transaction->loadMissing(['customer', 'invoice', 'subscription.subscriptionPlan.product', 'aiTokenPurchase.package', 'project']);
+        
+        $invoice = $this->transaction->invoice ?? \App\Models\Invoice::where('transaction_id', $this->transaction->id)->first();
+        if (!$invoice) {
+            $invoice = new \App\Models\Invoice([
+                'invoice_number' => $this->transaction->invoice_number,
+                'customer_id' => $this->transaction->customer_id,
+                'amount' => $this->transaction->net_amount ?? $this->transaction->amount,
+                'status' => 'paid',
+                'paid_at' => $this->transaction->paid_at ?? now(),
+                'issued_at' => $this->transaction->created_at ?? now(),
+            ]);
+            $invoice->setRelation('transaction', $this->transaction);
+            $invoice->setRelation('customer', $notifiable);
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('emails.invoice-pdf', [
+            'invoice' => $invoice,
+            'transaction' => $this->transaction,
+            'customer' => $notifiable,
+        ]);
+
+        $itemDesc = $this->transaction->type === 'ai_token_topup'
+            ? 'Top-Up Kuota Token AI'
+            : ($this->transaction->subscription?->subscriptionPlan?->name ?? ($this->transaction->description ?? 'Layanan SaaS COOCA.ID'));
 
         return (new MailMessage())
-            ->subject('Pembayaran Berhasil - Invoice ' . $this->transaction->invoice_number)
+            ->subject('Pembayaran Berhasil & Terverifikasi - Invoice #' . $this->transaction->invoice_number)
             ->greeting('Halo ' . $notifiable->name . ',')
-            ->line('Pembayaran Anda telah berhasil diproses.')
-            ->line('Invoice Number: ' . $this->transaction->invoice_number)
-            ->line('Jumlah Dibayar: Rp ' . number_format((float) $this->transaction->net_amount, 0, ',', '.'))
-            ->action('Lihat Dashboard', route('customer.dashboard'))
-            ->line('Terima kasih telah menggunakan COOCA.ID.')
+            ->line('Kabar baik! Pembayaran Anda telah berhasil diproses dan dikonfirmasi.')
+            ->line('• Nomor Invoice: ' . $this->transaction->invoice_number)
+            ->line('• Layanan: ' . $itemDesc)
+            ->line('• Total Pembayaran: Rp ' . number_format((float) ($this->transaction->net_amount ?? $this->transaction->amount), 0, ',', '.'))
+            ->line('• Status: LUNAS (PAID)')
+            ->action('Buka Dashboard Customer', route('customer.dashboard'))
+            ->line('Terlampir file PDF bukti invoice resmi untuk transaksi ini.')
+            ->line('Terima kasih telah mempercayai layanan COOCA.ID.')
             ->attachData($pdf->output(), 'Invoice_' . $this->transaction->invoice_number . '.pdf', [
                 'mime' => 'application/pdf',
             ]);

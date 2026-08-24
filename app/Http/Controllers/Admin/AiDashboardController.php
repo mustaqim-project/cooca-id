@@ -78,7 +78,7 @@ final class AiDashboardController extends Controller
 
         // AI Token Packages & Recent Purchases
         $tokenPackages = AiTokenPackage::orderBy('sort_order', 'asc')->get();
-        $recentPurchases = AiTokenPurchase::with(['customer', 'license.product', 'package'])
+        $recentPurchases = AiTokenPurchase::with(['customer', 'license.product', 'package', 'transaction'])
             ->latest()
             ->paginate(15);
 
