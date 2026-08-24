@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
@@ -46,7 +46,7 @@
                     <i data-lucide="check-circle" class="w-5 h-5 mr-3 flex-shrink-0 mt-0.5"></i>
                     <div>
                         <h4 class="text-sm font-semibold">Appeal Submitted</h4>
-                        <p class="text-sm mt-1">{{ session('success") }}</p>
+                        <p class="text-sm mt-1">{{ session('success') }}</p>
                     </div>
                 </div>
             @endif
@@ -57,7 +57,7 @@
                         <i data-lucide="clock" class="w-6 h-6"></i>
                     </div>
                     <h3 class="text-lg font-medium text-gray-900">Appeal Under Review</h3>
-                    <p class="text-sm text-gray-500 mt-1">You submitted your appeal on {{ \Carbon\Carbon::parse($affiliator->appealed_at)->format('d M Y, H:i") }}. Please wait for the admin to review it.</p>
+                    <p class="text-sm text-gray-500 mt-1">You submitted your appeal on {{ \Carbon\Carbon::parse($affiliator->appealed_at)->format('d M Y, H:i') }}. Please wait for the admin to review it.</p>
 
                     <form action="{{ route('affiliator.logout') }}" method="POST" class="mt-6">
                         @csrf

@@ -253,22 +253,22 @@
                 $isCustomer = auth('customer')->check();
                 $isAffiliator = auth('affiliator')->check();
             @endphp
-            <?php if($isAdmin): ?>
+            @if($isAdmin)
             <a href="{{ route('admin.dashboard') }}" class="btn-primary-glow"
                 style="display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-shield-halved"></i> Dashboard Admin
             </a>
-            <?php elseif($isCustomer): ?>
+            @elseif($isCustomer)
             <a href="{{ route('customer.dashboard') }}" class="btn-primary-glow"
                 style="display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-building"></i> Dashboard Bisnis
             </a>
-            <?php elseif($isAffiliator): ?>
+            @elseif($isAffiliator)
             <a href="{{ route('affiliator.dashboard') }}" class="btn-primary-glow"
                 style="display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-handshake"></i> Portal Partner
             </a>
-            <?php else: ?>
+            @else
             <div class="nav-dropdown" style="position: relative; display: inline-block;">
                 <button class="btn-ghost" id="nav-login-btn"
                     style="display: flex; align-items: center; gap: 8px; cursor: pointer; border: none; font-family: inherit;">
@@ -298,7 +298,7 @@
                         stroke-linejoin="round" />
                 </svg>
             </a>
-            <?php endif; ?>
+            @endif
         </div>
 
         {{-- Mobile Toggle --}}
@@ -318,21 +318,21 @@
         <a href="{{ route('contact') }}">Kontak</a>
         <div
             style="padding: 12px 0 4px; border-top: 1px solid var(--border); margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
-            <?php if($isAdmin): ?>
+            @if($isAdmin)
             <a href="{{ route('admin.dashboard') }}" class="btn-primary-glow mobile-cta"
                 style="text-align:center; justify-content:center;">Dashboard Admin →</a>
-            <?php elseif($isCustomer): ?>
+            @elseif($isCustomer)
             <a href="{{ route('customer.dashboard') }}" class="btn-primary-glow mobile-cta"
                 style="text-align:center; justify-content:center;">Dashboard Bisnis →</a>
-            <?php elseif($isAffiliator): ?>
+            @elseif($isAffiliator)
             <a href="{{ route('affiliator.dashboard') }}" class="btn-primary-glow mobile-cta"
                 style="text-align:center; justify-content:center;">Portal Partner →</a>
-            <?php else: ?>
+            @else
             <a href="{{ route('customer.login') }}" class="btn-ghost" style="text-align:center;">Login Pelanggan</a>
             <a href="{{ route('affiliator.login') }}" class="btn-ghost" style="text-align:center;">Login Partner</a>
             <a href="{{ route('customer.register') }}" class="btn-primary-glow mobile-cta"
                 style="text-align:center; justify-content:center;">Coba Gratis 14 Hari →</a>
-            <?php endif; ?>
+            @endif
         </div>
     </div>
 
