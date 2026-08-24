@@ -16,7 +16,7 @@
         <p class="page-subtitle">Configure software details, features, technology stack, and initial setup.</p>
     </div>
     <div class="page-actions">
-        <a href="{{ route('admin.products.index') }}" class="btn btn-outline">← Back to Products</a>
+        <a href="{{ route('admin.products.index') }}" class="btn btn-outline"><i class="fa-solid fa-arrow-left mr-1"></i> Back to Products</a>
     </div>
 </div>
 
@@ -193,7 +193,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary w-full mt-4">
-                    <span>💾</span> Save Product
+                    <i class="fa-solid fa-floppy-disk mr-1"></i> Save Product
                 </button>
             </div>
         </div>

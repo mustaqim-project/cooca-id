@@ -129,7 +129,9 @@
                         <div>
                             @php
                                 $lowestPlan = $product->subscriptionPlans->where('is_active', true)->sortBy('price')->first();
-                                $displayPrice = $lowestPlan ? $lowestPlan->price : $product->base_price;
+                                $origPrice = $lowestPlan ? (float)$lowestPlan->price : (float)($product->base_price ?? 0);
+                                $discount = $lowestPlan ? (float)($lowestPlan->discount_percent ?? 0) : 0;
+                                $finalPrice = $discount > 0 ? $origPrice * (1 - $discount / 100) : $origPrice;
                                 $period = '';
                                 if ($lowestPlan) {
                                     if ($lowestPlan->duration_months >= 999) {
@@ -143,13 +145,24 @@
                                     }
                                 }
                             @endphp
-                            @if($displayPrice)
-                            <div class="product-price">Rp {{ number_format($displayPrice, 0, ',', '.') }}<span class="price-period">{{ $period }}</span></div>
+                            @if($origPrice > 0 || $finalPrice > 0)
+                                @if($discount > 0)
+                                    <div style="font-size:12px;color:var(--text-muted);text-decoration:line-through;margin-bottom:2px;">
+                                        Rp {{ number_format($origPrice, 0, ',', '.') }}
+                                    </div>
+                                    <div class="product-price">
+                                        Rp {{ number_format($finalPrice, 0, ',', '.') }}<span class="price-period">{{ $period }}</span>
+                                    </div>
+                                @else
+                                    <div class="product-price">
+                                        Rp {{ number_format($origPrice, 0, ',', '.') }}<span class="price-period">{{ $period }}</span>
+                                    </div>
+                                @endif
                             @else
-                            <div style="font-size:13px;color:var(--text-muted);">Hubungi Kami</div>
+                                <div style="font-size:13px;color:var(--text-muted);">Hubungi Kami</div>
                             @endif
                         </div>
-                        <a href="{{ route('products.show', $product->slug) }}" class="btn-primary-glow" style="padding:10px 18px;font-size:13px;border-radius:10px;">Detail →</a>
+                        <a href="{{ route('products.show', $product->slug) }}" class="btn-primary-glow" style="padding:10px 18px;font-size:13px;border-radius:10px;display:inline-flex;align-items:center;gap:6px;">Detail <i class="fa-solid fa-arrow-right" style="font-size: 11px;"></i></a>
                     </div>
                 </div>
             </article>

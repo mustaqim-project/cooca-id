@@ -210,10 +210,14 @@
             </div>
         </div>
 
+        {{-- Plans Sidebar Link --}}
         <div class="card">
-            <div class="card-header"><div class="card-title">Subscription Plans</div></div>
+            <div class="card-header"><div class="card-title">Manage Pricing & Plans</div></div>
             <div class="card-body">
-                <a href="{{ route('admin.products.plans.index', $product->id) }}" class="btn btn-outline w-full">🏷️ Manage Pricing Plans ({{ $plans->count() }})</a>
+                <p class="text-sm text-muted mb-4">Set up recurring subscription tiers, billing cycles, trial durations, and discount rates for this product.</p>
+                <div style="max-width: 320px;">
+                    <a href="{{ route('admin.products.plans.index', $product->id) }}" class="btn btn-outline w-full"><i class="fa-solid fa-tags mr-1"></i> Manage Pricing Plans ({{ $plans->count() }})</a>
+                </div>
             </div>
         </div>
     </div>

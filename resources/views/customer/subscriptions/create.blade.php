@@ -89,6 +89,11 @@
                             <div id="planCards" style="display:flex;flex-direction:column;gap:8px;">
                                 @if ($selectedProduct && $selectedProduct->subscriptionPlans->count() > 0)
                                     @foreach ($selectedProduct->subscriptionPlans as $idx => $plan)
+                                        @php
+                                            $origPrice = (float) $plan->price;
+                                            $discount = (float) ($plan->discount_percent ?? 0);
+                                            $finalPrice = $discount > 0 ? $origPrice * (1 - $discount / 100) : $origPrice;
+                                        @endphp
                                         <label
                                             class="plan-card-select {{ ($selectedPlan ? $selectedPlan->id === $plan->id : $idx === 0) ? 'selected' : '' }}"
                                             for="plan_s_{{ $plan->id }}">
@@ -103,8 +108,13 @@
                                                         · {{ ucfirst($plan->billing_cycle) }}</div>
                                                 </div>
                                                 <div class="text-right">
-                                                    <div class="font-bold" style="color:var(--primary);">Rp
-                                                        {{ number_format($plan->price, 0, ',', '.') }}</div>
+                                                    @if ($discount > 0)
+                                                        <div class="text-xs text-muted" style="text-decoration: line-through;">Rp {{ number_format($origPrice, 0, ',', '.') }}</div>
+                                                        <div class="font-bold" style="color:var(--primary);">Rp {{ number_format($finalPrice, 0, ',', '.') }}</div>
+                                                        <div class="text-xs" style="color:var(--success); font-weight:600;">Hemat {{ number_format($discount, ($discount == floor($discount) ? 0 : 2)) }}%</div>
+                                                    @else
+                                                        <div class="font-bold" style="color:var(--primary);">Rp {{ number_format($origPrice, 0, ',', '.') }}</div>
+                                                    @endif
                                                     <div class="text-xs text-muted">/{{ $plan->billing_cycle }}</div>
                                                 </div>
                                             </div>
@@ -776,7 +786,18 @@
 
             planCards.innerHTML = '';
             plans.forEach((p, idx) => {
-                const priceStr = `Rp ${new Intl.NumberFormat('id-ID').format(p.price)}`;
+                const origPrice = Number(p.price) || 0;
+                const discount = Number(p.discount_percent) || 0;
+                const finalPrice = discount > 0 ? Math.round(origPrice * (1 - discount / 100)) : origPrice;
+                const origPriceStr = `Rp ${new Intl.NumberFormat('id-ID').format(origPrice)}`;
+                const finalPriceStr = `Rp ${new Intl.NumberFormat('id-ID').format(finalPrice)}`;
+
+                const priceHtml = discount > 0 
+                    ? `<div class="text-xs text-muted" style="text-decoration: line-through;">${origPriceStr}</div>
+                       <div class="font-bold" style="color:var(--primary);">${finalPriceStr}</div>
+                       <div class="text-xs" style="color:var(--success); font-weight:600;">Hemat ${discount % 1 === 0 ? discount : discount.toFixed(2)}%</div>`
+                    : `<div class="font-bold" style="color:var(--primary);">${origPriceStr}</div>`;
+
                 const lbl = document.createElement('label');
                 lbl.className = 'plan-card-select' + (idx === 0 ? ' selected' : '');
                 lbl.setAttribute('for', 'plan_dyn_' + p.id);
@@ -789,7 +810,7 @@
                     <div class="text-xs text-muted">${p.duration_months || 1} bulan · ${p.billing_cycle}</div>
                 </div>
                 <div class="text-right">
-                    <div class="font-bold" style="color:var(--primary);">${priceStr}</div>
+                    ${priceHtml}
                     <div class="text-xs text-muted">/${p.billing_cycle}</div>
                 </div>
             </div>`;
@@ -834,7 +855,9 @@
                 }
             }
 
-            const planPrice = Number(plan.price);
+            const rawPrice = Number(plan.price) || 0;
+            const discount = Number(plan.discount_percent) || 0;
+            const planPrice = discount > 0 ? Math.round(rawPrice * (1 - discount / 100)) : rawPrice;
             const subtotal = planPrice + domainCost;
             const taxAmount = Math.round(subtotal * 0.11);
             const grandTotal = subtotal + taxAmount;

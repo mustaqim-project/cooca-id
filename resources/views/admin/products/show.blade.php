@@ -15,7 +15,7 @@
         <h1 class="page-title">{{ $product->name ?? 'Product Detail' }}</h1>
     </div>
     <div class="page-actions">
-        <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-primary">✏️ Edit Product</a>
+        <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-primary"><i class="fa-solid fa-pen-to-square mr-1"></i> Edit Product</a>
     </div>
 </div>
 

@@ -51,7 +51,9 @@
                                 ->where('is_active', true)
                                 ->sortBy('price')
                                 ->first();
-                            $displayPrice = $lowestPlan ? $lowestPlan->price : $product->base_price;
+                            $origPrice = $lowestPlan ? (float)$lowestPlan->price : (float)($product->base_price ?? 0);
+                            $discount = $lowestPlan ? (float)($lowestPlan->discount_percent ?? 0) : 0;
+                            $finalPrice = $discount > 0 ? $origPrice * (1 - $discount / 100) : $origPrice;
                             $period = '';
                             if ($lowestPlan) {
                                 if ($lowestPlan->duration_months >= 999) {
@@ -68,12 +70,26 @@
 
                         <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
                             <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Mulai dari</span>
-                            @if ($displayPrice)
-                                <span
-                                    style="font-size: clamp(28px, 6vw, 36px); font-weight: 900; color: var(--text); letter-spacing: -.03em;">
-                                    Rp {{ number_format((float) $displayPrice, 0, ',', '.') }}
-                                </span>
-                                <span style="font-size: 14px; color: var(--text-muted);">{{ $period }}</span>
+                            @if ($origPrice > 0 || $finalPrice > 0)
+                                @if ($discount > 0)
+                                    <span style="font-size: 16px; color: var(--text-muted); text-decoration: line-through; margin-right: 4px;">
+                                        Rp {{ number_format($origPrice, 0, ',', '.') }}
+                                    </span>
+                                    <span
+                                        style="font-size: clamp(28px, 6vw, 36px); font-weight: 900; color: var(--text); letter-spacing: -.03em;">
+                                        Rp {{ number_format($finalPrice, 0, ',', '.') }}
+                                    </span>
+                                    <span style="font-size: 14px; color: var(--text-muted);">{{ $period }}</span>
+                                    <span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 999px;">
+                                        Hemat {{ number_format($discount, ($discount == floor($discount) ? 0 : 2)) }}%
+                                    </span>
+                                @else
+                                    <span
+                                        style="font-size: clamp(28px, 6vw, 36px); font-weight: 900; color: var(--text); letter-spacing: -.03em;">
+                                        Rp {{ number_format($origPrice, 0, ',', '.') }}
+                                    </span>
+                                    <span style="font-size: 14px; color: var(--text-muted);">{{ $period }}</span>
+                                @endif
                             @else
                                 <span
                                     style="font-size: clamp(24px, 5vw, 28px); font-weight: 800; color: var(--text);">Hubungi
@@ -229,30 +245,57 @@
 
                 <div class="pricing-grid reveal">
                     @foreach ($product->subscriptionPlans as $i => $plan)
+                        @php
+                            $origPrice = (float) $plan->price;
+                            $discount = (float) ($plan->discount_percent ?? 0);
+                            $finalPrice = $discount > 0 ? $origPrice * (1 - $discount / 100) : $origPrice;
+                        @endphp
                         <div class="pricing-card {{ $i === 1 ? 'featured' : '' }}">
                             @if ($i === 1)
-                                <div class="pricing-badge"><i class="fa-solid fa-bolt"></i>Best Plan</div>
+                                <div class="pricing-badge"><i class="fa-solid fa-bolt"></i> Best Plan</div>
                             @endif
                             <div class="pricing-name">{{ $plan->name }}</div>
-                            <div class="pricing-price">
-                                Rp {{ number_format((float) $plan->price, 0, ',', '.') }}
-                                <span class="pricing-period">
-                                    @if ($plan->duration_months >= 999)
-                                        / Lifetime
-                                    @elseif($plan->duration_months == 1)
-                                        / bln
-                                    @elseif($plan->duration_months == 12)
-                                        / thn
-                                    @else
-                                        / {{ $plan->duration_months }} bln
-                                    @endif
-                                </span>
+                            <div class="pricing-price-wrap" style="margin: 12px 0;">
+                                @if ($discount > 0)
+                                    <div style="font-size: 13px; color: var(--text-muted); text-decoration: line-through; margin-bottom: 2px;">
+                                        Rp {{ number_format($origPrice, 0, ',', '.') }}
+                                    </div>
+                                    <div class="pricing-price" style="margin-top: 0;">
+                                        Rp {{ number_format($finalPrice, 0, ',', '.') }}
+                                        <span class="pricing-period">
+                                            @if ($plan->duration_months >= 999)
+                                                / Lifetime
+                                            @elseif($plan->duration_months == 1)
+                                                / bln
+                                            @elseif($plan->duration_months == 12)
+                                                / thn
+                                            @else
+                                                / {{ $plan->duration_months }} bln
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div style="margin-top: 6px;">
+                                        <span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;">
+                                            Hemat {{ number_format($discount, ($discount == floor($discount) ? 0 : 2)) }}%
+                                        </span>
+                                    </div>
+                                @else
+                                    <div class="pricing-price">
+                                        Rp {{ number_format($origPrice, 0, ',', '.') }}
+                                        <span class="pricing-period">
+                                            @if ($plan->duration_months >= 999)
+                                                / Lifetime
+                                            @elseif($plan->duration_months == 1)
+                                                / bln
+                                            @elseif($plan->duration_months == 12)
+                                                / thn
+                                            @else
+                                                / {{ $plan->duration_months }} bln
+                                            @endif
+                                        </span>
+                                    </div>
+                                @endif
                             </div>
-                            @if ($plan->discount_percent > 0)
-                                <div style="font-size: 12px; font-weight: 700; color: #22c55e; margin-top: 4px;">
-                                    Diskon {{ number_format((float) $plan->discount_percent, 0) }}%
-                                </div>
-                            @endif
                             <div class="pricing-divider"></div>
                             <ul class="pricing-features">
                                 <li class="pricing-feature"><span class="check"><i class="fa-solid fa-check"></i></span>

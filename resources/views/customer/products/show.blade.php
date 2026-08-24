@@ -191,13 +191,17 @@
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    @if($plan->discount_percent > 0)
-                                    <div class="text-xs text-muted line-through">Rp {{ number_format($plan->price, 0, ',', '.') }}</div>
-                                    @php $discounted = $plan->price * (1 - $plan->discount_percent / 100); @endphp
-                                    <div class="font-bold" style="color:var(--primary);">Rp {{ number_format($discounted, 0, ',', '.') }}</div>
-                                    <div class="text-xs" style="color:var(--success);">Hemat {{ $plan->discount_percent }}%</div>
+                                    @php
+                                        $origPrice = (float) $plan->price;
+                                        $discount = (float) ($plan->discount_percent ?? 0);
+                                        $finalPrice = $discount > 0 ? $origPrice * (1 - $discount / 100) : $origPrice;
+                                    @endphp
+                                    @if($discount > 0)
+                                    <div class="text-xs text-muted" style="text-decoration: line-through;">Rp {{ number_format($origPrice, 0, ',', '.') }}</div>
+                                    <div class="font-bold" style="color:var(--primary);">Rp {{ number_format($finalPrice, 0, ',', '.') }}</div>
+                                    <div class="text-xs" style="color:var(--success); font-weight:600;">Hemat {{ number_format($discount, ($discount == floor($discount) ? 0 : 2)) }}%</div>
                                     @else
-                                    <div class="font-bold" style="color:var(--primary);">Rp {{ number_format($plan->price, 0, ',', '.') }}</div>
+                                    <div class="font-bold" style="color:var(--primary);">Rp {{ number_format($origPrice, 0, ',', '.') }}</div>
                                     @endif
                                     <div class="text-xs text-muted">
                                         @if(($plan->duration_months ?? 1) >= 999)

@@ -158,11 +158,22 @@
                 {{-- Price tag --}}
                 <div style="display:flex;align-items:center;justify-content:space-between;">
                     <div>
+                        @php
+                            $lowestPlan = $plans->first();
+                            $origPrice = $lowestPlan ? (float)$lowestPlan->price : 0;
+                            $discount = $lowestPlan ? (float)($lowestPlan->discount_percent ?? 0) : 0;
+                            $finalPrice = $discount > 0 ? $origPrice * (1 - $discount / 100) : $origPrice;
+                        @endphp
                         @if($isCustom)
                             <span class="text-xs font-bold" style="color:var(--accent);">Harga Custom</span>
-                        @elseif($minPrice)
+                        @elseif($origPrice > 0 || $finalPrice > 0)
                             <span class="text-xs text-muted">Mulai dari</span>
-                            <div class="font-bold text-base" style="color:var(--primary);">Rp {{ number_format($minPrice, 0, ',', '.') }}<span class="text-xs text-muted font-normal">/bln</span></div>
+                            @if($discount > 0)
+                                <div class="text-xs text-muted" style="text-decoration:line-through;">Rp {{ number_format($origPrice, 0, ',', '.') }}</div>
+                                <div class="font-bold text-base" style="color:var(--primary);">Rp {{ number_format($finalPrice, 0, ',', '.') }}<span class="text-xs text-muted font-normal">/bln</span></div>
+                            @else
+                                <div class="font-bold text-base" style="color:var(--primary);">Rp {{ number_format($origPrice, 0, ',', '.') }}<span class="text-xs text-muted font-normal">/bln</span></div>
+                            @endif
                         @else
                             <span class="text-xs text-muted">Harga tersedia</span>
                         @endif

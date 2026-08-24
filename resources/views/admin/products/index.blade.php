@@ -15,14 +15,14 @@
     </div>
     <div class="page-actions">
         <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-            <span>➕</span> Add New Product
+            <i class="fa-solid fa-plus mr-1"></i> Add New Product
         </a>
     </div>
 </div>
 
 <div class="filter-bar">
     <div class="filter-search">
-        <span class="filter-search-icon">🔍</span>
+        <span class="filter-search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
         <input type="text" placeholder="Filter by product name, slug, or tech stack...">
     </div>
     <select class="form-select" style="width: 180px;">
@@ -57,8 +57,8 @@
                         <tr>
                             <td>
                                 <div class="flex items-center gap-3">
-                                    <div class="avatar avatar-md" style="background: linear-gradient(135deg, #4F46E5, #06B6D4); font-size: 16px;">
-                                        💻
+                                    <div class="avatar avatar-md" style="background: linear-gradient(135deg, #4F46E5, #06B6D4); font-size: 16px; display:flex; align-items:center; justify-content:center; color:white;">
+                                        <i class="fa-solid fa-cube"></i>
                                     </div>
                                     <div>
                                         <div class="font-bold text-base">{{ $product->name }}</div>
@@ -84,12 +84,12 @@
                             </td>
                             <td>
                                 <div class="td-actions">
-                                    <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-ghost btn-sm" title="Edit Product">✏️ Edit</a>
-                                    <a href="{{ route('admin.products.plans.index', $product->id) }}" class="btn btn-outline btn-sm" title="Manage Plans">🏷️ Plans</a>
+                                    <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-ghost btn-sm" title="Edit Product"><i class="fa-solid fa-pen-to-square mr-1"></i> Edit</a>
+                                    <a href="{{ route('admin.products.plans.index', $product->id) }}" class="btn btn-outline btn-sm" title="Manage Plans"><i class="fa-solid fa-tags mr-1"></i> Plans</a>
                                     <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Delete this product?');" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-ghost btn-sm text-danger" title="Delete">🗑️</button>
+                                        <button type="submit" class="btn btn-ghost btn-sm text-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
                                     </form>
                                 </div>
                             </td>

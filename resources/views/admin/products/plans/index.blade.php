@@ -33,7 +33,12 @@
                     </thead>
                     <tbody>
                         @forelse($plans ?? [] as $plan)
-                            @php $pObj = is_array($plan) ? (object)$plan : $plan; @endphp
+                            @php 
+                                $pObj = is_array($plan) ? (object)$plan : $plan; 
+                                $origPrice = (float)($pObj->price ?? 0);
+                                $discount = (float)($pObj->discount_percent ?? 0);
+                                $finalPrice = $discount > 0 ? $origPrice * (1 - $discount / 100) : $origPrice;
+                            @endphp
                             <tr>
                                 <td class="font-bold">{{ $pObj->name ?? 'Tier' }}</td>
                                 <td>
@@ -43,13 +48,26 @@
                                         {{ $pObj->duration_months ?? 1 }} Months
                                     @endif
                                 </td>
-                                <td class="font-bold text-primary">Rp {{ number_format($pObj->price ?? 0, 0, ',', '.') }}</td>
-                                <td><span class="badge badge-accent">{{ $pObj->discount_percent ?? 0 }}%</span></td>
+                                <td>
+                                    @if($discount > 0)
+                                        <div class="text-xs text-muted" style="text-decoration: line-through;">Rp {{ number_format($origPrice, 0, ',', '.') }}</div>
+                                        <div class="font-bold text-primary">Rp {{ number_format($finalPrice, 0, ',', '.') }}</div>
+                                    @else
+                                        <div class="font-bold text-primary">Rp {{ number_format($origPrice, 0, ',', '.') }}</div>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($discount > 0)
+                                        <span class="badge badge-accent">{{ number_format($discount, ($discount == floor($discount) ? 0 : 2)) }}%</span>
+                                    @else
+                                        <span class="badge badge-muted">0%</span>
+                                    @endif
+                                </td>
                                 <td>
                                     <form action="{{ route('admin.products.plans.destroy', [$product->id ?? 1, $pObj->id ?? 1]) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-ghost btn-sm text-danger">🗑️</button>
+                                        <button type="submit" class="btn btn-ghost btn-sm text-danger" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>
@@ -89,9 +107,9 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Discount %</label>
-                    <input type="number" name="discount_percent" class="form-input" value="0">
+                    <input type="number" step="any" name="discount_percent" class="form-input" value="0">
                 </div>
-                <button type="submit" class="btn btn-primary w-full mt-4">➕ Add Tier</button>
+                <button type="submit" class="btn btn-primary w-full mt-4"><i class="fa-solid fa-plus mr-1"></i> Add Tier</button>
             </form>
         </div>
     </div>
