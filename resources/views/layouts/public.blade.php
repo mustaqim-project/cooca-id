@@ -72,12 +72,11 @@
     <link rel="apple-touch-icon" href="{{ $favicon }}">
 
     <!-- ── JSON-LD: WebSite Schema ──────────────────────────────────────── -->
-    <!-- ── JSON-LD: WebSite Schema ─────────────────────────────────── -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "name": "{{ $siteName }}",
+        "name": "{{ e($siteName) }}",
         "url": "{{ url('/') }}",
         "description": "Platform software manajemen dan otomatisasi bisnis terpadu. Move Faster. Decide Better.",
         "potentialAction": {
@@ -96,10 +95,10 @@
     {
         "@context": "https://schema.org",
         "@type": "Organization",
-        "name": "{{ $siteName }}",
-        "legalName": "{{ $siteName }}",
+        "name": "{{ e($siteName) }}",
+        "legalName": "{{ e($siteName) }}",
         "url": "{{ url('/') }}",
-        "logo": "{{ $logoLight ?? $logoDark ?? asset('favicon.svg') }}",
+        "logo": "{{ e($logoLight ?? $logoDark ?? asset('favicon.svg')) }}",
         "slogan": "Move Faster. Decide Better.",
         "description": "COOCA.ID adalah platform software manajemen bisnis terpadu di Indonesia yang menyediakan solusi otomatisasi operasional dan analitik data real-time.",
         "foundingLocation": {
@@ -108,7 +107,7 @@
         },
         "contactPoint": {
             "@type": "ContactPoint",
-            "telephone": "+{{ $waCleanNumber }}",
+            "telephone": "+{{ e($waCleanNumber) }}",
             "contactType": "customer support",
             "areaServed": "ID",
             "availableLanguage": "Indonesian"
