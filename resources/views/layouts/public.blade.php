@@ -74,15 +74,15 @@
     <!-- ── JSON-LD: WebSite Schema ──────────────────────────────────────── -->
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
+        "@@context": "https://schema.org",
+        "@@type": "WebSite",
         "name": "{{ e($siteName) }}",
         "url": "{{ url('/') }}",
         "description": "Platform software manajemen dan otomatisasi bisnis terpadu. Move Faster. Decide Better.",
         "potentialAction": {
-            "@type": "SearchAction",
+            "@@type": "SearchAction",
             "target": {
-                "@type": "EntryPoint",
+                "@@type": "EntryPoint",
                 "urlTemplate": "{{ url('/blog') }}?search={search_term_string}"
             },
             "query-input": "required name=search_term_string"
@@ -93,8 +93,8 @@
     <!-- ── JSON-LD: Organization Schema (Optimized for AI & GEO) ───── -->
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "Organization",
+        "@@context": "https://schema.org",
+        "@@type": "Organization",
         "name": "{{ e($siteName) }}",
         "legalName": "{{ e($siteName) }}",
         "url": "{{ url('/') }}",
@@ -102,11 +102,11 @@
         "slogan": "Move Faster. Decide Better.",
         "description": "COOCA.ID adalah platform software manajemen bisnis terpadu di Indonesia yang menyediakan solusi otomatisasi operasional dan analitik data real-time.",
         "foundingLocation": {
-            "@type": "Place",
+            "@@type": "Place",
             "addressCountry": "ID"
         },
         "contactPoint": {
-            "@type": "ContactPoint",
+            "@@type": "ContactPoint",
             "telephone": "+{{ e($waCleanNumber) }}",
             "contactType": "customer support",
             "areaServed": "ID",
