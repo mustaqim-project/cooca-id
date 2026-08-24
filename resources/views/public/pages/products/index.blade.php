@@ -1,8 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Katalog & Harga Paket Software Bisnis | COOCA.ID')
-@section('description', 'Jelajahi katalog fitur dan harga paket langganan software bisnis COOCA.ID. Dapatkan solusi manajemen stok, keuangan, hingga HR sesuai skala usaha Anda.')
-@section('keywords', 'harga software bisnis, paket langganan erp, katalog software erp, software kasir dan stok, aplikasi manajemen perusahaan')
+@section('title', 'Katalog & Paket Software Bisnis | COOCA.ID')
+@section('description', 'Pilihan fitur & paket langganan COOCA.ID. Otomatiskan sistem kerja, analisa data secara real-time, dan buat keputusan bisnis lebih cepat serta akurat.')
+@section('keywords', 'harga software bisnis, fitur software erp, paket langganan cooca, software analisa data bisnis, aplikasi manajemen perusahaan')
 
 @push('styles')
 {{-- Font Awesome 6 untuk mengganti emoji --}}

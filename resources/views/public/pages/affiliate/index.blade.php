@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Program Afiliasi Software Bisnis & Kemitraan | COOCA.ID')
-@section('description', 'Bergabunglah dengan Program Afiliasi COOCA.ID. Dapatkan komisi berkelanjutan dengan merekomendasikan software manajemen bisnis terbaik kepada jaringan pengusaha Anda.')
+@section('title', 'Program Afiliasi Software Bisnis | COOCA.ID')
+@section('description', 'Bantu para pengusaha Move Faster & Decide Better. Bergabunglah menjadi mitra afiliasi COOCA.ID dan dapatkan komisi berkelanjutan.')
 @section('keywords', 'program afiliasi software, affiliate saas indonesia, komisi reseller software, mitra bisnis cooca, peluang bisnis teknologi')
 
 @section('content')

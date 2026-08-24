@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Syarat & Ketentuan Penggunaan Layanan | COOCA.ID')
-@section('description', 'Syarat dan ketentuan penggunaan platform software COOCA.ID. Ketahui hak, kewajiban, dan regulasi lisensi penggunaan sistem kami.')
+@section('title', 'Syarat & Ketentuan Layanan | COOCA.ID')
+@section('description', 'Ketentuan lisensi dan aturan penggunaan platform COOCA.ID. Kerangka kerja transparan untuk mendukung pertumbuhan bisnis Anda.')
 @section('keywords', 'syarat dan ketentuan cooca, terms of service cooca id, ketentuan lisensi software')
 
 @section('content')

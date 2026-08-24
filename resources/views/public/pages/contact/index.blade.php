@@ -1,8 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Hubungi Kami & Jadwalkan Demo Gratis | COOCA.ID')
-@section('description', 'Siap mengotomatisasi bisnis Anda? Hubungi tim konsultan COOCA.ID untuk mendapatkan konsultasi gratis atau penjadwalan demo produk secara langsung.')
-@section('keywords', 'kontak cooca id, konsultasi software bisnis, demo software cooca, customer support cooca, alamat kantor cooca')
+@section('title', 'Konsultasi & Schedule Demo Gratis | COOCA.ID')
+@section('description', 'Siap untuk Move Faster & Decide Better? Hubungi tim COOCA.ID dan jadwalkan demo gratis untuk transformasi operasional bisnis Anda hari ini.')
+@section('keywords', 'kontak cooca id, jadwal demo software cooca, konsultasi software bisnis, customer support cooca, alamat kantor cooca')
 
 @section('content')
 

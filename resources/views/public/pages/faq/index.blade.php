@@ -1,8 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Pusat Bantuan & FAQ Lisensi Software | COOCA.ID')
-@section('description', 'Temukan jawaban atas pertanyaan umum seputar fitur, metode pembayaran, keamanan data, lisensi, dan penggunaan sistem software bisnis COOCA.ID.')
-@section('keywords', 'faq cooca id, lisensi software cooca, bantuan teknis cooca, metode pembayaran cooca, keamanan data software')
+@section('title', 'Pusat Bantuan & FAQ Sistem | COOCA.ID')
+@section('description', 'Pertanyaan umum seputar integrasi sistem, laporan real-time, lisensi, dan keamanan data di COOCA.ID untuk mendukung keputusan bisnis Anda.')
+@section('keywords', 'faq cooca id, lisensi software cooca, bantuan teknis cooca, laporan real time cooca, keamanan data software')
 
 @section('content')
 

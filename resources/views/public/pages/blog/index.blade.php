@@ -1,8 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Blog & Wawasan Bisnis, Teknologi, & ERP | COOCA.ID')
-@section('description', 'Temukan artikel terbaru seputar strategi manajemen bisnis, tips efisiensi operasional, tren teknologi perusahaan, dan panduan lengkap pengembangan usaha.')
-@section('keywords', 'blog bisnis indonesia, tips efisiensi operasional, strategi manajemen usaha, artikel teknologi bisnis, panduan memilih software erp')
+@section('title', 'Wawasan Bisnis & Analisis Data | COOCA.ID Blog')
+@section('description', 'Temukan artikel seputar otomatisasi, efisiensi operasional, dan strategi data-driven decision untuk membawa bisnis Anda melaju lebih cepat.')
+@section('keywords', 'blog bisnis indonesia, cara mengambil keputusan bisnis, tips efisiensi operasional, strategi data driven business, panduan software erp')
 
 @section('content')
 

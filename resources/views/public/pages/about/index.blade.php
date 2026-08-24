@@ -1,8 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Tentang Kami & Profil Perusahaan | COOCA.ID')
-@section('description', 'Pelajari profil COOCA.ID, penyedia solusi teknologi dan software bisnis tepercaya di Indonesia. Kami membantu pengusaha mengoptimalkan sistem dan operasional bisnis.')
-@section('keywords', 'tentang cooca id, profil perusahaan cooca, developer software bisnis, perusahaan saas indonesia, visi misi cooca')
+@section('title', 'Tentang Kami - Move Faster. Decide Better | COOCA.ID')
+@section('description', 'Pelajari bagaimana COOCA.ID membantu pengusaha bergerak lebih cepat dan mengambil keputusan lebih baik melalui teknologi software bisnis tepercaya.')
+@section('keywords', 'tentang cooca id, profil perusahaan cooca, move faster decide better cooca, developer software bisnis, perusahaan saas indonesia')
 
 @section('content')
 

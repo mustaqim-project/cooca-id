@@ -1,8 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'COOCA.ID - Software Manajemen & Otomatisasi Bisnis Indonesia')
-@section('description', 'Platform software manajemen bisnis terpadu di Indonesia. Tingkatkan efisiensi operasional, otomatisasi laporan, dan tingkatkan profit usaha Anda. Coba gratis sekarang!')
-@section('keywords', 'cooca id, software manajemen bisnis, software operasional perusahaan, platform otomatisasi bisnis, aplikasi bisnis indonesia, software erp lokal')
+@section('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis')
+@section('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID. Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.')
+@section('keywords', 'cooca id, software bisnis indonesia, move faster decide better, software manajemen operasional, platform otomatisasi bisnis, software pendukung keputusan')
 
 @push('styles')
 {{-- Font Awesome 6 untuk mengganti emoji --}}
