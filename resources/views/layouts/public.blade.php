@@ -346,7 +346,7 @@
 
         {{-- Floating Popup Window (Hidden by Default) --}}
         <div id="waChatbotWindow"
-            style="display: none; width: 350px; max-width: calc(100vw - 32px); background: #FFFFFF; border-radius: 18px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05); overflow: hidden; transform-origin: bottom right; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); margin-bottom: 12px;">
+            style="display: none; width: 350px; max-width: calc(100vw - 32px); background: #FFFFFF; border-radius: 18px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05); overflow: hidden; transform-origin: bottom right; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); margin-bottom: 72px;">
 
             {{-- Header --}}
             <div
