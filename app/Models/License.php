@@ -111,6 +111,11 @@ final class License extends Model
         return $this->belongsTo(Domain::class, 'domain_id');
     }
 
+    public function domainRecord(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Domain::class, 'domain_id');
+    }
+
     public function adminRevoked(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Admin::class, 'revoked_by');
