@@ -53,28 +53,18 @@
     <meta property="og:site_name" content="{{ $siteName }}">
     <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@hasSection('og_title')
-@yield('og_title')@else@yield('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis')
-@endif">
-    <meta property="og:description" content="@hasSection('og_description')
-@yield('og_description')@else@yield('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID. Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.')
-@endif">
+    <meta property="og:title" content="@yield('og_title', View::hasSection('og_title') ? View::getSection('og_title') : View::getSection('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis'))">
+    <meta property="og:description" content="@yield('og_description', View::hasSection('og_description') ? View::getSection('og_description') : View::getSection('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID. Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.'))">
     <meta property="og:image" content="@yield('og_image', asset('images/og-image.png'))">
     <meta property="og:image:width" content="@yield('og_image_width', '1200')">
     <meta property="og:image:height" content="@yield('og_image_height', '630')">
-    <meta property="og:image:alt" content="@hasSection('og_title')
-@yield('og_title')@else@yield('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis')
-@endif">
+    <meta property="og:image:alt" content="@yield('og_title', View::hasSection('og_title') ? View::getSection('og_title') : View::getSection('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis'))">
 
     <!-- ── Twitter Card ─────────────────────────────────────────────────── -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@coocaid">
-    <meta name="twitter:title" content="@hasSection('og_title')
-@yield('og_title')@else@yield('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis')
-@endif">
-    <meta name="twitter:description" content="@hasSection('og_description')
-@yield('og_description')@else@yield('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID. Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.')
-@endif">
+    <meta name="twitter:title" content="@yield('og_title', View::hasSection('og_title') ? View::getSection('og_title') : View::getSection('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis'))">
+    <meta name="twitter:description" content="@yield('og_description', View::hasSection('og_description') ? View::getSection('og_description') : View::getSection('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID. Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.'))">
     <meta name="twitter:image" content="@yield('og_image', asset('images/og-image.png'))">
 
     <!-- ── Favicon ──────────────────────────────────────────────────────── -->
@@ -1187,28 +1177,28 @@
             <i class="fa-solid fa-newspaper"></i>
             <span>Blog</span>
         </a>
-        <?php if($isAdmin): ?>
+        @if($isAdmin)
         <a href="{{ route('admin.dashboard') }}">
             <i class="fa-solid fa-gauge"></i>
             <span>Admin</span>
         </a>
-        <?php elseif($isCustomer): ?>
+        @elseif($isCustomer)
         <a href="{{ route('customer.dashboard') }}">
             <i class="fa-solid fa-chart-pie"></i>
             <span>Bisnis</span>
         </a>
-        <?php elseif($isAffiliator): ?>
+        @elseif($isAffiliator)
         <a href="{{ route('affiliator.dashboard') }}">
             <i class="fa-solid fa-handshake"></i>
             <span>Partner</span>
         </a>
-        <?php else: ?>
+        @else
         <a href="{{ route('customer.login') }}"
             class="{{ request()->routeIs('customer.login') ? 'active' : '' }}">
             <i class="fa-regular fa-user"></i>
             <span>Login</span>
         </a>
-        <?php endif; ?>
+        @endif
     </div>
 
     {{-- ── FLOATING COOKIE CONSENT BANNER ────────────────────────── --}}
