@@ -27,9 +27,9 @@
     @endphp
 
     <!-- ── Primary Meta ────────────────────────────────────────────────── -->
-    <title>@yield('title', $siteName . ' — Satu Platform ERP Untuk Seluruh Skala Bisnis')</title>
-    <meta name="description"   content="@yield('description', 'COOCA.ID adalah platform ERP enterprise untuk UMKM, Klinik, Bengkel, Restoran, Retail, dan semua skala bisnis. Cloud native, modular, dan siap pakai.')">
-    <meta name="keywords"      content="@yield('keywords', 'ERP Indonesia, software bisnis, COOCA, ERP klinik, ERP restoran, ERP bengkel, ERP retail, ERP UMKM')">
+    <title>@yield('title', 'COOCA.ID - Software Manajemen & Otomatisasi Bisnis Indonesia')</title>
+    <meta name="description"   content="@yield('description', 'Platform software manajemen bisnis terpadu di Indonesia. Tingkatkan efisiensi operasional, otomatisasi laporan, dan tingkatkan profit usaha Anda. Coba gratis sekarang!')">
+    <meta name="keywords"      content="@yield('keywords', 'cooca id, software manajemen bisnis, software operasional perusahaan, platform otomatisasi bisnis, aplikasi bisnis indonesia, software erp lokal')">
     <meta name="author"        content="{{ $siteName }}">
     <meta name="robots"        content="@yield('robots', 'index, follow')">
     <meta name="googlebot"     content="@yield('robots', 'index, follow')">
@@ -41,18 +41,18 @@
     <meta property="og:site_name"    content="{{ $siteName }}">
     <meta property="og:locale"       content="{{ str_replace('-', '_', app()->getLocale()) }}">
     <meta property="og:url"          content="{{ url()->current() }}">
-    <meta property="og:title"        content="@yield('og_title', 'COOCA.ID — Satu Platform ERP Untuk Seluruh Skala Bisnis Anda')">
-    <meta property="og:description"  content="@yield('og_description', 'COOCA.ID adalah platform ERP enterprise untuk UMKM, Klinik, Bengkel, Restoran, Retail, Notaris, Salon, Laundry, dan semua skala bisnis. Cloud native, modular, dan siap pakai.')">
+    <meta property="og:title"        content="@hasSection('og_title')@yield('og_title')@else@yield('title', 'COOCA.ID - Software Manajemen & Otomatisasi Bisnis Indonesia')@endif">
+    <meta property="og:description"  content="@hasSection('og_description')@yield('og_description')@else@yield('description', 'Platform software manajemen bisnis terpadu di Indonesia. Tingkatkan efisiensi operasional, otomatisasi laporan, dan tingkatkan profit usaha Anda. Coba gratis sekarang!')@endif">
     <meta property="og:image"        content="@yield('og_image', asset('images/og-image.png'))">
     <meta property="og:image:width"  content="@yield('og_image_width', '1200')">
     <meta property="og:image:height" content="@yield('og_image_height', '630')">
-    <meta property="og:image:alt"    content="@yield('og_title', 'COOCA.ID — Satu Platform ERP Untuk Seluruh Skala Bisnis Anda')">
+    <meta property="og:image:alt"    content="@hasSection('og_title')@yield('og_title')@else@yield('title', 'COOCA.ID - Software Manajemen & Otomatisasi Bisnis Indonesia')@endif">
 
     <!-- ── Twitter Card ─────────────────────────────────────────────────── -->
     <meta name="twitter:card"        content="summary_large_image">
     <meta name="twitter:site"        content="@coocaid">
-    <meta name="twitter:title"       content="@yield('og_title', 'COOCA.ID — Satu Platform ERP Untuk Seluruh Skala Bisnis Anda')">
-    <meta name="twitter:description" content="@yield('og_description', 'COOCA.ID adalah platform ERP enterprise untuk UMKM, Klinik, Bengkel, Restoran, Retail, Notaris, Salon, Laundry, dan semua skala bisnis. Cloud native, modular, dan siap pakai.')">
+    <meta name="twitter:title"       content="@hasSection('og_title')@yield('og_title')@else@yield('title', 'COOCA.ID - Software Manajemen & Otomatisasi Bisnis Indonesia')@endif">
+    <meta name="twitter:description" content="@hasSection('og_description')@yield('og_description')@else@yield('description', 'Platform software manajemen bisnis terpadu di Indonesia. Tingkatkan efisiensi operasional, otomatisasi laporan, dan tingkatkan profit usaha Anda. Coba gratis sekarang!')@endif">
     <meta name="twitter:image"       content="@yield('og_image', asset('images/og-image.png'))">
 
     <!-- ── Favicon ──────────────────────────────────────────────────────── -->

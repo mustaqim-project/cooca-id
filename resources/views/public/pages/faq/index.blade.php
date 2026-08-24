@@ -1,7 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'FAQ — Pertanyaan Sering Ditanyakan | COOCA.ID')
-@section('description', 'Temukan jawaban lengkap atas pertanyaan seputar fitur, harga, keamanan, dan implementasi ERP COOCA.ID.')
+@section('title', 'Pusat Bantuan & FAQ Lisensi Software | COOCA.ID')
+@section('description', 'Temukan jawaban atas pertanyaan umum seputar fitur, metode pembayaran, keamanan data, lisensi, dan penggunaan sistem software bisnis COOCA.ID.')
+@section('keywords', 'faq cooca id, lisensi software cooca, bantuan teknis cooca, metode pembayaran cooca, keamanan data software')
 
 @section('content')
 

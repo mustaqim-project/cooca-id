@@ -1,7 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Tentang Kami — COOCA.ID | Platform ERP Enterprise Indonesia')
-@section('description', 'COOCA.ID adalah startup teknologi Indonesia yang membangun platform ERP enterprise untuk semua skala bisnis. Kenali tim, misi, dan visi kami.')
+@section('title', 'Tentang Kami & Profil Perusahaan | COOCA.ID')
+@section('description', 'Pelajari profil COOCA.ID, penyedia solusi teknologi dan software bisnis tepercaya di Indonesia. Kami membantu pengusaha mengoptimalkan sistem dan operasional bisnis.')
+@section('keywords', 'tentang cooca id, profil perusahaan cooca, developer software bisnis, perusahaan saas indonesia, visi misi cooca')
 
 @section('content')
 

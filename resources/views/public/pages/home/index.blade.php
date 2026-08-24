@@ -1,7 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'COOCA.ID — Satu Platform ERP Untuk Seluruh Skala Bisnis Anda')
-@section('description', 'COOCA.ID adalah platform ERP enterprise untuk UMKM, Klinik, Bengkel, Restoran, Retail, Notaris, Salon, Laundry, dan semua skala bisnis. Cloud native, modular, dan siap pakai.')
+@section('title', 'COOCA.ID - Software Manajemen & Otomatisasi Bisnis Indonesia')
+@section('description', 'Platform software manajemen bisnis terpadu di Indonesia. Tingkatkan efisiensi operasional, otomatisasi laporan, dan tingkatkan profit usaha Anda. Coba gratis sekarang!')
+@section('keywords', 'cooca id, software manajemen bisnis, software operasional perusahaan, platform otomatisasi bisnis, aplikasi bisnis indonesia, software erp lokal')
 
 @push('styles')
 {{-- Font Awesome 6 untuk mengganti emoji --}}

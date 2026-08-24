@@ -1,4 +1,9 @@
 @extends('layouts.public')
+
+@section('title', 'Syarat & Ketentuan Penggunaan Layanan | COOCA.ID')
+@section('description', 'Syarat dan ketentuan penggunaan platform software COOCA.ID. Ketahui hak, kewajiban, dan regulasi lisensi penggunaan sistem kami.')
+@section('keywords', 'syarat dan ketentuan cooca, terms of service cooca id, ketentuan lisensi software')
+
 @section('content')
 <div style="min-height:100vh;padding:120px 20px 80px;">
   <div style="max-width:800px;margin:0 auto;">

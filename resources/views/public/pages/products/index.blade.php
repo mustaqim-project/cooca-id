@@ -1,7 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Produk ERP — COOCA.ID | Temukan Solusi untuk Bisnis Anda')
-@section('description', 'Katalog lengkap produk ERP COOCA.ID untuk Restoran, Klinik, Bengkel, Notaris, Retail, Salon, Laundry, dan banyak lagi.')
+@section('title', 'Katalog & Harga Paket Software Bisnis | COOCA.ID')
+@section('description', 'Jelajahi katalog fitur dan harga paket langganan software bisnis COOCA.ID. Dapatkan solusi manajemen stok, keuangan, hingga HR sesuai skala usaha Anda.')
+@section('keywords', 'harga software bisnis, paket langganan erp, katalog software erp, software kasir dan stok, aplikasi manajemen perusahaan')
 
 @push('styles')
 {{-- Font Awesome 6 untuk mengganti emoji --}}
