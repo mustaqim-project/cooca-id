@@ -231,6 +231,7 @@
             </li>
             <li><a href="{{ route('products.index') }}"
                     class="{{ request()->routeIs('products.*') ? 'active' : '' }}">Produk ERP</a></li>
+            <li><a href="https://hpp.cooca.id" target="_blank" rel="noopener noreferrer">Kalkulator HPP</a></li>
             <li><a href="{{ route('affiliate') }}"
                     class="{{ request()->routeIs('affiliate') ? 'active' : '' }}">Partner</a></li>
             <li><a href="{{ route('blog.index') }}"
@@ -252,51 +253,51 @@
                 $isCustomer = auth('customer')->check();
                 $isAffiliator = auth('affiliator')->check();
             @endphp
-            @if($isAdmin)
-            <a href="{{ route('admin.dashboard') }}" class="btn-primary-glow"
-                style="display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-shield-halved"></i> Dashboard Admin
-            </a>
+            @if ($isAdmin)
+                <a href="{{ route('admin.dashboard') }}" class="btn-primary-glow"
+                    style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-shield-halved"></i> Dashboard Admin
+                </a>
             @elseif($isCustomer)
-            <a href="{{ route('customer.dashboard') }}" class="btn-primary-glow"
-                style="display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-building"></i> Dashboard Bisnis
-            </a>
+                <a href="{{ route('customer.dashboard') }}" class="btn-primary-glow"
+                    style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-building"></i> Dashboard Bisnis
+                </a>
             @elseif($isAffiliator)
-            <a href="{{ route('affiliator.dashboard') }}" class="btn-primary-glow"
-                style="display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-handshake"></i> Portal Partner
-            </a>
+                <a href="{{ route('affiliator.dashboard') }}" class="btn-primary-glow"
+                    style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-handshake"></i> Portal Partner
+                </a>
             @else
-            <div class="nav-dropdown" style="position: relative; display: inline-block;">
-                <button class="btn-ghost" id="nav-login-btn"
-                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; border: none; font-family: inherit;">
-                    Masuk <i class="fa-solid fa-chevron-down" style="font-size: 10px; opacity: 0.6;"></i>
-                </button>
-                <div class="nav-dropdown-content"
-                    style="position: absolute; right: 0; top: 100%; margin-top: 8px; background: var(--surface); min-width: 200px; box-shadow: var(--shadow-xl); border-radius: 12px; border: 1px solid var(--border); z-index: 1000; overflow: hidden; padding: 4px; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transition-delay: 0.1s;">
-                    <a href="{{ route('customer.login') }}"
-                        style="color: var(--text); padding: 10px 16px; text-decoration: none; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; border-radius: 8px; transition: background .2s;"
-                        onmouseover="this.style.background='var(--bg)'; this.style.color='var(--primary)'"
-                        onmouseout="this.style.background='transparent'; this.style.color='var(--text)'">
-                        <i class="fa-solid fa-building" style="width: 16px; text-align: center;"></i> Pelanggan
-                    </a>
-                    <a href="{{ route('affiliator.login') }}"
-                        style="color: var(--text); padding: 10px 16px; text-decoration: none; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; border-radius: 8px; transition: background .2s;"
-                        onmouseover="this.style.background='var(--bg)'; this.style.color='var(--primary)'"
-                        onmouseout="this.style.background='transparent'; this.style.color='var(--text)'">
-                        <i class="fa-solid fa-handshake" style="width: 16px; text-align: center;"></i> Partner
-                    </a>
+                <div class="nav-dropdown" style="position: relative; display: inline-block;">
+                    <button class="btn-ghost" id="nav-login-btn"
+                        style="display: flex; align-items: center; gap: 8px; cursor: pointer; border: none; font-family: inherit;">
+                        Masuk <i class="fa-solid fa-chevron-down" style="font-size: 10px; opacity: 0.6;"></i>
+                    </button>
+                    <div class="nav-dropdown-content"
+                        style="position: absolute; right: 0; top: 100%; margin-top: 8px; background: var(--surface); min-width: 200px; box-shadow: var(--shadow-xl); border-radius: 12px; border: 1px solid var(--border); z-index: 1000; overflow: hidden; padding: 4px; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transition-delay: 0.1s;">
+                        <a href="{{ route('customer.login') }}"
+                            style="color: var(--text); padding: 10px 16px; text-decoration: none; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; border-radius: 8px; transition: background .2s;"
+                            onmouseover="this.style.background='var(--bg)'; this.style.color='var(--primary)'"
+                            onmouseout="this.style.background='transparent'; this.style.color='var(--text)'">
+                            <i class="fa-solid fa-building" style="width: 16px; text-align: center;"></i> Pelanggan
+                        </a>
+                        <a href="{{ route('affiliator.login') }}"
+                            style="color: var(--text); padding: 10px 16px; text-decoration: none; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; border-radius: 8px; transition: background .2s;"
+                            onmouseover="this.style.background='var(--bg)'; this.style.color='var(--primary)'"
+                            onmouseout="this.style.background='transparent'; this.style.color='var(--text)'">
+                            <i class="fa-solid fa-handshake" style="width: 16px; text-align: center;"></i> Partner
+                        </a>
+                    </div>
                 </div>
-            </div>
 
-            <a href="{{ route('customer.register') }}" class="btn-primary-glow" id="nav-cta-btn">
-                Coba Gratis 14 Hari
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                </svg>
-            </a>
+                <a href="{{ route('customer.register') }}" class="btn-primary-glow" id="nav-cta-btn">
+                    Coba Gratis 14 Hari
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                        <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </a>
             @endif
         </div>
 
@@ -311,26 +312,29 @@
     <div class="lp-mobile-menu" id="mobileMenu" role="dialog" aria-label="Mobile navigation">
         <a href="{{ route('home') }}">Beranda</a>
         <a href="{{ route('products.index') }}">Produk ERP</a>
+        <a href="https://hpp.cooca.id">Kalkulator Hpp</a>
         <a href="{{ route('affiliate') }}">Partner</a>
         <a href="{{ route('blog.index') }}">Blog</a>
         <a href="{{ route('about') }}">Tentang</a>
         <a href="{{ route('contact') }}">Kontak</a>
         <div
             style="padding: 12px 0 4px; border-top: 1px solid var(--border); margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
-            @if($isAdmin)
-            <a href="{{ route('admin.dashboard') }}" class="btn-primary-glow mobile-cta"
-                style="text-align:center; justify-content:center;">Dashboard Admin →</a>
+            @if ($isAdmin)
+                <a href="{{ route('admin.dashboard') }}" class="btn-primary-glow mobile-cta"
+                    style="text-align:center; justify-content:center;">Dashboard Admin →</a>
             @elseif($isCustomer)
-            <a href="{{ route('customer.dashboard') }}" class="btn-primary-glow mobile-cta"
-                style="text-align:center; justify-content:center;">Dashboard Bisnis →</a>
+                <a href="{{ route('customer.dashboard') }}" class="btn-primary-glow mobile-cta"
+                    style="text-align:center; justify-content:center;">Dashboard Bisnis →</a>
             @elseif($isAffiliator)
-            <a href="{{ route('affiliator.dashboard') }}" class="btn-primary-glow mobile-cta"
-                style="text-align:center; justify-content:center;">Portal Partner →</a>
+                <a href="{{ route('affiliator.dashboard') }}" class="btn-primary-glow mobile-cta"
+                    style="text-align:center; justify-content:center;">Portal Partner →</a>
             @else
-            <a href="{{ route('customer.login') }}" class="btn-ghost" style="text-align:center;">Login Pelanggan</a>
-            <a href="{{ route('affiliator.login') }}" class="btn-ghost" style="text-align:center;">Login Partner</a>
-            <a href="{{ route('customer.register') }}" class="btn-primary-glow mobile-cta"
-                style="text-align:center; justify-content:center;">Coba Gratis 14 Hari →</a>
+                <a href="{{ route('customer.login') }}" class="btn-ghost" style="text-align:center;">Login
+                    Pelanggan</a>
+                <a href="{{ route('affiliator.login') }}" class="btn-ghost" style="text-align:center;">Login
+                    Partner</a>
+                <a href="{{ route('customer.register') }}" class="btn-primary-glow mobile-cta"
+                    style="text-align:center; justify-content:center;">Coba Gratis 14 Hari →</a>
             @endif
         </div>
     </div>
@@ -801,7 +805,7 @@
             if (!lcToken) return;
             if (!confirm(
                     'Apakah Anda yakin ingin mengakhiri sesi percakapan ini? Transkrip lengkap percakapan akan otomatis dikirimkan ke WhatsApp dan Email Anda.'
-                    )) return;
+                )) return;
 
             fetch("{{ route('live-chat.end') }}", {
                     method: 'POST',
@@ -820,7 +824,8 @@
                 .then(function(data) {
                     if (data.success) {
                         alert(
-                            'Sesi percakapan telah berakhir. Ringkasan transkrip telah dikirimkan ke WhatsApp dan Email Anda.');
+                            'Sesi percakapan telah berakhir. Ringkasan transkrip telah dikirimkan ke WhatsApp dan Email Anda.'
+                            );
                         handleChatEndedLocally();
                     }
                 })
@@ -1176,27 +1181,27 @@
             <i class="fa-solid fa-newspaper"></i>
             <span>Blog</span>
         </a>
-        @if($isAdmin)
-        <a href="{{ route('admin.dashboard') }}">
-            <i class="fa-solid fa-gauge"></i>
-            <span>Admin</span>
-        </a>
+        @if ($isAdmin)
+            <a href="{{ route('admin.dashboard') }}">
+                <i class="fa-solid fa-gauge"></i>
+                <span>Admin</span>
+            </a>
         @elseif($isCustomer)
-        <a href="{{ route('customer.dashboard') }}">
-            <i class="fa-solid fa-chart-pie"></i>
-            <span>Bisnis</span>
-        </a>
+            <a href="{{ route('customer.dashboard') }}">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Bisnis</span>
+            </a>
         @elseif($isAffiliator)
-        <a href="{{ route('affiliator.dashboard') }}">
-            <i class="fa-solid fa-handshake"></i>
-            <span>Partner</span>
-        </a>
+            <a href="{{ route('affiliator.dashboard') }}">
+                <i class="fa-solid fa-handshake"></i>
+                <span>Partner</span>
+            </a>
         @else
-        <a href="{{ route('customer.login') }}"
-            class="{{ request()->routeIs('customer.login') ? 'active' : '' }}">
-            <i class="fa-regular fa-user"></i>
-            <span>Login</span>
-        </a>
+            <a href="{{ route('customer.login') }}"
+                class="{{ request()->routeIs('customer.login') ? 'active' : '' }}">
+                <i class="fa-regular fa-user"></i>
+                <span>Login</span>
+            </a>
         @endif
     </div>
 
