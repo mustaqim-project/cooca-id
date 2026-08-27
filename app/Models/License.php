@@ -68,6 +68,7 @@ final class License extends Model
 
     public const STATUS_INACTIVE = 'inactive';
     public const STATUS_ACTIVE = 'active';
+    public const STATUS_SUSPENDED = 'suspended';
     public const STATUS_EXPIRED = 'expired';
     public const STATUS_REVOKED = 'revoked';
 
@@ -76,6 +77,7 @@ final class License extends Model
         return [
             self::STATUS_INACTIVE,
             self::STATUS_ACTIVE,
+            self::STATUS_SUSPENDED,
             self::STATUS_EXPIRED,
             self::STATUS_REVOKED,
         ];
