@@ -21,13 +21,13 @@ class SubscriptionReminderJob implements ShouldQueue
     public function handle(): void
     {
         // Find subscriptions expiring in 7 days
-        $expiringSoon = Subscription::where('status', 'Active')
-            ->whereNotNull('ends_at')
-            ->whereBetween('ends_at', [now(), now()->addDays(7)])
+        $expiringSoon = Subscription::where('status', Subscription::STATUS_ACTIVE)
+            ->whereNotNull('expires_at')
+            ->whereBetween('expires_at', [now(), now()->addDays(7)])
             ->get();
 
         foreach ($expiringSoon as $subscription) {
-            $daysRemaining = now()->diffInDays($subscription->ends_at, false);
+            $daysRemaining = now()->diffInDays($subscription->expires_at, false);
             
             if ($daysRemaining <= 7 && $daysRemaining >= 1) {
                 $subscription->customer->notify(
@@ -52,9 +52,9 @@ class SubscriptionReminderJob implements ShouldQueue
         }
 
         // Find subscriptions expiring today
-        $expiringToday = Subscription::where('status', 'Active')
-            ->whereNotNull('ends_at')
-            ->whereDate('ends_at', now())
+        $expiringToday = Subscription::where('status', Subscription::STATUS_ACTIVE)
+            ->whereNotNull('expires_at')
+            ->whereDate('expires_at', now())
             ->get();
 
         foreach ($expiringToday as $subscription) {

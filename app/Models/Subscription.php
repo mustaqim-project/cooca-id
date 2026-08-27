@@ -111,4 +111,14 @@ final class Subscription extends Model
                     ->orWhere('expires_at', '>', now());
             });
     }
+
+    public function getEndsAtAttribute(): ?\Carbon\Carbon
+    {
+        return $this->expires_at;
+    }
+
+    public function setEndsAtAttribute($value): void
+    {
+        $this->attributes['expires_at'] = $value;
+    }
 }

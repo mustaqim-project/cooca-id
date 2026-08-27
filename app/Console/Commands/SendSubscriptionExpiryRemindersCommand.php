@@ -20,7 +20,7 @@ final class SendSubscriptionExpiryRemindersCommand extends Command
         $targetDate = now()->addDays($days)->startOfDay();
         
         $subscriptions = Subscription::where('status', 'active')
-            ->whereDate('ends_at', $targetDate)
+            ->whereDate('expires_at', $targetDate)
             ->with(['customer', 'license.product'])
             ->get();
 

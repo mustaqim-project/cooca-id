@@ -21,14 +21,14 @@ class SubscriptionExpirationJob implements ShouldQueue
     public function handle(): void
     {
         // Find expired subscriptions
-        $expired = Subscription::where('status', 'Active')
-            ->whereNotNull('ends_at')
-            ->where('ends_at', '<', now())
+        $expired = Subscription::where('status', Subscription::STATUS_ACTIVE)
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<', now())
             ->get();
 
         foreach ($expired as $subscription) {
             // Update subscription status
-            $subscription->update(['status' => 'Expired']);
+            $subscription->update(['status' => Subscription::STATUS_EXPIRED]);
 
             // Suspend associated licenses
             LicenseActivation::where('subscription_id', $subscription->id)
