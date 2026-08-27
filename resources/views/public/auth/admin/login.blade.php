@@ -34,7 +34,6 @@
                         <span>{{ $siteName }}</span>
                     @endif
                 </a>
-                <div style="width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #ef4444, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; margin: 0 auto 16px; border: 1px solid var(--border);"><i class="fa-solid fa-shield-halved"></i></div>
                 <h1 style="font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px;">Admin Console</h1>
                 <p style="font-size: 14px; color: var(--text-muted);">Masuk ke sistem kontrol internal COOCA.ID</p>
             </div>

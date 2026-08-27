@@ -231,7 +231,7 @@
             </li>
             <li><a href="{{ route('products.index') }}"
                     class="{{ request()->routeIs('products.*') ? 'active' : '' }}">Produk ERP</a></li>
-            <li><a href="https://hpp.cooca.id" target="_blank" rel="noopener noreferrer">Kalkulator HPP</a></li>
+            <li><a href="https://si-cost.cooca.id" target="_blank" rel="noopener noreferrer">Si-Cost</a></li>
             <li><a href="{{ route('affiliate') }}"
                     class="{{ request()->routeIs('affiliate') ? 'active' : '' }}">Partner</a></li>
             <li><a href="{{ route('blog.index') }}"
@@ -312,7 +312,7 @@
     <div class="lp-mobile-menu" id="mobileMenu" role="dialog" aria-label="Mobile navigation">
         <a href="{{ route('home') }}">Beranda</a>
         <a href="{{ route('products.index') }}">Produk ERP</a>
-        <a href="https://hpp.cooca.id">Kalkulator Hpp</a>
+        <a href="https://si-cost.cooca.id">Si-Cost</a>
         <a href="{{ route('affiliate') }}">Partner</a>
         <a href="{{ route('blog.index') }}">Blog</a>
         <a href="{{ route('about') }}">Tentang</a>
