@@ -22,7 +22,17 @@ final class RegisterAffiliatorRequest extends FormRequest
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['nullable', 'string', 'max:20'],
             'terms' => ['accepted'],
-            'parent_referral_code' => ['nullable', 'string', 'exists:affiliator_profiles,referral_code'],
+            'parent_referral_code' => [
+                'nullable',
+                'string',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $exists = \App\Models\Affiliator::where('referral_code', $value)->exists()
+                        || \App\Models\AffiliatorProfile::where('referral_code', $value)->exists();
+                    if (!$exists) {
+                        $fail('Kode referral tidak valid.');
+                    }
+                },
+            ],
         ];
     }
 

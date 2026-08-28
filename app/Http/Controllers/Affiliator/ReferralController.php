@@ -27,7 +27,7 @@ final class ReferralController extends Controller
 
         return view('affiliator.referrals.index', [
             'referrals' => CustomerResource::collection($referrals),
-            'referral_link' => route('customer.register', ['referral' => $affiliator->referral_code]),
+            'referral_link' => route('register', ['ref' => $affiliator->referral_code]),
         ]);
     }
 

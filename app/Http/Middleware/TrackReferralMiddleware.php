@@ -9,8 +9,9 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Track referral code from query parameter and persist to session.
- * This allows referral code to be available when user registers later.
+ * Track referral code from query parameter and persist to session & cookie.
+ * This ensures referral code is preserved even if user navigates through multiple pages
+ * or registers after reopening the browser within 30 days.
  */
 final class TrackReferralMiddleware
 {
@@ -21,16 +22,20 @@ final class TrackReferralMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $refCode = $request->query('ref');
+        $refCode = $request->query('ref') ?? $request->query('referral');
 
-        if ($refCode) {
-            // Store referral code in session for future use
-            session(['referral_code' => $refCode]);
-            
-            // Optionally store timestamp
+        if (!empty($refCode) && is_string($refCode)) {
+            $cleanRef = strtoupper(trim($refCode));
+
+            // Store referral code in session for immediate use
+            session(['referral_code' => $cleanRef]);
             session(['referral_code_time' => now()]);
+
+            // Queue a 30-day cookie for attribution durability
+            cookie()->queue('referral_code', $cleanRef, 60 * 24 * 30);
         }
 
         return $next($request);
     }
 }
+

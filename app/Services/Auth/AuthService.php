@@ -72,7 +72,7 @@ final class AuthService
             if (!$affiliator) {
                 $affiliatorProfile = AffiliatorProfile::where('referral_code', $data['referral_code'])->first();
                 if ($affiliatorProfile) {
-                    $affiliator = Affiliator::find($affiliatorProfile->user_id) ?? $affiliatorProfile->affiliator;
+                    $affiliator = $affiliatorProfile->affiliator ?? Affiliator::find($affiliatorProfile->affiliator_id);
                 }
             }
 
@@ -152,7 +152,7 @@ final class AuthService
                 ]);
 
                 $user->profile()->create([
-                    'referral_code' => strtoupper(Str::random(10)),
+                    'referral_code' => $user->referral_code ?? strtoupper(Str::random(8)),
                 ]);
             }
             Auth::guard('affiliator')->login($user);
@@ -171,15 +171,26 @@ final class AuthService
         ]);
         
         $profileData = [
-            'referral_code' => strtoupper(Str::random(10)),
+            'referral_code' => $affiliator->referral_code ?? strtoupper(Str::random(8)),
             'bank_account' => $data['bank_account'] ?? null,
             'bank_name' => $data['bank_name'] ?? null,
         ];
 
         if (isset($data['parent_referral_code'])) {
-            $parentProfile = AffiliatorProfile::where('referral_code', $data['parent_referral_code'])->first();
-            if ($parentProfile) {
-                $profileData['parent_referred_by_id'] = $parentProfile->affiliator_id;
+            $parent = Affiliator::where('referral_code', $data['parent_referral_code'])->first();
+            if (!$parent) {
+                $parentProfile = AffiliatorProfile::where('referral_code', $data['parent_referral_code'])->first();
+                if ($parentProfile) {
+                    $parent = $parentProfile->affiliator;
+                }
+            }
+            if ($parent) {
+                $affiliator->parent_affiliator_id = $parent->id;
+                $affiliator->save();
+
+                if ($parent->profile) {
+                    $profileData['parent_referred_by_id'] = $parent->profile->id;
+                }
             }
         }
         

@@ -147,7 +147,7 @@ final class Affiliator extends Authenticatable
 
     public function profile(): HasOne
     {
-        return $this->hasOne(AffiliatorProfile::class, 'user_id');
+        return $this->hasOne(AffiliatorProfile::class, 'affiliator_id');
     }
 
     public function downlines(): HasMany

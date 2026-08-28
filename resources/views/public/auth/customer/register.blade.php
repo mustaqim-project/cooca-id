@@ -115,7 +115,7 @@
 
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px;" for="reg-referral">Kode Referral (Opsional)</label>
-                    <input id="reg-referral" type="text" name="referral_code" value="{{ old('referral_code', request()->query('ref')) }}" placeholder="Masukkan kode partner jika ada"
+                    <input id="reg-referral" type="text" name="referral_code" value="{{ old('referral_code', request()->query('ref', request()->query('referral', session('referral_code', request()->cookie('referral_code'))))) }}" placeholder="Masukkan kode partner jika ada"
                         style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); font-size: 14px; outline: none; font-family: inherit; text-transform: uppercase;">
                 </div>
 

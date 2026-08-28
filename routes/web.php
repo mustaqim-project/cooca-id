@@ -146,8 +146,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-Route::get('/login', [AuthWebController::class, 'showCustomerLogin'])->name('login');
+Route::middleware('guest:customer')->group(function () {
+    Route::get('/login', [AuthWebController::class, 'showCustomerLogin'])->name('login');
+    Route::get('/register', [AuthWebController::class, 'showCustomerRegister'])->name('register');
+    Route::post('/register', [AuthWebController::class, 'customerRegister'])->middleware('throttle:customer-register');
+});
 
 Route::get('/clear-app-cache', [\App\Http\Controllers\Web\SystemController::class, 'clearAppCache']);
+
 
 

@@ -22,7 +22,17 @@ final class RegisterCustomerRequest extends FormRequest
             'phone' => ['required', 'string', 'max:20', Rule::unique('customers', 'phone')->whereNull('deleted_at')],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'business_name' => ['nullable', 'string', 'max:255'],
-            'referral_code' => ['nullable', 'string', 'exists:affiliator_profiles,referral_code'],
+            'referral_code' => [
+                'nullable',
+                'string',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $exists = \App\Models\Affiliator::where('referral_code', $value)->exists()
+                        || \App\Models\AffiliatorProfile::where('referral_code', $value)->exists();
+                    if (!$exists) {
+                        $fail('Kode referral tidak valid.');
+                    }
+                },
+            ],
             'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,svg', 'max:2048'],
             'terms' => ['accepted'],
         ];

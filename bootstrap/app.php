@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\ActivityLogger::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\CheckBlockedIp::class,
+            \App\Http\Middleware\TrackReferralMiddleware::class,
         ]);
 
         $middleware->api(append: [

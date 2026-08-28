@@ -15,7 +15,7 @@ final class AffiliatorProfile extends Model
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
+        'affiliator_id',
         'balance',
         'bank_account',
         'bank_name',
