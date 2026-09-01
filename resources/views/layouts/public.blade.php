@@ -6,71 +6,109 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
     <!-- SEO -->
     @php
         $siteName = setting('site.name', 'COOCA.ID');
+
         $favicon = setting('site.favicon') ? asset(setting('site.favicon')) : asset('favicon.svg');
+
         $logoLight = setting('site.logo_light')
             ? asset(setting('site.logo_light'))
             : (setting('site.logo')
                 ? asset(setting('site.logo'))
                 : null);
+
         $logoDark = setting('site.logo_dark')
             ? asset(setting('site.logo_dark'))
             : (setting('site.logo')
                 ? asset(setting('site.logo'))
                 : null);
+
         $waNumber = setting('contact.whatsapp', '6282134566667');
         $waCleanNumber = preg_replace('/[^0-9]/', '', $waNumber);
         $waLink = setting('contact.whatsapp_link') ?: 'https://wa.me/' . ($waCleanNumber ?: '6282134566667');
+
         $emailSupport = setting('contact.email', 'support@cooca.id');
+
         $contactAddress = setting('contact.address', 'Jl. Jend. Sudirman No. 52, Jakarta Selatan, DKI Jakarta 12920');
+
         $footerDesc = setting(
             'footer.description',
             'Platform ERP enterprise untuk UMKM, Klinik, Bengkel, Restoran, Retail dan semua skala bisnis. Cloud native, modular, dan selalu siap.',
         );
+
         $socialInsta = setting('social.instagram', '#');
         $socialFb = setting('social.facebook', '#');
         $socialTwitter = setting('social.twitter', '#');
         $socialYt = setting('social.youtube', '#');
         $socialGithub = setting('social.github', '#');
         $socialLinkedin = setting('social.linkedin', '#');
+
+        // Open Graph Image
+        $ogImage = asset('storage/system/cooca.png');
     @endphp
 
     <!-- ── Primary Meta ────────────────────────────────────────────────── -->
-    <title>@yield('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis')</title>
+    <title>
+        @yield('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis')
+    </title>
+
     <meta name="description" content="@yield('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID. Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.')">
+
     <meta name="keywords" content="@yield('keywords', 'cooca id, software bisnis indonesia, move faster decide better, software manajemen operasional, platform otomatisasi bisnis, software pendukung keputusan')">
+
     <meta name="author" content="{{ $siteName }}">
+
     <meta name="robots" content="@yield('robots', 'index, follow')">
+
     <meta name="googlebot" content="@yield('robots', 'index, follow')">
+
     <link rel="canonical" href="@yield('canonical', url()->current())">
+
     <meta name="dmca-site-verification" content="R3Q5WVUxSFVWZmlsc3kxRExzSHBCZz090">
 
+
     <!-- ── Open Graph / Facebook ────────────────────────────────────────── -->
+
     <meta property="og:type" content="@yield('og_type', 'website')">
+
     <meta property="og:site_name" content="{{ $siteName }}">
+
     <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}">
+
     <meta property="og:url" content="{{ url()->current() }}">
+
     <meta property="og:title" content="@yield('og_title', View::hasSection('og_title') ? View::getSection('og_title') : View::getSection('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis'))">
+
     <meta property="og:description" content="@yield('og_description', View::hasSection('og_description') ? View::getSection('og_description') : View::getSection('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID. Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.'))">
-    <meta property="og:image" content="@yield('og_image', asset('images/og-image.png'))">
+
+    <meta property="og:image" content="{{ $ogImage }}">
+
     <meta property="og:image:width" content="@yield('og_image_width', '1200')">
+
     <meta property="og:image:height" content="@yield('og_image_height', '630')">
+
     <meta property="og:image:alt" content="@yield('og_title', View::hasSection('og_title') ? View::getSection('og_title') : View::getSection('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis'))">
 
+
     <!-- ── Twitter Card ─────────────────────────────────────────────────── -->
+
     <meta name="twitter:card" content="summary_large_image">
+
     <meta name="twitter:site" content="@coocaid">
+
     <meta name="twitter:title" content="@yield('og_title', View::hasSection('og_title') ? View::getSection('og_title') : View::getSection('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis'))">
+
     <meta name="twitter:description" content="@yield('og_description', View::hasSection('og_description') ? View::getSection('og_description') : View::getSection('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID. Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.'))">
-    <meta name="twitter:image" content="@yield('og_image', asset('images/og-image.png'))">
+
+    <meta name="twitter:image" content="{{ $ogImage }}">
+
 
     <!-- ── Favicon ──────────────────────────────────────────────────────── -->
-    <link rel="icon" type="image/svg+xml" href="{{ $favicon }}">
-    <link rel="apple-touch-icon" href="{{ $favicon }}">
 
+    <link rel="icon" type="image/svg+xml" href="{{ $favicon }}">
+
+    <link rel="apple-touch-icon" href="{{ $favicon }}">
     <!-- ── JSON-LD: WebSite Schema ──────────────────────────────────────── -->
     <script type="application/ld+json">
     {
@@ -179,7 +217,8 @@
     </noscript>
 
     <!-- ── App CSS ──────────────────────────────────────────────────────── -->
-    <link rel="stylesheet" href="{{ asset('css/landing.css') }}?v={{ file_exists(public_path('css/landing.css')) ? filemtime(public_path('css/landing.css')) : time() }}">
+    <link rel="stylesheet"
+        href="{{ asset('css/landing.css') }}?v={{ file_exists(public_path('css/landing.css')) ? filemtime(public_path('css/landing.css')) : time() }}">
 
     <!-- ── SweetAlert2 (deferred) ───────────────────────────────────────── -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
@@ -825,7 +864,7 @@
                     if (data.success) {
                         alert(
                             'Sesi percakapan telah berakhir. Ringkasan transkrip telah dikirimkan ke WhatsApp dan Email Anda.'
-                            );
+                        );
                         handleChatEndedLocally();
                     }
                 })
