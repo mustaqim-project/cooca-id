@@ -44,7 +44,7 @@
                     </p>
 
                     {{-- Price & CTA Box with Psychological Pricing --}}
-                    <div style="background: var(--surface); border: 1.5px solid rgba(79, 70, 229, 0.2); border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-md);">
+                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); backdrop-filter: blur(16px);">
                         @php
                             $lowestPlan = $product->subscriptionPlans
                                 ->where('is_active', true)
@@ -74,47 +74,35 @@
                             $savings = $origPrice - $finalPrice;
                         @endphp
 
-                        <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(79,70,229,.1); border: 1px solid rgba(79,70,229,.25); padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 12px;">
-                            <i class="fa-solid fa-tags"></i> PENAWARAN SPESIAL
-                        </div>
-
-                        {{-- Price Anchoring --}}
-                        <div class="pricing-anchor-top" style="margin-bottom: 4px;">
-                            <span class="pricing-anchor-normal" style="font-size: 13.5px;">
-                                Harga Normal: <span class="pricing-anchor-strikethrough" style="font-size: 14px;">Rp {{ number_format($origPrice, 0, ',', '.') }}</span>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                            <span class="product-anchor-text" style="font-size: 13px;">
+                                Normal: <del class="product-anchor-del" style="font-size: 14px;">Rp {{ number_format($origPrice, 0, ',', '.') }}</del>
                             </span>
-                            <span class="badge-discount-save" style="background: #10B981; color: #FFFFFF; font-size: 11.5px; padding: 3px 9px;">
+                            <span class="product-discount-pill" style="font-size: 11.5px; padding: 3px 10px;">
                                 <i class="fa-solid fa-bolt"></i> HEMAT {{ number_format($discount, 0) }}%
                             </span>
                         </div>
 
-                        {{-- Priority #1: Promo Main Price --}}
-                        <div class="pricing-main-price-row" style="margin-bottom: 8px;">
-                            <span class="pricing-main-amount" style="color: var(--primary); font-size: clamp(32px, 5vw, 42px);">
-                                <span class="currency" style="color: var(--primary);">Rp</span>{{ number_format($finalPrice, 0, ',', '.') }}
-                            </span>
-                            <span class="pricing-main-period" style="font-size: 15px; font-weight: 700;">{{ $period }}</span>
+                        {{-- Hero Main Price --}}
+                        <div class="product-price-hero-row" style="margin-bottom: 10px;">
+                            <span class="price-val" style="font-size: clamp(34px, 5vw, 44px);">Rp {{ number_format($finalPrice, 0, ',', '.') }}</span>
+                            <span class="price-period" style="font-size: 16px; font-weight: 600;">{{ $period }}</span>
                         </div>
 
-                        {{-- Priority #4: Value Reinforcement --}}
-                        <div class="pricing-savings-ribbon" style="margin-bottom: 6px;">
+                        {{-- Savings Benefit --}}
+                        <div class="pricing-savings-chip" style="margin-bottom: 18px;">
                             <i class="fa-solid fa-circle-check"></i>
-                            <span><strong>✓ Hemat Rp {{ number_format($savings, 0, ',', '.') }}</strong> setiap bulan</span>
-                        </div>
-
-                        {{-- Priority #5: Urgency Copy --}}
-                        <div class="pricing-urgency-tag" style="margin-bottom: 18px;">
-                            <i class="fa-solid fa-fire-flame-curved"></i> Harga promo onboarding terbatas
+                            <span>Hemat Rp {{ number_format($savings, 0, ',', '.') }} setiap bulan</span>
                         </div>
 
                         {{-- Conversion CTAs --}}
                         <div class="hero-actions" style="margin-top: 0; gap: 12px;">
                             <a href="{{ route('customer.register') }}" class="btn-primary-glow"
-                                style="flex: 1.2; justify-content: center; padding: 14px; font-size: 15px; font-weight: 700;">
+                                style="flex: 1.3; justify-content: center; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 12px;">
                                 <i class="fa-solid fa-rocket"></i> Mulai Coba Gratis 14 Hari
                             </a>
                             <a href="{{ route('contact') }}" class="btn-ghost"
-                                style="flex: 1; justify-content: center; padding: 14px 20px; font-size: 14px;">
+                                style="flex: 1; justify-content: center; padding: 14px 20px; font-size: 14px; border-radius: 12px;">
                                 <i class="fa-solid fa-comment-dots"></i> Konsultasi
                             </a>
                         </div>
@@ -254,7 +242,7 @@
                     <p class="lp-subheading">Pilih paket durasi yang paling hemat untuk efisiensi maksimal bisnis Anda.</p>
                 </div>
 
-                <div class="pricing-grid reveal" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; align-items: stretch;">
+                <div class="pricing-cards-container reveal">
                     @foreach ($product->subscriptionPlans as $i => $plan)
                         @php
                             $rawPrice = (float) $plan->price;
@@ -271,37 +259,33 @@
                             $savings = $origPrice - $finalPrice;
                             $isPopular = ($i === 1 || $plan->is_popular);
                         @endphp
-                        <div class="pricing-psych-card {{ $isPopular ? 'featured-card' : '' }}" style="position: relative;">
+                        <div class="pricing-saas-card {{ $isPopular ? 'is-popular' : '' }}">
                             @if ($isPopular)
-                                <div class="pricing-badge-special">
+                                <div class="pricing-featured-floating-pill">
                                     <i class="fa-solid fa-star"></i> MOST POPULAR · REKOMENDASI
                                 </div>
                             @endif
 
-                            <div style="margin-top: {{ $isPopular ? '8px' : '0' }}; margin-bottom: 8px;">
-                                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: {{ $isPopular ? 'var(--primary)' : 'var(--text-muted)' }}; padding: 3px 8px; background: {{ $isPopular ? 'var(--primary-soft)' : 'var(--bg)' }}; border-radius: 6px;">
+                            <div class="pricing-card-header" style="{{ $isPopular ? 'margin-top: 6px;' : '' }}">
+                                <span class="pricing-plan-badge">
                                     {{ $plan->duration_months >= 999 ? 'LIFETIME ACCESS' : ($plan->duration_months . ' BULAN') }}
                                 </span>
+                                <h3 class="pricing-plan-title">{{ $plan->name }}</h3>
                             </div>
 
-                            <h3 style="font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 6px;">{{ $plan->name }}</h3>
-
-                            {{-- Price Anchor Box --}}
-                            <div class="pricing-anchor-container" style="{{ $isPopular ? 'background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(6, 182, 212, 0.06) 100%); border-color: rgba(79, 70, 229, 0.25);' : '' }}">
-                                <div class="pricing-anchor-top">
-                                    <span class="pricing-anchor-normal">
-                                        Harga Normal: <span class="pricing-anchor-strikethrough">Rp {{ number_format($origPrice, 0, ',', '.') }}</span>
-                                    </span>
-                                    <span class="badge-discount-save">
-                                        HEMAT {{ number_format($discount, 0) }}%
+                            {{-- Price Block --}}
+                            <div class="pricing-block-unified">
+                                <div class="pricing-anchor-row">
+                                    <span class="anchor-label">Normal: <del class="anchor-del">Rp {{ number_format($origPrice, 0, ',', '.') }}</del></span>
+                                    <span class="product-discount-pill">
+                                        <i class="fa-solid fa-bolt"></i> HEMAT {{ number_format($discount, 0) }}%
                                     </span>
                                 </div>
 
-                                <div class="pricing-main-price-row">
-                                    <span class="pricing-main-amount" style="{{ $isPopular ? 'color: var(--primary);' : '' }}">
-                                        <span class="currency">Rp</span>{{ number_format($finalPrice, 0, ',', '.') }}
-                                    </span>
-                                    <span class="pricing-main-period">
+                                <div class="pricing-hero-amount-wrap">
+                                    <span class="currency">Rp</span>
+                                    <span class="amount">{{ number_format($finalPrice, 0, ',', '.') }}</span>
+                                    <span class="period">
                                         @if ($plan->duration_months >= 999)
                                             / Lifetime
                                         @elseif($plan->duration_months == 1)
@@ -314,39 +298,35 @@
                                     </span>
                                 </div>
 
-                                <div class="pricing-savings-ribbon">
+                                <div class="pricing-savings-chip">
                                     <i class="fa-solid fa-circle-check"></i>
-                                    <span><strong>✓ Hemat Rp {{ number_format($savings, 0, ',', '.') }}</strong></span>
+                                    <span>Hemat Rp {{ number_format($savings, 0, ',', '.') }}</span>
                                 </div>
 
-                                <div class="pricing-urgency-tag">
+                                <div class="pricing-urgency-note">
                                     <i class="fa-solid fa-bolt"></i> Harga promo onboarding terbatas
                                 </div>
                             </div>
 
-                            <div style="border-top: 1px solid var(--border); margin: 8px 0 16px;"></div>
-
-                            <ul class="pricing-features" style="list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
-                                <li style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text);">
-                                    <i class="fa-solid fa-check text-success"></i> Akses penuh modul {{ $product->name }}
+                            <ul class="pricing-features-list">
+                                <li>
+                                    <i class="fa-solid fa-circle-check"></i> Akses penuh modul {{ $product->name }}
                                 </li>
                                 @if ($plan->duration_months >= 999 && $product->maintenance_fee > 0)
-                                    <li style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text);">
-                                        <i class="fa-solid fa-screwdriver-wrench text-primary"></i> Maint. Fee: Rp {{ number_format($product->maintenance_fee, 0, ',', '.') }}/thn
+                                    <li>
+                                        <i class="fa-solid fa-screwdriver-wrench" style="color: var(--primary);"></i> Maint. Fee: Rp {{ number_format($product->maintenance_fee, 0, ',', '.') }}/thn
                                     </li>
                                 @endif
-                                <li style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text);">
-                                    <i class="fa-solid fa-check text-success"></i> Dukungan teknis prioritas 24/7
+                                <li>
+                                    <i class="fa-solid fa-circle-check"></i> Dukungan teknis prioritas 24/7
                                 </li>
-                                <li style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text);">
-                                    <i class="fa-solid fa-check text-success"></i> Free update &amp; cloud backup
+                                <li>
+                                    <i class="fa-solid fa-circle-check"></i> Free update &amp; cloud backup
                                 </li>
                             </ul>
 
-                            <a href="{{ route('customer.register') }}"
-                                class="{{ $isPopular ? 'btn-primary-glow' : 'btn-ghost' }}"
-                                style="text-align:center; justify-content:center; width:100%; padding: 12px; font-weight: 700; border-radius: 12px;">
-                                Pilih Paket Ini <i class="fa-solid fa-arrow-right ml-1"></i>
+                            <a href="{{ route('customer.register') }}" class="{{ $isPopular ? 'btn-pricing-featured' : 'btn-pricing-regular' }}">
+                                Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                             </a>
                         </div>
                     @endforeach

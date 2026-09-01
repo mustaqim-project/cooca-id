@@ -125,7 +125,7 @@
                         </div>
                         @endif
                     </div>
-                    <div class="product-card-pricing">
+                    <div class="product-card-pricing-wrap">
                         @php
                             $lowestPlan = $product->subscriptionPlans->where('is_active', true)->sortBy('price')->first();
                             
@@ -153,33 +153,37 @@
                         @endphp
 
                         @if($origPrice > 0 || $finalPrice > 0)
-                            <div class="product-pricing-anchor-line">
-                                <span class="product-pricing-old">Harga Normal: Rp {{ number_format($origPrice, 0, ',', '.') }}</span>
-                                <span class="badge-discount-save">HEMAT {{ number_format($discount, 0) }}%</span>
-                            </div>
+                            <div class="product-pricing-glass-card">
+                                <div class="product-pricing-top-meta">
+                                    <span class="product-anchor-text">
+                                        Normal: <del class="product-anchor-del">Rp {{ number_format($origPrice, 0, ',', '.') }}</del>
+                                    </span>
+                                    <span class="product-discount-pill">
+                                        <i class="fa-solid fa-bolt"></i> HEMAT {{ number_format($discount, 0) }}%
+                                    </span>
+                                </div>
 
-                            <div class="product-pricing-main">
-                                <span class="product-pricing-val">Rp {{ number_format($finalPrice, 0, ',', '.') }}</span>
-                                <span class="product-pricing-period">{{ $period }}</span>
-                            </div>
+                                <div class="product-price-hero-row">
+                                    <span class="price-val">Rp {{ number_format($finalPrice, 0, ',', '.') }}</span>
+                                    <span class="price-period">{{ $period }}</span>
+                                </div>
 
-                            <div class="product-pricing-savings">
-                                <i class="fa-solid fa-check-circle"></i>
-                                <span>Hemat Rp {{ number_format($savings, 0, ',', '.') }} setiap bulan</span>
-                            </div>
-
-                            <div class="product-pricing-urgency">
-                                <i class="fa-solid fa-bolt"></i> Harga promo terbatas
+                                <div class="product-savings-line">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>Hemat Rp {{ number_format($savings, 0, ',', '.') }}</span>
+                                </div>
                             </div>
                         @else
-                            <div class="product-pricing-val" style="font-size: 15px; color: var(--text-muted);">Hubungi Sales</div>
+                            <div class="product-pricing-glass-card">
+                                <div class="product-price-hero-row">
+                                    <span class="price-val" style="font-size: 18px;">Hubungi Sales</span>
+                                </div>
+                            </div>
                         @endif
 
-                        <div style="margin-top: 14px;">
-                            <a href="{{ route('products.show', $product->slug) }}" class="btn-primary-glow" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 13.5px; font-weight: 700; border-radius: 10px;">
-                                Pilih Paket Ini <i class="fa-solid fa-arrow-right" style="font-size: 11px;"></i>
-                            </a>
-                        </div>
+                        <a href="{{ route('products.show', $product->slug) }}" class="btn-product-cta">
+                            Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
             </article>

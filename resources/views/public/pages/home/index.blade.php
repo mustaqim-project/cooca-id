@@ -402,7 +402,7 @@
                         @endif
                     </div>
 
-                    <div class="product-card-pricing">
+                    <div class="product-card-pricing-wrap">
                         @php
                             $lowestPlan = $product->subscriptionPlans
                                 ->where('is_active', true)
@@ -433,36 +433,37 @@
                         @endphp
 
                         @if($origPrice > 0 || $finalPrice > 0)
-                            <div class="product-pricing-anchor-line">
-                                <span class="product-pricing-old">Harga Normal: Rp {{ number_format($origPrice, 0, ',', '.') }}</span>
-                                <span class="badge-discount-save">HEMAT {{ number_format($discount, 0) }}%</span>
-                            </div>
+                            <div class="product-pricing-glass-card">
+                                <div class="product-pricing-top-meta">
+                                    <span class="product-anchor-text">
+                                        Normal: <del class="product-anchor-del">Rp {{ number_format($origPrice, 0, ',', '.') }}</del>
+                                    </span>
+                                    <span class="product-discount-pill">
+                                        <i class="fa-solid fa-bolt"></i> HEMAT {{ number_format($discount, 0) }}%
+                                    </span>
+                                </div>
 
-                            <div class="product-pricing-main">
-                                <span class="product-pricing-val">Rp {{ number_format($finalPrice, 0, ',', '.') }}</span>
-                                <span class="product-pricing-period">{{ $period }}</span>
-                            </div>
+                                <div class="product-price-hero-row">
+                                    <span class="price-val">Rp {{ number_format($finalPrice, 0, ',', '.') }}</span>
+                                    <span class="price-period">{{ $period }}</span>
+                                </div>
 
-                            <div class="product-pricing-savings">
-                                <i class="fa-solid fa-check-circle"></i>
-                                <span>Hemat Rp {{ number_format($savings, 0, ',', '.') }} setiap bulan</span>
-                            </div>
-
-                            <div class="product-pricing-urgency">
-                                <i class="fa-solid fa-bolt"></i> Harga promo terbatas
+                                <div class="product-savings-line">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>Hemat Rp {{ number_format($savings, 0, ',', '.') }}</span>
+                                </div>
                             </div>
                         @else
-                            <div class="product-pricing-val" style="font-size: 15px; color: var(--text-muted);">Hubungi Sales</div>
+                            <div class="product-pricing-glass-card">
+                                <div class="product-price-hero-row">
+                                    <span class="price-val" style="font-size: 18px;">Hubungi Sales</span>
+                                </div>
+                            </div>
                         @endif
 
-                        <div style="margin-top: 14px; display: flex; gap: 8px;">
-                            <a href="{{ route('products.show', $product->slug) }}"
-                               class="btn-primary-glow"
-                               style="flex: 1; justify-content: center; padding: 10px 14px; font-size: 13px; border-radius: 10px;"
-                               aria-label="Pilih paket {{ $product->name }}">
-                                Pilih Paket Ini <i class="fa-solid fa-arrow-right" style="font-size: 11px;"></i>
-                            </a>
-                        </div>
+                        <a href="{{ route('products.show', $product->slug) }}" class="btn-product-cta" aria-label="Pilih paket {{ $product->name }}">
+                            Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
             </article>
@@ -784,204 +785,155 @@
         </div>
 
         {{-- Pricing Grid (3-Tier Layout with Center Flagship Focus) --}}
-        <div class="pricing-grid reveal" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; align-items: stretch;">
+        <div class="pricing-cards-container reveal">
 
             {{-- 1. Starter Tier --}}
-            <div class="pricing-psych-card reveal reveal-delay-1">
-                <div style="margin-bottom: 12px;">
-                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 4px 10px; background: var(--bg); border-radius: 6px;">
-                        Starter Bisnis
-                    </span>
+            <div class="pricing-saas-card reveal reveal-delay-1">
+                <div class="pricing-card-header">
+                    <span class="pricing-plan-badge">Starter Bisnis</span>
+                    <h3 class="pricing-plan-title">Starter POS &amp; Sales</h3>
+                    <p class="pricing-plan-desc">
+                        Cocok untuk usaha baru / single outlet yang ingin digitalisasi kasir dan pencatatan transaksi.
+                    </p>
                 </div>
-                <h3 style="font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 6px;">Starter POS & Sales</h3>
-                <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
-                    Cocok untuk usaha baru / single outlet yang ingin digitalisasi kasir dan pencatatan transaksi.
-                </p>
 
-                {{-- Price Anchor Box --}}
-                <div class="pricing-anchor-container">
-                    <div class="pricing-anchor-top">
-                        <span class="pricing-anchor-normal">
-                            Harga Normal: <span class="pricing-anchor-strikethrough">Rp 400.000</span>
+                {{-- Price Block --}}
+                <div class="pricing-block-unified">
+                    <div class="pricing-anchor-row">
+                        <span class="anchor-label">Normal: <del class="anchor-del">Rp 400.000</del></span>
+                        <span class="product-discount-pill">
+                            <i class="fa-solid fa-bolt"></i> HEMAT 50%
                         </span>
-                        <span class="badge-discount-save">HEMAT 50%</span>
                     </div>
 
-                    <div class="pricing-main-price-row">
-                        <span class="pricing-main-amount"><span class="currency">Rp</span>200.000</span>
-                        <span class="pricing-main-period">/bulan</span>
+                    <div class="pricing-hero-amount-wrap">
+                        <span class="currency">Rp</span>
+                        <span class="amount">200.000</span>
+                        <span class="period">/bulan</span>
                     </div>
 
-                    <div class="pricing-savings-ribbon">
+                    <div class="pricing-savings-chip">
                         <i class="fa-solid fa-circle-check"></i>
-                        <span>Hemat Rp 200.000 setiap bulan</span>
+                        <span>Hemat Rp 200.000 /bulan</span>
                     </div>
 
-                    <div class="pricing-urgency-tag">
+                    <div class="pricing-urgency-note">
                         <i class="fa-solid fa-bolt"></i> Harga promo onboarding
                     </div>
                 </div>
 
                 {{-- Features List --}}
-                <ul class="pricing-features" style="list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success"></i> 1 Outlet &amp; 1 Perangkat Kasir
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success"></i> Manajemen POS &amp; Cetak Struk
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success"></i> Laporan Ringkasan Penjualan Harian
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success"></i> Dukungan Teknis Standar via Chat
-                    </li>
+                <ul class="pricing-features-list">
+                    <li><i class="fa-solid fa-circle-check"></i> 1 Outlet &amp; 1 Perangkat Kasir</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Manajemen POS &amp; Cetak Struk</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Laporan Ringkasan Penjualan Harian</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Dukungan Teknis Standar via Chat</li>
                 </ul>
 
-                <a href="{{ route('customer.register') }}" class="btn-ghost" style="width: 100%; justify-content: center; padding: 12px; border-radius: 12px; font-weight: 600;">
-                    Pilih Starter →
+                <a href="{{ route('customer.register') }}" class="btn-pricing-regular">
+                    Pilih Starter <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
 
             {{-- 2. Flagship All-in-One Tier (MOST POPULAR - HIGHEST VISUAL PROMINENCE) --}}
-            <div class="pricing-psych-card featured-card reveal reveal-delay-2" style="position: relative;">
-                {{-- Special Offer Badge --}}
-                <div class="pricing-badge-special">
-                    <i class="fa-solid fa-star"></i> PENAWARAN SPESIAL · MOST POPULAR
+            <div class="pricing-saas-card is-popular reveal reveal-delay-2">
+                {{-- Special Offer Floating Badge --}}
+                <div class="pricing-featured-floating-pill">
+                    <i class="fa-solid fa-star"></i> MOST POPULAR · REKOMENDASI
                 </div>
 
-                <div style="margin-top: 8px; margin-bottom: 12px;">
-                    <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--primary); padding: 4px 10px; background: var(--primary-soft); border-radius: 6px;">
-                        REKOMENDASI UTAMA
-                    </span>
+                <div class="pricing-card-header">
+                    <span class="pricing-plan-badge" style="color: #C7D2FE; background: rgba(99, 102, 241, 0.25);">FLAGSHIP ALL-IN-ONE</span>
+                    <h3 class="pricing-plan-title">COOCA All-in-One ERP &amp; POS</h3>
+                    <p class="pricing-plan-desc">
+                        Satu sistem lengkap untuk mengelola operasional, inventori, keuangan, dan seluruh cabang secara real-time.
+                    </p>
                 </div>
-                <h3 style="font-size: 24px; font-weight: 900; color: var(--text); margin-bottom: 6px;">COOCA All-in-One ERP &amp; POS</h3>
-                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
-                    Satu sistem lengkap untuk mengelola seluruh operasional, inventori, keuangan, dan cabang bisnis secara real-time.
-                </p>
 
-                {{-- Price Anchor Box with 5-Level Visual Hierarchy --}}
-                <div class="pricing-anchor-container" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(6, 182, 212, 0.06) 100%); border: 1.5px solid rgba(79, 70, 229, 0.25);">
-                    {{-- Priority #3: Anchor Price --}}
-                    <div class="pricing-anchor-top">
-                        <span class="pricing-anchor-normal" style="font-size: 13.5px;">
-                            Harga Normal: <span class="pricing-anchor-strikethrough" style="font-size: 14px;">Rp 700.000</span>
-                        </span>
-                        {{-- Priority #2: Promotional Badge --}}
-                        <span class="badge-discount-save" style="background: #10B981; color: #FFFFFF; font-size: 11.5px; padding: 4px 10px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">
+                {{-- Price Block --}}
+                <div class="pricing-block-unified">
+                    <div class="pricing-anchor-row">
+                        <span class="anchor-label">Normal: <del class="anchor-del">Rp 700.000</del></span>
+                        <span class="product-discount-pill" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(6, 182, 212, 0.3) 100%); color: #6EE7B7; border-color: rgba(110, 231, 183, 0.5);">
                             <i class="fa-solid fa-bolt"></i> HEMAT 50%
                         </span>
                     </div>
 
-                    {{-- Priority #1: Promo Main Price (Focal Point) --}}
-                    <div class="pricing-main-price-row">
-                        <span class="pricing-main-amount" style="color: var(--primary); font-size: clamp(34px, 4.5vw, 44px);">
-                            <span class="currency" style="color: var(--primary);">Rp</span>350.000
-                        </span>
-                        <span class="pricing-main-period" style="font-size: 15px; font-weight: 700;">/bulan</span>
+                    <div class="pricing-hero-amount-wrap">
+                        <span class="currency">Rp</span>
+                        <span class="amount">350.000</span>
+                        <span class="period">/bulan</span>
                     </div>
 
-                    {{-- Priority #4: Value Reinforcement (Savings Framing) --}}
-                    <div class="pricing-savings-ribbon" style="background: rgba(16, 185, 129, 0.12); font-size: 13px; border-color: rgba(16, 185, 129, 0.45);">
-                        <i class="fa-solid fa-circle-check" style="font-size: 15px;"></i>
-                        <span><strong>✓ Hemat Rp 350.000</strong> setiap bulan</span>
+                    <div class="pricing-savings-chip" style="background: rgba(16, 185, 129, 0.18); border-color: rgba(52, 211, 153, 0.4);">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Hemat Rp 350.000 setiap bulan</span>
                     </div>
 
-                    {{-- Priority #5: Urgency Copy --}}
-                    <div class="pricing-urgency-tag" style="font-size: 12px; margin-top: 8px;">
+                    <div class="pricing-urgency-note">
                         <i class="fa-solid fa-fire-flame-curved" style="color: #F59E0B;"></i>
-                        <span>Harga promo terbatas untuk kuota onboarding bulan ini</span>
+                        <span>Harga promo onboarding terbatas</span>
                     </div>
                 </div>
 
                 {{-- Features Checklist --}}
-                <ul class="pricing-features" style="list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success" style="font-size: 16px;"></i> Akses Penuh Semua Modul ERP &amp; POS
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success" style="font-size: 16px;"></i> Multi-Outlet &amp; Multi-Kasir Terpusat
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success" style="font-size: 16px;"></i> Laporan Keuangan &amp; Laba Rugi Otomatis
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success" style="font-size: 16px;"></i> Manajemen Inventori &amp; Stok Realtime
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success" style="font-size: 16px;"></i> Notifikasi WhatsApp &amp; Struk Digital
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success" style="font-size: 16px;"></i> Setup Kilat 24 Jam &amp; Training Tim Gratis
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success" style="font-size: 16px;"></i> Dukungan Prioritas 24/7 &amp; SLA 99.9%
-                    </li>
+                <ul class="pricing-features-list">
+                    <li><i class="fa-solid fa-circle-check"></i> <strong>Akses Penuh Seluruh Modul ERP &amp; POS</strong></li>
+                    <li><i class="fa-solid fa-circle-check"></i> Multi-Outlet &amp; Multi-Kasir Terpusat</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Laporan Keuangan &amp; Laba Rugi Otomatis</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Manajemen Inventori &amp; Stok Realtime</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Notifikasi WhatsApp &amp; Struk Digital</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Setup Kilat 24 Jam &amp; Training Tim Gratis</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Dukungan Prioritas 24/7 &amp; SLA 99.9%</li>
                 </ul>
 
-                {{-- Conversion-Focused CTAs --}}
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a href="{{ route('customer.register') }}" class="btn-primary-glow" style="width: 100%; justify-content: center; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 12px;">
-                        <i class="fa-solid fa-rocket"></i> Mulai Sekarang →
-                    </a>
-                    <a href="{{ route('products.index') }}" class="btn-ghost" style="width: 100%; justify-content: center; padding: 10px; font-size: 13px; border-radius: 10px;">
-                        Lihat Semua Fitur
-                    </a>
-                </div>
+                <a href="{{ route('customer.register') }}" class="btn-pricing-featured">
+                    <i class="fa-solid fa-rocket"></i> Mulai Sekarang <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
 
             {{-- 3. Enterprise Custom Tier --}}
-            <div class="pricing-psych-card reveal reveal-delay-3">
-                <div style="margin-bottom: 12px;">
-                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); padding: 4px 10px; background: rgba(6, 182, 212, 0.1); border-radius: 6px;">
-                        Enterprise &amp; Multi-Corp
-                    </span>
+            <div class="pricing-saas-card reveal reveal-delay-3">
+                <div class="pricing-card-header">
+                    <span class="pricing-plan-badge" style="color: #67E8F9; background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.25);">Enterprise &amp; Multi-Corp</span>
+                    <h3 class="pricing-plan-title">Enterprise Custom</h3>
+                    <p class="pricing-plan-desc">
+                        Untuk perusahaan berskala besar dengan kebutuhan integrasi API kustom, white-label, dan server dedicated.
+                    </p>
                 </div>
-                <h3 style="font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 6px;">Enterprise Custom</h3>
-                <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
-                    Untuk perusahaan berskala besar dengan kebutuhan integrasi API kustom, white-label, dan server dedicated.
-                </p>
 
-                {{-- Price Anchor Box --}}
-                <div class="pricing-anchor-container">
-                    <div class="pricing-anchor-top">
-                        <span class="pricing-anchor-normal">Infrastruktur Dedicated</span>
-                        <span class="badge-discount-save" style="background: rgba(6, 182, 212, 0.15); color: var(--accent); border-color: rgba(6, 182, 212, 0.3);">
-                            CUSTOM SOLUTION
+                {{-- Price Block --}}
+                <div class="pricing-block-unified">
+                    <div class="pricing-anchor-row">
+                        <span class="anchor-label">Infrastruktur Khusus</span>
+                        <span class="product-discount-pill" style="color: #67E8F9; border-color: rgba(103, 232, 249, 0.35);">
+                            CUSTOM
                         </span>
                     </div>
 
-                    <div class="pricing-main-price-row">
-                        <span class="pricing-main-amount" style="font-size: 30px;">Hubungi Tim</span>
+                    <div class="pricing-hero-amount-wrap">
+                        <span class="amount" style="font-size: 32px;">Hubungi Tim</span>
                     </div>
 
-                    <div class="pricing-savings-ribbon" style="color: var(--accent); border-color: rgba(6, 182, 212, 0.35); background: rgba(6, 182, 212, 0.08);">
+                    <div class="pricing-savings-chip" style="color: #67E8F9; background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.3);">
                         <i class="fa-solid fa-headset"></i>
-                        <span>Dedicated Account Manager &amp; Custom SLA</span>
+                        <span>Dedicated Account Manager &amp; SLA</span>
                     </div>
 
-                    <div class="pricing-urgency-tag" style="color: var(--text-muted);">
+                    <div class="pricing-urgency-note" style="color: var(--text-muted);">
                         <i class="fa-solid fa-building"></i> Penyesuaian workflow korporasi
                     </div>
                 </div>
 
                 {{-- Features List --}}
-                <ul class="pricing-features" style="list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success"></i> Outlet &amp; User Tanpa Batas (Unlimited)
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success"></i> Dedicated Private Cloud Database
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success"></i> Kustomisasi Modul &amp; White-label Brand
-                    </li>
-                    <li style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text);">
-                        <i class="fa-solid fa-circle-check text-success"></i> Integrasi API ERP Warisan (SAP/Oracle/dll)
-                    </li>
+                <ul class="pricing-features-list">
+                    <li><i class="fa-solid fa-circle-check"></i> Outlet &amp; User Tanpa Batas (Unlimited)</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Dedicated Private Cloud Database</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Kustomisasi Modul &amp; White-label Brand</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Integrasi API ERP Warisan (SAP/Oracle/dll)</li>
                 </ul>
 
-                <a href="{{ route('contact') }}" class="btn-ghost" style="width: 100%; justify-content: center; padding: 12px; border-radius: 12px; font-weight: 600;">
+                <a href="{{ route('contact') }}" class="btn-pricing-regular">
                     <i class="fa-solid fa-phone mr-1"></i> Konsultasi Tim Expert
                 </a>
             </div>
