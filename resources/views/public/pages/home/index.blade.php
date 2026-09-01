@@ -1,11 +1,13 @@
 @extends('layouts.public')
 
-@section('title', 'Software ERP Indonesia untuk Operasional Bisnis | COOCA.ID')
+@section('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis')
 
-@section('description', 'COOCA.ID adalah software ERP Indonesia untuk mengelola operasional, data, dan keputusan bisnis
+@section('description',
+    'COOCA.ID adalah software ERP Indonesia untuk mengelola operasional, data, dan keputusan bisnis
     dalam satu sistem terpadu. Mulai digitalisasi bisnis Anda.')
 
-@section('keywords', 'software ERP Indonesia, sistem ERP, software manajemen bisnis, software operasional bisnis,
+@section('keywords',
+    'software ERP Indonesia, sistem ERP, software manajemen bisnis, software operasional bisnis,
     digitalisasi bisnis, COOCA.ID')
 
     @push('styles')
