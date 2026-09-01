@@ -784,41 +784,41 @@
             </p>
         </div>
 
-        {{-- Pricing Grid (3-Tier Layout matching Reference Mockup) --}}
+        {{-- Pricing Grid (3-Tier Layout matching Reference Mockup: 6 Bulan, Tahunan, Bulanan) --}}
         <div class="cooca-pricing-grid reveal">
 
-            {{-- 1. Starter Tier (Theme Blue) --}}
-            <div class="cooca-card theme-blue reveal reveal-delay-1">
+            {{-- 1. 6 Bulan Tier (Left) --}}
+            <div class="cooca-card theme-side reveal reveal-delay-1">
                 {{-- Diagonal Ribbon --}}
                 <div class="corner-ribbon-wrap">
-                    <div class="corner-ribbon corner-ribbon-blue">
-                        HEMAT<br>50%
+                    <div class="corner-ribbon corner-ribbon-muted">
+                        HEMAT<br>30%
                     </div>
                 </div>
 
                 <div>
-                    <span class="cooca-badge-duration badge-duration-blue">STARTER POS</span>
+                    <span class="cooca-badge-duration badge-duration-blue">6 BULAN</span>
                 </div>
-                <h3 class="cooca-tier-title">Starter POS &amp; Sales</h3>
+                <h3 class="cooca-tier-title">6 Bulan</h3>
 
                 {{-- Normal Price Strikethrough --}}
                 <div class="cooca-normal-price-row">
                     <span>Harga Normal</span>
-                    <del class="cooca-normal-del">Rp400.000</del>
+                    <del class="cooca-normal-del">Rp5.328.000</del>
                 </div>
 
                 {{-- Price Box --}}
                 <div class="cooca-hero-price-box">
                     <div class="cooca-main-price-line">
                         <span class="currency">Rp</span>
-                        <span class="amount">200.000</span>
-                        <span class="period">/ bulan</span>
+                        <span class="amount">3.729.600</span>
+                        <span class="period">/ 6 bln</span>
                     </div>
 
-                    <div class="cooca-savings-box savings-box-blue">
+                    <div class="cooca-savings-box">
                         <div class="cooca-savings-left">
                             <i class="fa-solid fa-tags"></i>
-                            <span>Anda hemat Rp 200.000</span>
+                            <span>Anda hemat Rp 1.598.400</span>
                         </div>
                         <i class="fa-solid fa-circle-check cooca-savings-check"></i>
                     </div>
@@ -831,19 +831,18 @@
 
                 {{-- Features List --}}
                 <ul class="cooca-feature-list">
-                    <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>1 Outlet &amp; 1 Perangkat Kasir</span></li>
-                    <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Manajemen POS &amp; Cetak Struk</span></li>
-                    <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Laporan Ringkasan Penjualan Harian</span></li>
-                    <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Dukungan Teknis Standar via Chat</span></li>
+                    <li><i class="fa-solid fa-circle-check"></i> <span>Akses penuh modul Cooca ERP &amp; POS</span></li>
+                    <li><i class="fa-solid fa-circle-check"></i> <span>Dukungan teknis prioritas 24/7</span></li>
+                    <li><i class="fa-solid fa-circle-check"></i> <span>Free update &amp; cloud backup otomatis</span></li>
                 </ul>
 
-                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-blue">
+                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-side">
                     Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
 
-            {{-- 2. Flagship All-in-One Tier (Theme Purple Glow - MOST POPULAR) --}}
-            <div class="cooca-card theme-purple reveal reveal-delay-2">
+            {{-- 2. Tahunan Tier (Center - Featured Most Popular) --}}
+            <div class="cooca-card theme-featured reveal reveal-delay-2">
                 {{-- Most Popular Floating Badge --}}
                 <div class="cooca-floating-badge">
                     <i class="fa-solid fa-star"></i> MOST POPULAR • REKOMENDASI
@@ -852,35 +851,35 @@
                 {{-- Diagonal Gold Ribbon --}}
                 <div class="corner-ribbon-wrap">
                     <div class="corner-ribbon corner-ribbon-gold">
-                        HEMAT<br>50%
+                        HEMAT<br>35%
                     </div>
                 </div>
 
                 <div>
-                    <span class="cooca-badge-duration badge-duration-purple">12 BULAN (ANNUAL)</span>
+                    <span class="cooca-badge-duration badge-duration-purple">12 BULAN</span>
                 </div>
-                <h3 class="cooca-tier-title">COOCA All-in-One ERP</h3>
+                <h3 class="cooca-tier-title">Tahunan</h3>
 
                 {{-- Normal Price Strikethrough --}}
                 <div class="cooca-normal-price-row">
                     <span>Harga Normal</span>
-                    <del class="cooca-normal-del">Rp700.000</del>
+                    <del class="cooca-normal-del">Rp10.656.000</del>
                 </div>
 
-                {{-- Main Price Box with Crown --}}
+                {{-- Main Price Box with Gold Crown --}}
                 <div class="cooca-hero-price-box">
                     <i class="fa-solid fa-crown cooca-price-crown"></i>
 
                     <div class="cooca-main-price-line">
                         <span class="currency">Rp</span>
-                        <span class="amount">350.000</span>
-                        <span class="period">/ bulan</span>
+                        <span class="amount">6.926.400</span>
+                        <span class="period">/ tahun</span>
                     </div>
 
-                    <div class="cooca-savings-box savings-box-purple">
+                    <div class="cooca-savings-box">
                         <div class="cooca-savings-left">
                             <i class="fa-solid fa-tags"></i>
-                            <span>Anda hemat Rp 350.000</span>
+                            <span>Anda hemat Rp 3.729.600</span>
                         </div>
                         <i class="fa-solid fa-circle-check cooca-savings-check"></i>
                     </div>
@@ -893,67 +892,66 @@
 
                 {{-- Features List --}}
                 <ul class="cooca-feature-list">
-                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Akses Penuh Seluruh Modul ERP &amp; POS</span></li>
-                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Multi-Outlet &amp; Multi-Kasir Terpusat</span></li>
-                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Laporan Keuangan &amp; Laba Rugi Otomatis</span></li>
-                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Manajemen Inventori &amp; Stok Realtime</span></li>
-                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Dukungan Prioritas 24/7 &amp; SLA 99.9%</span></li>
+                    <li><i class="fa-solid fa-circle-check"></i> <span>Akses penuh seluruh modul Cooca ERP &amp; POS</span></li>
+                    <li><i class="fa-solid fa-circle-check"></i> <span>Dukungan teknis prioritas 24/7</span></li>
+                    <li><i class="fa-solid fa-circle-check"></i> <span>Free update &amp; cloud backup otomatis</span></li>
                 </ul>
 
-                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-purple-glow">
+                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-featured">
                     Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
 
-            {{-- 3. Enterprise Custom Tier (Theme Green) --}}
-            <div class="cooca-card theme-green reveal reveal-delay-3">
-                {{-- Diagonal Green Ribbon --}}
+            {{-- 3. Bulanan Tier (Right) --}}
+            <div class="cooca-card theme-side reveal reveal-delay-3">
+                {{-- Diagonal Ribbon --}}
                 <div class="corner-ribbon-wrap">
-                    <div class="corner-ribbon corner-ribbon-green">
-                        CUSTOM<br>PLAN
+                    <div class="corner-ribbon corner-ribbon-muted">
+                        HEMAT<br>18%
                     </div>
                 </div>
 
                 <div>
-                    <span class="cooca-badge-duration badge-duration-green">ENTERPRISE</span>
+                    <span class="cooca-badge-duration badge-duration-green">1 BULAN</span>
                 </div>
-                <h3 class="cooca-tier-title">Enterprise Custom</h3>
+                <h3 class="cooca-tier-title">Bulanan</h3>
 
-                {{-- Normal Price --}}
+                {{-- Normal Price Strikethrough --}}
                 <div class="cooca-normal-price-row">
-                    <span>Infrastruktur Khusus</span>
-                    <span style="color: #4ADE80; font-weight: 700; margin-left: 6px;">Dedicated Server</span>
+                    <span>Harga Normal</span>
+                    <del class="cooca-normal-del">Rp888.000</del>
                 </div>
 
                 {{-- Price Box --}}
                 <div class="cooca-hero-price-box">
                     <div class="cooca-main-price-line">
-                        <span class="amount" style="font-size: 32px;">Hubungi Tim</span>
+                        <span class="currency">Rp</span>
+                        <span class="amount">728.160</span>
+                        <span class="period">/ bulan</span>
                     </div>
 
-                    <div class="cooca-savings-box savings-box-green">
+                    <div class="cooca-savings-box">
                         <div class="cooca-savings-left">
-                            <i class="fa-solid fa-headset"></i>
-                            <span>Dedicated Account Manager &amp; SLA</span>
+                            <i class="fa-solid fa-tags"></i>
+                            <span>Anda hemat Rp 159.840</span>
                         </div>
                         <i class="fa-solid fa-circle-check cooca-savings-check"></i>
                     </div>
 
-                    <div class="cooca-urgency-row" style="color: #94A3B8;">
-                        <i class="fa-solid fa-building"></i>
-                        <span>Penyesuaian workflow korporasi</span>
+                    <div class="cooca-urgency-row">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Harga promo onboarding terbatas</span>
                     </div>
                 </div>
 
                 {{-- Features List --}}
                 <ul class="cooca-feature-list">
-                    <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Outlet &amp; User Tanpa Batas (Unlimited)</span></li>
-                    <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Dedicated Private Cloud Database</span></li>
-                    <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Kustomisasi Modul &amp; White-label Brand</span></li>
-                    <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Integrasi API ERP Warisan (SAP/Oracle/dll)</span></li>
+                    <li><i class="fa-solid fa-circle-check"></i> <span>Akses penuh modul Cooca ERP &amp; POS</span></li>
+                    <li><i class="fa-solid fa-circle-check"></i> <span>Dukungan teknis prioritas 24/7</span></li>
+                    <li><i class="fa-solid fa-circle-check"></i> <span>Free update &amp; cloud backup otomatis</span></li>
                 </ul>
 
-                <a href="{{ route('contact') }}" class="cooca-btn cooca-btn-green">
+                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-side">
                     Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
