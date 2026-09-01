@@ -179,7 +179,7 @@
     </noscript>
 
     <!-- ── App CSS ──────────────────────────────────────────────────────── -->
-    <link rel="stylesheet" href="{{ asset('css/landing.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/landing.css') }}?v={{ file_exists(public_path('css/landing.css')) ? filemtime(public_path('css/landing.css')) : time() }}">
 
     <!-- ── SweetAlert2 (deferred) ───────────────────────────────────────── -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
