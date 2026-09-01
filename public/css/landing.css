@@ -1125,6 +1125,8 @@ body.landing-page {
   color: #FFFFFF;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+}
+
 /* ── PRODUCT DETAIL HERO PRICING BOX (DUAL THEME COMPATIBLE) ── */
 .product-hero-pricing-box {
   background: rgba(15, 23, 42, 0.6);
