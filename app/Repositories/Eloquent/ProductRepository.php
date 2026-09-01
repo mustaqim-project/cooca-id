@@ -77,16 +77,25 @@ final class ProductRepository extends BaseRepository implements ProductRepositor
         $query = $this->model->with(['category', 'subscriptionPlans']);
 
         if (!empty($filters['search'])) {
-            $query->where('name', 'like', '%' . $filters['search'] . '%')
-                  ->orWhere('description', 'like', '%' . $filters['search'] . '%');
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%')
+                  ->orWhere('short_description', 'like', '%' . $search . '%');
+            });
         }
 
         if (!empty($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
         }
 
-        if (isset($filters['is_active'])) {
-            $query->where('is_active', $filters['is_active']);
+        if (!empty($filters['product_type'])) {
+            $query->where('product_type', $filters['product_type']);
+        }
+
+        if (isset($filters['is_active']) && $filters['is_active'] !== '') {
+            $isActive = in_array($filters['is_active'], [1, '1', 'active', true], true);
+            $query->where('is_active', $isActive);
         }
 
         return $query->orderBy('sort_order')->paginate($perPage);

@@ -24,12 +24,22 @@ final class ProductController extends Controller
      */
     public function index()
     {
-        $products = $this->productRepository->paginateWithFilters(15);
+        $filters = request()->only(['search', 'category_id', 'product_type', 'is_active']);
+        $products = $this->productRepository->paginateWithFilters(15, $filters);
         $categories = \App\Models\ProductCategory::where('is_active', true)->orderBy('sort_order')->get();
+
+        $stats = [
+            'total' => \App\Models\Product::count(),
+            'active' => \App\Models\Product::where('is_active', true)->count(),
+            'featured' => \App\Models\Product::where('is_featured', true)->count(),
+            'categories' => $categories->count(),
+        ];
 
         return view('admin.products.index', [
             'products' => $products,
             'categories' => $categories,
+            'filters' => $filters,
+            'stats' => $stats,
         ]);
     }
 
@@ -50,7 +60,7 @@ final class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $product = $this->productRepository->find($id);
+        $product = Product::with(['category', 'subscriptionPlans', 'licenses'])->find($id);
 
         if (!$product) {
             abort(404, 'Product not found');

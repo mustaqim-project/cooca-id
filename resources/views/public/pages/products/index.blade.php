@@ -125,44 +125,61 @@
                         </div>
                         @endif
                     </div>
-                    <div class="product-footer">
-                        <div>
-                            @php
-                                $lowestPlan = $product->subscriptionPlans->where('is_active', true)->sortBy('price')->first();
-                                $origPrice = $lowestPlan ? (float)$lowestPlan->price : (float)($product->base_price ?? 0);
-                                $discount = $lowestPlan ? (float)($lowestPlan->discount_percent ?? 0) : 0;
-                                $finalPrice = $discount > 0 ? $origPrice * (1 - $discount / 100) : $origPrice;
-                                $period = '';
-                                if ($lowestPlan) {
-                                    if ($lowestPlan->duration_months >= 999) {
-                                        $period = ' / Lifetime';
-                                    } elseif ($lowestPlan->duration_months == 1) {
-                                        $period = '/bln';
-                                    } elseif ($lowestPlan->duration_months == 12) {
-                                        $period = '/thn';
-                                    } else {
-                                        $period = '/' . $lowestPlan->duration_months . ' bln';
-                                    }
+                    <div class="product-card-pricing">
+                        @php
+                            $lowestPlan = $product->subscriptionPlans->where('is_active', true)->sortBy('price')->first();
+                            
+                            if ($lowestPlan) {
+                                $rawPrice = (float)$lowestPlan->price;
+                                $planDiscount = (float)($lowestPlan->discount_percent ?? 0);
+                                if ($planDiscount > 0) {
+                                    $origPrice = $rawPrice;
+                                    $finalPrice = $origPrice * (1 - $planDiscount / 100);
+                                    $discount = $planDiscount;
+                                } else {
+                                    $finalPrice = $rawPrice;
+                                    $origPrice = $rawPrice * 2;
+                                    $discount = 50;
                                 }
-                            @endphp
-                            @if($origPrice > 0 || $finalPrice > 0)
-                                @if($discount > 0)
-                                    <div style="font-size:12px;color:var(--text-muted);text-decoration:line-through;margin-bottom:2px;">
-                                        Rp {{ number_format($origPrice, 0, ',', '.') }}
-                                    </div>
-                                    <div class="product-price">
-                                        Rp {{ number_format($finalPrice, 0, ',', '.') }}<span class="price-period">{{ $period }}</span>
-                                    </div>
-                                @else
-                                    <div class="product-price">
-                                        Rp {{ number_format($origPrice, 0, ',', '.') }}<span class="price-period">{{ $period }}</span>
-                                    </div>
-                                @endif
-                            @else
-                                <div style="font-size:13px;color:var(--text-muted);">Hubungi Kami</div>
-                            @endif
+                                $period = $lowestPlan->duration_months >= 999 ? ' / Lifetime' : ($lowestPlan->duration_months == 1 ? '/bulan' : '/' . $lowestPlan->duration_months . ' bln');
+                            } else {
+                                $base = (float)($product->base_price ?? 350000);
+                                $finalPrice = $base > 0 ? $base : 350000;
+                                $origPrice = $finalPrice * 2;
+                                $discount = 50;
+                                $period = '/bulan';
+                            }
+                            $savings = $origPrice - $finalPrice;
+                        @endphp
+
+                        @if($origPrice > 0 || $finalPrice > 0)
+                            <div class="product-pricing-anchor-line">
+                                <span class="product-pricing-old">Harga Normal: Rp {{ number_format($origPrice, 0, ',', '.') }}</span>
+                                <span class="badge-discount-save">HEMAT {{ number_format($discount, 0) }}%</span>
+                            </div>
+
+                            <div class="product-pricing-main">
+                                <span class="product-pricing-val">Rp {{ number_format($finalPrice, 0, ',', '.') }}</span>
+                                <span class="product-pricing-period">{{ $period }}</span>
+                            </div>
+
+                            <div class="product-pricing-savings">
+                                <i class="fa-solid fa-check-circle"></i>
+                                <span>Hemat Rp {{ number_format($savings, 0, ',', '.') }} setiap bulan</span>
+                            </div>
+
+                            <div class="product-pricing-urgency">
+                                <i class="fa-solid fa-bolt"></i> Harga promo terbatas
+                            </div>
+                        @else
+                            <div class="product-pricing-val" style="font-size: 15px; color: var(--text-muted);">Hubungi Sales</div>
+                        @endif
+
+                        <div style="margin-top: 14px;">
+                            <a href="{{ route('products.show', $product->slug) }}" class="btn-primary-glow" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 13.5px; font-weight: 700; border-radius: 10px;">
+                                Pilih Paket Ini <i class="fa-solid fa-arrow-right" style="font-size: 11px;"></i>
+                            </a>
                         </div>
-                        <a href="{{ route('products.show', $product->slug) }}" class="btn-primary-glow" style="padding:10px 18px;font-size:13px;border-radius:10px;display:inline-flex;align-items:center;gap:6px;">Detail <i class="fa-solid fa-arrow-right" style="font-size: 11px;"></i></a>
                     </div>
                 </div>
             </article>
