@@ -47,9 +47,8 @@ final class SubscriptionPlanController extends Controller
         SubscriptionPlan::create($validated);
 
         return redirect()
-            ->route('admin.products.edit', $product)
-            ->with('success', 'Pricing plan created successfully.')
-            ->withFragment('plans');
+            ->route('admin.products.plans.index', $product->id)
+            ->with('success', 'Pricing plan created successfully.');
     }
 
     /**
@@ -73,9 +72,8 @@ final class SubscriptionPlanController extends Controller
         $plan->update($validated);
 
         return redirect()
-            ->route('admin.products.edit', $product)
-            ->with('success', 'Pricing plan updated successfully.')
-            ->withFragment('plans');
+            ->route('admin.products.plans.index', $product->id)
+            ->with('success', 'Pricing plan "' . $plan->name . '" updated successfully.');
     }
 
     /**
@@ -83,12 +81,12 @@ final class SubscriptionPlanController extends Controller
      */
     public function destroy(Product $product, SubscriptionPlan $plan): RedirectResponse
     {
+        $planName = $plan->name;
         $plan->delete();
 
         return redirect()
-            ->route('admin.products.edit', $product)
-            ->with('success', 'Pricing plan deleted successfully.')
-            ->withFragment('plans');
+            ->route('admin.products.plans.index', $product->id)
+            ->with('success', 'Pricing plan "' . $planName . '" deleted successfully.');
     }
 
     /**
@@ -99,8 +97,7 @@ final class SubscriptionPlanController extends Controller
         $plan->update(['is_active' => ! $plan->is_active]);
 
         return redirect()
-            ->route('admin.products.edit', $product)
-            ->with('success', 'Plan status updated.')
-            ->withFragment('plans');
+            ->route('admin.products.plans.index', $product->id)
+            ->with('success', 'Plan status updated to ' . ($plan->is_active ? 'Active' : 'Inactive') . '.');
     }
 }
