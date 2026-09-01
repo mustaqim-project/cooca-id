@@ -2136,412 +2136,390 @@ body.landing-page {
 .markdown-body pre { background: #0f172a; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; }
 .markdown-body pre code { background: none; color: #e2e8f0; padding: 0; font-size: 14px; }
 .markdown-body blockquote { border-left: 4px solid var(--border); padding-left: 16px; color: var(--text-muted); font-style: italic; margin-left: 0; margin-bottom: 16px; background: var(--bg); padding-top: 8px; padding-bottom: 8px; border-radius: 0 8px 8px 0; }
-/* ── ULTRA-PREMIUM PSYCHOLOGICAL PRICING DESIGN SYSTEM ── */
+/* ── EXACT REFERENCE PRICING DESIGN SYSTEM (COOCA SAAS) ── */
 
-/* 1. PRODUCT CATALOG CARD PRICING BOX */
-.product-card-pricing-wrap {
-  margin-top: auto;
-  padding-top: 16px;
-  width: 100%;
-}
-
-.product-pricing-glass-card {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  backdrop-filter: blur(12px);
-  transition: all 0.25s ease;
-}
-[data-theme="light"] .product-pricing-glass-card {
-  background: rgba(241, 245, 249, 0.8);
-  border-color: rgba(15, 23, 42, 0.08);
-}
-.product-card:hover .product-pricing-glass-card {
-  border-color: rgba(99, 102, 241, 0.3);
-  background: rgba(15, 23, 42, 0.8);
-}
-
-.product-pricing-top-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-.product-anchor-text {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-.product-anchor-del {
-  text-decoration: line-through;
-  text-decoration-color: rgba(248, 113, 113, 0.8);
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.product-discount-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
-  color: #34D399;
-  border: 1px solid rgba(52, 211, 153, 0.35);
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 10.5px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  text-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
-}
-
-.product-price-hero-row {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  margin: 2px 0 6px;
-}
-.product-price-hero-row .price-val {
-  font-size: 26px;
-  font-weight: 900;
-  color: #FFFFFF;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  font-family: 'Outfit', 'Inter', sans-serif;
-}
-[data-theme="light"] .product-price-hero-row .price-val {
-  color: var(--text);
-}
-.product-price-hero-row .price-period {
-  font-size: 13px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.product-savings-line {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  color: #34D399;
-  font-weight: 600;
-  padding-top: 6px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.08);
-}
-[data-theme="light"] .product-savings-line {
-  border-top-color: rgba(15, 23, 42, 0.08);
-  color: #059669;
-}
-
-.btn-product-cta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 12px 18px;
-  background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
-  color: #FFFFFF !important;
-  font-size: 13.5px;
-  font-weight: 700;
-  border-radius: 12px;
-  text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.35);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+.cooca-pricing-wrapper {
   position: relative;
-  overflow: hidden;
-}
-.btn-product-cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(79, 70, 229, 0.5);
-  background: linear-gradient(135deg, #818CF8 0%, #6366F1 100%);
-}
-.btn-product-cta:active {
-  transform: translateY(0);
+  width: 100%;
 }
 
-
-/* 2. DEDICATED 3-TIER PRICING CARDS (HOME & DETAIL) */
-.pricing-cards-container {
+.cooca-pricing-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 28px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
   align-items: stretch;
+  margin-bottom: 36px;
 }
 
-.pricing-saas-card {
+@media (max-width: 1024px) {
+  .cooca-pricing-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+  }
+}
+
+/* Base Card */
+.cooca-card {
   position: relative;
-  background: rgba(17, 24, 39, 0.75);
+  background: #0B1120;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 36px 30px;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border-radius: 26px;
+  padding: 36px 28px 30px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-[data-theme="light"] .pricing-saas-card {
-  background: var(--surface);
-  border-color: var(--border);
-  box-shadow: var(--shadow-lg);
-}
-.pricing-saas-card:hover {
+.cooca-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4), 0 0 24px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
 }
 
-.pricing-saas-card.is-popular {
-  background: linear-gradient(180deg, rgba(30, 27, 75, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%);
-  border: 2px solid #6366F1;
-  box-shadow: 0 0 50px rgba(99, 102, 241, 0.25), 0 20px 40px rgba(0, 0, 0, 0.4);
+/* Color Themes for Cards */
+.cooca-card.theme-blue {
+  border-color: rgba(14, 165, 233, 0.25);
 }
-[data-theme="light"] .pricing-saas-card.is-popular {
-  background: linear-gradient(180deg, rgba(238, 242, 255, 0.9) 0%, #FFFFFF 100%);
-  border-color: var(--primary);
-  box-shadow: 0 16px 40px rgba(79, 70, 229, 0.18);
+.cooca-card.theme-blue:hover {
+  border-color: rgba(14, 165, 233, 0.5);
+  box-shadow: 0 20px 48px rgba(14, 165, 233, 0.15);
 }
 
-.pricing-featured-floating-pill {
+.cooca-card.theme-purple {
+  background: linear-gradient(180deg, #130B24 0%, #0A0D18 100%);
+  border: 2px solid #A855F7;
+  box-shadow: 0 0 35px rgba(168, 85, 247, 0.28), 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+.cooca-card.theme-purple:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 0 50px rgba(168, 85, 247, 0.45), 0 24px 50px rgba(0, 0, 0, 0.6);
+}
+
+.cooca-card.theme-green {
+  border-color: rgba(34, 197, 94, 0.25);
+}
+.cooca-card.theme-green:hover {
+  border-color: rgba(34, 197, 94, 0.5);
+  box-shadow: 0 20px 48px rgba(34, 197, 94, 0.15);
+}
+
+/* Diagonal Corner Sash Ribbon */
+.corner-ribbon-wrap {
   position: absolute;
-  top: -15px;
+  top: 0;
+  right: 0;
+  width: 140px;
+  height: 140px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+}
+.corner-ribbon {
+  position: absolute;
+  top: 24px;
+  right: -36px;
+  width: 150px;
+  padding: 6px 0;
+  text-align: center;
+  transform: rotate(45deg);
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+.corner-ribbon-blue {
+  background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+  color: #FFFFFF;
+  border-top: 1px dashed rgba(255, 255, 255, 0.5);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.5);
+}
+.corner-ribbon-gold {
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+  color: #000000;
+  font-weight: 900;
+  border-top: 1px dashed rgba(0, 0, 0, 0.3);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.3);
+}
+.corner-ribbon-green {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #FFFFFF;
+  border-top: 1px dashed rgba(255, 255, 255, 0.5);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.5);
+}
+
+/* Most Popular Floating Pill */
+.cooca-floating-badge {
+  position: absolute;
+  top: -16px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #06B6D4 100%);
+  background: linear-gradient(90deg, #9333EA 0%, #A855F7 40%, #06B6D4 100%);
   color: #FFFFFF;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 6px 18px;
   border-radius: 999px;
-  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.6);
   display: inline-flex;
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  z-index: 5;
+  z-index: 20;
 }
 
-.pricing-card-header {
-  margin-bottom: 24px;
-}
-
-.pricing-plan-badge {
+/* Card Header Components */
+.cooca-badge-duration {
   display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
   font-size: 11px;
   font-weight: 800;
-  text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #818CF8;
-  background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  padding: 4px 10px;
-  border-radius: 8px;
+  text-transform: uppercase;
   margin-bottom: 12px;
 }
-.pricing-saas-card.is-popular .pricing-plan-badge {
-  color: #A5B4FC;
-  background: rgba(99, 102, 241, 0.2);
-  border-color: rgba(99, 102, 241, 0.4);
+.badge-duration-blue {
+  background: rgba(14, 165, 233, 0.12);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+.badge-duration-purple {
+  background: rgba(168, 85, 247, 0.18);
+  color: #C084FC;
+  border: 1px solid rgba(192, 132, 252, 0.4);
+}
+.badge-duration-green {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ADE80;
+  border: 1px solid rgba(74, 222, 128, 0.35);
 }
 
-.pricing-plan-title {
+.cooca-tier-title {
   font-size: 26px;
   font-weight: 800;
-  color: var(--text);
-  margin-bottom: 8px;
+  color: #FFFFFF;
+  margin: 0 0 10px;
   letter-spacing: -0.02em;
 }
-.pricing-plan-desc {
-  font-size: 14px;
-  color: var(--text-muted);
-  line-height: 1.6;
-}
 
-/* SLEEK PRICE BLOCK */
-.pricing-block-unified {
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  padding: 20px;
-  margin-bottom: 28px;
-  position: relative;
-}
-[data-theme="light"] .pricing-block-unified {
-  background: rgba(241, 245, 249, 0.7);
-  border-color: rgba(15, 23, 42, 0.08);
-}
-.pricing-saas-card.is-popular .pricing-block-unified {
-  background: rgba(15, 23, 42, 0.7);
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.08);
-}
-
-.pricing-anchor-row {
+.cooca-normal-price-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-.pricing-anchor-row .anchor-label {
-  font-size: 13px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-.pricing-anchor-row .anchor-del {
-  text-decoration: line-through;
-  text-decoration-color: rgba(248, 113, 113, 0.8);
-  color: var(--text-muted);
-  font-weight: 600;
+  gap: 8px;
   font-size: 14px;
+  color: #94A3B8;
+  margin-bottom: 16px;
+}
+.cooca-normal-del {
+  color: #E2E8F0;
+  text-decoration: line-through;
+  text-decoration-color: #EF4444;
+  text-decoration-thickness: 2px;
+  font-weight: 700;
+  font-size: 14.5px;
 }
 
-.pricing-hero-amount-wrap {
+/* Main Price Container */
+.cooca-hero-price-box {
+  position: relative;
+  margin-bottom: 14px;
+}
+.cooca-card.theme-purple .cooca-hero-price-box {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.35) 0%, rgba(67, 56, 202, 0.25) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 18px;
+  padding: 16px 18px 12px;
+}
+
+.cooca-price-crown {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  color: #FBBF24;
+  font-size: 22px;
+  filter: drop-shadow(0 2px 8px rgba(251, 191, 36, 0.5));
+}
+
+.cooca-main-price-line {
   display: flex;
   align-items: baseline;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: 4px;
+  margin-bottom: 12px;
 }
-.pricing-hero-amount-wrap .currency {
-  font-size: 22px;
-  font-weight: 700;
-  color: #818CF8;
+.cooca-main-price-line .currency {
+  font-size: 18px;
+  font-weight: 800;
+  color: #E2E8F0;
+  margin-right: 2px;
 }
-.pricing-hero-amount-wrap .amount {
-  font-size: clamp(34px, 4vw, 42px);
+.cooca-main-price-line .amount {
+  font-size: clamp(34px, 3.8vw, 44px);
   font-weight: 900;
   color: #FFFFFF;
   letter-spacing: -0.03em;
   line-height: 1;
   font-family: 'Outfit', 'Inter', sans-serif;
 }
-[data-theme="light"] .pricing-hero-amount-wrap .amount {
-  color: var(--text);
-}
-.pricing-hero-amount-wrap .period {
-  font-size: 15px;
-  color: var(--text-muted);
+.cooca-main-price-line .period {
+  font-size: 14px;
+  color: #94A3B8;
   font-weight: 600;
+  margin-left: 4px;
 }
 
-.pricing-savings-chip {
+/* Savings Box */
+.cooca-savings-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+.savings-box-blue {
+  background: rgba(14, 165, 233, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38BDF8;
+}
+.savings-box-purple {
+  background: rgba(168, 85, 247, 0.16);
+  border: 1px solid rgba(192, 132, 252, 0.4);
+  color: #E879F9;
+}
+.savings-box-green {
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  color: #4ADE80;
+}
+.cooca-savings-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.cooca-savings-check {
+  font-size: 14px;
+  color: #34D399;
+}
+
+/* Urgency Tag */
+.cooca-urgency-row {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(16, 185, 129, 0.12);
-  color: #34D399;
-  border: 1px solid rgba(52, 211, 153, 0.25);
-  border-radius: 8px;
-  padding: 6px 10px;
   font-size: 12.5px;
+  color: #F59E0B;
   font-weight: 700;
-  margin-bottom: 6px;
-}
-[data-theme="light"] .pricing-savings-chip {
-  color: #059669;
-  background: rgba(16, 185, 129, 0.1);
+  margin-bottom: 22px;
 }
 
-.pricing-urgency-note {
-  font-size: 11.5px;
-  color: #FBBF24;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-/* FEATURES LIST */
-.pricing-features-list {
+/* Checklist Features */
+.cooca-feature-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 32px;
+  margin: 0 0 28px;
   display: flex;
   flex-direction: column;
   gap: 14px;
   flex: 1;
 }
-.pricing-features-list li {
+.cooca-feature-list li {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
   font-size: 14px;
-  color: var(--text);
-  line-height: 1.5;
+  color: #E2E8F0;
+  font-weight: 500;
 }
-.pricing-features-list li i {
-  color: #34D399;
+.cooca-feature-list li i.icon-blue {
+  color: #38BDF8;
   font-size: 16px;
-  margin-top: 2px;
-  flex-shrink: 0;
+}
+.cooca-feature-list li i.icon-purple {
+  color: #C084FC;
+  font-size: 16px;
+}
+.cooca-feature-list li i.icon-green {
+  color: #4ADE80;
+  font-size: 16px;
 }
 
-/* BUTTONS */
-.btn-pricing-featured {
+/* Buttons */
+.cooca-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 14px 20px;
-  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
-  color: #FFFFFF !important;
+  height: 50px;
+  border-radius: 14px;
   font-size: 15px;
-  font-weight: 700;
-  border-radius: 14px;
+  font-weight: 800;
   text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
   transition: all 0.25s ease;
+  cursor: pointer;
 }
-.btn-pricing-featured:hover {
+.cooca-btn-blue {
+  background: rgba(14, 165, 233, 0.05);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38BDF8 !important;
+}
+.cooca-btn-blue:hover {
+  background: rgba(14, 165, 233, 0.15);
+  border-color: #38BDF8;
   transform: translateY(-2px);
-  box-shadow: 0 10px 32px rgba(99, 102, 241, 0.6);
-  background: linear-gradient(135deg, #818CF8 0%, #7C3AED 100%);
 }
 
-.btn-pricing-regular {
+.cooca-btn-purple-glow {
+  background: linear-gradient(90deg, #7C3AED 0%, #C026D3 100%);
+  color: #FFFFFF !important;
+  border: none;
+  box-shadow: 0 6px 28px rgba(192, 38, 211, 0.55);
+}
+.cooca-btn-purple-glow:hover {
+  background: linear-gradient(90deg, #9333EA 0%, #D946EF 100%);
+  box-shadow: 0 8px 36px rgba(192, 38, 211, 0.75);
+  transform: translateY(-2px);
+}
+
+.cooca-btn-green {
+  background: rgba(34, 197, 94, 0.05);
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  color: #4ADE80 !important;
+}
+.cooca-btn-green:hover {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: #4ADE80;
+  transform: translateY(-2px);
+}
+
+/* Bottom Trust Bar */
+.cooca-trust-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 14px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #FFFFFF !important;
-  font-size: 14.5px;
+  flex-wrap: wrap;
+  gap: 24px 36px;
+  padding: 16px 24px;
+  font-size: 13.5px;
   font-weight: 600;
-  border-radius: 14px;
-  text-decoration: none;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: all 0.2s ease;
+  color: #94A3B8;
 }
-[data-theme="light"] .btn-pricing-regular {
-  background: var(--bg-secondary);
-  color: var(--text) !important;
-  border-color: var(--border);
+.cooca-trust-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
-.btn-pricing-regular:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-2px);
+.cooca-trust-item i {
+  color: #38BDF8;
+  font-size: 16px;
 }
 
-@media (max-width: 768px) {
-  .pricing-saas-card {
-    padding: 28px 20px;
-  }
-  .pricing-hero-amount-wrap .amount {
-    font-size: 32px;
-  }
-}
 
 
