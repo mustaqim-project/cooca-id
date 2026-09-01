@@ -1,13 +1,14 @@
 @extends('layouts.public')
 
-@section('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis')
-@section('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID.
-    Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.')
-@section('keywords', 'cooca id, software bisnis indonesia, move faster decide better, software manajemen operasional,
-    platform otomatisasi bisnis, software pendukung keputusan')
+@section('title', 'Software ERP Indonesia untuk Operasional Bisnis | COOCA.ID')
+
+@section('description', 'COOCA.ID adalah software ERP Indonesia untuk mengelola operasional, data, dan keputusan bisnis
+    dalam satu sistem terpadu. Mulai digitalisasi bisnis Anda.')
+
+@section('keywords', 'software ERP Indonesia, sistem ERP, software manajemen bisnis, software operasional bisnis,
+    digitalisasi bisnis, COOCA.ID')
 
     @push('styles')
-        {{-- Font Awesome 6 untuk mengganti emoji --}}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @endpush
 

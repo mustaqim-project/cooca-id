@@ -3,13 +3,31 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- SEO -->
+
+    {{-- ============================================================
+        SEO, Branding, Contact, Social, dan Default Metadata
+    ============================================================ --}}
     @php
+        /*
+        |--------------------------------------------------------------------------
+        | Global Website Settings
+        |--------------------------------------------------------------------------
+        */
         $siteName = setting('site.name', 'COOCA.ID');
 
+        $siteUrl = rtrim(url('/'), '/');
+
+        $locale = str_replace('_', '-', app()->getLocale());
+
+        $ogLocale = str_replace('-', '_', $locale);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Logo dan Favicon
+        |--------------------------------------------------------------------------
+        */
         $favicon = setting('site.favicon') ? asset(setting('site.favicon')) : asset('favicon.svg');
 
         $logoLight = setting('site.logo_light')
@@ -24,205 +42,344 @@
                 ? asset(setting('site.logo'))
                 : null);
 
-        $waNumber = setting('contact.whatsapp', '6282134566667');
-        $waCleanNumber = preg_replace('/[^0-9]/', '', $waNumber);
-        $waLink = setting('contact.whatsapp_link') ?: 'https://wa.me/' . ($waCleanNumber ?: '6282134566667');
+        $logoUrl = $logoLight ?? ($logoDark ?? asset('favicon.svg'));
 
-        $emailSupport = setting('contact.email', 'support@cooca.id');
+        /*
+        |--------------------------------------------------------------------------
+        | Contact Settings
+        |--------------------------------------------------------------------------
+        */
+        $waNumber = setting('contact.whatsapp', '');
+
+        $waCleanNumber = preg_replace('/[^0-9]/', '', $waNumber);
+
+        $waLink = setting('contact.whatsapp_link') ?: (!empty($waCleanNumber) ? 'https://wa.me/' . $waCleanNumber : '');
+
+        $emailSupport = setting('contact.email', '');
 
         $contactAddress = setting('contact.address', 'Jl. Jend. Sudirman No. 52, Jakarta Selatan, DKI Jakarta 12920');
 
-        $footerDesc = setting(
-            'footer.description',
-            'Platform ERP enterprise untuk UMKM, Klinik, Bengkel, Restoran, Retail dan semua skala bisnis. Cloud native, modular, dan selalu siap.',
+        /*
+        |--------------------------------------------------------------------------
+        | Default SEO Metadata
+        |--------------------------------------------------------------------------
+        */
+        $defaultTitle = 'Software ERP Indonesia untuk Operasional Bisnis | COOCA.ID';
+
+        $defaultDescription =
+            'COOCA.ID adalah software ERP Indonesia untuk mengelola operasional, data, dan keputusan bisnis dalam satu sistem terpadu.';
+
+        $metaTitle = trim(View::yieldContent('title', $defaultTitle));
+
+        $metaDescription = trim(View::yieldContent('description', $defaultDescription));
+
+        $robots = trim(View::yieldContent('robots', 'index, follow'));
+
+        /*
+        |--------------------------------------------------------------------------
+        | Canonical URL
+        |--------------------------------------------------------------------------
+        | url()->current() tidak menyertakan query string seperti:
+        | ?utm_source=google, ?gclid=..., atau ?fbclid=...
+        |
+        | Untuk halaman penting, override dengan:
+        | @section('canonical', route('nama.route'))
+        |--------------------------------------------------------------------------
+        */
+        $canonicalUrl = trim(View::yieldContent('canonical', url()->current()));
+
+        /*
+        |--------------------------------------------------------------------------
+        | Open Graph dan Twitter Metadata
+        |--------------------------------------------------------------------------
+        */
+        $defaultOgImage = asset('assets/image/cooca.png');
+
+        $ogType = trim(View::yieldContent('og_type', 'website'));
+
+        $ogTitle = trim(View::yieldContent('og_title', $metaTitle));
+
+        $ogDescription = trim(View::yieldContent('og_description', $metaDescription));
+
+        $ogImage = trim(View::yieldContent('og_image', $defaultOgImage));
+
+        $ogImageWidth = trim(View::yieldContent('og_image_width', '1200'));
+
+        $ogImageHeight = trim(View::yieldContent('og_image_height', '630'));
+
+        $twitterHandle = trim(setting('social.twitter_handle', ''));
+
+        /*
+        |--------------------------------------------------------------------------
+        | Social Media URLs
+        |--------------------------------------------------------------------------
+        | Hanya masukkan URL valid ke schema sameAs.
+        | Nilai "#" atau URL kosong otomatis diabaikan.
+        |--------------------------------------------------------------------------
+        */
+        $socialInsta = setting('social.instagram', '');
+        $socialFb = setting('social.facebook', '');
+        $socialTwitter = setting('social.twitter', '');
+        $socialYt = setting('social.youtube', '');
+        $socialGithub = setting('social.github', '');
+        $socialLinkedin = setting('social.linkedin', '');
+
+        $socialUrls = array_values(
+            array_filter(
+                [$socialInsta, $socialFb, $socialTwitter, $socialYt, $socialGithub, $socialLinkedin],
+                function ($url) {
+                    return !empty($url) && filter_var($url, FILTER_VALIDATE_URL);
+                },
+            ),
         );
 
-        $socialInsta = setting('social.instagram', '#');
-        $socialFb = setting('social.facebook', '#');
-        $socialTwitter = setting('social.twitter', '#');
-        $socialYt = setting('social.youtube', '#');
-        $socialGithub = setting('social.github', '#');
-        $socialLinkedin = setting('social.linkedin', '#');
+        /*
+        |--------------------------------------------------------------------------
+        | Organization JSON-LD Schema
+        |--------------------------------------------------------------------------
+        */
+        $organizationSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            '@id' => $siteUrl . '#organization',
+            'name' => $siteName,
+            'legalName' => $siteName,
+            'url' => $siteUrl,
+            'logo' => $logoUrl,
+            'slogan' => 'Move Faster. Decide Better.',
+            'description' =>
+                'COOCA.ID adalah platform software ERP Indonesia untuk mengelola operasional, mengotomatisasi proses bisnis, dan mendukung keputusan berbasis data.',
+            'foundingLocation' => [
+                '@type' => 'Place',
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'addressCountry' => 'ID',
+                ],
+            ],
+        ];
 
-        // Open Graph Image
-        $ogImage = asset('/assets/image/cooca.png');
+        if (!empty($waCleanNumber)) {
+            $organizationSchema['contactPoint'] = [
+                '@type' => 'ContactPoint',
+                'telephone' => '+' . $waCleanNumber,
+                'contactType' => 'customer support',
+                'areaServed' => 'ID',
+                'availableLanguage' => ['Indonesian', 'English'],
+            ];
+        }
+
+        if (!empty($emailSupport) && filter_var($emailSupport, FILTER_VALIDATE_EMAIL)) {
+            $organizationSchema['email'] = $emailSupport;
+        }
+
+        if (!empty($socialUrls)) {
+            $organizationSchema['sameAs'] = $socialUrls;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Website JSON-LD Schema
+        |--------------------------------------------------------------------------
+        */
+        $websiteSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'WebSite',
+            '@id' => $siteUrl . '#website',
+            'name' => $siteName,
+            'url' => $siteUrl,
+            'description' =>
+                'Platform software ERP dan manajemen bisnis terpadu untuk membantu perusahaan mengelola operasional, data, dan pertumbuhan bisnis.',
+            'inLanguage' => $locale,
+            'publisher' => [
+                '@id' => $siteUrl . '#organization',
+            ],
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
+        | SearchAction
+        |--------------------------------------------------------------------------
+        | Aktifkan hanya bila URL /blog?search=keyword benar-benar
+        | menghasilkan halaman pencarian blog yang berfungsi.
+        |--------------------------------------------------------------------------
+        */
+        $blogSearchEnabled = true;
+
+        if ($blogSearchEnabled) {
+            $websiteSchema['potentialAction'] = [
+                '@type' => 'SearchAction',
+                'target' => [
+                    '@type' => 'EntryPoint',
+                    'urlTemplate' => $siteUrl . '/blog?search={search_term_string}',
+                ],
+                'query-input' => 'required name=search_term_string',
+            ];
+        }
     @endphp
 
-    <!-- ── Primary Meta ────────────────────────────────────────────────── -->
-    <title>
-        @yield('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis')
-    </title>
+    {{-- ============================================================
+        Primary SEO Metadata
+    ============================================================ --}}
+    <title>{{ $metaTitle }}</title>
 
-    <meta name="description" content="@yield('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID. Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.')">
-
-    <meta name="keywords" content="@yield('keywords', 'cooca id, software bisnis indonesia, move faster decide better, software manajemen operasional, platform otomatisasi bisnis, software pendukung keputusan')">
-
+    <meta name="description" content="{{ $metaDescription }}">
     <meta name="author" content="{{ $siteName }}">
 
-    <meta name="robots" content="@yield('robots', 'index, follow')">
+    <meta name="robots" content="{{ $robots }}">
+    <meta name="googlebot" content="{{ $robots }}">
 
-    <meta name="googlebot" content="@yield('robots', 'index, follow')">
+    <link rel="canonical" href="{{ $canonicalUrl }}">
 
-    <link rel="canonical" href="@yield('canonical', url()->current())">
-
+    {{-- DMCA Verification --}}
     <meta name="dmca-site-verification" content="R3Q5WVUxSFVWZmlsc3kxRExzSHBCZz090">
 
-
-    <!-- ── Open Graph / Facebook ────────────────────────────────────────── -->
-
-    <meta property="og:type" content="@yield('og_type', 'website')">
-
+    {{-- ============================================================
+        Open Graph Metadata
+    ============================================================ --}}
+    <meta property="og:type" content="{{ $ogType }}">
     <meta property="og:site_name" content="{{ $siteName }}">
-
-    <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}">
-
-    <meta property="og:url" content="{{ url()->current() }}">
-
-    <meta property="og:title" content="@yield('og_title', View::hasSection('og_title') ? View::getSection('og_title') : View::getSection('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis'))">
-
-    <meta property="og:description" content="@yield('og_description', View::hasSection('og_description') ? View::getSection('og_description') : View::getSection('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID. Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.'))">
-
+    <meta property="og:locale" content="{{ $ogLocale }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
+    <meta property="og:title" content="{{ $ogTitle }}">
+    <meta property="og:description" content="{{ $ogDescription }}">
     <meta property="og:image" content="{{ $ogImage }}">
+    <meta property="og:image:secure_url" content="{{ $ogImage }}">
+    <meta property="og:image:width" content="{{ $ogImageWidth }}">
+    <meta property="og:image:height" content="{{ $ogImageHeight }}">
+    <meta property="og:image:alt" content="{{ $ogTitle }}">
 
-    <meta property="og:image:width" content="@yield('og_image_width', '1200')">
-
-    <meta property="og:image:height" content="@yield('og_image_height', '630')">
-
-    <meta property="og:image:alt" content="@yield('og_title', View::hasSection('og_title') ? View::getSection('og_title') : View::getSection('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis'))">
-
-
-    <!-- ── Twitter Card ─────────────────────────────────────────────────── -->
-
+    {{-- ============================================================
+        Twitter / X Card Metadata
+    ============================================================ --}}
     <meta name="twitter:card" content="summary_large_image">
-
-    <meta name="twitter:site" content="@coocaid">
-
-    <meta name="twitter:title" content="@yield('og_title', View::hasSection('og_title') ? View::getSection('og_title') : View::getSection('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis'))">
-
-    <meta name="twitter:description" content="@yield('og_description', View::hasSection('og_description') ? View::getSection('og_description') : View::getSection('description', 'Eksekusi operasional lebih cepat dan ambil keputusan bisnis lebih tepat dengan COOCA.ID. Software manajemen bisnis terpadu untuk efisiensi total usaha Anda.'))">
-
+    <meta name="twitter:title" content="{{ $ogTitle }}">
+    <meta name="twitter:description" content="{{ $ogDescription }}">
     <meta name="twitter:image" content="{{ $ogImage }}">
+    <meta name="twitter:image:alt" content="{{ $ogTitle }}">
 
+    @if (!empty($twitterHandle) && Str::startsWith($twitterHandle, '@'))
+        <meta name="twitter:site" content="{{ $twitterHandle }}">
+    @endif
 
-    <!-- ── Favicon ──────────────────────────────────────────────────────── -->
-
+    {{-- ============================================================
+        Favicon dan App Icon
+    ============================================================ --}}
     <link rel="icon" type="image/svg+xml" href="{{ $favicon }}">
+    <link rel="alternate icon" type="image/png" href="{{ asset('favicon.png') }}">
 
-    <link rel="apple-touch-icon" href="{{ $favicon }}">
-    <!-- ── JSON-LD: WebSite Schema ──────────────────────────────────────── -->
+    {{-- Buat file publik: public/apple-touch-icon.png berukuran 180x180 px --}}
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+
+    {{-- ============================================================
+        Structured Data / JSON-LD
+    ============================================================ --}}
     <script type="application/ld+json">
-    {
-        "@@context": "https://schema.org",
-        "@@type": "WebSite",
-        "name": "{{ e($siteName) }}",
-        "url": "{{ url('/') }}",
-        "description": "Platform software manajemen dan otomatisasi bisnis terpadu. Move Faster. Decide Better.",
-        "potentialAction": {
-            "@@type": "SearchAction",
-            "target": {
-                "@@type": "EntryPoint",
-                "urlTemplate": "{{ url('/blog') }}?search={search_term_string}"
-            },
-            "query-input": "required name=search_term_string"
-        }
-    }
+        @json($websiteSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
     </script>
 
-    <!-- ── JSON-LD: Organization Schema (Optimized for AI & GEO) ───── -->
     <script type="application/ld+json">
-    {
-        "@@context": "https://schema.org",
-        "@@type": "Organization",
-        "name": "{{ e($siteName) }}",
-        "legalName": "{{ e($siteName) }}",
-        "url": "{{ url('/') }}",
-        "logo": "{{ e($logoLight ?? $logoDark ?? asset('favicon.svg')) }}",
-        "slogan": "Move Faster. Decide Better.",
-        "description": "COOCA.ID adalah platform software manajemen bisnis terpadu di Indonesia yang menyediakan solusi otomatisasi operasional dan analitik data real-time.",
-        "foundingLocation": {
-            "@@type": "Place",
-            "addressCountry": "ID"
-        },
-        "contactPoint": {
-            "@@type": "ContactPoint",
-            "telephone": "+{{ e($waCleanNumber) }}",
-            "contactType": "customer support",
-            "areaServed": "ID",
-            "availableLanguage": "Indonesian"
-        },
-        "sameAs": [
-            "https://www.instagram.com/cooca.id",
-            "https://www.linkedin.com/company/cooca-id"
-        ]
-    }
+        @json($organizationSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
     </script>
 
-    <!-- ── Consent-Aware Google Analytics (GA4) ────────────────────────── -->
+    {{-- Schema tambahan khusus per halaman:
+         Article, BlogPosting, BreadcrumbList, FAQPage, SoftwareApplication, dll.
+    --}}
+    @stack('seo')
+
+    {{-- ============================================================
+        Consent-Aware Google Analytics 4
+    ============================================================ --}}
     <script>
         window.gaLoaded = false;
 
         function loadAnalyticsIfConsented() {
-            var consent = localStorage.getItem('cooca_cookie_consent');
-            if (consent === 'all' && !window.gaLoaded) {
-                window.gaLoaded = true;
-                var script = document.createElement('script');
-                script.async = true;
-                script.src = 'https://www.googletagmanager.com/gtag/js?id=G-HZSN9QHGN1';
-                document.head.appendChild(script);
+            const consent = localStorage.getItem('cooca_cookie_consent');
 
-                window.dataLayer = window.dataLayer || [];
-
-                function gtag() {
-                    dataLayer.push(arguments);
-                }
-                window.gtag = gtag;
-                gtag('js', new Date());
-                gtag('config', 'G-HZSN9QHGN1', {
-                    'anonymize_ip': true,
-                    'cookie_flags': 'SameSite=None;Secure'
-                });
+            if (consent !== 'all' || window.gaLoaded) {
+                return;
             }
+
+            window.gaLoaded = true;
+
+            const script = document.createElement('script');
+
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-HZSN9QHGN1';
+
+            document.head.appendChild(script);
+
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                window.dataLayer.push(arguments);
+            }
+
+            window.gtag = gtag;
+
+            window.gtag('js', new Date());
+
+            window.gtag('config', 'G-HZSN9QHGN1', {
+                anonymize_ip: true,
+                cookie_flags: 'SameSite=None;Secure'
+            });
         }
+
         loadAnalyticsIfConsented();
     </script>
 
-    <!-- ── Performance: DNS prefetch / Preconnect ───────────────────────── -->
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-    <link rel="dns-prefetch" href="https://www.google-analytics.com">
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    {{-- ============================================================
+        Performance: DNS Prefetch dan Preconnect
+    ============================================================ --}}
+    <link rel="dns-prefetch" href="//www.googletagmanager.com">
+    <link rel="dns-prefetch" href="//www.google-analytics.com">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- ── Fonts (non-blocking) ─────────────────────────────────────────── -->
+    {{-- ============================================================
+        Google Fonts
+    ============================================================ --}}
     <link rel="preload" as="style"
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap">
+
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap"
         media="print" onload="this.media='all'">
+
     <noscript>
         <link rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap">
     </noscript>
 
-    <!-- ── Icons (non-blocking) ─────────────────────────────────────────── -->
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        as="style">
+    {{-- ============================================================
+        Font Awesome Icons
+    ============================================================ --}}
+    <link rel="preload" as="style"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         media="print" onload="this.media='all'">
+
     <noscript>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     </noscript>
 
-    <!-- ── App CSS ──────────────────────────────────────────────────────── -->
+    {{-- ============================================================
+        Application CSS
+    ============================================================ --}}
     <link rel="stylesheet"
         href="{{ asset('css/landing.css') }}?v={{ file_exists(public_path('css/landing.css')) ? filemtime(public_path('css/landing.css')) : time() }}">
 
-    <!-- ── SweetAlert2 (deferred) ───────────────────────────────────────── -->
+    {{-- ============================================================
+        Third-Party JavaScript
+    ============================================================ --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 
+    {{-- Styles khusus per halaman --}}
     @stack('styles')
 </head>
 
