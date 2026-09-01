@@ -133,7 +133,7 @@
                                 </div>
                             </div>
                         @endif
-                        <div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);padding:4px 10px;border-radius:100px;font-size:12px;font-weight:700;color:#f59e0b;">
+                        <div style="position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);padding:4px 10px;border-radius:100px;font-size:12px;font-weight:700;color:#f59e0b;z-index:5;">
                             <i class="fa-solid fa-star"></i> 4.9
                         </div>
                         @if($product->category)
