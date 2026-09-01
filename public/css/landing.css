@@ -2387,26 +2387,26 @@ body.landing-page {
 .markdown-body pre { background: #0f172a; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; }
 .markdown-body pre code { background: none; color: #e2e8f0; padding: 0; font-size: 14px; }
 .markdown-body blockquote { border-left: 4px solid var(--border); padding-left: 16px; color: var(--text-muted); font-style: italic; margin-left: 0; margin-bottom: 16px; background: var(--bg); padding-top: 8px; padding-bottom: 8px; border-radius: 0 8px 8px 0; }
-/* ── COOCA SAAS PRICING DESIGN SYSTEM (ELEGANT & COHESIVE DARK SAAS) ── */
+/* ── COOCA SAAS PRICING DESIGN SYSTEM (100% MOCKUP MATCH — DUAL THEME DARK & LIGHT) ── */
 
 .cooca-pricing-grid {
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
   gap: 24px !important;
-  align-items: start !important;
+  align-items: stretch !important;
   margin-bottom: 36px !important;
   width: 100% !important;
 }
 @media (max-width: 1024px) {
   .cooca-pricing-grid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
-    gap: 24px !important;
+    gap: 28px !important;
   }
 }
 @media (max-width: 640px) {
   .cooca-pricing-grid {
     grid-template-columns: 1fr !important;
-    gap: 32px !important;
+    gap: 36px !important;
   }
 }
 
@@ -2420,40 +2420,81 @@ body.landing-page {
   display: flex !important;
   flex-direction: column !important;
   overflow: visible !important;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45) !important;
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
 }
 .cooca-card:hover {
-  transform: translateY(-5px) !important;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6) !important;
+  transform: translateY(-6px) !important;
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.6) !important;
 }
 
-/* Side Cards (Clean & Refined) */
-.cooca-card.theme-blue,
-.cooca-card.theme-green,
-.cooca-card.theme-side {
-  border-color: rgba(255, 255, 255, 0.08) !important;
+/* Light Mode Base Card */
+[data-theme="light"] .cooca-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
-.cooca-card.theme-blue:hover,
-.cooca-card.theme-green:hover,
-.cooca-card.theme-side:hover {
-  border-color: rgba(99, 102, 241, 0.35) !important;
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55) !important;
+[data-theme="light"] .cooca-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.12) !important;
 }
 
-/* Center Featured Card (Subtle Indigo Glow - Hero Focus) */
+/* 1. Theme Blue (Left Tier) */
+.cooca-card.theme-blue {
+  border-color: rgba(14, 165, 233, 0.3) !important;
+}
+.cooca-card.theme-blue:hover {
+  border-color: rgba(14, 165, 233, 0.6) !important;
+  box-shadow: 0 20px 52px rgba(14, 165, 233, 0.18) !important;
+}
+[data-theme="light"] .cooca-card.theme-blue {
+  border-color: #BAE6FD !important;
+}
+[data-theme="light"] .cooca-card.theme-blue:hover {
+  border-color: #0284C7 !important;
+  box-shadow: 0 20px 48px rgba(2, 132, 199, 0.15) !important;
+}
+
+/* 2. Theme Purple / Featured (Center Tier - Hero Focus) */
 .cooca-card.theme-purple,
 .cooca-card.theme-featured {
-  background: linear-gradient(180deg, #101426 0%, #0B1120 100%) !important;
-  border: 2px solid #6366F1 !important;
-  box-shadow: 0 0 35px rgba(99, 102, 241, 0.22), 0 18px 44px rgba(0, 0, 0, 0.55) !important;
+  background: linear-gradient(180deg, #130B24 0%, #0A0D18 100%) !important;
+  border: 2px solid #A855F7 !important;
+  box-shadow: 0 0 35px rgba(168, 85, 247, 0.32), 0 18px 44px rgba(0, 0, 0, 0.55) !important;
   padding-top: 56px !important;
 }
 .cooca-card.theme-purple:hover,
 .cooca-card.theme-featured:hover {
   transform: translateY(-8px) !important;
-  border-color: #818CF8 !important;
-  box-shadow: 0 0 45px rgba(99, 102, 241, 0.35), 0 24px 52px rgba(0, 0, 0, 0.65) !important;
+  border-color: #C084FC !important;
+  box-shadow: 0 0 55px rgba(168, 85, 247, 0.48), 0 26px 56px rgba(0, 0, 0, 0.65) !important;
+}
+[data-theme="light"] .cooca-card.theme-purple,
+[data-theme="light"] .cooca-card.theme-featured {
+  background: linear-gradient(180deg, #FAF5FF 0%, #FFFFFF 100%) !important;
+  border: 2px solid #8B5CF6 !important;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.22), 0 14px 36px rgba(0, 0, 0, 0.08) !important;
+}
+[data-theme="light"] .cooca-card.theme-purple:hover,
+[data-theme="light"] .cooca-card.theme-featured:hover {
+  border-color: #7C3AED !important;
+  box-shadow: 0 0 45px rgba(139, 92, 246, 0.35), 0 20px 48px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* 3. Theme Green (Right Tier) */
+.cooca-card.theme-green {
+  border-color: rgba(34, 197, 94, 0.3) !important;
+}
+.cooca-card.theme-green:hover {
+  border-color: rgba(34, 197, 94, 0.6) !important;
+  box-shadow: 0 20px 52px rgba(34, 197, 94, 0.18) !important;
+}
+[data-theme="light"] .cooca-card.theme-green {
+  border-color: #BBF7D0 !important;
+}
+[data-theme="light"] .cooca-card.theme-green:hover {
+  border-color: #16A34A !important;
+  box-shadow: 0 20px 48px rgba(22, 163, 74, 0.15) !important;
 }
 
 /* Diagonal Corner Sash Ribbon */
@@ -2477,26 +2518,30 @@ body.landing-page {
   text-align: center !important;
   transform: rotate(45deg) !important;
   font-size: 10.5px !important;
-  font-weight: 800 !important;
-  line-height: 1.3 !important;
+  font-weight: 900 !important;
+  line-height: 1.25 !important;
   letter-spacing: 0.04em !important;
   text-transform: uppercase !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
 }
-.corner-ribbon-blue,
-.corner-ribbon-green,
-.corner-ribbon-muted {
-  background: #1E293B !important;
-  color: #E2E8F0 !important;
-  border-top: 1px dashed rgba(255, 255, 255, 0.25) !important;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.25) !important;
+.corner-ribbon-blue {
+  background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+  color: #FFFFFF !important;
+  border-top: 1px dashed rgba(255, 255, 255, 0.6) !important;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.6) !important;
 }
 .corner-ribbon-gold {
-  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%) !important;
   color: #000000 !important;
   font-weight: 900 !important;
   border-top: 1px dashed rgba(0, 0, 0, 0.3) !important;
   border-bottom: 1px dashed rgba(0, 0, 0, 0.3) !important;
+}
+.corner-ribbon-green {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  color: #FFFFFF !important;
+  border-top: 1px dashed rgba(255, 255, 255, 0.6) !important;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.6) !important;
 }
 
 /* Most Popular Floating Pill Badge */
@@ -2505,7 +2550,7 @@ body.landing-page {
   top: -18px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  background: linear-gradient(90deg, #4F46E5 0%, #7C3AED 100%) !important;
+  background: linear-gradient(90deg, #9333EA 0%, #A855F7 45%, #06B6D4 100%) !important;
   color: #FFFFFF !important;
   font-size: 11px !important;
   font-weight: 800 !important;
@@ -2513,7 +2558,7 @@ body.landing-page {
   text-transform: uppercase !important;
   padding: 6px 20px !important;
   border-radius: 999px !important;
-  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.5) !important;
+  box-shadow: 0 4px 22px rgba(168, 85, 247, 0.65) !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
@@ -2531,34 +2576,51 @@ body.landing-page {
   letter-spacing: 0.08em !important;
   text-transform: uppercase !important;
   margin-bottom: 14px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  color: #94A3B8 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 .badge-duration-blue {
-  background: rgba(255, 255, 255, 0.05) !important;
-  color: #CBD5E1 !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(14, 165, 233, 0.12) !important;
+  color: #38BDF8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.38) !important;
 }
 .badge-duration-purple {
-  background: rgba(99, 102, 241, 0.15) !important;
-  color: #C7D2FE !important;
-  border-color: rgba(99, 102, 241, 0.35) !important;
+  background: rgba(168, 85, 247, 0.18) !important;
+  color: #C084FC !important;
+  border: 1px solid rgba(192, 132, 252, 0.42) !important;
 }
 .badge-duration-green {
-  background: rgba(255, 255, 255, 0.05) !important;
-  color: #CBD5E1 !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(34, 197, 94, 0.12) !important;
+  color: #4ADE80 !important;
+  border: 1px solid rgba(74, 222, 128, 0.38) !important;
+}
+
+/* Light Mode Duration Badges */
+[data-theme="light"] .badge-duration-blue {
+  background: #E0F2FE !important;
+  color: #0284C7 !important;
+  border-color: #BAE6FD !important;
+}
+[data-theme="light"] .badge-duration-purple {
+  background: #F3E8FF !important;
+  color: #7C3AED !important;
+  border-color: #DDD6FE !important;
+}
+[data-theme="light"] .badge-duration-green {
+  background: #DCFCE7 !important;
+  color: #16A34A !important;
+  border-color: #BBF7D0 !important;
 }
 
 /* Tier Title */
 .cooca-tier-title {
-  font-size: 24px !important;
+  font-size: 26px !important;
   font-weight: 800 !important;
   color: #FFFFFF !important;
   margin: 0 0 10px !important;
   letter-spacing: -0.02em !important;
   line-height: 1.2 !important;
+}
+[data-theme="light"] .cooca-tier-title {
+  color: #0F172A !important;
 }
 
 /* Normal Price Strikethrough Row */
@@ -2566,10 +2628,13 @@ body.landing-page {
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
-  font-size: 13px !important;
+  font-size: 13.5px !important;
   color: #94A3B8 !important;
   margin-bottom: 14px !important;
   flex-wrap: wrap !important;
+}
+[data-theme="light"] .cooca-normal-price-row {
+  color: #64748B !important;
 }
 .cooca-normal-del {
   color: #CBD5E1 !important;
@@ -2577,22 +2642,48 @@ body.landing-page {
   text-decoration-color: #EF4444 !important;
   text-decoration-thickness: 2px !important;
   font-weight: 700 !important;
-  font-size: 14px !important;
+  font-size: 14.5px !important;
+}
+[data-theme="light"] .cooca-normal-del {
+  color: #64748B !important;
 }
 
 /* Hero Price Box */
 .cooca-hero-price-box {
   position: relative !important;
-  margin-bottom: 16px !important;
-  padding: 14px 16px 12px !important;
+  margin-bottom: 18px !important;
+  padding: 14px 18px 12px !important;
   border-radius: 16px !important;
   background: rgba(255, 255, 255, 0.03) !important;
   border: 1px solid rgba(255, 255, 255, 0.07) !important;
 }
+.cooca-card.theme-blue .cooca-hero-price-box {
+  background: rgba(14, 165, 233, 0.06) !important;
+  border-color: rgba(56, 189, 248, 0.22) !important;
+}
 .cooca-card.theme-purple .cooca-hero-price-box,
 .cooca-card.theme-featured .cooca-hero-price-box {
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.14) 0%, rgba(124, 58, 237, 0.08) 100%) !important;
-  border-color: rgba(99, 102, 241, 0.28) !important;
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.32) 0%, rgba(67, 56, 202, 0.22) 100%) !important;
+  border-color: rgba(168, 85, 247, 0.38) !important;
+}
+.cooca-card.theme-green .cooca-hero-price-box {
+  background: rgba(34, 197, 94, 0.06) !important;
+  border-color: rgba(74, 222, 128, 0.22) !important;
+}
+
+/* Light Mode Hero Price Boxes */
+[data-theme="light"] .cooca-card.theme-blue .cooca-hero-price-box {
+  background: #F0F9FF !important;
+  border-color: #BAE6FD !important;
+}
+[data-theme="light"] .cooca-card.theme-purple .cooca-hero-price-box,
+[data-theme="light"] .cooca-card.theme-featured .cooca-hero-price-box {
+  background: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%) !important;
+  border-color: #DDD6FE !important;
+}
+[data-theme="light"] .cooca-card.theme-green .cooca-hero-price-box {
+  background: #F0FDF4 !important;
+  border-color: #BBF7D0 !important;
 }
 
 /* Crown Icon */
@@ -2600,9 +2691,9 @@ body.landing-page {
   position: absolute !important;
   top: 12px !important;
   right: 14px !important;
-  color: #F59E0B !important;
-  font-size: 18px !important;
-  filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.45)) !important;
+  color: #FBBF24 !important;
+  font-size: 20px !important;
+  filter: drop-shadow(0 2px 8px rgba(251, 191, 36, 0.55)) !important;
 }
 
 /* Main Price Line */
@@ -2610,23 +2701,30 @@ body.landing-page {
   display: flex !important;
   align-items: baseline !important;
   gap: 3px !important;
-  margin-bottom: 10px !important;
+  margin-bottom: 12px !important;
   flex-wrap: nowrap !important;
 }
 .cooca-main-price-line .currency {
-  font-size: 16px !important;
+  font-size: 17px !important;
   font-weight: 800 !important;
   color: #E2E8F0 !important;
   flex-shrink: 0 !important;
 }
+[data-theme="light"] .cooca-main-price-line .currency {
+  color: #475569 !important;
+}
 .cooca-main-price-line .amount {
-  font-size: clamp(26px, 3vw, 38px) !important;
+  font-size: clamp(28px, 3.2vw, 42px) !important;
   font-weight: 900 !important;
   color: #FFFFFF !important;
   letter-spacing: -0.03em !important;
   line-height: 1 !important;
+  font-family: 'Outfit', 'Inter', sans-serif !important;
   flex-shrink: 1 !important;
   min-width: 0 !important;
+}
+[data-theme="light"] .cooca-main-price-line .amount {
+  color: #0F172A !important;
 }
 .cooca-main-price-line .period {
   font-size: 12px !important;
@@ -2636,6 +2734,9 @@ body.landing-page {
   flex-shrink: 0 !important;
   white-space: nowrap !important;
 }
+[data-theme="light"] .cooca-main-price-line .period {
+  color: #64748B !important;
+}
 
 /* Savings Box */
 .cooca-savings-box {
@@ -2643,36 +2744,53 @@ body.landing-page {
   align-items: center !important;
   justify-content: space-between !important;
   border-radius: 10px !important;
-  padding: 8px 12px !important;
+  padding: 9px 13px !important;
   margin-bottom: 10px !important;
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #CBD5E1 !important;
 }
-.cooca-card.theme-purple .cooca-savings-box,
-.cooca-card.theme-featured .cooca-savings-box {
-  background: rgba(99, 102, 241, 0.12) !important;
-  border-color: rgba(99, 102, 241, 0.25) !important;
-  color: #E0E7FF !important;
+.savings-box-blue {
+  background: rgba(14, 165, 233, 0.09) !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  color: #38BDF8 !important;
 }
+.savings-box-purple {
+  background: rgba(168, 85, 247, 0.14) !important;
+  border: 1px solid rgba(192, 132, 252, 0.38) !important;
+  color: #E879F9 !important;
+}
+.savings-box-green {
+  background: rgba(34, 197, 94, 0.09) !important;
+  border: 1px solid rgba(74, 222, 128, 0.3) !important;
+  color: #4ADE80 !important;
+}
+
+/* Light Mode Savings Box */
+[data-theme="light"] .savings-box-blue {
+  background: #E0F2FE !important;
+  border-color: #BAE6FD !important;
+  color: #0284C7 !important;
+}
+[data-theme="light"] .savings-box-purple {
+  background: #F3E8FF !important;
+  border-color: #DDD6FE !important;
+  color: #7C3AED !important;
+}
+[data-theme="light"] .savings-box-green {
+  background: #DCFCE7 !important;
+  border-color: #BBF7D0 !important;
+  color: #166534 !important;
+}
+
 .cooca-savings-left {
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
-  font-size: 12px !important;
+  font-size: 12.5px !important;
   font-weight: 700 !important;
   flex: 1 !important;
   min-width: 0 !important;
 }
-.cooca-savings-left i {
-  color: #94A3B8 !important;
-}
-.cooca-card.theme-purple .cooca-savings-left i,
-.cooca-card.theme-featured .cooca-savings-left i {
-  color: #A5B4FC !important;
-}
 .cooca-savings-check {
-  font-size: 14px !important;
+  font-size: 15px !important;
   color: #10B981 !important;
   flex-shrink: 0 !important;
 }
@@ -2682,16 +2800,19 @@ body.landing-page {
   display: flex !important;
   align-items: center !important;
   gap: 6px !important;
-  font-size: 11.5px !important;
+  font-size: 12px !important;
   color: #F59E0B !important;
   font-weight: 700 !important;
+}
+[data-theme="light"] .cooca-urgency-row {
+  color: #D97706 !important;
 }
 
 /* Feature Checklist */
 .cooca-feature-list {
   list-style: none !important;
   padding: 0 !important;
-  margin: 18px 0 22px !important;
+  margin: 20px 0 24px !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 12px !important;
@@ -2701,21 +2822,36 @@ body.landing-page {
   display: flex !important;
   align-items: flex-start !important;
   gap: 10px !important;
-  font-size: 13.5px !important;
+  font-size: 14px !important;
   color: #CBD5E1 !important;
   font-weight: 500 !important;
-  line-height: 1.45 !important;
+  line-height: 1.5 !important;
+}
+[data-theme="light"] .cooca-feature-list li {
+  color: #334155 !important;
 }
 .cooca-feature-list li i {
   margin-top: 2px !important;
   flex-shrink: 0 !important;
-  font-size: 14px !important;
-  color: #818CF8 !important;
+  font-size: 15px !important;
 }
-.icon-blue,
-.icon-purple,
+.icon-blue {
+  color: #38BDF8 !important;
+}
+.icon-purple {
+  color: #C084FC !important;
+}
 .icon-green {
-  color: #818CF8 !important;
+  color: #4ADE80 !important;
+}
+[data-theme="light"] .icon-blue {
+  color: #0284C7 !important;
+}
+[data-theme="light"] .icon-purple {
+  color: #7C3AED !important;
+}
+[data-theme="light"] .icon-green {
+  color: #16A34A !important;
 }
 
 /* CTA Buttons */
@@ -2725,45 +2861,84 @@ body.landing-page {
   justify-content: center !important;
   gap: 8px !important;
   width: 100% !important;
-  min-height: 48px !important;
-  border-radius: 12px !important;
-  font-size: 14.5px !important;
+  min-height: 50px !important;
+  border-radius: 14px !important;
+  font-size: 15px !important;
   font-weight: 800 !important;
   text-decoration: none !important;
-  transition: all 0.22s ease !important;
+  transition: all 0.25s ease !important;
   cursor: pointer !important;
   letter-spacing: 0.01em !important;
   margin-top: auto !important;
 }
-.cooca-btn-blue,
-.cooca-btn-green,
-.cooca-btn-side {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
-  color: #F1F5F9 !important;
+
+/* Blue Button */
+.cooca-btn-blue {
+  background: rgba(14, 165, 233, 0.06) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.4) !important;
+  color: #38BDF8 !important;
 }
-.cooca-btn-blue:hover,
-.cooca-btn-green:hover,
-.cooca-btn-side:hover {
-  background: rgba(99, 102, 241, 0.12) !important;
-  border-color: #818CF8 !important;
-  color: #FFFFFF !important;
+.cooca-btn-blue:hover {
+  background: rgba(14, 165, 233, 0.18) !important;
+  border-color: #38BDF8 !important;
   transform: translateY(-2px) !important;
+  color: #38BDF8 !important;
+}
+[data-theme="light"] .cooca-btn-blue {
+  background: #F0F9FF !important;
+  border: 1.5px solid #0284C7 !important;
+  color: #0284C7 !important;
+}
+[data-theme="light"] .cooca-btn-blue:hover {
+  background: #0284C7 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.25) !important;
 }
 
-.cooca-btn-purple-glow,
-.cooca-btn-featured {
-  background: linear-gradient(90deg, #4F46E5 0%, #6366F1 100%) !important;
+/* Purple Glow Button (Featured) */
+.cooca-btn-purple-glow {
+  background: linear-gradient(90deg, #7C3AED 0%, #C026D3 100%) !important;
   color: #FFFFFF !important;
   border: none !important;
-  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.4) !important;
+  box-shadow: 0 6px 28px rgba(192, 38, 211, 0.55) !important;
 }
-.cooca-btn-purple-glow:hover,
-.cooca-btn-featured:hover {
-  background: linear-gradient(90deg, #4338CA 0%, #4F46E5 100%) !important;
-  box-shadow: 0 6px 26px rgba(79, 70, 229, 0.6) !important;
+.cooca-btn-purple-glow:hover {
+  background: linear-gradient(90deg, #9333EA 0%, #D946EF 100%) !important;
+  box-shadow: 0 10px 36px rgba(192, 38, 211, 0.75) !important;
   transform: translateY(-2px) !important;
   color: #FFFFFF !important;
+}
+[data-theme="light"] .cooca-btn-purple-glow {
+  background: linear-gradient(90deg, #7C3AED 0%, #9333EA 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.35) !important;
+}
+[data-theme="light"] .cooca-btn-purple-glow:hover {
+  background: linear-gradient(90deg, #6D28D9 0%, #7C3AED 100%) !important;
+  box-shadow: 0 10px 32px rgba(124, 58, 237, 0.5) !important;
+}
+
+/* Green Button */
+.cooca-btn-green {
+  background: rgba(34, 197, 94, 0.06) !important;
+  border: 1.5px solid rgba(74, 222, 128, 0.4) !important;
+  color: #4ADE80 !important;
+}
+.cooca-btn-green:hover {
+  background: rgba(34, 197, 94, 0.18) !important;
+  border-color: #4ADE80 !important;
+  transform: translateY(-2px) !important;
+  color: #4ADE80 !important;
+}
+[data-theme="light"] .cooca-btn-green {
+  background: #F0FDF4 !important;
+  border: 1.5px solid #16A34A !important;
+  color: #16A34A !important;
+}
+[data-theme="light"] .cooca-btn-green:hover {
+  background: #16A34A !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.25) !important;
 }
 
 /* Bottom Trust Bar */
@@ -2772,19 +2947,27 @@ body.landing-page {
   align-items: center !important;
   justify-content: center !important;
   flex-wrap: wrap !important;
-  gap: 12px 28px !important;
-  padding: 16px 24px !important;
+  gap: 12px 32px !important;
+  padding: 18px 24px !important;
   font-size: 13px !important;
   font-weight: 600 !important;
   color: #94A3B8 !important;
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 16px !important;
-  margin-top: 20px !important;
+  margin-top: 24px !important;
+}
+[data-theme="light"] .cooca-trust-bar {
+  background: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+  color: #475569 !important;
 }
 .cooca-trust-bar > span {
   color: rgba(255, 255, 255, 0.2) !important;
-  font-size: 16px !important;
+  font-size: 18px !important;
+}
+[data-theme="light"] .cooca-trust-bar > span {
+  color: #CBD5E1 !important;
 }
 .cooca-trust-item {
   display: inline-flex !important;
@@ -2792,7 +2975,11 @@ body.landing-page {
   gap: 8px !important;
 }
 .cooca-trust-item i {
-  color: #818CF8 !important;
-  font-size: 14px !important;
+  color: #38BDF8 !important;
+  font-size: 15px !important;
 }
+[data-theme="light"] .cooca-trust-item i {
+  color: #4F46E5 !important;
+}
+
 

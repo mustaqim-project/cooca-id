@@ -810,11 +810,11 @@
         {{-- Pricing Grid (3-Tier Layout matching Reference Mockup: 6 Bulan, Tahunan, Bulanan) --}}
         <div class="cooca-pricing-grid reveal">
 
-            {{-- 1. 6 Bulan Tier (Left) --}}
-            <div class="cooca-card theme-side reveal reveal-delay-1">
+            {{-- 1. 6 Bulan Tier (Left - Theme Blue) --}}
+            <div class="cooca-card theme-blue reveal reveal-delay-1">
                 {{-- Diagonal Ribbon --}}
                 <div class="corner-ribbon-wrap">
-                    <div class="corner-ribbon corner-ribbon-muted">
+                    <div class="corner-ribbon corner-ribbon-blue">
                         HEMAT<br>30%
                     </div>
                 </div>
@@ -838,7 +838,7 @@
                         <span class="period">/ 6 bln</span>
                     </div>
 
-                    <div class="cooca-savings-box">
+                    <div class="cooca-savings-box savings-box-blue">
                         <div class="cooca-savings-left">
                             <i class="fa-solid fa-tags"></i>
                             <span>Anda hemat Rp 1.598.400</span>
@@ -854,18 +854,18 @@
 
                 {{-- Features List --}}
                 <ul class="cooca-feature-list">
-                    <li><i class="fa-solid fa-circle-check"></i> <span>Akses penuh modul Cooca ERP &amp; POS</span></li>
-                    <li><i class="fa-solid fa-circle-check"></i> <span>Dukungan teknis prioritas 24/7</span></li>
-                    <li><i class="fa-solid fa-circle-check"></i> <span>Free update &amp; cloud backup otomatis</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Akses penuh modul Cooca ERP &amp; POS</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Dukungan teknis prioritas 24/7</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Free update &amp; cloud backup otomatis</span></li>
                 </ul>
 
-                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-side">
+                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-blue">
                     Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
 
-            {{-- 2. Tahunan Tier (Center - Featured Most Popular) --}}
-            <div class="cooca-card theme-featured reveal reveal-delay-2">
+            {{-- 2. Tahunan Tier (Center - Featured Most Popular - Theme Purple) --}}
+            <div class="cooca-card theme-purple reveal reveal-delay-2">
                 {{-- Most Popular Floating Badge --}}
                 <div class="cooca-floating-badge">
                     <i class="fa-solid fa-star"></i> MOST POPULAR • REKOMENDASI
@@ -899,7 +899,7 @@
                         <span class="period">/ tahun</span>
                     </div>
 
-                    <div class="cooca-savings-box">
+                    <div class="cooca-savings-box savings-box-purple">
                         <div class="cooca-savings-left">
                             <i class="fa-solid fa-tags"></i>
                             <span>Anda hemat Rp 3.729.600</span>
@@ -915,21 +915,21 @@
 
                 {{-- Features List --}}
                 <ul class="cooca-feature-list">
-                    <li><i class="fa-solid fa-circle-check"></i> <span>Akses penuh seluruh modul Cooca ERP &amp; POS</span></li>
-                    <li><i class="fa-solid fa-circle-check"></i> <span>Dukungan teknis prioritas 24/7</span></li>
-                    <li><i class="fa-solid fa-circle-check"></i> <span>Free update &amp; cloud backup otomatis</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Akses penuh seluruh modul Cooca ERP &amp; POS</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Dukungan teknis prioritas 24/7</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Free update &amp; cloud backup otomatis</span></li>
                 </ul>
 
-                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-featured">
+                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-purple-glow">
                     Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
 
-            {{-- 3. Bulanan Tier (Right) --}}
-            <div class="cooca-card theme-side reveal reveal-delay-3">
+            {{-- 3. Bulanan Tier (Right - Theme Green) --}}
+            <div class="cooca-card theme-green reveal reveal-delay-3">
                 {{-- Diagonal Ribbon --}}
                 <div class="corner-ribbon-wrap">
-                    <div class="corner-ribbon corner-ribbon-muted">
+                    <div class="corner-ribbon corner-ribbon-green">
                         HEMAT<br>18%
                     </div>
                 </div>
@@ -953,7 +953,7 @@
                         <span class="period">/ bulan</span>
                     </div>
 
-                    <div class="cooca-savings-box">
+                    <div class="cooca-savings-box savings-box-green">
                         <div class="cooca-savings-left">
                             <i class="fa-solid fa-tags"></i>
                             <span>Anda hemat Rp 159.840</span>
@@ -969,12 +969,12 @@
 
                 {{-- Features List --}}
                 <ul class="cooca-feature-list">
-                    <li><i class="fa-solid fa-circle-check"></i> <span>Akses penuh modul Cooca ERP &amp; POS</span></li>
-                    <li><i class="fa-solid fa-circle-check"></i> <span>Dukungan teknis prioritas 24/7</span></li>
-                    <li><i class="fa-solid fa-circle-check"></i> <span>Free update &amp; cloud backup otomatis</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Akses penuh modul Cooca ERP &amp; POS</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Dukungan teknis prioritas 24/7</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Free update &amp; cloud backup otomatis</span></li>
                 </ul>
 
-                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-side">
+                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-green">
                     Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
