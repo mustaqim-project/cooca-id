@@ -69,7 +69,7 @@
         | Default SEO Metadata
         |--------------------------------------------------------------------------
         */
-        $defaultTitle = 'Software ERP Indonesia untuk Operasional Bisnis | COOCA.ID';
+        $defaultTitle = 'COOCA.ID - Move Faster. Decide Better | Software Bisnis';
 
         $defaultDescription =
             'COOCA.ID adalah software ERP Indonesia untuk mengelola operasional, data, dan keputusan bisnis dalam satu sistem terpadu.';
