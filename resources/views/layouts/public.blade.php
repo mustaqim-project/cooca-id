@@ -45,7 +45,7 @@
         $socialLinkedin = setting('social.linkedin', '#');
 
         // Open Graph Image
-        $ogImage = asset('storage/system/cooca.png');
+        $ogImage = asset('/assets/image/cooca.png');
     @endphp
 
     <!-- ── Primary Meta ────────────────────────────────────────────────── -->
