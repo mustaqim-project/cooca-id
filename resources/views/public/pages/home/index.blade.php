@@ -421,47 +421,61 @@
                                     $origPrice = $rawPrice * 2;
                                     $discount = 50;
                                 }
-                                $period = $lowestPlan->duration_months >= 999 ? ' / Lifetime' : ($lowestPlan->duration_months == 1 ? '/bulan' : '/' . $lowestPlan->duration_months . ' bln');
+                                $period = $lowestPlan->duration_months >= 999 ? '/ Lifetime' : ($lowestPlan->duration_months == 1 ? '/ bulan' : '/' . $lowestPlan->duration_months . ' bln');
                             } else {
                                 $base = (float)($product->base_price ?? 350000);
                                 $finalPrice = $base > 0 ? $base : 350000;
                                 $origPrice = $finalPrice * 2;
                                 $discount = 50;
-                                $period = '/bulan';
+                                $period = '/ bulan';
                             }
                             $savings = $origPrice - $finalPrice;
                         @endphp
 
                         @if($origPrice > 0 || $finalPrice > 0)
                             <div class="product-pricing-glass-card">
+                                {{-- Strikethrough Normal Price & Discount Pill --}}
                                 <div class="product-pricing-top-meta">
                                     <span class="product-anchor-text">
-                                        Normal: <del class="product-anchor-del">Rp {{ number_format($origPrice, 0, ',', '.') }}</del>
+                                        Harga Normal <del class="product-anchor-del">Rp {{ number_format($origPrice, 0, ',', '.') }}</del>
                                     </span>
                                     <span class="product-discount-pill">
                                         <i class="fa-solid fa-bolt"></i> HEMAT {{ number_format($discount, 0) }}%
                                     </span>
                                 </div>
 
+                                {{-- Main Hero Price Line --}}
                                 <div class="product-price-hero-row">
-                                    <span class="price-val">Rp {{ number_format($finalPrice, 0, ',', '.') }}</span>
+                                    <span class="price-currency">Rp</span>
+                                    <span class="price-val">{{ number_format($finalPrice, 0, ',', '.') }}</span>
                                     <span class="price-period">{{ $period }}</span>
                                 </div>
 
-                                <div class="product-savings-line">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                    <span>Hemat Rp {{ number_format($savings, 0, ',', '.') }}</span>
+                                {{-- Savings Tag Box --}}
+                                <div class="product-savings-box">
+                                    <div class="product-savings-left">
+                                        <i class="fa-solid fa-tags"></i>
+                                        <span>Anda hemat Rp {{ number_format($savings, 0, ',', '.') }}</span>
+                                    </div>
+                                    <i class="fa-solid fa-circle-check product-savings-check"></i>
+                                </div>
+
+                                {{-- Urgency Notice --}}
+                                <div class="product-urgency-row">
+                                    <i class="fa-solid fa-bolt"></i>
+                                    <span>Harga promo onboarding terbatas</span>
                                 </div>
                             </div>
                         @else
                             <div class="product-pricing-glass-card">
                                 <div class="product-price-hero-row">
-                                    <span class="price-val" style="font-size: 18px;">Hubungi Sales</span>
+                                    <span class="price-val" style="font-size: 20px;">Hubungi Sales</span>
                                 </div>
+                                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Kustomisasi modul sesuai kebutuhan korporasi</p>
                             </div>
                         @endif
 
-                        <a href="{{ route('products.show', $product->slug) }}" class="btn-product-cta" aria-label="Pilih paket {{ $product->name }}">
+                        <a href="{{ route('products.show', $product->slug) }}" class="btn-product-cta" aria-label="Lihat detail {{ $product->name }}">
                             Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
@@ -474,9 +488,9 @@
         <div class="products-grid reveal">
             @php
             $demoProducts = [
-                ['icon'=>'fa-solid fa-wrench','name'=>'Cooca Auto Bengkel & Sparepart','category'=>'BENGKEL & OTOMOTIF','desc'=>'Cooca Auto mengelola proses estimasi&breakdown komponen & penjualan unit. Bengkel semakin terukur, efisien, dan memberikan pengalaman pelanggan lebih baik.','price'=>'350.000','period'=>'/bln'],
-                ['icon'=>'fa-solid fa-spa','name'=>'Cooca Booking & Salon Services','category'=>'BOOKING & RESERVASI JASA','desc'=>'Sistem booking mandiri bagi Salon, Barbershop, Klinik, Estetika, Nail Art. Terintegras lengkap CRM Pelanggan dan laporan keuangan.','price'=>'200.000','period'=>'/bln'],
-                ['icon'=>'fa-solid fa-scale-balanced','name'=>'Cooca Legal Notaris & Akta','category'=>'NOTARIS & LEGAL','desc'=>'Dirancang khusus untuk Kantor Notaris & Pejabat Pembuat Akta Tanah (PPAT). Manajemen dokumen legal, billing, klien, dan arsip.','price'=>'500.000','period'=>'/bln'],
+                ['icon'=>'fa-solid fa-wrench','name'=>'Cooca Auto Bengkel & Sparepart','category'=>'BENGKEL & OTOMOTIF','desc'=>'Cooca Auto mengelola proses estimasi & breakdown komponen & penjualan unit. Bengkel semakin terukur, efisien, dan memberikan pengalaman pelanggan lebih baik.','price'=>'350.000','normal'=>'700.000','discount'=>'50','savings'=>'350.000','period'=>'/ bulan'],
+                ['icon'=>'fa-solid fa-spa','name'=>'Cooca Booking & Salon Services','category'=>'BOOKING & RESERVASI JASA','desc'=>'Sistem booking mandiri bagi Salon, Barbershop, Klinik, Estetika, Nail Art. Terintegrasi lengkap CRM Pelanggan dan laporan keuangan.','price'=>'200.000','normal'=>'400.000','discount'=>'50','savings'=>'200.000','period'=>'/ bulan'],
+                ['icon'=>'fa-solid fa-scale-balanced','name'=>'Cooca Legal Notaris & Akta','category'=>'NOTARIS & LEGAL','desc'=>'Dirancang khusus untuk Kantor Notaris & Pejabat Pembuat Akta Tanah (PPAT). Manajemen dokumen legal, billing, klien, dan arsip.','price'=>'500.000','normal'=>'1.000.000','discount'=>'50','savings'=>'500.000','period'=>'/ bulan'],
             ];
             @endphp
             @foreach($demoProducts as $i => $demo)
@@ -494,31 +508,40 @@
                         <h3 class="product-name">{{ $demo['name'] }}</h3>
                         <p class="product-desc">{{ $demo['desc'] }}</p>
                     </div>
-                    <div class="product-card-pricing">
-                        <div class="product-pricing-anchor-line">
-                            <span class="product-pricing-old">Harga Normal: Rp 700.000</span>
-                            <span class="badge-discount-save">HEMAT 50%</span>
+                    <div class="product-card-pricing-wrap">
+                        <div class="product-pricing-glass-card">
+                            <div class="product-pricing-top-meta">
+                                <span class="product-anchor-text">
+                                    Harga Normal <del class="product-anchor-del">Rp {{ $demo['normal'] }}</del>
+                                </span>
+                                <span class="product-discount-pill">
+                                    <i class="fa-solid fa-bolt"></i> HEMAT {{ $demo['discount'] }}%
+                                </span>
+                            </div>
+
+                            <div class="product-price-hero-row">
+                                <span class="price-currency">Rp</span>
+                                <span class="price-val">{{ $demo['price'] }}</span>
+                                <span class="price-period">{{ $demo['period'] }}</span>
+                            </div>
+
+                            <div class="product-savings-box">
+                                <div class="product-savings-left">
+                                    <i class="fa-solid fa-tags"></i>
+                                    <span>Anda hemat Rp {{ $demo['savings'] }}</span>
+                                </div>
+                                <i class="fa-solid fa-circle-check product-savings-check"></i>
+                            </div>
+
+                            <div class="product-urgency-row">
+                                <i class="fa-solid fa-bolt"></i>
+                                <span>Harga promo onboarding terbatas</span>
+                            </div>
                         </div>
 
-                        <div class="product-pricing-main">
-                            <span class="product-pricing-val">Rp {{ $demo['price'] }}</span>
-                            <span class="product-pricing-period">{{ $demo['period'] }}</span>
-                        </div>
-
-                        <div class="product-pricing-savings">
-                            <i class="fa-solid fa-check-circle"></i>
-                            <span>Hemat Rp 350.000 setiap bulan</span>
-                        </div>
-
-                        <div class="product-pricing-urgency">
-                            <i class="fa-solid fa-bolt"></i> Harga promo terbatas
-                        </div>
-
-                        <div style="margin-top: 14px;">
-                            <a href="{{ route('products.index') }}" class="btn-primary-glow" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 13px; border-radius: 10px;">
-                                Pilih Paket Ini <i class="fa-solid fa-arrow-right" style="font-size: 11px;"></i>
-                            </a>
-                        </div>
+                        <a href="{{ route('products.index') }}" class="btn-product-cta">
+                            Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
             </article>

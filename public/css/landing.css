@@ -935,85 +935,156 @@ body.landing-page {
 @media (max-width: 1024px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) { .products-grid { grid-template-columns: 1fr; } }
 
-/* ── PRODUCT CARD PRICING WRAP ── */
+/* ── PRODUCT CARD PRICING WRAP (RESPONSIVE & DUAL THEME COMPATIBLE) ── */
 .product-card-pricing-wrap {
-  padding: 0 16px 20px;
+  padding: 0 20px 22px;
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Glass Pricing Card inside Product Card */
+/* Glass / Box Container for Price */
 .product-pricing-glass-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 16px;
   padding: 14px 16px 12px;
   margin-bottom: 12px;
+  transition: all 0.25s ease;
+}
+[data-theme="light"] .product-pricing-glass-card {
+  background: #F8FAFC;
+  border-color: #E2E8F0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
 }
 
-/* Top meta row: normal price + discount pill */
+/* Top Meta Row (Normal Price + Discount Pill) */
 .product-pricing-top-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 .product-anchor-text {
   font-size: 12px;
-  color: #94A3B8;
+  color: var(--text-muted);
   font-weight: 500;
 }
 .product-anchor-del {
   text-decoration: line-through;
   text-decoration-color: #EF4444;
   text-decoration-thickness: 2px;
-  color: #CBD5E1;
-  font-weight: 600;
+  color: var(--text);
+  font-weight: 700;
+  margin-left: 2px;
 }
 .product-discount-pill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 10px;
-  background: rgba(99,102,241,0.18);
-  border: 1px solid rgba(99,102,241,0.35);
+  padding: 3px 9px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
   border-radius: 999px;
   font-size: 10.5px;
   font-weight: 800;
-  color: #A5B4FC;
+  color: #818CF8;
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
+[data-theme="light"] .product-discount-pill {
+  background: #EEF2FF;
+  border-color: #C7D2FE;
+  color: #4F46E5;
+}
 
-/* Main price row */
+/* Main Hero Price Row */
 .product-price-hero-row {
   display: flex;
   align-items: baseline;
-  gap: 4px;
-  margin-bottom: 8px;
+  gap: 3px;
+  margin-bottom: 10px;
+  flex-wrap: nowrap;
+}
+.product-price-hero-row .price-currency {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-muted);
+  flex-shrink: 0;
 }
 .product-price-hero-row .price-val {
-  font-size: clamp(20px, 2.5vw, 28px);
+  font-size: clamp(22px, 2.5vw, 30px);
   font-weight: 900;
-  color: #FFFFFF;
-  letter-spacing: -0.025em;
+  color: var(--text);
+  letter-spacing: -0.03em;
   line-height: 1;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  flex-shrink: 1;
+  min-width: 0;
 }
 .product-price-hero-row .price-period {
   font-size: 12px;
-  color: #94A3B8;
+  color: var(--text-muted);
   font-weight: 600;
-  margin-left: 2px;
+  margin-left: 3px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-/* Savings line */
-.product-savings-line {
+/* Savings Box Row */
+.product-savings-box {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text);
   font-size: 12px;
-  color: #34D399;
-  font-weight: 600;
+  font-weight: 700;
+}
+[data-theme="light"] .product-savings-box {
+  background: #F0FDF4;
+  border-color: #BBF7D0;
+  color: #166534;
+}
+.product-savings-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  flex: 1;
+  min-width: 0;
+}
+.product-savings-left i {
+  color: var(--text-muted);
+}
+[data-theme="light"] .product-savings-left i {
+  color: #16A34A;
+}
+.product-savings-check {
+  font-size: 14px;
+  color: #10B981;
+  flex-shrink: 0;
+}
+
+/* Urgency Row */
+.product-urgency-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #F59E0B;
+  font-weight: 700;
+  margin-top: 4px;
+}
+[data-theme="light"] .product-urgency-row {
+  color: #D97706;
 }
 
 /* CTA Button */
@@ -1023,31 +1094,38 @@ body.landing-page {
   justify-content: center;
   gap: 6px;
   width: 100%;
-  height: 44px;
+  height: 46px;
   border-radius: 12px;
-  background: rgba(99,102,241,0.07);
-  border: 1.5px solid rgba(99,102,241,0.3);
-  color: #A5B4FC;
-  font-size: 13.5px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1.5px solid rgba(99, 102, 241, 0.35);
+  color: #C7D2FE;
+  font-size: 14px;
   font-weight: 800;
   text-decoration: none;
   transition: all 0.22s ease;
+  cursor: pointer;
   letter-spacing: 0.01em;
+  margin-top: auto;
 }
 .btn-product-cta:hover {
-  background: rgba(99,102,241,0.18);
+  background: rgba(99, 102, 241, 0.22);
   border-color: #818CF8;
-  color: #C7D2FE;
+  color: #FFFFFF;
   transform: translateY(-2px);
 }
-
-/* Demo product card pricing (fallback) */
-.product-card-pricing {
-  padding: 14px 16px 16px;
-  border-top: 1px solid rgba(255,255,255,0.07);
-  background: rgba(0,0,0,0.15);
+[data-theme="light"] .btn-product-cta {
+  background: #4F46E5;
+  border: 1px solid #4F46E5;
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
 }
-.product-pricing-anchor-line {
+[data-theme="light"] .btn-product-cta:hover {
+  background: #4338CA;
+  border-color: #4338CA;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+}
   display: flex;
   align-items: center;
   justify-content: space-between;

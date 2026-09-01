@@ -141,47 +141,61 @@
                                     $origPrice = $rawPrice * 2;
                                     $discount = 50;
                                 }
-                                $period = $lowestPlan->duration_months >= 999 ? ' / Lifetime' : ($lowestPlan->duration_months == 1 ? '/bulan' : '/' . $lowestPlan->duration_months . ' bln');
+                                $period = $lowestPlan->duration_months >= 999 ? '/ Lifetime' : ($lowestPlan->duration_months == 1 ? '/ bulan' : '/' . $lowestPlan->duration_months . ' bln');
                             } else {
                                 $base = (float)($product->base_price ?? 350000);
                                 $finalPrice = $base > 0 ? $base : 350000;
                                 $origPrice = $finalPrice * 2;
                                 $discount = 50;
-                                $period = '/bulan';
+                                $period = '/ bulan';
                             }
                             $savings = $origPrice - $finalPrice;
                         @endphp
 
                         @if($origPrice > 0 || $finalPrice > 0)
                             <div class="product-pricing-glass-card">
+                                {{-- Normal Price Strikethrough & Discount Pill --}}
                                 <div class="product-pricing-top-meta">
                                     <span class="product-anchor-text">
-                                        Normal: <del class="product-anchor-del">Rp {{ number_format($origPrice, 0, ',', '.') }}</del>
+                                        Harga Normal <del class="product-anchor-del">Rp {{ number_format($origPrice, 0, ',', '.') }}</del>
                                     </span>
                                     <span class="product-discount-pill">
                                         <i class="fa-solid fa-bolt"></i> HEMAT {{ number_format($discount, 0) }}%
                                     </span>
                                 </div>
 
+                                {{-- Main Hero Price Line --}}
                                 <div class="product-price-hero-row">
-                                    <span class="price-val">Rp {{ number_format($finalPrice, 0, ',', '.') }}</span>
+                                    <span class="price-currency">Rp</span>
+                                    <span class="price-val">{{ number_format($finalPrice, 0, ',', '.') }}</span>
                                     <span class="price-period">{{ $period }}</span>
                                 </div>
 
-                                <div class="product-savings-line">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                    <span>Hemat Rp {{ number_format($savings, 0, ',', '.') }}</span>
+                                {{-- Savings Tag Box --}}
+                                <div class="product-savings-box">
+                                    <div class="product-savings-left">
+                                        <i class="fa-solid fa-tags"></i>
+                                        <span>Anda hemat Rp {{ number_format($savings, 0, ',', '.') }}</span>
+                                    </div>
+                                    <i class="fa-solid fa-circle-check product-savings-check"></i>
+                                </div>
+
+                                {{-- Urgency Notice --}}
+                                <div class="product-urgency-row">
+                                    <i class="fa-solid fa-bolt"></i>
+                                    <span>Harga promo onboarding terbatas</span>
                                 </div>
                             </div>
                         @else
                             <div class="product-pricing-glass-card">
                                 <div class="product-price-hero-row">
-                                    <span class="price-val" style="font-size: 18px;">Hubungi Sales</span>
+                                    <span class="price-val" style="font-size: 20px;">Hubungi Sales</span>
                                 </div>
+                                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Kustomisasi modul sesuai kebutuhan korporasi</p>
                             </div>
                         @endif
 
-                        <a href="{{ route('products.show', $product->slug) }}" class="btn-product-cta">
+                        <a href="{{ route('products.show', $product->slug) }}" class="btn-product-cta" aria-label="Lihat detail {{ $product->name }}">
                             Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
