@@ -242,7 +242,7 @@
                     <p class="lp-subheading">Pilih paket durasi yang paling hemat untuk efisiensi maksimal bisnis Anda.</p>
                 </div>
 
-                <div class="pricing-cards-container reveal">
+                <div class="cooca-pricing-grid reveal">
                     @foreach ($product->subscriptionPlans as $i => $plan)
                         @php
                             $rawPrice = (float) $plan->price;
@@ -258,36 +258,85 @@
                             }
                             $savings = $origPrice - $finalPrice;
                             $isPopular = ($i === 1 || $plan->is_popular);
+
+                            // Theme selection based on index / duration
+                            if ($isPopular) {
+                                $themeClass = 'theme-purple';
+                                $badgeClass = 'badge-duration-purple';
+                                $ribbonClass = 'corner-ribbon-gold';
+                                $savingsClass = 'savings-box-purple';
+                                $iconClass = 'icon-purple';
+                                $btnClass = 'cooca-btn-purple-glow';
+                            } elseif ($i === 0 || $plan->duration_months == 6) {
+                                $themeClass = 'theme-blue';
+                                $badgeClass = 'badge-duration-blue';
+                                $ribbonClass = 'corner-ribbon-blue';
+                                $savingsClass = 'savings-box-blue';
+                                $iconClass = 'icon-blue';
+                                $btnClass = 'cooca-btn-blue';
+                            } else {
+                                $themeClass = 'theme-green';
+                                $badgeClass = 'badge-duration-green';
+                                $ribbonClass = 'corner-ribbon-green';
+                                $savingsClass = 'savings-box-green';
+                                $iconClass = 'icon-green';
+                                $btnClass = 'cooca-btn-green';
+                            }
                         @endphp
-                        <div class="pricing-saas-card {{ $isPopular ? 'is-popular' : '' }}">
-                            @if ($isPopular)
-                                <div class="pricing-featured-floating-pill">
-                                    <i class="fa-solid fa-star"></i> MOST POPULAR · REKOMENDASI
+
+                        <div class="cooca-card {{ $themeClass }}">
+                            {{-- Top Right Diagonal Sash Ribbon --}}
+                            @if($discount > 0)
+                                <div class="corner-ribbon-wrap">
+                                    <div class="corner-ribbon {{ $ribbonClass }}">
+                                        HEMAT<br>{{ number_format($discount, 0) }}%
+                                    </div>
                                 </div>
                             @endif
 
-                            <div class="pricing-card-header" style="{{ $isPopular ? 'margin-top: 6px;' : '' }}">
-                                <span class="pricing-plan-badge">
-                                    {{ $plan->duration_months >= 999 ? 'LIFETIME ACCESS' : ($plan->duration_months . ' BULAN') }}
+                            {{-- Most Popular Floating Badge --}}
+                            @if ($isPopular)
+                                <div class="cooca-floating-badge">
+                                    <i class="fa-solid fa-star"></i> MOST POPULAR • REKOMENDASI
+                                </div>
+                            @endif
+
+                            {{-- Duration Pill --}}
+                            <div>
+                                <span class="cooca-badge-duration {{ $badgeClass }}">
+                                    @if($plan->duration_months >= 999)
+                                        LIFETIME
+                                    @elseif($plan->duration_months == 1)
+                                        1 BULAN
+                                    @elseif($plan->duration_months == 12)
+                                        12 BULAN
+                                    @else
+                                        {{ $plan->duration_months }} BULAN
+                                    @endif
                                 </span>
-                                <h3 class="pricing-plan-title">{{ $plan->name }}</h3>
                             </div>
 
-                            {{-- Price Block --}}
-                            <div class="pricing-block-unified">
-                                <div class="pricing-anchor-row">
-                                    <span class="anchor-label">Normal: <del class="anchor-del">Rp {{ number_format($origPrice, 0, ',', '.') }}</del></span>
-                                    <span class="product-discount-pill">
-                                        <i class="fa-solid fa-bolt"></i> HEMAT {{ number_format($discount, 0) }}%
-                                    </span>
-                                </div>
+                            {{-- Tier Name --}}
+                            <h3 class="cooca-tier-title">{{ $plan->name }}</h3>
 
-                                <div class="pricing-hero-amount-wrap">
+                            {{-- Harga Normal Strikethrough --}}
+                            <div class="cooca-normal-price-row">
+                                <span>Harga Normal</span>
+                                <del class="cooca-normal-del">Rp{{ number_format($origPrice, 0, ',', '.') }}</del>
+                            </div>
+
+                            {{-- Main Price Container --}}
+                            <div class="cooca-hero-price-box">
+                                @if($isPopular)
+                                    <i class="fa-solid fa-crown cooca-price-crown"></i>
+                                @endif
+
+                                <div class="cooca-main-price-line">
                                     <span class="currency">Rp</span>
                                     <span class="amount">{{ number_format($finalPrice, 0, ',', '.') }}</span>
                                     <span class="period">
                                         @if ($plan->duration_months >= 999)
-                                            / Lifetime
+                                            / lifetime
                                         @elseif($plan->duration_months == 1)
                                             / bulan
                                         @elseif($plan->duration_months == 12)
@@ -298,38 +347,73 @@
                                     </span>
                                 </div>
 
-                                <div class="pricing-savings-chip">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                    <span>Hemat Rp {{ number_format($savings, 0, ',', '.') }}</span>
+                                {{-- Savings Tag Box --}}
+                                <div class="cooca-savings-box {{ $savingsClass }}">
+                                    <div class="cooca-savings-left">
+                                        <i class="fa-solid fa-tags"></i>
+                                        <span>Anda hemat Rp {{ number_format($savings, 0, ',', '.') }}</span>
+                                    </div>
+                                    <i class="fa-solid fa-circle-check cooca-savings-check"></i>
                                 </div>
 
-                                <div class="pricing-urgency-note">
-                                    <i class="fa-solid fa-bolt"></i> Harga promo onboarding terbatas
+                                {{-- Urgency Notice --}}
+                                <div class="cooca-urgency-row">
+                                    <i class="fa-solid fa-bolt"></i>
+                                    <span>Harga promo onboarding terbatas</span>
                                 </div>
                             </div>
 
-                            <ul class="pricing-features-list">
+                            {{-- Feature Checklist --}}
+                            <ul class="cooca-feature-list">
                                 <li>
-                                    <i class="fa-solid fa-circle-check"></i> Akses penuh modul {{ $product->name }}
+                                    <i class="fa-solid fa-circle-check {{ $iconClass }}"></i>
+                                    <span>Akses penuh modul {{ $product->name }}</span>
                                 </li>
                                 @if ($plan->duration_months >= 999 && $product->maintenance_fee > 0)
                                     <li>
-                                        <i class="fa-solid fa-screwdriver-wrench" style="color: var(--primary);"></i> Maint. Fee: Rp {{ number_format($product->maintenance_fee, 0, ',', '.') }}/thn
+                                        <i class="fa-solid fa-screwdriver-wrench {{ $iconClass }}"></i>
+                                        <span>Maint. Fee: Rp {{ number_format($product->maintenance_fee, 0, ',', '.') }}/thn</span>
                                     </li>
                                 @endif
                                 <li>
-                                    <i class="fa-solid fa-circle-check"></i> Dukungan teknis prioritas 24/7
+                                    <i class="fa-solid fa-circle-check {{ $iconClass }}"></i>
+                                    <span>Dukungan teknis prioritas 24/7</span>
                                 </li>
                                 <li>
-                                    <i class="fa-solid fa-circle-check"></i> Free update &amp; cloud backup
+                                    <i class="fa-solid fa-circle-check {{ $iconClass }}"></i>
+                                    <span>Free update &amp; cloud backup</span>
                                 </li>
                             </ul>
 
-                            <a href="{{ route('customer.register') }}" class="{{ $isPopular ? 'btn-pricing-featured' : 'btn-pricing-regular' }}">
+                            {{-- CTA Button --}}
+                            <a href="{{ route('customer.register') }}" class="cooca-btn {{ $btnClass }}">
                                 Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                             </a>
                         </div>
                     @endforeach
+                </div>
+
+                {{-- Bottom Trust Bar --}}
+                <div class="cooca-trust-bar reveal">
+                    <div class="cooca-trust-item">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Aman &amp; Terpercaya</span>
+                    </div>
+                    <span>•</span>
+                    <div class="cooca-trust-item">
+                        <i class="fa-solid fa-cloud"></i>
+                        <span>Cloud Backup</span>
+                    </div>
+                    <span>•</span>
+                    <div class="cooca-trust-item">
+                        <i class="fa-solid fa-headset"></i>
+                        <span>Support 24/7</span>
+                    </div>
+                    <span>•</span>
+                    <div class="cooca-trust-item">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>Free Update</span>
+                    </div>
                 </div>
             </div>
         </section>

@@ -784,175 +784,202 @@
             </p>
         </div>
 
-        {{-- Pricing Grid (3-Tier Layout with Center Flagship Focus) --}}
-        <div class="pricing-cards-container reveal">
+        {{-- Pricing Grid (3-Tier Layout matching Reference Mockup) --}}
+        <div class="cooca-pricing-grid reveal">
 
-            {{-- 1. Starter Tier --}}
-            <div class="pricing-saas-card reveal reveal-delay-1">
-                <div class="pricing-card-header">
-                    <span class="pricing-plan-badge">Starter Bisnis</span>
-                    <h3 class="pricing-plan-title">Starter POS &amp; Sales</h3>
-                    <p class="pricing-plan-desc">
-                        Cocok untuk usaha baru / single outlet yang ingin digitalisasi kasir dan pencatatan transaksi.
-                    </p>
+            {{-- 1. Starter Tier (Theme Blue) --}}
+            <div class="cooca-card theme-blue reveal reveal-delay-1">
+                {{-- Diagonal Ribbon --}}
+                <div class="corner-ribbon-wrap">
+                    <div class="corner-ribbon corner-ribbon-blue">
+                        HEMAT<br>50%
+                    </div>
                 </div>
 
-                {{-- Price Block --}}
-                <div class="pricing-block-unified">
-                    <div class="pricing-anchor-row">
-                        <span class="anchor-label">Normal: <del class="anchor-del">Rp 400.000</del></span>
-                        <span class="product-discount-pill">
-                            <i class="fa-solid fa-bolt"></i> HEMAT 50%
-                        </span>
-                    </div>
+                <div>
+                    <span class="cooca-badge-duration badge-duration-blue">STARTER POS</span>
+                </div>
+                <h3 class="cooca-tier-title">Starter POS &amp; Sales</h3>
 
-                    <div class="pricing-hero-amount-wrap">
+                {{-- Normal Price Strikethrough --}}
+                <div class="cooca-normal-price-row">
+                    <span>Harga Normal</span>
+                    <del class="cooca-normal-del">Rp400.000</del>
+                </div>
+
+                {{-- Price Box --}}
+                <div class="cooca-hero-price-box">
+                    <div class="cooca-main-price-line">
                         <span class="currency">Rp</span>
                         <span class="amount">200.000</span>
-                        <span class="period">/bulan</span>
+                        <span class="period">/ bulan</span>
                     </div>
 
-                    <div class="pricing-savings-chip">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span>Hemat Rp 200.000 /bulan</span>
+                    <div class="cooca-savings-box savings-box-blue">
+                        <div class="cooca-savings-left">
+                            <i class="fa-solid fa-tags"></i>
+                            <span>Anda hemat Rp 200.000</span>
+                        </div>
+                        <i class="fa-solid fa-circle-check cooca-savings-check"></i>
                     </div>
 
-                    <div class="pricing-urgency-note">
-                        <i class="fa-solid fa-bolt"></i> Harga promo onboarding
-                    </div>
-                </div>
-
-                {{-- Features List --}}
-                <ul class="pricing-features-list">
-                    <li><i class="fa-solid fa-circle-check"></i> 1 Outlet &amp; 1 Perangkat Kasir</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Manajemen POS &amp; Cetak Struk</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Laporan Ringkasan Penjualan Harian</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Dukungan Teknis Standar via Chat</li>
-                </ul>
-
-                <a href="{{ route('customer.register') }}" class="btn-pricing-regular">
-                    Pilih Starter <i class="fa-solid fa-arrow-right"></i>
-                </a>
-            </div>
-
-            {{-- 2. Flagship All-in-One Tier (MOST POPULAR - HIGHEST VISUAL PROMINENCE) --}}
-            <div class="pricing-saas-card is-popular reveal reveal-delay-2">
-                {{-- Special Offer Floating Badge --}}
-                <div class="pricing-featured-floating-pill">
-                    <i class="fa-solid fa-star"></i> MOST POPULAR · REKOMENDASI
-                </div>
-
-                <div class="pricing-card-header">
-                    <span class="pricing-plan-badge" style="color: #C7D2FE; background: rgba(99, 102, 241, 0.25);">FLAGSHIP ALL-IN-ONE</span>
-                    <h3 class="pricing-plan-title">COOCA All-in-One ERP &amp; POS</h3>
-                    <p class="pricing-plan-desc">
-                        Satu sistem lengkap untuk mengelola operasional, inventori, keuangan, dan seluruh cabang secara real-time.
-                    </p>
-                </div>
-
-                {{-- Price Block --}}
-                <div class="pricing-block-unified">
-                    <div class="pricing-anchor-row">
-                        <span class="anchor-label">Normal: <del class="anchor-del">Rp 700.000</del></span>
-                        <span class="product-discount-pill" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(6, 182, 212, 0.3) 100%); color: #6EE7B7; border-color: rgba(110, 231, 183, 0.5);">
-                            <i class="fa-solid fa-bolt"></i> HEMAT 50%
-                        </span>
-                    </div>
-
-                    <div class="pricing-hero-amount-wrap">
-                        <span class="currency">Rp</span>
-                        <span class="amount">350.000</span>
-                        <span class="period">/bulan</span>
-                    </div>
-
-                    <div class="pricing-savings-chip" style="background: rgba(16, 185, 129, 0.18); border-color: rgba(52, 211, 153, 0.4);">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span>Hemat Rp 350.000 setiap bulan</span>
-                    </div>
-
-                    <div class="pricing-urgency-note">
-                        <i class="fa-solid fa-fire-flame-curved" style="color: #F59E0B;"></i>
+                    <div class="cooca-urgency-row">
+                        <i class="fa-solid fa-bolt"></i>
                         <span>Harga promo onboarding terbatas</span>
                     </div>
                 </div>
 
-                {{-- Features Checklist --}}
-                <ul class="pricing-features-list">
-                    <li><i class="fa-solid fa-circle-check"></i> <strong>Akses Penuh Seluruh Modul ERP &amp; POS</strong></li>
-                    <li><i class="fa-solid fa-circle-check"></i> Multi-Outlet &amp; Multi-Kasir Terpusat</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Laporan Keuangan &amp; Laba Rugi Otomatis</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Manajemen Inventori &amp; Stok Realtime</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Notifikasi WhatsApp &amp; Struk Digital</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Setup Kilat 24 Jam &amp; Training Tim Gratis</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Dukungan Prioritas 24/7 &amp; SLA 99.9%</li>
+                {{-- Features List --}}
+                <ul class="cooca-feature-list">
+                    <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>1 Outlet &amp; 1 Perangkat Kasir</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Manajemen POS &amp; Cetak Struk</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Laporan Ringkasan Penjualan Harian</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Dukungan Teknis Standar via Chat</span></li>
                 </ul>
 
-                <a href="{{ route('customer.register') }}" class="btn-pricing-featured">
-                    <i class="fa-solid fa-rocket"></i> Mulai Sekarang <i class="fa-solid fa-arrow-right"></i>
+                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-blue">
+                    Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
 
-            {{-- 3. Enterprise Custom Tier --}}
-            <div class="pricing-saas-card reveal reveal-delay-3">
-                <div class="pricing-card-header">
-                    <span class="pricing-plan-badge" style="color: #67E8F9; background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.25);">Enterprise &amp; Multi-Corp</span>
-                    <h3 class="pricing-plan-title">Enterprise Custom</h3>
-                    <p class="pricing-plan-desc">
-                        Untuk perusahaan berskala besar dengan kebutuhan integrasi API kustom, white-label, dan server dedicated.
-                    </p>
+            {{-- 2. Flagship All-in-One Tier (Theme Purple Glow - MOST POPULAR) --}}
+            <div class="cooca-card theme-purple reveal reveal-delay-2">
+                {{-- Most Popular Floating Badge --}}
+                <div class="cooca-floating-badge">
+                    <i class="fa-solid fa-star"></i> MOST POPULAR • REKOMENDASI
                 </div>
 
-                {{-- Price Block --}}
-                <div class="pricing-block-unified">
-                    <div class="pricing-anchor-row">
-                        <span class="anchor-label">Infrastruktur Khusus</span>
-                        <span class="product-discount-pill" style="color: #67E8F9; border-color: rgba(103, 232, 249, 0.35);">
-                            CUSTOM
-                        </span>
+                {{-- Diagonal Gold Ribbon --}}
+                <div class="corner-ribbon-wrap">
+                    <div class="corner-ribbon corner-ribbon-gold">
+                        HEMAT<br>50%
+                    </div>
+                </div>
+
+                <div>
+                    <span class="cooca-badge-duration badge-duration-purple">12 BULAN (ANNUAL)</span>
+                </div>
+                <h3 class="cooca-tier-title">COOCA All-in-One ERP</h3>
+
+                {{-- Normal Price Strikethrough --}}
+                <div class="cooca-normal-price-row">
+                    <span>Harga Normal</span>
+                    <del class="cooca-normal-del">Rp700.000</del>
+                </div>
+
+                {{-- Main Price Box with Crown --}}
+                <div class="cooca-hero-price-box">
+                    <i class="fa-solid fa-crown cooca-price-crown"></i>
+
+                    <div class="cooca-main-price-line">
+                        <span class="currency">Rp</span>
+                        <span class="amount">350.000</span>
+                        <span class="period">/ bulan</span>
                     </div>
 
-                    <div class="pricing-hero-amount-wrap">
-                        <span class="amount" style="font-size: 32px;">Hubungi Tim</span>
+                    <div class="cooca-savings-box savings-box-purple">
+                        <div class="cooca-savings-left">
+                            <i class="fa-solid fa-tags"></i>
+                            <span>Anda hemat Rp 350.000</span>
+                        </div>
+                        <i class="fa-solid fa-circle-check cooca-savings-check"></i>
                     </div>
 
-                    <div class="pricing-savings-chip" style="color: #67E8F9; background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.3);">
-                        <i class="fa-solid fa-headset"></i>
-                        <span>Dedicated Account Manager &amp; SLA</span>
-                    </div>
-
-                    <div class="pricing-urgency-note" style="color: var(--text-muted);">
-                        <i class="fa-solid fa-building"></i> Penyesuaian workflow korporasi
+                    <div class="cooca-urgency-row">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Harga promo onboarding terbatas</span>
                     </div>
                 </div>
 
                 {{-- Features List --}}
-                <ul class="pricing-features-list">
-                    <li><i class="fa-solid fa-circle-check"></i> Outlet &amp; User Tanpa Batas (Unlimited)</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Dedicated Private Cloud Database</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Kustomisasi Modul &amp; White-label Brand</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Integrasi API ERP Warisan (SAP/Oracle/dll)</li>
+                <ul class="cooca-feature-list">
+                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Akses Penuh Seluruh Modul ERP &amp; POS</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Multi-Outlet &amp; Multi-Kasir Terpusat</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Laporan Keuangan &amp; Laba Rugi Otomatis</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Manajemen Inventori &amp; Stok Realtime</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Dukungan Prioritas 24/7 &amp; SLA 99.9%</span></li>
                 </ul>
 
-                <a href="{{ route('contact') }}" class="btn-pricing-regular">
-                    <i class="fa-solid fa-phone mr-1"></i> Konsultasi Tim Expert
+                <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-purple-glow">
+                    Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            {{-- 3. Enterprise Custom Tier (Theme Green) --}}
+            <div class="cooca-card theme-green reveal reveal-delay-3">
+                {{-- Diagonal Green Ribbon --}}
+                <div class="corner-ribbon-wrap">
+                    <div class="corner-ribbon corner-ribbon-green">
+                        CUSTOM<br>PLAN
+                    </div>
+                </div>
+
+                <div>
+                    <span class="cooca-badge-duration badge-duration-green">ENTERPRISE</span>
+                </div>
+                <h3 class="cooca-tier-title">Enterprise Custom</h3>
+
+                {{-- Normal Price --}}
+                <div class="cooca-normal-price-row">
+                    <span>Infrastruktur Khusus</span>
+                    <span style="color: #4ADE80; font-weight: 700; margin-left: 6px;">Dedicated Server</span>
+                </div>
+
+                {{-- Price Box --}}
+                <div class="cooca-hero-price-box">
+                    <div class="cooca-main-price-line">
+                        <span class="amount" style="font-size: 32px;">Hubungi Tim</span>
+                    </div>
+
+                    <div class="cooca-savings-box savings-box-green">
+                        <div class="cooca-savings-left">
+                            <i class="fa-solid fa-headset"></i>
+                            <span>Dedicated Account Manager &amp; SLA</span>
+                        </div>
+                        <i class="fa-solid fa-circle-check cooca-savings-check"></i>
+                    </div>
+
+                    <div class="cooca-urgency-row" style="color: #94A3B8;">
+                        <i class="fa-solid fa-building"></i>
+                        <span>Penyesuaian workflow korporasi</span>
+                    </div>
+                </div>
+
+                {{-- Features List --}}
+                <ul class="cooca-feature-list">
+                    <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Outlet &amp; User Tanpa Batas (Unlimited)</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Dedicated Private Cloud Database</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Kustomisasi Modul &amp; White-label Brand</span></li>
+                    <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Integrasi API ERP Warisan (SAP/Oracle/dll)</span></li>
+                </ul>
+
+                <a href="{{ route('contact') }}" class="cooca-btn cooca-btn-green">
+                    Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
 
         </div>
 
-        {{-- Trust & Risk Reversal Banner --}}
-        <div class="reveal" style="margin-top: 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-around; flex-wrap: wrap; gap: 16px;">
-            <div style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; color: var(--text);">
-                <i class="fa-solid fa-shield-halved text-success" style="font-size: 18px;"></i>
-                <span>Garansi Uang Kembali 30 Hari</span>
+        {{-- Bottom Trust Bar --}}
+        <div class="cooca-trust-bar reveal" style="margin-top: 10px;">
+            <div class="cooca-trust-item">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Aman &amp; Terpercaya</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; color: var(--text);">
-                <i class="fa-solid fa-bolt text-primary" style="font-size: 18px;"></i>
-                <span>Setup Kilat 24 Jam Siap Pakai</span>
+            <span>•</span>
+            <div class="cooca-trust-item">
+                <i class="fa-solid fa-cloud"></i>
+                <span>Cloud Backup</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; color: var(--text);">
-                <i class="fa-solid fa-lock text-accent" style="font-size: 18px;"></i>
-                <span>Enkripsi SOC2 &amp; Tanpa Biaya Tersembunyi</span>
+            <span>•</span>
+            <div class="cooca-trust-item">
+                <i class="fa-solid fa-headset"></i>
+                <span>Support 24/7</span>
+            </div>
+            <span>•</span>
+            <div class="cooca-trust-item">
+                <i class="fa-solid fa-rotate"></i>
+                <span>Free Update</span>
             </div>
         </div>
     </div>
