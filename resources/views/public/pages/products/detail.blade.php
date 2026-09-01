@@ -43,8 +43,8 @@
                         {{ $product->short_description ?? Str::limit($product->description, 160) }}
                     </p>
 
-                    {{-- Price & CTA Box with Psychological Pricing --}}
-                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); backdrop-filter: blur(16px);">
+                    {{-- Price & CTA Box with Psychological Pricing (Dual-Theme Compatible) --}}
+                    <div class="product-hero-pricing-box">
                         @php
                             $lowestPlan = $product->subscriptionPlans
                                 ->where('is_active', true)
@@ -63,20 +63,20 @@
                                     $origPrice = $rawPrice * 2;
                                     $discount = 50;
                                 }
-                                $period = $lowestPlan->duration_months >= 999 ? ' / Lifetime' : ($lowestPlan->duration_months == 1 ? '/bulan' : '/' . $lowestPlan->duration_months . ' bln');
+                                $period = $lowestPlan->duration_months >= 999 ? '/ Lifetime' : ($lowestPlan->duration_months == 1 ? '/ bulan' : '/' . $lowestPlan->duration_months . ' bln');
                             } else {
                                 $base = (float)($product->base_price ?? 350000);
                                 $finalPrice = $base > 0 ? $base : 350000;
                                 $origPrice = $finalPrice * 2;
                                 $discount = 50;
-                                $period = '/bulan';
+                                $period = '/ bulan';
                             }
                             $savings = $origPrice - $finalPrice;
                         @endphp
 
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <div class="product-pricing-top-meta" style="margin-bottom: 12px;">
                             <span class="product-anchor-text" style="font-size: 13px;">
-                                Normal: <del class="product-anchor-del" style="font-size: 14px;">Rp {{ number_format($origPrice, 0, ',', '.') }}</del>
+                                Harga Normal <del class="product-anchor-del" style="font-size: 14px;">Rp {{ number_format($origPrice, 0, ',', '.') }}</del>
                             </span>
                             <span class="product-discount-pill" style="font-size: 11.5px; padding: 3px 10px;">
                                 <i class="fa-solid fa-bolt"></i> HEMAT {{ number_format($discount, 0) }}%
@@ -84,15 +84,16 @@
                         </div>
 
                         {{-- Hero Main Price --}}
-                        <div class="product-price-hero-row" style="margin-bottom: 10px;">
-                            <span class="price-val" style="font-size: clamp(34px, 5vw, 44px);">Rp {{ number_format($finalPrice, 0, ',', '.') }}</span>
-                            <span class="price-period" style="font-size: 16px; font-weight: 600;">{{ $period }}</span>
+                        <div class="product-price-hero-row" style="margin-bottom: 12px;">
+                            <span class="price-currency" style="font-size: 22px;">Rp</span>
+                            <span class="price-val" style="font-size: clamp(34px, 5vw, 44px);">{{ number_format($finalPrice, 0, ',', '.') }}</span>
+                            <span class="price-period" style="font-size: 15px; font-weight: 600;">{{ $period }}</span>
                         </div>
 
-                        {{-- Savings Benefit --}}
+                        {{-- Savings Benefit Chip --}}
                         <div class="pricing-savings-chip" style="margin-bottom: 18px;">
                             <i class="fa-solid fa-circle-check"></i>
-                            <span>Hemat Rp {{ number_format($savings, 0, ',', '.') }} setiap bulan</span>
+                            <span>Anda hemat Rp {{ number_format($savings, 0, ',', '.') }} setiap bulan</span>
                         </div>
 
                         {{-- Conversion CTAs --}}
@@ -102,7 +103,7 @@
                                 <i class="fa-solid fa-rocket"></i> Mulai Coba Gratis 14 Hari
                             </a>
                             <a href="{{ route('contact') }}" class="btn-ghost"
-                                style="flex: 1; justify-content: center; padding: 14px 20px; font-size: 14px; border-radius: 12px;">
+                                style="flex: 1; justify-content: center; padding: 14px 20px; font-size: 14px; font-weight: 600; border-radius: 12px;">
                                 <i class="fa-solid fa-comment-dots"></i> Konsultasi
                             </a>
                         </div>

@@ -76,8 +76,42 @@
         @if($products->count() > 0)
         <div class="products-grid">
             @foreach($products as $index => $product)
+            @php
+                $lowestPlan = $product->subscriptionPlans->where('is_active', true)->sortBy('price')->first();
+                
+                if ($lowestPlan) {
+                    $rawPrice = (float)$lowestPlan->price;
+                    $planDiscount = (float)($lowestPlan->discount_percent ?? 0);
+                    if ($planDiscount > 0) {
+                        $origPrice = $rawPrice;
+                        $finalPrice = $origPrice * (1 - $planDiscount / 100);
+                        $discount = $planDiscount;
+                    } else {
+                        $finalPrice = $rawPrice;
+                        $origPrice = $rawPrice * 2;
+                        $discount = 50;
+                    }
+                    $period = $lowestPlan->duration_months >= 999 ? '/ Lifetime' : ($lowestPlan->duration_months == 1 ? '/ bulan' : '/' . $lowestPlan->duration_months . ' bln');
+                } else {
+                    $base = (float)($product->base_price ?? 350000);
+                    $finalPrice = $base > 0 ? $base : 350000;
+                    $origPrice = $finalPrice * 2;
+                    $discount = 50;
+                    $period = '/ bulan';
+                }
+                $savings = $origPrice - $finalPrice;
+            @endphp
             <article class="product-card" id="product-card-{{ $product->id }}">
                 <div class="product-inner">
+                    {{-- Diagonal Discount Ribbon (Pita Diskon) --}}
+                    @if($discount > 0)
+                    <div class="corner-ribbon-wrap">
+                        <div class="corner-ribbon corner-ribbon-blue">
+                            HEMAT<br>{{ number_format($discount, 0) }}%
+                        </div>
+                    </div>
+                    @endif
+
                     <div class="product-thumb">
                         @if($product->thumbnail_url)
                             <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name }}" loading="lazy"
@@ -126,13 +160,6 @@
                         @endif
                     </div>
                     <div class="product-card-pricing-wrap">
-                        @php
-                            $lowestPlan = $product->subscriptionPlans->where('is_active', true)->sortBy('price')->first();
-                            
-                            if ($lowestPlan) {
-                                $rawPrice = (float)$lowestPlan->price;
-                                $planDiscount = (float)($lowestPlan->discount_percent ?? 0);
-                                if ($planDiscount > 0) {
                                     $origPrice = $rawPrice;
                                     $finalPrice = $origPrice * (1 - $planDiscount / 100);
                                     $discount = $planDiscount;

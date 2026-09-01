@@ -344,8 +344,45 @@
         @if($products->count() > 0)
         <div class="products-grid reveal">
             @foreach($products->take(6) as $index => $product)
+            @php
+                $lowestPlan = $product->subscriptionPlans
+                    ->where('is_active', true)
+                    ->sortBy('price')
+                    ->first();
+                
+                if ($lowestPlan) {
+                    $rawPrice = (float)$lowestPlan->price;
+                    $planDiscount = (float)($lowestPlan->discount_percent ?? 0);
+                    if ($planDiscount > 0) {
+                        $origPrice = $rawPrice;
+                        $finalPrice = $origPrice * (1 - $planDiscount / 100);
+                        $discount = $planDiscount;
+                    } else {
+                        $finalPrice = $rawPrice;
+                        $origPrice = $rawPrice * 2;
+                        $discount = 50;
+                    }
+                    $period = $lowestPlan->duration_months >= 999 ? '/ Lifetime' : ($lowestPlan->duration_months == 1 ? '/ bulan' : '/' . $lowestPlan->duration_months . ' bln');
+                } else {
+                    $base = (float)($product->base_price ?? 350000);
+                    $finalPrice = $base > 0 ? $base : 350000;
+                    $origPrice = $finalPrice * 2;
+                    $discount = 50;
+                    $period = '/ bulan';
+                }
+                $savings = $origPrice - $finalPrice;
+            @endphp
             <article class="product-card reveal reveal-delay-{{ ($index % 3) + 1 }}" id="product-{{ $product->id }}">
                 <div class="product-inner">
+                    {{-- Diagonal Discount Ribbon (Pita Diskon) --}}
+                    @if($discount > 0)
+                    <div class="corner-ribbon-wrap">
+                        <div class="corner-ribbon corner-ribbon-blue">
+                            HEMAT<br>{{ number_format($discount, 0) }}%
+                        </div>
+                    </div>
+                    @endif
+
                     {{-- Thumbnail --}}
                     <div class="product-thumb">
                         @if($product->thumbnail_url)
@@ -403,35 +440,6 @@
                     </div>
 
                     <div class="product-card-pricing-wrap">
-                        @php
-                            $lowestPlan = $product->subscriptionPlans
-                                ->where('is_active', true)
-                                ->sortBy('price')
-                                ->first();
-                            
-                            if ($lowestPlan) {
-                                $rawPrice = (float)$lowestPlan->price;
-                                $planDiscount = (float)($lowestPlan->discount_percent ?? 0);
-                                if ($planDiscount > 0) {
-                                    $origPrice = $rawPrice;
-                                    $finalPrice = $origPrice * (1 - $planDiscount / 100);
-                                    $discount = $planDiscount;
-                                } else {
-                                    $finalPrice = $rawPrice;
-                                    $origPrice = $rawPrice * 2;
-                                    $discount = 50;
-                                }
-                                $period = $lowestPlan->duration_months >= 999 ? '/ Lifetime' : ($lowestPlan->duration_months == 1 ? '/ bulan' : '/' . $lowestPlan->duration_months . ' bln');
-                            } else {
-                                $base = (float)($product->base_price ?? 350000);
-                                $finalPrice = $base > 0 ? $base : 350000;
-                                $origPrice = $finalPrice * 2;
-                                $discount = 50;
-                                $period = '/ bulan';
-                            }
-                            $savings = $origPrice - $finalPrice;
-                        @endphp
-
                         @if($origPrice > 0 || $finalPrice > 0)
                             <div class="product-pricing-glass-card">
                                 {{-- Strikethrough Normal Price & Discount Pill --}}
@@ -496,6 +504,13 @@
             @foreach($demoProducts as $i => $demo)
             <article class="product-card reveal reveal-delay-{{ $i+1 }}">
                 <div class="product-inner">
+                    {{-- Diagonal Discount Ribbon (Pita Diskon) --}}
+                    <div class="corner-ribbon-wrap">
+                        <div class="corner-ribbon corner-ribbon-blue">
+                            HEMAT<br>{{ $demo['discount'] }}%
+                        </div>
+                    </div>
+
                     <div class="product-thumb">
                         <div class="product-thumb-fallback"><i class="{{ $demo['icon'] }}"></i></div>
                         <div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);padding:4px 10px;border-radius:100px;display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#f59e0b;">
