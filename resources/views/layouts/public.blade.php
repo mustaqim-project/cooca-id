@@ -59,6 +59,11 @@
 
         $contactAddress = setting('contact.address', 'Jl. Jend. Sudirman No. 52, Jakarta Selatan, DKI Jakarta 12920');
 
+        $footerDesc = setting(
+            'footer.description',
+            'COOCA.ID adalah software ERP Indonesia untuk mengelola operasional, data, dan proses bisnis dalam satu sistem terintegrasi. Dirancang fleksibel untuk UMKM hingga perusahaan yang sedang berkembang.',
+        );
+
         /*
         |--------------------------------------------------------------------------
         | Default SEO Metadata
