@@ -1,12 +1,21 @@
 @extends('layouts.public')
 
-@section('title', 'Katalog & Paket Software Bisnis | COOCA.ID')
-@section('description', 'Pilihan fitur & paket langganan COOCA.ID. Otomatiskan sistem kerja, analisa data secara real-time, dan buat keputusan bisnis lebih cepat serta akurat.')
-@section('keywords', 'harga software bisnis, fitur software erp, paket langganan cooca, software analisa data bisnis, aplikasi manajemen perusahaan')
+@section('title', 'Katalog Produk ERP untuk Bengkel, Klinik, Resto & Retail | COOCA.ID')
+@section('description', 'Temukan produk ERP COOCA.ID: SiCorp multi-outlet, ERP Bengkel, ERP Klinik, ERP Restoran & Retail. Setup 24 jam, support 24/7. Mulai gratis 14 hari.')
+@section('keywords', 'katalog produk erp, erp bengkel indonesia, erp klinik indonesia, erp restoran indonesia, software retail multi-cabang, erp notaris, harga erp indonesia, paket erp umkm')
 
-@push('styles')
-{{-- Font Awesome 6 untuk mengganti emoji --}}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+@push('seo')
+<link rel="canonical" href="{{ url('/products') }}">
+<meta name="robots" content="index, follow">
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Katalog Produk ERP COOCA.ID",
+    "description": "Daftar lengkap produk ERP multi-industri COOCA.ID untuk Bengkel, Klinik, Restoran, Retail, dan Notaris.",
+    "url": "{{ url('/products') }}"
+}
+</script>
 @endpush
 
 @section('content')
@@ -17,7 +26,7 @@
         <div style="text-align: center; max-width: 680px; margin: 0 auto;">
             <span class="lp-eyebrow">KATALOG PRODUK</span>
             <h1 class="lp-heading reveal" style="font-size: clamp(40px,5vw,60px); margin-bottom: 16px;">
-                Temukan <span class="gradient-text">Solusi ERP</span><br>untuk Bisnis Anda
+                Katalog ERP untuk <span class="gradient-text">Bengkel, Klinik,</span><br>Resto & Retail Indonesia
             </h1>
             <p class="lp-subheading reveal" style="margin: 0 auto 40px;">{{ $products->count() > 0 ? $products->count() . ' produk' : 'Banyak produk' }} tersedia, siap digunakan dalam 24 jam.</p>
         </div>
@@ -88,15 +97,15 @@
                         $discount = $planDiscount;
                     } else {
                         $finalPrice = $rawPrice;
-                        $origPrice = $rawPrice * 2;
-                        $discount = 50;
+                        $origPrice = $rawPrice;
+                        $discount = 0;
                     }
                     $period = $lowestPlan->duration_months >= 999 ? '/ Lifetime' : ($lowestPlan->duration_months == 1 ? '/ bulan' : '/' . $lowestPlan->duration_months . ' bln');
                 } else {
                     $base = (float)($product->base_price ?? 350000);
                     $finalPrice = $base > 0 ? $base : 350000;
-                    $origPrice = $finalPrice * 2;
-                    $discount = 50;
+                    $origPrice = $finalPrice;
+                    $discount = 0;
                     $period = '/ bulan';
                 }
                 $savings = $origPrice - $finalPrice;
@@ -164,6 +173,7 @@
                         @if($origPrice > 0 || $finalPrice > 0)
                             <div class="product-pricing-glass-card">
                                 {{-- Normal Price Strikethrough & Discount Pill --}}
+                                @if($discount > 0)
                                 <div class="product-pricing-top-meta">
                                     <span class="product-anchor-text">
                                         Harga Normal <del class="product-anchor-del">Rp {{ number_format($origPrice, 0, ',', '.') }}</del>
@@ -172,6 +182,7 @@
                                         <i class="fa-solid fa-bolt"></i> HEMAT {{ number_format($discount, 0) }}%
                                     </span>
                                 </div>
+                                @endif
 
                                 {{-- Main Hero Price Line --}}
                                 <div class="product-price-hero-row">
@@ -181,6 +192,7 @@
                                 </div>
 
                                 {{-- Savings Tag Box --}}
+                                @if($discount > 0 && $savings > 0)
                                 <div class="product-savings-box">
                                     <div class="product-savings-left">
                                         <i class="fa-solid fa-tags"></i>
@@ -188,6 +200,7 @@
                                     </div>
                                     <i class="fa-solid fa-circle-check product-savings-check"></i>
                                 </div>
+                                @endif
 
                                 {{-- Urgency Notice --}}
                                 <div class="product-urgency-row">
@@ -244,7 +257,7 @@
                     <i class="fa-solid fa-comment-dots"></i> Konsultasi Gratis
                 </a>
                 <a href="{{ route('customer.register') }}" class="btn-white-outline">
-                    <i class="fa-solid fa-rocket"></i> Coba Gratis 14 Hari
+                    <i class="fa-solid fa-rocket"></i> Mulai Sekarang - Gratis
                 </a>
             </div>
         </div>

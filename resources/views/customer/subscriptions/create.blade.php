@@ -29,7 +29,7 @@
         if ($selectedProduct && $prePlan) {
             $selectedPlan = $selectedProduct->subscriptionPlans->firstWhere('id', $prePlan);
         }
-        $waNumber = setting('contact.whatsapp', '6282134566667');
+        $waNumber = setting('contact.whatsapp', '6282337499577');
     @endphp
 
     <div class="page-header">

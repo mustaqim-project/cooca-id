@@ -7,7 +7,7 @@
 @section('content')
     @php
         $customer = auth('customer')->user();
-        $waNumber = setting('contact.whatsapp', '6282134566667');
+        $waNumber = setting('contact.whatsapp', '6282337499577');
 
         // Active subscriptions
         $activeSubs =

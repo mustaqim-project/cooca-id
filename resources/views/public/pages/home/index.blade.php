@@ -1,18 +1,11 @@
 @extends('layouts.public')
 
-@section('title', 'COOCA.ID - Move Faster. Decide Better | Software Bisnis')
+@section('title', 'ERP Multi-Industri untuk UMKM Indonesia · COOCA.ID')
 
-@section('description',
-    'COOCA.ID adalah software ERP Indonesia untuk mengelola operasional, data, dan keputusan bisnis
-    dalam satu sistem terpadu. Mulai digitalisasi bisnis Anda.')
+@section('description', 'COOCA.ID: ERP Multi-Industri untuk 1.000+ Bisnis Indonesia. Bengkel, Klinik, Resto, Retail, Jasa. Setup 24 jam. Coba gratis 14 hari.')
 
-@section('keywords',
-    'software ERP Indonesia, sistem ERP, software manajemen bisnis, software operasional bisnis,
-    digitalisasi bisnis, COOCA.ID')
+@section('keywords', 'ERP multi-industri untuk UMKM Indonesia, software ERP Indonesia, software bisnis Indonesia, ERP terbaik Indonesia 2026, software kasir multi-cabang, sistem operasi bisnis, ERP untuk usaha berkembang, ERP UMKM Indonesia, aplikasi ERP Indonesia')
 
-    @push('styles')
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    @endpush
 
 @section('content')
 
@@ -31,22 +24,21 @@
                     <!--</div>-->
 
 
-                    {{-- Headline --}}
+                    {{-- Tagline & Headline --}}
+                    <p class="hero-tagline" style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px;">Move Faster. Decide Better.</p>
                     <h1 class="hero-title" id="hero-heading">
-                        Optimalkan Bisnis<br>
-                        Dengan <span class="highlight">ERP</span>
+                        ERP Multi-Industri<br>
+                        untuk <span class="highlight">UMKM Indonesia</span>
                     </h1>
 
                     <p class="hero-desc">
-                        Kelola operasional lebih rapi, cepat, dan terukur dengan satu platform ERP dari Cooca.
+                        Kelola Bengkel, Klinik, Restoran, Retail & Notaris dari satu platform ERP terpadu. Setup instan 24 jam.
                     </p>
-
-
 
                     {{-- CTAs --}}
                     <div class="hero-actions">
                         <a href="{{ route('customer.register') }}" class="btn-primary-glow btn-hero" id="hero-cta-primary">
-                            <i class="fa-solid fa-rocket"></i> Mulai Coba Gratis 14 Hari
+                            <i class="fa-solid fa-rocket"></i> Mulai Sekarang - Gratis
                         </a>
                         <a href="{{ route('products.index') }}" class="btn-outline-glow btn-hero" id="hero-cta-secondary">
                             <span>Jelajahi Produk ERP</span>
@@ -55,6 +47,10 @@
 
                     {{-- Trust Badges --}}
                     <div class="hero-trust-badges">
+                        <div class="trust-badge-item">
+                            <i class="fa-solid fa-wand-magic-sparkles" style="color: #6366f1;"></i>
+                            AI-Powered ERP
+                        </div>
                         <div class="trust-badge-item">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                                 <path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.1 4.4 12l.7-4L2.2 5.2l4-.6L8 1z"
@@ -253,7 +249,6 @@
     {{-- ═══════════════════════════════════════════════════
      ERP ECOSYSTEM — BENTO GRID
 ═══════════════════════════════════════════════════ --}}
-    {{--
 <section class="lp-section section-bg-alt" id="ecosystem" aria-labelledby="ecosystem-heading">
     <div class="lp-container">
         <div class="lp-section-header reveal">
@@ -351,7 +346,6 @@
         </div>
     </div>
 </section>
---}}
 
     {{-- ═══════════════════════════════════════════════════
      PRODUCT SHOWCASE — Dynamic from DB
@@ -385,8 +379,8 @@
                                     $discount = $planDiscount;
                                 } else {
                                     $finalPrice = $rawPrice;
-                                    $origPrice = $rawPrice * 2;
-                                    $discount = 50;
+                                    $origPrice = $rawPrice;
+                                    $discount = 0;
                                 }
                                 $period =
                                     $lowestPlan->duration_months >= 999
@@ -397,8 +391,8 @@
                             } else {
                                 $base = (float) ($product->base_price ?? 350000);
                                 $finalPrice = $base > 0 ? $base : 350000;
-                                $origPrice = $finalPrice * 2;
-                                $discount = 50;
+                                $origPrice = $finalPrice;
+                                $discount = 0;
                                 $period = '/ bulan';
                             }
                             $savings = $origPrice - $finalPrice;
@@ -474,6 +468,7 @@
                                     @if ($origPrice > 0 || $finalPrice > 0)
                                         <div class="product-pricing-glass-card">
                                             {{-- Strikethrough Normal Price & Discount Pill --}}
+                                            @if ($discount > 0)
                                             <div class="product-pricing-top-meta">
                                                 <span class="product-anchor-text">
                                                     Harga Normal <del class="product-anchor-del">Rp
@@ -484,6 +479,7 @@
                                                     {{ number_format($discount, 0) }}%
                                                 </span>
                                             </div>
+                                            @endif
 
                                             {{-- Main Hero Price Line --}}
                                             <div class="product-price-hero-row">
@@ -640,6 +636,27 @@
             <div style="text-align:center; margin-top: 48px;" class="reveal">
                 <a href="{{ route('products.index') }}" class="btn-outline-glow" id="see-all-products-btn">
                     <span>Lihat Semua Produk →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {{-- ═══════════════════════════════════════════════════
+     CROSS-BRAND UMKM REFERRAL BANNER
+    ═══════════════════════════════════════════════════ --}}
+    <section class="lp-container" style="margin-top: 24px; margin-bottom: 48px;">
+        <div class="reveal" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 20px; padding: 28px 36px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 20px;">
+            <div style="max-width: 700px;">
+                <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6366f1; margin-bottom: 8px;">
+                    <i class="fa-solid fa-store"></i> PROGRAM KHUSUS UMKM
+                </div>
+                <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Baru Merintis Usaha Mandiri?</h3>
+                <p style="font-size: 14px; color: var(--text-muted); margin: 0; line-height: 1.5;">Gunakan versi dasar 100% GRATIS SELAMANYA di portal UMKM kami — lengkap dengan POS kasir, inventaris, dan kalkulator HPP tanpa biaya.</p>
+            </div>
+            <div>
+                <a href="https://umkm.cooca.id" target="_blank" rel="noopener noreferrer" class="btn-primary-glow" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 12px 24px; border-radius: 12px; white-space: nowrap; text-decoration: none;">
+                    <span>Coba Portal UMKM Gratis</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i>
                 </a>
             </div>
         </div>
@@ -938,8 +955,7 @@
                         <span class="how-step-icon">01</span>
                     </div>
                     <h3 class="how-step-title">Daftar Akun</h3>
-                    <p class="how-step-desc">Buat akun gratis dalam 2 menit. Tidak perlu kartu kredit. Tidak perlu
-                        instalasi apapun.</p>
+                    <p class="how-step-desc">Buat akun gratis dalam 2 menit. Langsung aktif tanpa instalasi apapun.</p>
                 </div>
                 <div class="how-step reveal reveal-delay-2">
                     <div class="how-step-num" style="background: linear-gradient(135deg, #7C3AED, var(--accent));">
@@ -1452,7 +1468,7 @@
 
                 <div class="cta-actions">
                     <a href="{{ route('customer.register') }}" class="btn-white" id="cta-primary-btn">
-                        <i class="fa-solid fa-rocket"></i> Daftar Sekarang — Gratis 14 Hari
+                        <i class="fa-solid fa-rocket"></i> Mulai Sekarang - Gratis
                     </a>
                     <a href="{{ route('contact') }}" class="btn-white-outline" id="cta-demo-btn">
                         <i class="fa-solid fa-phone"></i> Konsultasi Tim Expert
@@ -1460,7 +1476,7 @@
                 </div>
 
                 <p class="cta-trust">
-                    Tidak perlu kartu kredit · Cancel saat apapun · Data 100% aman
+                    Akses uji coba 14 hari · Setup instan 24 jam · Data 100% aman
                 </p>
             </div>
         </div>

@@ -1,18 +1,18 @@
 @extends('layouts.public')
 
-@section('title', 'Wawasan Bisnis & Analisis Data | COOCA.ID Blog')
-@section('description', 'Temukan artikel seputar otomatisasi, efisiensi operasional, dan strategi data-driven decision untuk membawa bisnis Anda melaju lebih cepat.')
-@section('keywords', 'blog bisnis indonesia, cara mengambil keputusan bisnis, tips efisiensi operasional, strategi data driven business, panduan software erp')
+@section('title', 'Blog COOCA.ID: ERP, Operasional, Multi-Cabang, AI')
+@section('description', 'Blog COOCA.ID: panduan ERP Multi-Industri, operasional multi-cabang, AI Assistant, klinik, bengkel, resto, retail. Update setiap minggu.')
+@section('keywords', 'blog software ERP Indonesia, artikel ERP Indonesia, blog bisnis multi-cabang, tips digitalisasi UMKM, operasional bisnis, panduan ERP')
 
 @section('content')
 
 {{-- Hero Section --}}
 <section class="aurora-bg page-hero">
     <div class="lp-container">
-        <div style="text-align: center; max-width: 720px; margin: 0 auto;">
-            <span class="lp-eyebrow">BLOG &amp; WAKTU BISNIS</span>
-            <h1 class="lp-heading reveal" style="font-size: clamp(40px, 5vw, 60px); margin-bottom: 16px;">
-                Wawasan <span class="gradient-text">Pertumbuhan Bisnis</span>
+        <div style="text-align: center; max-width: 760px; margin: 0 auto;">
+            <span class="lp-eyebrow">BLOG &amp; INSIGHT BISNIS</span>
+            <h1 class="lp-heading reveal" style="font-size: clamp(34px, 5vw, 54px); margin-bottom: 16px;">
+                Blog COOCA.ID: <span class="gradient-text">Panduan ERP &amp; Operasional</span> Bisnis Indonesia
             </h1>
             <p class="lp-subheading reveal" style="margin: 0 auto 32px;">
                 Strategi, panduan teknis, dan tren industri terupdate untuk memajukan operasional bisnis Anda.

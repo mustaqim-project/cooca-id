@@ -92,7 +92,7 @@
             <div class="text-xs text-muted">Lihat histori & unduh PDF</div>
         </div>
     </a>
-    <a href="https://wa.me/{{ setting('contact.whatsapp', '6282134566667') }}?text={{ urlencode('Halo COOCA.ID, saya butuh bantuan terkait layanan.') }}" target="_blank" class="card card-hover" style="padding:14px;display:flex;align-items:center;gap:12px;text-decoration:none;border:1px solid var(--border);">
+    <a href="https://wa.me/{{ setting('contact.whatsapp', '6282337499577') }}?text={{ urlencode('Halo COOCA.ID, saya butuh bantuan terkait layanan.') }}" target="_blank" class="card card-hover" style="padding:14px;display:flex;align-items:center;gap:12px;text-decoration:none;border:1px solid var(--border);">
         <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">
             <i class="fa-brands fa-whatsapp"></i>
         </div>

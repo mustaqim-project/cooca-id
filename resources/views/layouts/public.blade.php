@@ -21,7 +21,7 @@
 
         $locale = str_replace('_', '-', app()->getLocale());
 
-        $ogLocale = str_replace('-', '_', $locale);
+        $ogLocale = 'id_ID';
 
         /*
         |--------------------------------------------------------------------------
@@ -49,11 +49,14 @@
         | Contact Settings
         |--------------------------------------------------------------------------
         */
-        $waNumber = setting('contact.whatsapp', '');
+        $waNumber = setting('contact.whatsapp', '0823 3749 9577');
 
         $waCleanNumber = preg_replace('/[^0-9]/', '', $waNumber);
+        if (str_starts_with($waCleanNumber, '0')) {
+            $waCleanNumber = '62' . substr($waCleanNumber, 1);
+        }
 
-        $waLink = setting('contact.whatsapp_link') ?: (!empty($waCleanNumber) ? 'https://wa.me/' . $waCleanNumber : '');
+        $waLink = setting('contact.whatsapp_link') ?: (!empty($waCleanNumber) ? 'https://wa.me/' . $waCleanNumber : 'https://wa.me/6282337499577');
 
         $emailSupport = setting('contact.email', '');
 
@@ -194,7 +197,7 @@
             'url' => $siteUrl,
             'description' =>
                 'Platform software ERP dan manajemen bisnis terpadu untuk membantu perusahaan mengelola operasional, data, dan pertumbuhan bisnis.',
-            'inLanguage' => $locale,
+            'inLanguage' => 'id',
             'publisher' => [
                 '@id' => $siteUrl . '#organization',
             ],
@@ -295,41 +298,51 @@
         Consent-Aware Google Analytics 4
     ============================================================ --}}
     <script>
-        window.gaLoaded = false;
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { window.dataLayer.push(arguments); }
+        window.gtag = gtag;
 
-        function loadAnalyticsIfConsented() {
-            const consent = localStorage.getItem('cooca_cookie_consent');
+        // Google Consent Mode v2 - Default Denied
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'wait_for_update': 500
+        });
 
-            if (consent !== 'all' || window.gaLoaded) {
-                return;
-            }
-
-            window.gaLoaded = true;
-
-            const script = document.createElement('script');
-
-            script.async = true;
-            script.src = 'https://www.googletagmanager.com/gtag/js?id=G-HZSN9QHGN1';
-
-            document.head.appendChild(script);
-
-            window.dataLayer = window.dataLayer || [];
-
-            function gtag() {
-                window.dataLayer.push(arguments);
-            }
-
-            window.gtag = gtag;
-
-            window.gtag('js', new Date());
-
-            window.gtag('config', 'G-HZSN9QHGN1', {
-                anonymize_ip: true,
-                cookie_flags: 'SameSite=None;Secure'
+        const consent = localStorage.getItem('cooca_cookie_consent');
+        if (consent === 'all') {
+            gtag('consent', 'update', {
+                'ad_storage': 'granted',
+                'ad_user_data': 'granted',
+                'ad_personalization': 'granted',
+                'analytics_storage': 'granted'
             });
         }
 
-        loadAnalyticsIfConsented();
+        // Load GA4
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-HZSN9QHGN1';
+        document.head.appendChild(script);
+
+        gtag('js', new Date());
+        gtag('config', 'G-HZSN9QHGN1', {
+            anonymize_ip: true,
+            cookie_flags: 'SameSite=None;Secure'
+        });
+
+        function loadAnalyticsIfConsented() {
+            if (localStorage.getItem('cooca_cookie_consent') === 'all') {
+                gtag('consent', 'update', {
+                    'ad_storage': 'granted',
+                    'ad_user_data': 'granted',
+                    'ad_personalization': 'granted',
+                    'analytics_storage': 'granted'
+                });
+            }
+        }
     </script>
 
     {{-- ============================================================
@@ -493,7 +506,7 @@
                 </div>
 
                 <a href="{{ route('customer.register') }}" class="btn-primary-glow" id="nav-cta-btn">
-                    Coba Gratis 14 Hari
+                    Mulai Sekarang - Gratis
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                         <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                             stroke-linejoin="round" />
@@ -535,7 +548,7 @@
                 <a href="{{ route('affiliator.login') }}" class="btn-ghost" style="text-align:center;">Login
                     Partner</a>
                 <a href="{{ route('customer.register') }}" class="btn-primary-glow mobile-cta"
-                    style="text-align:center; justify-content:center;">Coba Gratis 14 Hari →</a>
+                    style="text-align:center; justify-content:center;">Mulai Sekarang - Gratis →</a>
             @endif
         </div>
     </div>
@@ -698,7 +711,7 @@
     </div>
 
     {{-- Pusher JS (Optional Realtime Websocket) --}}
-    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js" defer></script>
 
     <script>
         var loadedFaqsList = [];

@@ -1,8 +1,27 @@
 @extends('layouts.public')
 
-@section('title', 'Program Afiliasi Software Bisnis | COOCA.ID')
-@section('description', 'Bantu para pengusaha Move Faster & Decide Better. Bergabunglah menjadi mitra afiliasi COOCA.ID dan dapatkan komisi berkelanjutan.')
-@section('keywords', 'program afiliasi software, affiliate saas indonesia, komisi reseller software, mitra bisnis cooca, peluang bisnis teknologi')
+@section('title', 'Program Partner & Afiliasi ERP | Komisi 25% Setiap Bulan — COOCA.ID')
+@section('description', 'Bergabung sebagai mitra afiliasi COOCA.ID. Dapatkan komisi 25% (Level 1) + 5% (Level 2) dari setiap tagihan bulanan klien ERP Anda. Daftar gratis sekarang.')
+@section('keywords', 'program afiliasi erp indonesia, partner software bisnis, komisi reseller erp, affiliate saas indonesia, mitra cooca id, penghasilan pasif software, referral erp')
+
+@push('seo')
+<link rel="canonical" href="{{ url('/affiliate') }}">
+<meta name="robots" content="index, follow">
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Program Partner & Afiliasi COOCA.ID",
+    "description": "Program afiliasi 2 level COOCA.ID: komisi 25% Level 1 dan 5% Level 2 dari setiap pembayaran bulanan. Daftar gratis untuk konsultan, agensi, dan komunitas bisnis Indonesia.",
+    "url": "{{ url('/affiliate') }}",
+    "publisher": {
+        "@type": "Organization",
+        "name": "COOCA.ID",
+        "url": "https://cooca.id"
+    }
+}
+</script>
+@endpush
 
 @section('content')
 
@@ -12,7 +31,7 @@
         <div style="text-align: center; max-width: 720px; margin: 0 auto;">
             <span class="lp-eyebrow">PROGRAM PARTNER &amp; AFFILIATE</span>
             <h1 class="lp-heading reveal" style="font-size: clamp(40px,6vw,64px); margin-bottom: 20px;">
-                Penghasilan <span class="gradient-text">Pasif 2 Level</span><br>Bersama COOCA.ID
+                Program Partner & Afiliasi ERP — <span class="gradient-text">Komisi 25%</span> Setiap Bulan
             </h1>
             <p class="lp-subheading reveal" style="margin: 0 auto 36px;">
                 Rekomendasikan platform ERP terbaik ke jaringan Anda. Dapatkan komisi <strong>25% (Level 1)</strong> dan <strong>5% (Level 2)</strong> dari setiap tagihan bulanan klien.

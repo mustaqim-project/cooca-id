@@ -1,8 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Konsultasi & Schedule Demo Gratis | COOCA.ID')
-@section('description', 'Siap untuk Move Faster & Decide Better? Hubungi tim COOCA.ID dan jadwalkan demo gratis untuk transformasi operasional bisnis Anda hari ini.')
-@section('keywords', 'kontak cooca id, jadwal demo software cooca, konsultasi software bisnis, customer support cooca, alamat kantor cooca')
+@section('title', 'Hubungi Kami · COOCA.ID Support 24/7')
+@section('description', 'Hubungi tim COOCA.ID: WhatsApp 0823 3749 9577, support@cooca.id, demo gratis. Response dalam 1 jam kerja. Pro/Enterprise 24/7.')
+@section('keywords', 'kontak COOCA Indonesia support, hubungi COOCA, customer support COOCA, WhatsApp COOCA, demo COOCA gratis, email support COOCA')
 
 @section('content')
 
@@ -31,7 +31,7 @@
                 @php
                 $contacts = [
                     ['<i class="fa-solid fa-location-dot"></i>','Alamat Kantor','Jl. Jend. Sudirman No. 52, Jakarta Selatan, DKI Jakarta 12920'],
-                    ['<i class="fa-solid fa-mobile-screen"></i>','WhatsApp Business','+62 821-3456-6667'],
+                    ['<i class="fa-solid fa-mobile-screen"></i>','WhatsApp Business','+62 823-3749-9577'],
                     ['<i class="fa-solid fa-envelope"></i>','Email Support','support@cooca.id'],
                     ['<i class="fa-regular fa-clock"></i>','Jam Operasional','Senin–Jumat: 08.00–20.00 WIB | Sabtu: 09.00–15.00 WIB'],
                     ['<i class="fa-solid fa-headset"></i>','Support Darurat','24/7 untuk pelanggan Pro & Enterprise'],
@@ -134,8 +134,8 @@
     <div class="lp-container">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
             @php
-            $waNum = preg_replace('/[^0-9]/', '', setting('contact.whatsapp', '6282134566667'));
-            $waUrl = setting('contact.whatsapp_link') ?: ('https://wa.me/' . ($waNum ?: '6282134566667'));
+            $waNum = preg_replace('/[^0-9]/', '', setting('contact.whatsapp', '6282337499577'));
+            $waUrl = setting('contact.whatsapp_link') ?: ('https://wa.me/' . ($waNum ?: '6282337499577'));
             $email = setting('contact.email', 'support@cooca.id');
 
             $actions = [

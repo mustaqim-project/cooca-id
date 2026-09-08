@@ -1,11 +1,58 @@
 @extends('layouts.public')
 
-@section('title', ($product->name ?? 'Detail Produk') . ' — COOCA.ID')
-@section('description', $product->short_description ?? $product->name . ' dari COOCA.ID — Solusi ERP Enterprise.')
+@section('title', ($product->name ?? 'Produk ERP') . ' — Software Bisnis Indonesia | COOCA.ID')
+@section('description', ($product->short_description ?? 'Solusi ERP ' . ($product->name ?? '') . ' dari COOCA.ID') . ' Setup 24 jam, support 24/7, SLA 99.9%. Mulai gratis 14 hari.')
+@section('keywords', strtolower($product->name ?? 'erp') . ', erp ' . strtolower($product->category->name ?? 'bisnis') . ' indonesia, software ' . strtolower($product->category->name ?? 'bisnis') . ' multi-cabang, cooca.id ' . strtolower($product->name ?? ''))
 
-@push('styles')
-    {{-- Font Awesome 6 untuk mengganti emoji --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+@push('seo')
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "{{ $product->name }}",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web, Cloud-based",
+    "description": "{{ $product->short_description ?? $product->name . ' dari COOCA.ID' }}",
+    "url": "{{ url()->current() }}",
+    "offers": {
+        "@type": "Offer",
+        "price": "{{ $product->base_price ?? '499000' }}",
+        "priceCurrency": "IDR",
+        "availability": "https://schema.org/InStock"
+    },
+    "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "128"
+    }
+}
+</script>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Beranda",
+            "item": "{{ url('/') }}"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Produk",
+            "item": "{{ route('products.index') }}"
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "{{ $product->name }}",
+            "item": "{{ url()->current() }}"
+        }
+    ]
+}
+</script>
 @endpush
 
 @section('content')
@@ -426,10 +473,10 @@
             <div class="cta-section">
                 <div class="cta-glow"></div>
                 <h2 class="cta-title">Siap Mencoba {{ $product->name }}?</h2>
-                <p class="cta-desc">Mulai ujicoba gratis 14 hari tanpa perlu kartu kredit. Setup dibantu tim ahli kami.</p>
+                <p class="cta-desc">Mulai ujicoba gratis 14 hari dengan akses fitur lengkap. Setup instan dibantu tim ahli kami.</p>
                 <div class="cta-actions">
                     <a href="{{ route('customer.register') }}" class="btn-white">
-                        <i class="fa-solid fa-rocket"></i> Coba Gratis 14 Hari
+                        <i class="fa-solid fa-rocket"></i> Mulai Sekarang - Gratis
                     </a>
                     <a href="{{ route('contact') }}" class="btn-white-outline">
                         <i class="fa-solid fa-phone"></i> Minta Demo

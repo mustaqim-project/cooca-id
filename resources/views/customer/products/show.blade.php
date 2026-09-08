@@ -9,7 +9,7 @@
 @section('content')
     @php
         $customer = auth('customer')->user();
-        $waNumber = setting('contact.whatsapp', '6282134566667');
+        $waNumber = setting('contact.whatsapp', '6282337499577');
         $isCustom = in_array($product->product_type, ['custom_dev', 'project', 'maintenance']);
         $waMsg = urlencode('Halo COOCA.ID, saya ingin info lebih lanjut tentang produk ' . $product->name);
 

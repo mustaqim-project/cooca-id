@@ -1,8 +1,69 @@
 @extends('layouts.public')
 
-@section('title', 'Pusat Bantuan & FAQ Sistem | COOCA.ID')
-@section('description', 'Pertanyaan umum seputar integrasi sistem, laporan real-time, lisensi, dan keamanan data di COOCA.ID untuk mendukung keputusan bisnis Anda.')
-@section('keywords', 'faq cooca id, lisensi software cooca, bantuan teknis cooca, laporan real time cooca, keamanan data software')
+@section('title', 'FAQ & Pusat Bantuan ERP | Pertanyaan Seputar COOCA.ID')
+@section('description', 'Jawaban lengkap seputar setup ERP, keamanan data, harga, integrasi cabang, dan garansi 14 hari COOCA.ID. Temukan solusi untuk bisnis Anda di sini.')
+@section('keywords', 'faq erp indonesia, pertanyaan software bisnis, bantuan teknis erp, onboarding erp, keamanan data cloud bisnis, biaya erp bulanan, cooca faq')
+
+@push('seo')
+<link rel="canonical" href="{{ url('/faq') }}">
+<meta name="robots" content="index, follow">
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "Apakah saya perlu instalasi hardware khusus?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Tidak. COOCA.ID sepenuhnya cloud-based dan dapat diakses dari browser mana saja (laptop, tablet, HP Android/iOS). Anda cukup memiliki koneksi internet."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Berapa lama proses onboarding dan setup awal?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Setup akun selesai secara otomatis dalam hitungan menit. Konfigurasi awal dan pendampingan tim kami biasanya membutuhkan 1x24 jam kerja."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Apakah data bisnis kami terjamin keamanannya?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sangat terjamin. Data disimpan dengan enkripsi kelas bank (AES-256), arsitektur multi-tenant terisolasi, backup harian otomatis, dan jaminan Uptime SLA 99.9%."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Bagaimana jika cabang atau bisnis kami bertambah?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Platform COOCA.ID sangat modular. Anda dapat menambah cabang, kasir, atau modul baru kapan saja dari dashboard tanpa perlu instalasi ulang."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Apakah ada garansi jika produk tidak sesuai?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Kami menyediakan uji coba gratis 14 hari penuh tanpa perlu kartu kredit. Anda dapat menguji semua fitur secara langsung sebelum memutuskan berlangganan."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Metode pembayaran apa saja yang didukung?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Kami mendukung transfer bank, QRIS, e-wallet (GoPay, OVO, ShopeePay), kartu kredit/debit, serta opsi invoicing bulanan untuk paket Enterprise."
+            }
+        }
+    ]
+}
+</script>
+@endpush
 
 @section('content')
 
@@ -12,9 +73,9 @@
         <div style="text-align: center; max-width: 640px; margin: 0 auto;">
             <span class="lp-eyebrow">PUSAT BANTUAN</span>
             <h1 class="lp-heading reveal" style="font-size: clamp(40px,5vw,56px); margin-bottom: 16px;">
-                Pertanyaan yang <span class="gradient-text">Sering Ditanyakan</span>
+                FAQ & Pusat Bantuan <span class="gradient-text">ERP COOCA.ID</span>
             </h1>
-            <p class="lp-subheading reveal" style="margin: 0 auto;">Semua hal yang perlu Anda ketahui tentang COOCA.ID platform ERP.</p>
+            <p class="lp-subheading reveal" style="margin: 0 auto;">Jawaban lengkap seputar setup, harga, keamanan data, dan integrasi cabang platform ERP COOCA.ID.</p>
         </div>
     </div>
 </section>

@@ -1,8 +1,8 @@
 @extends('layouts.public')
 
-@section('title', 'Tentang Kami - Move Faster. Decide Better | COOCA.ID')
-@section('description', 'Pelajari bagaimana COOCA.ID membantu pengusaha bergerak lebih cepat dan mengambil keputusan lebih baik melalui teknologi software bisnis tepercaya.')
-@section('keywords', 'tentang cooca id, profil perusahaan cooca, move faster decide better cooca, developer software bisnis, perusahaan saas indonesia')
+@section('title', 'Tentang Kami: Visi 2030 untuk ERP #1 Indonesia')
+@section('description', 'COOCA.ID: platform ERP Indonesia ber visi 2030 jadi solusi #1 dengan 100.000+ bisnis. Dari Indonesia, untuk UMKM Indonesia.')
+@section('keywords', 'tentang COOCA ID Indonesia, visi COOCA 2030, sejarah COOCA Indonesia, company profile ERP Indonesia, tim COOCA founder, misi digitalisasi UMKM')
 
 @section('content')
 
@@ -11,8 +11,8 @@
     <div class="lp-container">
         <div style="text-align: center; max-width: 760px; margin: 0 auto;">
             <span class="lp-eyebrow">TENTANG KAMI</span>
-            <h1 class="lp-heading reveal" style="font-size: clamp(40px, 6vw, 64px); margin-bottom: 20px;">
-                Kami Membangun <span class="gradient-text">Masa Depan</span><br>Bisnis Indonesia
+            <h1 class="lp-heading reveal" style="font-size: clamp(38px, 6vw, 62px); margin-bottom: 20px;">
+                Membangun <span class="gradient-text">Masa Depan</span><br>Bisnis Indonesia
             </h1>
             <p class="lp-subheading reveal" style="margin: 0 auto 40px; max-width: 560px;">
                 COOCA.ID adalah platform ERP enterprise yang dirancang dari Indonesia, untuk bisnis Indonesia — dari UMKM hingga perusahaan multinasional.

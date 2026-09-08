@@ -36,8 +36,8 @@
                         <span>{{ $siteName }}</span>
                     @endif
                 </a>
-                <h1 style="font-size: 22px; font-weight: 800; color: var(--text); margin-top: 16px; margin-bottom: 4px;">Mulai Coba Gratis 14 Hari</h1>
-                <p style="font-size: 14px; color: var(--text-muted);">Tanpa kartu kredit · Setup instan 24 jam</p>
+                <h1 style="font-size: 22px; font-weight: 800; color: var(--text); margin-top: 16px; margin-bottom: 4px;">Mulai Sekarang - Gratis</h1>
+                <p style="font-size: 14px; color: var(--text-muted);">Uji coba gratis 14 hari · Setup instan 24 jam</p>
             </div>
 
             {{-- Validation Errors --}}
