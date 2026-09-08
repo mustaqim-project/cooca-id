@@ -9,7 +9,7 @@
 <meta name="robots" content="index, follow">
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Program Partner & Afiliasi COOCA.ID",
     "description": "Program afiliasi 2 level COOCA.ID: komisi 25% Level 1 dan 5% Level 2 dari setiap pembayaran bulanan. Daftar gratis untuk konsultan, agensi, dan komunitas bisnis Indonesia.",

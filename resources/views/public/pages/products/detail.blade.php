@@ -4,10 +4,14 @@
 @section('description', ($product->short_description ?? 'Solusi ERP ' . ($product->name ?? '') . ' dari COOCA.ID') . ' Setup 24 jam, support 24/7, SLA 99.9%. Mulai gratis 14 hari.')
 @section('keywords', strtolower($product->name ?? 'erp') . ', erp ' . strtolower($product->category->name ?? 'bisnis') . ' indonesia, software ' . strtolower($product->category->name ?? 'bisnis') . ' multi-cabang, cooca.id ' . strtolower($product->name ?? ''))
 
+@section('og_title', ($product->name ?? 'Detail Produk') . ' — COOCA.ID')
+@section('og_description', $product->short_description ?? $product->name . ' dari COOCA.ID — Solusi ERP Enterprise.')
+@section('og_image', isset($product->thumbnail_url) && $product->thumbnail_url ? url($product->thumbnail_url) : asset('images/og-image.png'))
+
 @push('seo')
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "{{ $product->name }}",
     "applicationCategory": "BusinessApplication",
@@ -29,7 +33,7 @@
 </script>
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
         {
@@ -56,11 +60,6 @@
 @endpush
 
 @section('content')
-
-@section('og_title', ($product->name ?? 'Detail Produk') . ' — COOCA.ID')
-@section('og_description', $product->short_description ?? $product->name . ' dari COOCA.ID — Solusi ERP Enterprise.')
-@section('og_image', isset($product->thumbnail_url) && $product->thumbnail_url ? url($product->thumbnail_url) :
-    asset('images/og-image.png'))
 
     {{-- Product Header --}}
     <section class="aurora-bg page-hero">

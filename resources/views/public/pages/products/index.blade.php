@@ -9,7 +9,7 @@
 <meta name="robots" content="index, follow">
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "ItemList",
     "name": "Katalog Produk ERP COOCA.ID",
     "description": "Daftar lengkap produk ERP multi-industri COOCA.ID untuk Bengkel, Klinik, Restoran, Retail, dan Notaris.",
