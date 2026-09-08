@@ -2,9 +2,12 @@
 
 @section('title', 'ERP Multi-Industri untuk UMKM Indonesia · COOCA.ID')
 
-@section('description', 'COOCA.ID: ERP Multi-Industri untuk 1.000+ Bisnis Indonesia. Bengkel, Klinik, Resto, Retail, Jasa. Setup 24 jam. Coba gratis 14 hari.')
+@section('description', 'COOCA.ID: ERP Multi-Industri untuk 1.000+ Bisnis Indonesia. Bengkel, Klinik, Resto, Retail,
+    Jasa. Setup 24 jam. Coba gratis 14 hari.')
 
-@section('keywords', 'ERP multi-industri untuk UMKM Indonesia, software ERP Indonesia, software bisnis Indonesia, ERP terbaik Indonesia 2026, software kasir multi-cabang, sistem operasi bisnis, ERP untuk usaha berkembang, ERP UMKM Indonesia, aplikasi ERP Indonesia')
+@section('keywords', 'ERP multi-industri untuk UMKM Indonesia, software ERP Indonesia, software bisnis Indonesia, ERP
+    terbaik Indonesia 2026, software kasir multi-cabang, sistem operasi bisnis, ERP untuk usaha berkembang, ERP UMKM
+    Indonesia, aplikasi ERP Indonesia')
 
 
 @section('content')
@@ -25,14 +28,17 @@
 
 
                     {{-- Tagline & Headline --}}
-                    <p class="hero-tagline" style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px;">Move Faster. Decide Better.</p>
+                    <p class="hero-tagline"
+                        style="font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px;">
+                        Move Faster. Decide Better.</p>
                     <h1 class="hero-title" id="hero-heading">
                         ERP Multi-Industri<br>
                         untuk <span class="highlight">UMKM Indonesia</span>
                     </h1>
 
                     <p class="hero-desc">
-                        Kelola Bengkel, Klinik, Restoran, Retail & Notaris dari satu platform ERP terpadu. Setup instan 24 jam.
+                        Kelola Bengkel, Klinik, Restoran, Retail & Notaris dari satu platform ERP terpadu. Setup instan 24
+                        jam.
                     </p>
 
                     {{-- CTAs --}}
@@ -249,103 +255,127 @@
     {{-- ═══════════════════════════════════════════════════
      ERP ECOSYSTEM — BENTO GRID
 ═══════════════════════════════════════════════════ --}}
-<section class="lp-section section-bg-alt" id="ecosystem" aria-labelledby="ecosystem-heading">
-    <div class="lp-container">
-        <div class="lp-section-header reveal">
-            <span class="lp-eyebrow">EKOSISTEM COOCA</span>
-            <h2 class="lp-heading" id="ecosystem-heading">
-                Ekosistem ERP Modular<br>
-                <span class="gradient-text">Terintegrasi Penuh</span>
-            </h2>
-            <p class="lp-subheading">Dirancang khusus untuk berbagai jenis bisnis di Indonesia dengan standar enterprise tinggi</p>
+    <section class="lp-section section-bg-alt" id="ecosystem" aria-labelledby="ecosystem-heading">
+        <div class="lp-container">
+            <div class="lp-section-header reveal">
+                <span class="lp-eyebrow">EKOSISTEM COOCA</span>
+                <h2 class="lp-heading" id="ecosystem-heading">
+                    Ekosistem ERP Modular<br>
+                    <span class="gradient-text">Terintegrasi Penuh</span>
+                </h2>
+                <p class="lp-subheading">Dirancang khusus untuk berbagai jenis bisnis di Indonesia dengan standar
+                    enterprise tinggi</p>
+            </div>
+
+            <div class="bento-grid">
+                <div class="bento-card reveal reveal-delay-1">
+                    <div class="bento-icon"><i class="fa-solid fa-utensils"></i></div>
+                    <h3 class="bento-title">ERP Restoran &amp; F&amp;B</h3>
+                    <p class="bento-desc">POS meja, manajemen dapur, QR Table, kitchen display system, laporan harian
+                        otomatis, dan manajemen bahan baku.</p>
+                    <div class="bento-tags">
+                        <span class="bento-tag">POS Meja</span>
+                        <span class="bento-tag">QR Order</span>
+                        <span class="bento-tag">Kitchen</span>
+                        <span class="bento-tag">Struk Digital</span>
+                    </div>
+                    <a href="{{ route('products.index') }}" class="bento-link">
+                        Lihat Fitur Restoran
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="bento-card reveal reveal-delay-2">
+                    <div class="bento-icon"><i class="fa-solid fa-hospital"></i></div>
+                    <h3 class="bento-title">ERP Klinik &amp; Medis</h3>
+                    <p class="bento-desc">Rekam medis digital, antrian pasien otomatis, manajemen dokter, billing, dan
+                        terintegrasi WhatsApp &amp; resep digital.</p>
+                    <div class="bento-tags">
+                        <span class="bento-tag">EMR</span>
+                        <span class="bento-tag">Antrian</span>
+                        <span class="bento-tag">Resep Digital</span>
+                    </div>
+                    <a href="{{ route('products.index') }}" class="bento-link">
+                        Selengkapnya
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="bento-card reveal reveal-delay-3">
+                    <div class="bento-icon"><i class="fa-solid fa-wrench"></i></div>
+                    <h3 class="bento-title">ERP Bengkel &amp; Otomotif</h3>
+                    <p class="bento-desc">Work order digital, manajemen sparepart, tracking servis kendaraan, kasir teknisi
+                        &amp; laporan produktivitas.</p>
+                    <div class="bento-tags">
+                        <span class="bento-tag">Work Order</span>
+                        <span class="bento-tag">Sparepart</span>
+                        <span class="bento-tag">Telford</span>
+                    </div>
+                    <a href="{{ route('products.index') }}" class="bento-link">
+                        Selengkapnya
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="bento-card bento-wide reveal reveal-delay-1">
+                    <div class="bento-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <h3 class="bento-title">ERP Legal &amp; Notaris</h3>
+                    <p class="bento-desc">Manajemen dokumen legal, tracking klien &amp; akta, pembuatan surat otomatis, dan
+                        arsip digital berstandar hukum.</p>
+                    <div class="bento-tags">
+                        <span class="bento-tag">Akta</span>
+                        <span class="bento-tag">Finance</span>
+                        <span class="bento-tag">Dokumen</span>
+                    </div>
+                    <a href="{{ route('products.index') }}" class="bento-link">
+                        Selengkapnya
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="bento-card reveal reveal-delay-2">
+                    <div class="bento-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <h3 class="bento-title">Sistem Booking &amp; Reservasi</h3>
+                    <p class="bento-desc">Portal booking mandiri, konfirmasi otomatis via WhatsApp, manajemen jadwal
+                        multi-outlet yang terintegrasi.</p>
+                    <div class="bento-tags">
+                        <span class="bento-tag">Online</span>
+                        <span class="bento-tag">WhatsApp</span>
+                        <span class="bento-tag">Kalender</span>
+                    </div>
+                    <a href="{{ route('products.index') }}" class="bento-link">Lihat Katalog →</a>
+                </div>
+
+                <div class="bento-card bento-featured reveal reveal-delay-3">
+                    <div class="bento-icon"
+                        style="background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.2);"><i
+                            class="fa-solid fa-cloud"></i></div>
+                    <div
+                        style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.7); margin-bottom:8px;">
+                        Enterprise Ready</div>
+                    <h3 class="bento-title" style="color:#fff;">Cloud Infrastructure</h3>
+                    <p class="bento-desc" style="color:rgba(255,255,255,.8);">Infrastruktur cloud enterprise,
+                        auto-scaling, 99.9% uptime, auto-backup &amp; disaster recovery.</p>
+                    <a href="{{ route('about') }}" class="bento-link"
+                        style="color:rgba(255,255,255,.9); margin-top:20px;">
+                        Learn More →
+                    </a>
+                </div>
+            </div>
         </div>
-
-        <div class="bento-grid">
-            <div class="bento-card reveal reveal-delay-1">
-                <div class="bento-icon"><i class="fa-solid fa-utensils"></i></div>
-                <h3 class="bento-title">ERP Restoran &amp; F&amp;B</h3>
-                <p class="bento-desc">POS meja, manajemen dapur, QR Table, kitchen display system, laporan harian otomatis, dan manajemen bahan baku.</p>
-                <div class="bento-tags">
-                    <span class="bento-tag">POS Meja</span>
-                    <span class="bento-tag">QR Order</span>
-                    <span class="bento-tag">Kitchen</span>
-                    <span class="bento-tag">Struk Digital</span>
-                </div>
-                <a href="{{ route('products.index') }}" class="bento-link">
-                    Lihat Fitur Restoran
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </a>
-            </div>
-
-            <div class="bento-card reveal reveal-delay-2">
-                <div class="bento-icon"><i class="fa-solid fa-hospital"></i></div>
-                <h3 class="bento-title">ERP Klinik &amp; Medis</h3>
-                <p class="bento-desc">Rekam medis digital, antrian pasien otomatis, manajemen dokter, billing, dan terintegrasi WhatsApp &amp; resep digital.</p>
-                <div class="bento-tags">
-                    <span class="bento-tag">EMR</span>
-                    <span class="bento-tag">Antrian</span>
-                    <span class="bento-tag">Resep Digital</span>
-                </div>
-                <a href="{{ route('products.index') }}" class="bento-link">
-                    Selengkapnya
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </a>
-            </div>
-
-            <div class="bento-card reveal reveal-delay-3">
-                <div class="bento-icon"><i class="fa-solid fa-wrench"></i></div>
-                <h3 class="bento-title">ERP Bengkel &amp; Otomotif</h3>
-                <p class="bento-desc">Work order digital, manajemen sparepart, tracking servis kendaraan, kasir teknisi &amp; laporan produktivitas.</p>
-                <div class="bento-tags">
-                    <span class="bento-tag">Work Order</span>
-                    <span class="bento-tag">Sparepart</span>
-                    <span class="bento-tag">Telford</span>
-                </div>
-                <a href="{{ route('products.index') }}" class="bento-link">
-                    Selengkapnya
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </a>
-            </div>
-
-            <div class="bento-card bento-wide reveal reveal-delay-1">
-                <div class="bento-icon"><i class="fa-solid fa-scale-balanced"></i></div>
-                <h3 class="bento-title">ERP Legal &amp; Notaris</h3>
-                <p class="bento-desc">Manajemen dokumen legal, tracking klien &amp; akta, pembuatan surat otomatis, dan arsip digital berstandar hukum.</p>
-                <div class="bento-tags">
-                    <span class="bento-tag">Akta</span>
-                    <span class="bento-tag">Finance</span>
-                    <span class="bento-tag">Dokumen</span>
-                </div>
-                <a href="{{ route('products.index') }}" class="bento-link">
-                    Selengkapnya
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </a>
-            </div>
-
-            <div class="bento-card reveal reveal-delay-2">
-                <div class="bento-icon"><i class="fa-solid fa-calendar-days"></i></div>
-                <h3 class="bento-title">Sistem Booking &amp; Reservasi</h3>
-                <p class="bento-desc">Portal booking mandiri, konfirmasi otomatis via WhatsApp, manajemen jadwal multi-outlet yang terintegrasi.</p>
-                <div class="bento-tags">
-                    <span class="bento-tag">Online</span>
-                    <span class="bento-tag">WhatsApp</span>
-                    <span class="bento-tag">Kalender</span>
-                </div>
-                <a href="{{ route('products.index') }}" class="bento-link">Lihat Katalog →</a>
-            </div>
-
-            <div class="bento-card bento-featured reveal reveal-delay-3">
-                <div class="bento-icon" style="background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.2);"><i class="fa-solid fa-cloud"></i></div>
-                <div style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.7); margin-bottom:8px;">Enterprise Ready</div>
-                <h3 class="bento-title" style="color:#fff;">Cloud Infrastructure</h3>
-                <p class="bento-desc" style="color:rgba(255,255,255,.8);">Infrastruktur cloud enterprise, auto-scaling, 99.9% uptime, auto-backup &amp; disaster recovery.</p>
-                <a href="{{ route('about') }}" class="bento-link" style="color:rgba(255,255,255,.9); margin-top:20px;">
-                    Learn More →
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
     {{-- ═══════════════════════════════════════════════════
      PRODUCT SHOWCASE — Dynamic from DB
@@ -469,16 +499,16 @@
                                         <div class="product-pricing-glass-card">
                                             {{-- Strikethrough Normal Price & Discount Pill --}}
                                             @if ($discount > 0)
-                                            <div class="product-pricing-top-meta">
-                                                <span class="product-anchor-text">
-                                                    Harga Normal <del class="product-anchor-del">Rp
-                                                        {{ number_format($origPrice, 0, ',', '.') }}</del>
-                                                </span>
-                                                <span class="product-discount-pill">
-                                                    <i class="fa-solid fa-bolt"></i> HEMAT
-                                                    {{ number_format($discount, 0) }}%
-                                                </span>
-                                            </div>
+                                                <div class="product-pricing-top-meta">
+                                                    <span class="product-anchor-text">
+                                                        Harga Normal <del class="product-anchor-del">Rp
+                                                            {{ number_format($origPrice, 0, ',', '.') }}</del>
+                                                    </span>
+                                                    <span class="product-discount-pill">
+                                                        <i class="fa-solid fa-bolt"></i> HEMAT
+                                                        {{ number_format($discount, 0) }}%
+                                                    </span>
+                                                </div>
                                             @endif
 
                                             {{-- Main Hero Price Line --}}
@@ -645,16 +675,22 @@
      CROSS-BRAND UMKM REFERRAL BANNER
     ═══════════════════════════════════════════════════ --}}
     <section class="lp-container" style="margin-top: 24px; margin-bottom: 48px;">
-        <div class="reveal" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 20px; padding: 28px 36px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 20px;">
+        <div class="reveal"
+            style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 20px; padding: 28px 36px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 20px;">
             <div style="max-width: 700px;">
-                <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6366f1; margin-bottom: 8px;">
+                <div
+                    style="display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6366f1; margin-bottom: 8px;">
                     <i class="fa-solid fa-store"></i> PROGRAM KHUSUS UMKM
                 </div>
-                <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Baru Merintis Usaha Mandiri?</h3>
-                <p style="font-size: 14px; color: var(--text-muted); margin: 0; line-height: 1.5;">Gunakan versi dasar 100% GRATIS SELAMANYA di portal UMKM kami — lengkap dengan POS kasir, inventaris, dan kalkulator HPP tanpa biaya.</p>
+                <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 6px;">Baru Merintis Usaha
+                    Mandiri?</h3>
+                <p style="font-size: 14px; color: var(--text-muted); margin: 0; line-height: 1.5;">Gunakan versi dasar 100%
+                    GRATIS SELAMANYA di portal UMKM kami — lengkap dengan POS kasir, inventaris, dan kalkulator HPP tanpa
+                    biaya.</p>
             </div>
             <div>
-                <a href="https://umkm.cooca.id" target="_blank" rel="noopener noreferrer" class="btn-primary-glow" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 12px 24px; border-radius: 12px; white-space: nowrap; text-decoration: none;">
+                <a href="https://umkm.cooca.id" target="_blank" rel="noopener noreferrer" class="btn-primary-glow"
+                    style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 12px 24px; border-radius: 12px; white-space: nowrap; text-decoration: none;">
                     <span>Coba Portal UMKM Gratis</span>
                     <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i>
                 </a>
@@ -983,236 +1019,7 @@
         </div>
     </section>
 
-    {{-- ═══════════════════════════════════════════════════
-     PRICING SECTION — Psychological Pricing & Conversion Focus
-═══════════════════════════════════════════════════ --}}
-    <section class="lp-section" id="pricing" aria-labelledby="pricing-heading"
-        style="position: relative; overflow: hidden;">
-        <div class="lp-container">
-            {{-- Section Header with Marketing Psychology Narrative --}}
-            <div class="lp-section-header reveal" style="max-width: 820px; margin: 0 auto 56px; text-align: center;">
-                <div
-                    style="display: inline-flex; align-items: center; gap: 8px; background: rgba(79,70,229,.1); border: 1px solid rgba(79,70,229,.25); padding: 6px 16px; border-radius: 999px; font-size: 11.5px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px;">
-                    <i class="fa-solid fa-tags"></i> PENAWARAN SPESIAL TERBATAS
-                </div>
-                <h2 class="lp-heading" id="pricing-heading"
-                    style="font-size: clamp(32px, 5vw, 48px); margin-bottom: 16px; line-height: 1.2;">
-                    Kelola Bisnis Lebih Mudah dalam <span class="gradient-text">Satu Sistem</span>
-                </h2>
-                <p class="lp-subheading"
-                    style="font-size: 17px; color: var(--text-muted); line-height: 1.7; margin: 0 auto;">
-                    COOCA membantu bisnis Anda mengelola operasional, data, dan proses kerja dalam satu platform yang
-                    terintegrasi.
-                </p>
-            </div>
 
-            {{-- Pricing Grid (3-Tier Layout matching Reference Mockup: 6 Bulan, Tahunan, Bulanan) --}}
-            <div class="cooca-pricing-grid reveal">
-
-                {{-- 1. 6 Bulan Tier (Left - Theme Blue) --}}
-                <div class="cooca-card theme-blue reveal reveal-delay-1">
-                    {{-- Diagonal Ribbon --}}
-                    <div class="corner-ribbon-wrap">
-                        <div class="corner-ribbon corner-ribbon-blue">
-                            HEMAT<br>30%
-                        </div>
-                    </div>
-
-                    <div>
-                        <span class="cooca-badge-duration badge-duration-blue">6 BULAN</span>
-                    </div>
-                    <h3 class="cooca-tier-title">6 Bulan</h3>
-
-                    {{-- Normal Price Strikethrough --}}
-                    <div class="cooca-normal-price-row">
-                        <span>Harga Normal</span>
-                        <del class="cooca-normal-del">Rp5.328.000</del>
-                    </div>
-
-                    {{-- Price Box --}}
-                    <div class="cooca-hero-price-box">
-                        <div class="cooca-main-price-line">
-                            <span class="currency">Rp</span>
-                            <span class="amount">3.729.600</span>
-                            <span class="period">/ 6 bln</span>
-                        </div>
-
-                        <div class="cooca-savings-box savings-box-blue">
-                            <div class="cooca-savings-left">
-                                <i class="fa-solid fa-tags"></i>
-                                <span>Anda hemat Rp 1.598.400</span>
-                            </div>
-                            <i class="fa-solid fa-circle-check cooca-savings-check"></i>
-                        </div>
-
-                        <div class="cooca-urgency-row">
-                            <i class="fa-solid fa-bolt"></i>
-                            <span>Harga promo onboarding terbatas</span>
-                        </div>
-                    </div>
-
-                    {{-- Features List --}}
-                    <ul class="cooca-feature-list">
-                        <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Akses penuh modul Cooca ERP &amp;
-                                POS</span></li>
-                        <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Dukungan teknis prioritas 24/7</span>
-                        </li>
-                        <li><i class="fa-solid fa-circle-check icon-blue"></i> <span>Free update &amp; cloud backup
-                                otomatis</span></li>
-                    </ul>
-
-                    <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-blue">
-                        Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                {{-- 2. Tahunan Tier (Center - Featured Most Popular - Theme Purple) --}}
-                <div class="cooca-card theme-purple reveal reveal-delay-2">
-                    {{-- Most Popular Floating Badge --}}
-                    <div class="cooca-floating-badge">
-                        <i class="fa-solid fa-star"></i> MOST POPULAR • REKOMENDASI
-                    </div>
-
-                    {{-- Diagonal Gold Ribbon --}}
-                    <div class="corner-ribbon-wrap">
-                        <div class="corner-ribbon corner-ribbon-gold">
-                            HEMAT<br>35%
-                        </div>
-                    </div>
-
-                    <div>
-                        <span class="cooca-badge-duration badge-duration-purple">12 BULAN</span>
-                    </div>
-                    <h3 class="cooca-tier-title">Tahunan</h3>
-
-                    {{-- Normal Price Strikethrough --}}
-                    <div class="cooca-normal-price-row">
-                        <span>Harga Normal</span>
-                        <del class="cooca-normal-del">Rp10.656.000</del>
-                    </div>
-
-                    {{-- Main Price Box with Gold Crown --}}
-                    <div class="cooca-hero-price-box">
-                        <i class="fa-solid fa-crown cooca-price-crown"></i>
-
-                        <div class="cooca-main-price-line">
-                            <span class="currency">Rp</span>
-                            <span class="amount">6.926.400</span>
-                            <span class="period">/ tahun</span>
-                        </div>
-
-                        <div class="cooca-savings-box savings-box-purple">
-                            <div class="cooca-savings-left">
-                                <i class="fa-solid fa-tags"></i>
-                                <span>Anda hemat Rp 3.729.600</span>
-                            </div>
-                            <i class="fa-solid fa-circle-check cooca-savings-check"></i>
-                        </div>
-
-                        <div class="cooca-urgency-row">
-                            <i class="fa-solid fa-bolt"></i>
-                            <span>Harga promo onboarding terbatas</span>
-                        </div>
-                    </div>
-
-                    {{-- Features List --}}
-                    <ul class="cooca-feature-list">
-                        <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Akses penuh seluruh modul Cooca ERP
-                                &amp; POS</span></li>
-                        <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Dukungan teknis prioritas
-                                24/7</span></li>
-                        <li><i class="fa-solid fa-circle-check icon-purple"></i> <span>Free update &amp; cloud backup
-                                otomatis</span></li>
-                    </ul>
-
-                    <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-purple-glow">
-                        Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                {{-- 3. Bulanan Tier (Right - Theme Green) --}}
-                <div class="cooca-card theme-green reveal reveal-delay-3">
-                    {{-- Diagonal Ribbon --}}
-                    <div class="corner-ribbon-wrap">
-                        <div class="corner-ribbon corner-ribbon-green">
-                            HEMAT<br>18%
-                        </div>
-                    </div>
-
-                    <div>
-                        <span class="cooca-badge-duration badge-duration-green">1 BULAN</span>
-                    </div>
-                    <h3 class="cooca-tier-title">Bulanan</h3>
-
-                    {{-- Normal Price Strikethrough --}}
-                    <div class="cooca-normal-price-row">
-                        <span>Harga Normal</span>
-                        <del class="cooca-normal-del">Rp888.000</del>
-                    </div>
-
-                    {{-- Price Box --}}
-                    <div class="cooca-hero-price-box">
-                        <div class="cooca-main-price-line">
-                            <span class="currency">Rp</span>
-                            <span class="amount">728.160</span>
-                            <span class="period">/ bulan</span>
-                        </div>
-
-                        <div class="cooca-savings-box savings-box-green">
-                            <div class="cooca-savings-left">
-                                <i class="fa-solid fa-tags"></i>
-                                <span>Anda hemat Rp 159.840</span>
-                            </div>
-                            <i class="fa-solid fa-circle-check cooca-savings-check"></i>
-                        </div>
-
-                        <div class="cooca-urgency-row">
-                            <i class="fa-solid fa-bolt"></i>
-                            <span>Harga promo onboarding terbatas</span>
-                        </div>
-                    </div>
-
-                    {{-- Features List --}}
-                    <ul class="cooca-feature-list">
-                        <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Akses penuh modul Cooca ERP &amp;
-                                POS</span></li>
-                        <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Dukungan teknis prioritas 24/7</span>
-                        </li>
-                        <li><i class="fa-solid fa-circle-check icon-green"></i> <span>Free update &amp; cloud backup
-                                otomatis</span></li>
-                    </ul>
-
-                    <a href="{{ route('customer.register') }}" class="cooca-btn cooca-btn-green">
-                        Pilih Paket Ini <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-
-            </div>
-
-            {{-- Bottom Trust Bar --}}
-            <div class="cooca-trust-bar reveal" style="margin-top: 10px;">
-                <div class="cooca-trust-item">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <span>Aman &amp; Terpercaya</span>
-                </div>
-                <span>•</span>
-                <div class="cooca-trust-item">
-                    <i class="fa-solid fa-cloud"></i>
-                    <span>Cloud Backup</span>
-                </div>
-                <span>•</span>
-                <div class="cooca-trust-item">
-                    <i class="fa-solid fa-headset"></i>
-                    <span>Support 24/7</span>
-                </div>
-                <span>•</span>
-                <div class="cooca-trust-item">
-                    <i class="fa-solid fa-rotate"></i>
-                    <span>Free Update</span>
-                </div>
-            </div>
-        </div>
-    </section>
 
     {{-- ═══════════════════════════════════════════════════
      TESTIMONIALS — Dynamic from DB
