@@ -160,24 +160,6 @@
                         @endif
                     </div>
                     <div class="product-card-pricing-wrap">
-                                    $origPrice = $rawPrice;
-                                    $finalPrice = $origPrice * (1 - $planDiscount / 100);
-                                    $discount = $planDiscount;
-                                } else {
-                                    $finalPrice = $rawPrice;
-                                    $origPrice = $rawPrice * 2;
-                                    $discount = 50;
-                                }
-                                $period = $lowestPlan->duration_months >= 999 ? '/ Lifetime' : ($lowestPlan->duration_months == 1 ? '/ bulan' : '/' . $lowestPlan->duration_months . ' bln');
-                            } else {
-                                $base = (float)($product->base_price ?? 350000);
-                                $finalPrice = $base > 0 ? $base : 350000;
-                                $origPrice = $finalPrice * 2;
-                                $discount = 50;
-                                $period = '/ bulan';
-                            }
-                            $savings = $origPrice - $finalPrice;
-                        @endphp
 
                         @if($origPrice > 0 || $finalPrice > 0)
                             <div class="product-pricing-glass-card">
