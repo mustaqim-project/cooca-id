@@ -2,10 +2,12 @@
 
 @section('title', 'ERP Multi-Industri untuk UMKM Indonesia · COOCA.ID')
 
-@section('description', 'COOCA.ID: ERP Multi-Industri untuk 1.000+ Bisnis Indonesia. Bengkel, Klinik, Resto, Retail,
+@section('description',
+    'COOCA.ID: ERP Multi-Industri untuk 1.000+ Bisnis Indonesia. Bengkel, Klinik, Resto, Retail,
     Jasa. Setup 24 jam. Coba gratis 14 hari.')
 
-@section('keywords', 'ERP multi-industri untuk UMKM Indonesia, software ERP Indonesia, software bisnis Indonesia, ERP
+@section('keywords',
+    'ERP multi-industri untuk UMKM Indonesia, software ERP Indonesia, software bisnis Indonesia, ERP
     terbaik Indonesia 2026, software kasir multi-cabang, sistem operasi bisnis, ERP untuk usaha berkembang, ERP UMKM
     Indonesia, aplikasi ERP Indonesia')
 
@@ -57,13 +59,13 @@
                             <i class="fa-solid fa-wand-magic-sparkles" style="color: #6366f1;"></i>
                             AI-Powered ERP
                         </div>
-                        <div class="trust-badge-item">
+                        {{-- <div class="trust-badge-item">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                                 <path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.1 4.4 12l.7-4L2.2 5.2l4-.6L8 1z"
                                     fill="#22C55E" />
                             </svg>
                             SOC2 Ready
-                        </div>
+                        </div> --}}
                         <div class="trust-badge-item">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                                 <path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.1 4.4 12l.7-4L2.2 5.2l4-.6L8 1z"
